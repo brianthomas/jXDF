@@ -31,6 +31,7 @@ package gov.nasa.gsfc.adc.xdf;
 
 // Import Java stuff
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -242,9 +243,10 @@ class XDFSaxDocumentHandler implements DocumentHandler {
     private Hashtable endElementHandlerHashtable;   // end node handler
 
     // References to the current working structure/array
-    private gov.nasa.gsfc.adc.xdf.Structure currentStructure;   
-    private gov.nasa.gsfc.adc.xdf.Array     currentArray;   
-    private String currentDatatypeObject;
+    private gov.nasa.gsfc.adc.xdf.Structure CurrentStructure;   
+    private gov.nasa.gsfc.adc.xdf.Array     CurrentArray;   
+    private String CurrentDatatypeObject;
+    private ArrayList CurrentNodePath = new ArrayList();
 
     // lookup tables holding objects that have id/idref stuff
     private Hashtable AxisObj = new Hashtable();
@@ -347,7 +349,7 @@ class XDFSaxDocumentHandler implements DocumentHandler {
         
 
         // add "element" to current path (??) 
-        // push @CURRENT_NODE_PATH, $element
+        CurrentNodePath.add(element); 
 
         // if a handler exists, run it, else give a warning
         if ( startElementHandlerHashtable.containsKey(element) ) {
@@ -368,10 +370,10 @@ class XDFSaxDocumentHandler implements DocumentHandler {
 
         Log.debugln("H_END:["+element+"]");
 
-       // peel off the last element in the current path
-       // my $last_element = pop @CURRENT_NODE_PATH;
+        // peel off the last element in the current path
+        CurrentNodePath.remove(CurrentNodePath.size()-1); 
 
-       // if a handler exists, run it, else give a warning
+        // if a handler exists, run it, else give a warning
         if ( endElementHandlerHashtable.containsKey(element) ) {
 
            // run the appropriate start handler
@@ -407,7 +409,7 @@ class XDFSaxDocumentHandler implements DocumentHandler {
         // use it, and currently most SAX nonvalidating ones will
         // also; but nonvalidating parsers might hardly use it,
         // depending on the DTD structure.
-        Log.debugln("Whitespace BUF:["+buf+"] OFFSET:["+ offset+"] LEN:["+len+"]");
+       // Log.debugln("Whitespace BUF:["+buf+"] OFFSET:["+ offset+"] LEN:["+len+"]");
     }
 
     public void processingInstruction(String target, String data)
@@ -468,19 +470,109 @@ class XDFSaxDocumentHandler implements DocumentHandler {
 
        startElementHandlerHashtable.put(XDFNodeName.ARRAY, new arrayStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.AXIS, new axisStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.AXISUNITS, new axisUnitsStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.BINARYFLOAT, new binaryFloatFieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.BINARYINTEGER, new binaryIntegerFieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.DATA, new dataStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.DATAFORMAT, new dataFormatStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.EXPONENT, new exponentFieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.FIELD, new fieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.FIELDAXIS, new fieldAxisStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.FIELDRELATIONSHIP, new fieldRelationshipStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.FIXED, new fixedFieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.FORNODE, new forStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.FIELDGROUP, new fieldGroupStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.INDEX, new noteIndexStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.INTEGER, new integerFieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.LOCATIONORDER, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.NOTE, new noteStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.NOTES, new notesStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.PARAMETER, new parameterStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.PARAMETERGROUP, new parameterGroupStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.READ, new readStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.READCELL, new readCellStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.REPEAT, new repeatStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.ROOT, new rootStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.SKIPCHAR, new skipCharStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.STRING, new stringFieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.STRUCTURE, new structureStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TAGTOAXIS, new tagToAxisStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TD0, new dataTagStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TD1, new dataTagStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TD2, new dataTagStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TD3, new dataTagStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TD4, new dataTagStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TD5, new dataTagStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TD6, new dataTagStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TD7, new dataTagStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TD8, new dataTagStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.TEXTDELIMITER, new asciiDelimiterStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.UNIT, new unitStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.UNITS, new unitsStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.UNITLESS, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.VALUE, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.VECTOR, new vectorStartElementHandlerFunc());
 
     }
 
     // 
     private void initCharDataHandlerHashtable () {
 
+       charDataHandlerHashtable.put(XDFNodeName.NOTE, new noteCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.UNIT, new unitCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.VALUE, new valueCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListCharDataHandlerFunc());
+
     }
 
     //
     private void initEndHandlerHashtable () {
 
-       // endElementHandlerHashtable.put(XDFNodeName.ARRAY, new arrayEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.DATA, new dataEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.FIELDGROUP, new fieldGroupEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.NOTES, new notesEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.READ, new readEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.REPEAT, new repeatEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.TD0, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.TD1, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.TD2, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.TD3, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.TD4, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.TD5, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.TD6, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.TD7, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.TD8, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupEndElementHandlerFunc());
+
+    }
+
+    // return the element before last 
+    private String getParentNodeName () {
+     
+       String parentNodeName = null;
+       int pathSize = CurrentNodePath.size(); 
+
+       if (pathSize > 1) {
+          parentNodeName = (String) CurrentNodePath.get((pathSize-2));
+       }
+
+       return parentNodeName;
+
+    }
+
+    // return 2 elements before last 
+    private String getGrandParentNodeName () {
+
+       String gParentNodeName = null;
+       int pathSize = CurrentNodePath.size();
+
+       if (pathSize > 2) {
+          gParentNodeName = (String) CurrentNodePath.get((pathSize-3));
+       }
+
+       return gParentNodeName;
 
     }
 
@@ -499,48 +591,48 @@ class XDFSaxDocumentHandler implements DocumentHandler {
        protected static final String AXIS = "axis";
        protected static final String AXISUNITS= "axisUnits";
        protected static final String BINARYFLOAT = "binaryFloat";
-       protected static final String binaryInteger = "binaryInteger";
-       protected static final String data = "data";
-       protected static final String dataFormat = "dataFormat";
-       protected static final String exponent = "exponent";
-       protected static final String field = "field";
-       protected static final String fieldAxis = "fieldAxis";
-       protected static final String fixed = "fixed";
-       protected static final String fornode = "for";
-       protected static final String fieldGroup = "fieldGroup";
-       protected static final String index = "index";
-       protected static final String integer = "integer";
-       protected static final String locationOrder = "locationOrder";
-       protected static final String note = "note";
-       protected static final String notes = "notes";
-       protected static final String parameter = "parameter";
-       protected static final String parameterGroup = "parameterGroup";
+       protected static final String BINARYINTEGER = "binaryInteger";
+       protected static final String DATA = "data";
+       protected static final String DATAFORMAT = "dataFormat";
+       protected static final String EXPONENT = "exponent";
+       protected static final String FIELD = "field";
+       protected static final String FIELDAXIS = "fieldAxis";
+       protected static final String FIELDRELATIONSHIP = "relation";
+       protected static final String FIXED = "fixed";
+       protected static final String FORNODE = "for";
+       protected static final String FIELDGROUP = "fieldGroup";
+       protected static final String INDEX = "index";
+       protected static final String INTEGER = "integer";
+       protected static final String LOCATIONORDER = "locationOrder";
+       protected static final String NOTE = "note";
+       protected static final String NOTES = "notes";
+       protected static final String PARAMETER = "parameter";
+       protected static final String PARAMETERGROUP = "parameterGroup";
        protected static final String ROOT = "XDF"; // beware setting this to the same name as structure 
-       protected static final String read = "read";
-       protected static final String readCell = "readCell";
-       protected static final String repeat = "repeat";
-       protected static final String relationship = "relation";
-       protected static final String skipChar = "skipChars";
-       protected static final String structure = "structure";
-       protected static final String string = "string";
-       protected static final String tagToAxis = "tagToAxis";
-       protected static final String td0 = "d0";
-       protected static final String td1 = "d1";
-       protected static final String td2 = "d2";
-       protected static final String td3 = "d3";
-       protected static final String td4 = "d4";
-       protected static final String td5 = "d5";
-       protected static final String td6 = "d6";
-       protected static final String td7 = "d7";
-       protected static final String td8 = "d8";
-       protected static final String textDelimiter = "textDelimiter";
-       protected static final String unit = "unit";
-       protected static final String units = "units";
-       protected static final String unitless = "unitless";
-       protected static final String valueList = "valueList";
-       protected static final String value = "value";
-       protected static final String valueGroup = "valueGroup";
-       protected static final String vector = "unitDirection";
+       protected static final String READ = "read";
+       protected static final String READCELL = "readCell";
+       protected static final String REPEAT = "repeat";
+       protected static final String SKIPCHAR = "skipChars";
+       protected static final String STRUCTURE = "structure";
+       protected static final String STRING = "string";
+       protected static final String TAGTOAXIS = "tagToAxis";
+       protected static final String TD0 = "d0";
+       protected static final String TD1 = "d1";
+       protected static final String TD2 = "d2";
+       protected static final String TD3 = "d3";
+       protected static final String TD4 = "d4";
+       protected static final String TD5 = "d5";
+       protected static final String TD6 = "d6";
+       protected static final String TD7 = "d7";
+       protected static final String TD8 = "d8";
+       protected static final String TEXTDELIMITER = "textDelimiter";
+       protected static final String UNIT = "unit";
+       protected static final String UNITS = "units";
+       protected static final String UNITLESS = "unitless";
+       protected static final String VALUELIST = "valueList";
+       protected static final String VALUE = "value";
+       protected static final String VALUEGROUP = "valueGroup";
+       protected static final String VECTOR = "unitDirection";
 
     } // End of XDFNodeName class 
 
@@ -549,19 +641,21 @@ class XDFSaxDocumentHandler implements DocumentHandler {
     //
 
     // ASCII DELIMITER NODE HANDLERS
-/*
-sub asciiDelimiter_node_end { pop @CURRENT_FORMAT_OBJECT; }
+    //
 
-sub asciiDelimiter_node_start {
-  my (%attrib_hash) = @_;
+    // asciiDelimiter node start
+    class asciiDelimiterStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("Ascii Delimiter Start handler not implemented yet.");
+       }
+    }
 
-  # set the format object in the current array
-  my $formatObj = $CURRENT_ARRAY->XmlDataIOStyle(new XDF::DelimitedXMLDataIOStyle(\%attrib_hash));
+    // asciiDelimiter node end
+    class asciiDelimiterEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () { System.out.println("Ascii Delimiter end node handler not implemented yet."); }
+    }
 
-  push @CURRENT_FORMAT_OBJECT, $formatObj;
 
-}
-*/
     // ARRAY NODE
     //
 
@@ -574,9 +668,9 @@ sub asciiDelimiter_node_start {
           newarray.setXMLAttributes(attrs); // set XML attributes from passed list 
 
           // set current array and add this array to current structure 
-          currentArray = currentStructure.addArray(newarray);
+          CurrentArray = CurrentStructure.addArray(newarray);
 
-          currentDatatypeObject = "currentArray";
+          CurrentDatatypeObject = "CurrentArray";
 
        }
     } 
@@ -604,7 +698,7 @@ sub asciiDelimiter_node_start {
              if (axisId != null) {
 
                  // a warning check, just in case 
-                 if (AxisObj.contains(axisId)) 
+                 if (AxisObj.containsKey(axisId)) 
                     Log.warnln("More than one axis node with axisId=\""+axisId+"\", using latest node.\n" ); 
 
                  // add this into the list of axis objects
@@ -616,37 +710,303 @@ sub asciiDelimiter_node_start {
              //  the new axis
              if (axisIdRef != null) {
 
-                 if (AxisObj.contains(axisIdRef)) {
+                 if (AxisObj.containsKey(axisIdRef)) {
 
- //                   Object refAxisObj = AxisObj.get(axisIdRef);
-//                    newaxis = (Axis) refAxisObj.clone();
+                    BaseObject refAxisObj = (BaseObject) AxisObj.get(axisIdRef);
+                    newaxis = (Axis) refAxisObj.clone();
 
                     // override attrs with those in passed list
-//                    newaxis.setXMLAttributes(attrs);
-
+                    newaxis.setXMLAttributes(attrs);
+           
                  } else {
-
                     Log.errorln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
                     return;
-
                  }
              }
 
              // add this axis to the current array object
-             currentArray.addAxis(newaxis);
+             CurrentArray.addAxis(newaxis);
 
-             currentDatatypeObject = "lastAxis";
+             CurrentDatatypeObject = "lastAxis";
 
           } else {
-
              Log.errorln("Axis object:"+newaxis+" lacks either axisId or axisIdRef, ignoring!");
-
           }
 
        }
     }
 
-    // ROOT NODE 
+    // AXIS UNITS
+    //
+
+    class axisUnitsStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("AXIS UNITS Start handler not implemented yet.");
+       }
+    }
+
+    // BinaryFloatField 
+    //
+
+    class binaryFloatFieldStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("Binary Float Field Start handler not implemented yet.");
+       }
+    }
+
+
+    // BinaryIntegerField 
+    //
+
+    class binaryIntegerFieldStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("Binary Integer Field Start handler not implemented yet.");
+       }
+    }
+
+
+    // Datatag 
+    //
+
+    class dataTagStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("DATATAG Start handler not implemented yet.");
+       }
+    }
+
+    class dataTagEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () { 
+          Log.errorln("DATATAG End handler not implemented yet.");
+       }
+    }
+
+    // DATA
+    //
+
+    class dataCharDataHandlerFunc implements CharDataHandlerAction {
+       public void action (char buf [], int offset, int len) {
+          System.out.println("DATA NODE Char Data Handler NOT implemented yet.");
+       }
+    }
+
+    class dataEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () { 
+          Log.errorln("DATA End handler not implemented yet.");
+       }
+    }
+
+    class dataStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("DATA Start handler not implemented yet.");
+       }
+    }
+
+    // DATAFORMAT 
+    //
+
+    class dataFormatStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("DATAFORMAT Start handler not implemented yet.");
+       }
+    }
+
+
+    // EXPONENTFIELD
+    //
+
+    class exponentFieldStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("EXPONENTFIELD Start handler not implemented yet.");
+       }
+    }
+
+    // FIELD
+    //
+
+    class fieldStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("FIELD Start handler not implemented yet.");
+       }
+    }
+
+    // FIELDAXIS 
+    //
+
+    class fieldAxisStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("FIELDAXIS Start handler not implemented yet.");
+       }
+    }
+
+
+    // FIELDGROUP 
+    //
+
+    class fieldGroupEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () {
+          Log.errorln("FIELDGROUP End handler not implemented yet.");
+       }
+    }
+
+    class fieldGroupStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("FIELDGROUP Start handler not implemented yet.");
+       }
+    }
+
+    // FIELDRELATIONSHIP 
+    //
+
+    class fieldRelationshipStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("FIELDRELATIONSHIP Start handler not implemented yet.");
+       }
+    }
+
+    // FIXEDFIELD
+    //
+
+    class fixedFieldStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("FIXEDFIELD Start handler not implemented yet.");
+       }
+    }
+
+    // FOR
+    //
+
+    class forStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("FOR Start handler not implemented yet.");
+       }
+    }
+
+    // INTEGERFIELD
+    //
+
+    class integerFieldStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("INTEGERFIELD Start handler not implemented yet.");
+       }
+    }
+
+    // NOTE
+    //
+
+    class noteCharDataHandlerFunc implements CharDataHandlerAction {
+       public void action (char buf [], int offset, int len) {
+          System.out.println("NOTE Char Data Handler NOT implemented yet.");
+       }
+    }
+
+    class noteStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("NOTE Start handler not implemented yet.");
+       }
+    }
+
+
+    // NOTEINDEX
+    //
+    
+    class noteIndexStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("NOTEINDEX Start handler not implemented yet.");
+       }
+    }
+
+
+    // NOTES
+    //
+    
+    class notesEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () {
+          Log.errorln("NOTES End handler not implemented yet.");
+       }
+    }
+
+    class notesStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("NOTES Start handler not implemented yet.");
+       }
+    }
+
+
+    // NULL
+    //
+
+    class nullStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+           // null means do nothing!!
+       }
+    }
+
+
+    // PARAMETER
+    //
+    
+    class parameterStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          String parentName = getParentNodeName();
+          Log.errorln("PARAMETER Start handler not implemented yet. Parent:"+parentName);
+       }
+    }
+
+    // PARAMETERGROUP
+    //
+
+    class parameterGroupEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () {
+          Log.errorln("PARAMETERGROUP End handler not implemented yet.");
+       }
+    }
+
+    class parameterGroupStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("PARAMETERGROUP Start handler not implemented yet.");
+       }
+    }
+
+    // READ
+    //
+
+    class readEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () {
+          Log.errorln("READ End handler not implemented yet.");
+       }
+    }
+
+    class readStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("READ Start handler not implemented yet.");
+       }
+    }
+
+    // READCELL
+    //
+
+    class readCellStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("READCELL Start handler not implemented yet.");
+       }
+    }
+
+    // REPEAT
+    //
+
+    class repeatEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () {
+          Log.errorln("REPEAT End handler not implemented yet.");
+       }
+    }
+
+    class repeatStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("REPEAT Start handler not implemented yet.");
+       }
+    }
+
+    // ROOT 
     //
 
     // Root node start 
@@ -655,7 +1015,7 @@ sub asciiDelimiter_node_start {
           // The root node is just a "structure" node,
           // but is always the first one.
           XDF.setXMLAttributes(attrs); // set XML attributes from passed list 
-          currentStructure = XDF;      // current working structure is now the root 
+          CurrentStructure = XDF;      // current working structure is now the root 
                                        // structure
 
           // if this global option is set in the reader, we use it
@@ -666,18 +1026,115 @@ sub asciiDelimiter_node_start {
        }
     }
 
+    // SKIPCHAR
+    //
 
-// generic node end
-class genericEndElementHandlerFunc implements EndElementHandlerAction {
-   public void action () { System.out.println("End generic node"); }
-}
+    class skipCharStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("SKIPCHAR Start handler not implemented yet.");
+       }
+    }
 
-// CDATA EXAMPLE FUNCTION STUFF
-class charDataXDFHandlerFunc1 implements CharDataHandlerAction {
-  public void action (char buf [], int offset, int len) { 
-    System.out.println("call to start XDF node"); 
-  }
-}
+    // STRINGFIELD
+    //
+
+    class stringFieldStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("STRINGFIELD Start handler not implemented yet.");
+       }
+    }
+
+
+    // STRUCTURE
+    //
+
+    class structureStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("STRUCTURE Start handler not implemented yet.");
+       }
+    }
+
+    // TAGTOAXIS
+    //
+
+    class tagToAxisStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("TAGTOAXIS Start handler not implemented yet.");
+       }
+    }
+
+    // UNIT
+    //
+
+    class unitCharDataHandlerFunc implements CharDataHandlerAction {
+       public void action (char buf [], int offset, int len) {
+          System.out.println("UNIT Char Data Handler NOT implemented yet.");
+       }
+    }
+
+    class unitStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("UNIT Start handler not implemented yet.");
+       }
+    }
+
+    // UNITS
+    //
+
+    class unitsStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          Log.errorln("UNITS Start handler not implemented yet.");
+       }
+    }
+
+    // VALUE 
+    //
+
+    class valueCharDataHandlerFunc implements CharDataHandlerAction {
+       public void action (char buf [], int offset, int len) {
+          System.out.println("VALUE Char Data Handler NOT implemented yet.");
+       }
+    }
+
+    // VALUEGROUP 
+    //
+
+    class valueGroupEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () {
+          Log.errorln("VALUEGROUP End handler not implemented yet.");
+       }
+    }
+
+    class valueGroupStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("VALUEGROUP Start handler not implemented yet.");
+       }
+    }
+
+    // VALUELIST 
+    //
+
+    class valueListCharDataHandlerFunc implements CharDataHandlerAction {
+       public void action (char buf [], int offset, int len) {
+          System.out.println("VALUELIST Char Data Handler NOT implemented yet.");
+       }
+    }
+
+    class valueListStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("VALUELIST Start handler not implemented yet.");
+       }
+    }
+
+    // VECTOR
+    //
+
+    class vectorStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) {
+          Log.errorln("VECTOR Start handler not implemented yet.");
+       }
+    }
+
 
 } // End of XDFSaxDocumentHandler class 
 
@@ -700,10 +1157,11 @@ interface EndElementHandlerAction {
 /* Modification History:
  *
  * $Log$
- * Revision 1.4  2000/10/24 17:03:10  thomas
- * This is an interim version. Most of the basic structure
- * is here, but the reader lacks the various handlers
- * needed for various XDF nodes. -b.t.
+ * Revision 1.5  2000/10/24 21:33:11  thomas
+ * More handlers implimented. Added in parentNodeName,
+ * gParentNodeName methods, impl CurrentNodePAth
+ * field in SaxDocHandler too. Not finished yet however.
+ * -b.t.
  *
  * 
  */
