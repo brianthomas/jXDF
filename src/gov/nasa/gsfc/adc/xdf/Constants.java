@@ -48,7 +48,7 @@ public abstract class Constants {
 
   /** The name of the relevant version of XDF DTD file for this package.
   */
-  public static final String XDF_DTD_NAME = "XDF_017.dtd";
+  public static final String XDF_DTD_NAME = "XDF_018.dtd";
 
   /** The name of the Attribute which is written out as PCDATA rather than as
       a node attribute (String/Number type Attributes) or child node (Object
@@ -183,6 +183,9 @@ public abstract class Constants {
 /* Modification History
  * 
  * $Log$
+ * Revision 1.19  2001/10/15 20:20:03  thomas
+ * changed DTD name to 018
+ *
  * Revision 1.18  2001/09/27 17:19:27  thomas
  * added default values for NotationNode publicId and name
  *
