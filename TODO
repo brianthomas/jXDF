@@ -9,6 +9,10 @@
         that code.) 
         ------------------------------------------------------------
 
+       - allow multiple datanodes with each having seperate href in a single array 
+
+       - string data format getLength -> getWidth
+
         - consider getByte/getLogical (boolean) methods. Q: how to store internally?
           using just a primative int array will waste memory but is a short-cut.
 

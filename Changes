@@ -1,7 +1,24 @@
       
       Package Version History
 
-0.18-alpha  12/12/01  - 1st Alpha, 
+0.18-alpha2  6/??/02  - 2nd Alpha, 
+                        -many bug fixes/changes merged in from stable package, including:
+                          - bug fix: Reader missing Lexical Handler, couldnt distinquish between
+                            CDATA/PCDATA events. Now passes CDATA/PCDATA properly.
+                          - Added Overview.html documentation
+                          - Added CDATASection accessor methods to DataCube so that
+                            output wrapping of content in <data> nodes can be controlled by user.
+                          - Added missing public accessor methods to attributes in ValueListAlgorithm
+                            and ValueListDelimitedList
+                          - Added minor documentation and made getValueListObjects method public
+                            in BaseObjectWithValueList and BaseObjectWithXMLElementsAndValueList classes.
+                          - re-done build.xml file to be smarter about compiling things.
+                          - split off the XDF DOM stuff into separate packages, added JAXP interface 
+                            for XDF::DOM class(es). Should be *way* easier to use now.
+                          - Added test file XDF_sample20.xml.. delimited with NO CDATA wrapper.
+
+
+0.18-alpha1 12/21/01  - 1st Alpha, 
                       - added byte offset reading
                       - fixed bug where various types of FTP/HTTP transfer could screw up metadata
                         for reading some kinds of Delimited/Formatted IOStyles.
