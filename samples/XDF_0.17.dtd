@@ -45,7 +45,7 @@ calls XDF.dtd by a parameter entity.
 	description CDATA #IMPLIED
 	paramId ID #IMPLIED
 	paramIdRef IDREF #IMPLIED
-	datatype (integer | fixed | exponential | string | url) #IMPLIED
+	datatype (integer | float | exponential | string | url) #IMPLIED
 >
 <!--    The unit strings should be written out without abbreviations to
 	avoid ambiguity, unless system SI units 
@@ -55,7 +55,7 @@ calls XDF.dtd by a parameter entity.
 	unitless, <units><unit></unit></units> means undefined or unknown. 
 	Units are multiplied together (divide by using power="-1").
 	Units can begin with a constant multiplier in
-	fixed format or in E (exponential) format. 
+	float format (F) exponential (E) format. 
 	  10^12 kg*m/s^2  is expressed as,
 	<units system="SI" factor="1E12" > 
 		<unit>kg</unit><unit>m</unit>
@@ -95,7 +95,8 @@ calls XDF.dtd by a parameter entity.
 <!ATTLIST value
 	valueId ID #IMPLIED
 	valueRef IDREF #IMPLIED
-	special (infinite | infiniteNegative | noData) #IMPLIED
+	special (infinite | infiniteNegative | noData | notANumber | underflow 
+	| overflow ) #IMPLIED
 	inequality (lessThan | lessThanOrEqual | greaterThan | greaterThanOrEqual) #IMPLIED
 	upperErrorValue NMTOKEN #IMPLIED
 	lowerErrorValue NMTOKEN #IMPLIED
@@ -115,9 +116,12 @@ calls XDF.dtd by a parameter entity.
 	step CDATA  #IMPLIED
 	valueListId ID #IMPLIED
 	valueListIdRef IDREF #IMPLIED
-	infiniteValue NMTOKEN #IMPLIED
-	infiniteNegativeValue NMTOKEN #IMPLIED
-	noDataValue NMTOKEN #IMPLIED
+	infiniteValue CDATA #IMPLIED
+	infiniteNegativeValue CDATA #IMPLIED
+	noDataValue CDATA #IMPLIED
+	notANumberValue   CDATA   #IMPLIED
+	underflowValue   CDATA   #IMPLIED
+	overflowValue     CDATA    #IMPLIED
 >
 <!ELEMENT parameterGroup ((parameter | parameterGroup)+)>
 <!ATTLIST parameterGroup
@@ -165,9 +169,13 @@ calls XDF.dtd by a parameter entity.
 	lessThanOrEqualValue NMTOKEN #IMPLIED
 	greaterThanValue NMTOKEN #IMPLIED
 	greaterThanOrEqualValue NMTOKEN #IMPLIED
-	infiniteValue NMTOKEN #IMPLIED
-	infiniteNegativeValue NMTOKEN #IMPLIED
-	noDataValue NMTOKEN #IMPLIED
+	infiniteValue CDATA #IMPLIED
+	infiniteNegativeValue CDATA #IMPLIED
+	noDataValue CDATA #IMPLIED
+	notANumberValue   CDATA   #IMPLIED
+	underflowValue   CDATA   #IMPLIED
+	overflowValue     CDATA    #IMPLIED
+	disabled          CDATA    #IMPLIED
 >
 <!--    Each dimension of an N-dimensional structure is introduced by
 	an axis element.  The order is not important because the read element
@@ -193,7 +201,7 @@ calls XDF.dtd by a parameter entity.
 	axisId ID #IMPLIED
 	axisIdRef IDREF #IMPLIED
 	align IDREF #IMPLIED
-	axisDatatype (integer | fixed | exponential | string | url) #IMPLIED
+	axisDatatype (integer | float | exponential | string | url) #IMPLIED
 >
 <!ELEMENT axisUnits (unitless | unit+)>
 <!-- A vector field is represented by an additional axis with components or
@@ -242,9 +250,14 @@ calls XDF.dtd by a parameter entity.
 	lessThanOrEqualValue NMTOKEN #IMPLIED
 	greaterThanValue NMTOKEN #IMPLIED
 	greaterThanOrEqualValue NMTOKEN #IMPLIED
-	infiniteValue NMTOKEN #IMPLIED
-	infiniteNegativeValue NMTOKEN #IMPLIED
-	noDataValue NMTOKEN #IMPLIED
+	infiniteValue NCDATA #IMPLIED
+	infiniteNegativeValue CDATA #IMPLIED
+	noDataValue CDATA #IMPLIED
+	notANumberValue   CDATA   #IMPLIED
+	underflowValue   CDATA   #IMPLIED
+	overflowValue     CDATA    #IMPLIED
+	disabled          CDATA    #IMPLIED
+
 >
 <!-- 	Relationships between fields in a fieldGroup can be expressed with 
 	the field/relation element.  
@@ -293,7 +306,7 @@ grouped together with name="position".
 	Or, if there are no terminators, the set of formats are 
 	repeated until the end of the data. 
 -->
-<!ELEMENT dataFormat (fixed | integer | string | exponential | binaryInteger | binaryFloat)>
+<!ELEMENT dataFormat (float | integer | string | binaryInteger | binaryFloat)>
 <!ELEMENT read (for | tagToAxis+)>
 <!ATTLIST read
 	encoding (ANSI | ISO-8859-1 | UTF-8 | UTF-16) "ISO-8859-1"
@@ -328,22 +341,19 @@ grouped together with name="position".
 	count NMTOKEN "1"
 	output CDATA "&space;"
 >
-<!ELEMENT fixed EMPTY>
-<!ATTLIST fixed
+<!-- 
+The element float is used for text format of non-integer (floating point) 
+numbers.  If exponential format is to be used, supply the width of the exponent
+with the exponent attribute.  If the exponent attribute is set then all numbers
+are expected to be read or written as E-format.  One can not mix E and F-format.
+-->
+<!ELEMENT float EMPTY>
+<!ATTLIST float
 	width NMTOKEN #REQUIRED
 	precision NMTOKEN #REQUIRED
+	exponent  NMTOKEN  #IMPLIED
 >
-<!-- For exponential notation, width is total length, precision is
-again the number of digits past the decimal point and exponent is
-the number of characters past the E or e.  For example, 7.345E-12 has
-width="9", precision="3", and exponent="3".  The mantissa width
-is equal to width - exponent - 1. -->
-<!ELEMENT exponential EMPTY>
-<!ATTLIST exponential
-	width NMTOKEN #REQUIRED
-	precision NMTOKEN #REQUIRED
-	exponent  NMTOKEN #REQUIRED
->
+
 <!ELEMENT integer EMPTY>
 <!ATTLIST integer
 	type (decimal | octal | hexadecimal) "decimal"
@@ -395,7 +405,7 @@ the particular axis.  For now, one is restricted to use d0...d7 for tagnames.
 <!ELEMENT d7 (#PCDATA)>
 <!-- The Data element is a very general container for data.
 	It could be marked up with d0...dN for N+1 dimensional data.
-	It can be fixed format, or delimited data.  If it is not tagged data
+	It can be float format, or delimited data.  If it is not tagged data
 	it can begin with a <![CDATA[ and end with ]]>.  
 	However, a data element may contain data elements
 	within it.  For instance, an animation would be a set of frames
