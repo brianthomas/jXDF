@@ -98,7 +98,9 @@ import java.util.*;
    * to which this array object belongs
   */
   protected Set paramGroupOwnedHash = Collections.synchronizedSet(new HashSet());
- // protected locatorOrder;   //doudle chekc init value
+ // protected locatorOrder;   //doudle check init value
+
+  protected boolean hasFieldAxis = false;
 
   //
   // Constructor and related methods
@@ -149,11 +151,12 @@ import java.util.*;
 
     //set up the attribute hashtable key with the default initial value
     attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("dataCube", new XMLAttribute(new DataCube(), Constants.OBJECT_TYPE));
-    getDataCube().setParentArray(this);  //cross reference with dataCube
+    attribHash.put("dataCube", new XMLAttribute(new DataCube(this), Constants.OBJECT_TYPE));
+
+
     //default is TaggedXMLDataIOStyle, xmlDataOStyle.parentArray = this
     attribHash.put("xmlDataIOStyle", new XMLAttribute(new TaggedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
-    attribHash.put("dataFormat", new XMLAttribute(new StringDataFormat(), Constants.OBJECT_TYPE));  //
+    attribHash.put("dataFormat", new XMLAttribute(new StringDataFormat(), Constants.OBJECT_TYPE));
     attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
     attribHash.put("axisList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("paramList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
@@ -337,13 +340,6 @@ import java.util.*;
   {
     return paramGroupOwnedHash;
   }
-  /**setDimension: set the dimension of the L<XDF::DataCube> held within this Array.
-   * @param: Number
-   * @return: the current dimension of the L<XDF::DataCube> held within this Array
-   */
-  public Number setDimension(Number dimension) {
-    return getDataCube().setDimension(dimension);
-  }
 
    /**getDimension: set the dimension of the L<XDF::DataCube> held within this Array.
    */
@@ -356,6 +352,7 @@ import java.util.*;
     */
    public Locator createLocator() {
     Locator locatorObj = new Locator(this);
+
     return locatorObj;
    }
 
@@ -401,8 +398,12 @@ import java.util.*;
     if (!canAddAxisObjToArray(axis)) //check if the axis can be added
       return null;
 
-    getDataCube().incrementDimension();  //increment the DataCube dimension by 1
-    getAxisList().add(axis);
+    getDataCube().incrementDimension(axis );  //increment the DataCube dimension by 1
+    if (hasFieldAxis()) {
+      getAxisList().add(1,axis);
+    }
+    else
+      getAxisList().add(0,axis);
     return axis;
   }
 
@@ -554,16 +555,64 @@ import java.util.*;
    * Overwrites existing datacell value if any.
    */
 
-   public double  setData (Locator locator, double numValue) {
-    return getDataCube().setData(locator, numValue);
+
+   public double  setData (Locator locator, double numValue) throws SetDataException {
+    try {
+      return getDataCube().setData(locator, numValue);
+    }
+    catch (SetDataException e) {
+      throw e;
+    }
   }
+
+  public int  setData (Locator locator, int numValue) throws SetDataException {
+    try {
+      return getDataCube().setData(locator, numValue);
+    }
+    catch (SetDataException e) {
+      throw e;
+    }
+  }
+
 
   /** setData: Set the SCALAR value of the requested datacell
    * (via L<XDF::DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
-  public String  setData (Locator locator, String strValue) {
-    return getDataCube().setData(locator, strValue);
+  public String  setData (Locator locator, String strValue) throws SetDataException{
+    try {
+      return getDataCube().setData(locator, strValue);
+    }
+    catch (SetDataException e) {
+      throw e;
+    }
+  }
+
+  public String getStringData(Locator locator) throws NoDataException {
+    try {
+      return getDataCube().getStringData(locator);
+    }
+    catch (NoDataException e) {
+      throw e;
+    }
+  }
+
+  public int getIntData(Locator locator) throws NoDataException {
+    try {
+      return getDataCube().getIntData(locator);
+    }
+    catch (NoDataException e) {
+      throw e;
+    }
+  }
+
+  public double getDoubleData(Locator locator) throws NoDataException {
+    try {
+      return getDataCube().getDoubleData(locator);
+    }
+    catch (NoDataException e) {
+      throw e;
+    }
   }
 
   /**removeData : Remove the requested data from the indicated datacell
@@ -611,7 +660,7 @@ import java.util.*;
     }
     else {  //add fieldAxis and increment dimension
       getAxisList().add(0, fieldAxis);
-      getDataCube().incrementDimension();
+      //getDataCube().incrementDimension(fieldAxis);
     }
 
     //inficiency???
@@ -630,6 +679,10 @@ import java.util.*;
 
   public FieldAxis setFieldAxis(FieldAxis fieldAxis) {
     return addFieldAxis(fieldAxis);
+  }
+
+  public boolean hasFieldAxis() {
+    return hasFieldAxis;
   }
 
   //
