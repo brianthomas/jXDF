@@ -328,8 +328,11 @@ public class Field extends BaseObject{
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/10/26 20:27:39  kelly
+ * fixed a little documentation
+ *
  * Revision 1.3  2000/10/26 20:22:28  kelly
- * renamed it to ExponentialDataFormat.java
+ * completed the class
  *
  * Revision 1.2  2000/09/29 22:03:37  cvs
  * More files
