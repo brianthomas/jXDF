@@ -35,7 +35,7 @@ public class  ErroredValue extends Value {
    /** Passed string sets the *value* attribute (PCDATA)
        of this object.
     */
-   public  ErroredValue (String strValue) {
+   public ErroredValue (String strValue) {
       super(strValue); // set value attribute from passed argument
    }
 
@@ -48,6 +48,25 @@ public class  ErroredValue extends Value {
    //
    // Public Methods
    //
+
+  /** set the upperErrorValue and lowerErrorValue attributes
+      to the same value.
+   */
+   public void setErrorValue (Number errorValue)
+   {
+      setUpperErrorValue(errorValue);
+      setLowerErrorValue(errorValue);
+   }
+
+   /** A convenience method which returns a String array holding 
+       the value of the lowerErrorValue and upperErrorValue attributes. 
+    */
+   public String[] getErrorValues () {
+      String values[];
+      values[0] = getLowerErrorValue();
+      values[1] = getUpperErrorValue();
+      return values;
+   }
 
   /** get the *upperErrorValue* attribute.
    */
@@ -103,19 +122,21 @@ public class  ErroredValue extends Value {
       // append more attributes
       attribOrder.add("upperErrorValue");
       attribOrder.add("lowerErrorValue");
-      attribOrder.add("errorValue");
 
 
        //set up the attribute hashtable key with the default initial value
        attribHash.put("upperErrorValue", new XMLAttribute(null, Constants.STRING_TYPE));
        attribHash.put("lowerErrorValue", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("errorValue", new XMLAttribute(null, Constants.STRING_TYPE));
 
    }
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/01/19 17:23:59  thomas
+ * Fixed class to match DTD standard. Now there
+ * is no attribute called "errorValue". -b.t.
+ *
  * Revision 1.3  2000/11/20 22:03:48  thomas
  * Split up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
