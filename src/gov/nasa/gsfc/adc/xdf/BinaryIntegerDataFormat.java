@@ -67,7 +67,7 @@ public class BinaryIntegerDataFormat extends DataFormat {
     attribHash.put("infiniteNegativeValue", new XMLAttribute(null, Constants.NUMBER_TYPE));
     attribHash.put("noDataValue", new XMLAttribute(null, Constants.NUMBER_TYPE));
     attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryIntegerBits), Constants.NUMBER_TYPE));
-    attribHash.put("signed", new XMLAttribute(new Boolean(DefaultBinaryIntegerSigned), Constants.BOOLEAN_TYPE));
+    attribHash.put("signed", new XMLAttribute("yes", Constants.STRING_TYPE));
 
   }
 
@@ -191,16 +191,23 @@ public class BinaryIntegerDataFormat extends DataFormat {
   /**setSigned: set the *signed* attribute
    * @return: the current *signed* attribute
    */
-  public Boolean setSigned(Boolean signed) {
-    return (Boolean) ((XMLAttribute) attribHash.get("signed")).setAttribValue(signed);
+  public String setSigned(String strSigned) {
+
+    if (!strSigned.equals("yes")  && !strSigned.equals("yes") ) {
+      Log.error("*signed* attribute can only be set to yes or no");
+      Log.error("tend to set as" + strSigned);
+      Log.error("invalid. ignoring request");
+      return null;
+    }
+    return (String) ((XMLAttribute) attribHash.get("signed")).setAttribValue(strSigned);
 
   }
   /**getSigned
    * @return: the current *signed* attribute
    */
-  public Boolean getSigned()
+  public String getSigned()
   {
-    return (Boolean) ((XMLAttribute) attribHash.get("signed")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get("signed")).getAttribValue();
   }
   //
   //Other PUBLIC Methods
@@ -264,6 +271,9 @@ public class BinaryIntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/10/17 21:59:19  kelly
+ * removed boolean type, declare *signed" attribute as String.  -k.z.
+ *
  * Revision 1.1  2000/10/16 14:51:24  kelly
  * created and pretty much completed the class. --k.z.
  *
