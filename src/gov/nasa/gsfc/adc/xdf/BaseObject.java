@@ -716,7 +716,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** Set the XMLattributes of this object using the passed AttributeList.
    */
   // NOTE: this is essentially the Perl update method
-  protected void setXMLAttributes (AttributeList attrs) {
+  public void setXMLAttributes (AttributeList attrs) {
 
      synchronized (attribHash) {
       // set object attributes from an AttributeList
@@ -983,6 +983,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.41  2001/05/04 21:01:06  thomas
+ * made setXMLAttributes public method.
+ *
  * Revision 1.40  2001/05/04 20:18:58  thomas
  * Small changes to accomodate new XDF class.
  *
