@@ -586,7 +586,6 @@ public class DataCube extends BaseObject {
     */
     public void toXMLOutputStream (
                                      OutputStream outputstream,
-                                     Hashtable XMLDeclAttribs,
                                      String strIndent,
                                      boolean dontCloseNode,
                                      String newNodeNameString,
@@ -761,6 +760,7 @@ public class DataCube extends BaseObject {
   
       }  //done dealing with with TaggedXMLDataIOSytle
       else {
+
          if (readObj instanceof DelimitedXMLDataIOStyle) {
              writeDelimitedData( dataOutputStream, currentLocator,
                                  (DelimitedXMLDataIOStyle) readObj,
@@ -1648,6 +1648,10 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.39  2001/07/19 21:52:39  thomas
+  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
+  * in the XDF class)
+  *
   * Revision 1.38  2001/07/11 22:35:21  thomas
   * Changes related to adding valueList or removeal of unneeded interface files.
   *

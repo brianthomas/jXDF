@@ -172,7 +172,6 @@ import java.util.Hashtable;
    /** override the base object method to add a little tailoring
     */
    public void toXMLOutputStream (  OutputStream outputstream,
-                                    Hashtable XMLDeclAttribs,
                                     String indent,
                                     boolean dontCloseNode,
                                     String newNodeNameString,
@@ -263,6 +262,10 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/07/19 21:52:39  thomas
+ * yanked XMLDeclAttribs from toXMLOutputStream (only needed
+ * in the XDF class)
+ *
  * Revision 1.16  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).

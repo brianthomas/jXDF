@@ -124,7 +124,6 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
    public void toXMLOutputStream (
                                    OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
                                    String indent,
                                    boolean dontCloseNode,
                                    String newNodeNameString,
@@ -262,7 +261,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
                 indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
                 indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                 String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-                containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
+                containedObj.toXMLOutputStream(outputstream, newindent);
               }
             }
           } else {
@@ -359,6 +358,10 @@ public abstract class BaseObjectWithValueList extends BaseObject
 /** Modification Log 
   *
   * $Log$
+  * Revision 1.3  2001/07/19 21:51:48  thomas
+  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
+  * in the XDF class)
+  *
   * Revision 1.2  2001/07/13 21:45:04  thomas
   * improved comments
   *

@@ -113,7 +113,6 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
     */
    public void toXMLOutputStream (
                                    OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
                                    String indent,
                                    boolean dontCloseNode,
                                    String newNodeNameString,
@@ -197,6 +196,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
              }
              else if (item.get("type") == Constants.OBJECT_TYPE)
              {
+
                BaseObject containedObj = (BaseObject) item.get("value");
                if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
                  // shouldnt this be synchronized too??
@@ -204,7 +204,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
                    indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
                    indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                    String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-                   containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
+                   containedObj.toXMLOutputStream(outputstream, newindent);
                  }
                }
              } else {
