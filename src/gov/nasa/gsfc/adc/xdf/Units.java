@@ -234,13 +234,11 @@ import java.io.IOException;
 
   public void toXMLOutputStream  (
                                    OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
                                    String indent
                                  )
   throws java.io.IOException
   {
     super.toXMLOutputStream( outputstream,
-                             XMLDeclAttribs,
                              indent,
                              false,
                              XDFNodeName,
@@ -280,6 +278,10 @@ import java.io.IOException;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/07/19 21:59:44  thomas
+ * yanked XMLDeclAttribs from toXMLOutputStream (only needed
+ * in the XDF class)
+ *
  * Revision 1.17  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).

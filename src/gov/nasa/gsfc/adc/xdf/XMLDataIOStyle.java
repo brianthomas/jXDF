@@ -167,7 +167,6 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
   public void toXMLOutputStream (
                                    OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
                                    String indent,
                                    boolean dontCloseNode,
                                    String newNodeNameString,
@@ -175,6 +174,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
                                 )
   throws java.io.IOException
   {
+
     boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
     String myIndent;
     if (indent!=null)
@@ -329,6 +329,10 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.23  2001/07/19 21:59:44  thomas
+ * yanked XMLDeclAttribs from toXMLOutputStream (only needed
+ * in the XDF class)
+ *
  * Revision 1.22  2001/07/11 22:35:21  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *

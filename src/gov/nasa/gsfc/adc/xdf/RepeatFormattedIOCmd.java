@@ -157,7 +157,6 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
 
   public void toXMLOutputStream (
                                    OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
                                    String indent,
                                    boolean dontCloseNode,
                                    String newNodeNameString,
@@ -226,6 +225,10 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/07/19 21:59:44  thomas
+ * yanked XMLDeclAttribs from toXMLOutputStream (only needed
+ * in the XDF class)
+ *
  * Revision 1.10  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).

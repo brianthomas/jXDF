@@ -77,7 +77,6 @@ public class NotesLocationOrder extends BaseObject {
    }
 
    public void toXMLOutputStream (  OutputStream outputstream, 
-                                    Hashtable XMLDeclAttribs,
                                     String indent,
                                     boolean dontCloseNode,
                                     String newNodeNameString,
@@ -91,16 +90,6 @@ public class NotesLocationOrder extends BaseObject {
       // Setup. Sometimes the name of the node we are opening is different from
       // that specified in the classXDFNodeName (*sigh*)
       if (newNodeNameString != null) nodeNameString = newNodeNameString;
-
-      // 0. To be valid XML, we always start an XML block with an
-      //    XML declaration (e.g. somehting like "<?xml standalone="no"?>").
-      //    Here we deal with  printing out XML Declaration && its attributes
-/*
-      if ((XMLDeclAttribs !=null) &&(!XMLDeclAttribs.isEmpty())) {
-         indent = "";
-         writeXMLDeclToOutputStream(outputstream, XMLDeclAttribs);
-      }
-*/
 
       // 1. open this node, print its simple XML attributes
       if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, indent); // indent node if desired
@@ -150,6 +139,10 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/07/19 21:58:31  thomas
+ * yanked XMLDeclAttribs from toXMLOutputStream (only needed
+ * in the XDF class)
+ *
  * Revision 1.8  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).
