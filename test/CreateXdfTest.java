@@ -49,8 +49,8 @@ public class CreateXdfTest extends org.apache.tools.ant.Task
     private String outputfile = "out.xml";
     private String externalFileEntityName = "xdfTest";
     private String externalFileName = "xdfTest.dat";
+    private String myXMLDataIOStyle = "tagged";
     private boolean showSuccess = false;
-    private boolean useFormattedXMLDataIOStyle = false;
     private boolean useExternalFile = false;
 
     //
@@ -67,9 +67,9 @@ public class CreateXdfTest extends org.apache.tools.ant.Task
          useExternalFile = val;
     }
 
-    public void setCreateformatteddata (boolean val) 
+    public void setDataiostyle (String type) 
     {
-       useFormattedXMLDataIOStyle = val;
+       myXMLDataIOStyle = type;
     }
 
     public void setShowsuccess (boolean val) {
@@ -166,12 +166,16 @@ public class CreateXdfTest extends org.apache.tools.ant.Task
             // the following 6 lines to set write out style: formatted style
             // otherwise, data will be in tagged format
 
-            if (useFormattedXMLDataIOStyle) {
+            if (myXMLDataIOStyle.equals("formatted")) {
                FormattedXMLDataIOStyle xmlIOStyle = new FormattedXMLDataIOStyle(array);
                List cmdList = new Vector();
                ReadCellFormattedIOCmd readCell = new ReadCellFormattedIOCmd();
                cmdList.add(readCell);
                xmlIOStyle.setFormatCommandList(cmdList);
+               array.setXMLDataIOStyle(xmlIOStyle);
+            } else if (myXMLDataIOStyle.equals("delimited")) {
+               DelimitedXMLDataIOStyle xmlIOStyle = new DelimitedXMLDataIOStyle(array);
+               xmlIOStyle.setRepeatable("no");
                array.setXMLDataIOStyle(xmlIOStyle);
             }
          

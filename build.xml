@@ -63,26 +63,39 @@
     <!-- create tagged data, internal -->
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
-         <param name="formattedDataType" value="false"/>
+         <param name="dataiostyle" value="tagged"/>
     </antcall>
 
     <!-- create tagged data, external -->
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
-         <param name="formattedDataType" value="false"/>
+         <param name="dataiostyle" value="tagged"/>
+    </antcall>
+
+    <!-- create delimited data, internal -->
+    <antcall target="creationTest">
+         <param name="internalFile" value="false"/>
+         <param name="dataiostyle" value="delimited"/>
+    </antcall>
+
+    <!-- create delimited data, external -->
+    <antcall target="creationTest">
+         <param name="internalFile" value="true"/>
+         <param name="dataiostyle" value="delimited"/>
     </antcall>
 
     <!-- create formatted data, internal -->
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
-         <param name="formattedDataType" value="true"/>
+         <param name="dataiostyle" value="formatted"/>
     </antcall>
 
     <!-- create formatted data, external -->
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
-         <param name="formattedDataType" value="true"/>
+         <param name="dataiostyle" value="formatted"/>
     </antcall>
+
 
     <!-- check loading/re-loading of existing files -->
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample1.xml"/></antcall>
@@ -110,9 +123,9 @@
   </target>
 
   <target name="creationTest" >
-    <echo message="Checking creation of file formattedData=${formattedDataType} internalData=${internalFile} ..." />
+    <echo message="Checking creation of file XMLDataIOStyle=${dataiostyle} internalData=${internalFile} ..." />
     <createTest writedatatoseparatefile="${internalFile}" 
-                createformatteddata="${formattedDataType}" 
+                dataiostyle="${dataiostyle}" 
                 outputfile="test1.xml" 
                 entityfilename="test1.dat" 
                 entityname="table1" 
