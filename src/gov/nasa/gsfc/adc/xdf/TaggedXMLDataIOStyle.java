@@ -1,3 +1,4 @@
+
 // XDF TaggedXMLDataIOStyle Class
 // CVS $Id$
 
@@ -118,40 +119,43 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //
   //PROTECTED Methods
   //
-  protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
-  {
-    boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
+   protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
+   {
 
-    //write out the tags info
-    String[] tags = getAxisTags();
-    List axisList = parentArray.getAxes();
-    String axisId;
-    String tag;
-    int stop = axisList.size();
+      boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
 
-    synchronized (axisList) {
-      for (int i = 0; i <stop; i++) {
-        axisId = ((AxisInterface) axisList.get(i)).getAxisId();
-        tag = tags[i];
-        if (niceOutput) {
-          writeOut(outputstream, Constants.NEW_LINE);
-          writeOut(outputstream, indent);
-        }
-        writeOut(outputstream, "<" + TagToAxisNodeName + " axisIdRef=\"");
-        writeOutAttribute(outputstream, axisId);
-        writeOut(outputstream, "\"");
-        writeOut(outputstream, " tag = \"");
-        writeOutAttribute(outputstream, tag);
-        writeOut(outputstream, "\"/>");
+      //write out the tags info
+      String[] tags = getAxisTags();
+      String axisId;
+      String tag;
+
+      List axisList = parentArray.getAxes();
+/*
+      List axisList = getIOAxesOrder(); // actually, for tagged data order isnt important
+                                        // in the least, its tagToAxis that is important.
+*/
+      int numberOfAxes = axisList.size();   
+      for (int i = 0; i < numberOfAxes ; i++) {
+         axisId = ((AxisInterface) axisList.get(i)).getAxisId();
+         tag = tags[i];
+         if (niceOutput) {
+            writeOut(outputstream, Constants.NEW_LINE);
+            writeOut(outputstream, indent);
+         }
+         writeOut(outputstream, "<" + TagToAxisNodeName + " axisIdRef=\"");
+         writeOutAttribute(outputstream, axisId);
+         writeOut(outputstream, "\"");
+         writeOut(outputstream, " tag=\"");
+         writeOutAttribute(outputstream, tag);
+         writeOut(outputstream, "\"/>");
       }
 
       // wrap up newline 
       if (niceOutput) {
-          writeOut(outputstream, Constants.NEW_LINE);
+         writeOut(outputstream, Constants.NEW_LINE);
       }
 
-    }
-  }
+   }
 
 
    /** Remove an axis tag from the tag hash. This should be PROTECTED
@@ -167,6 +171,10 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/06/18 21:34:09  thomas
+ * changes reflecting new getIOAxesOrder in parent and cleanup
+ * of specificIO method output.
+ *
  * Revision 1.13  2001/05/10 21:41:52  thomas
  * minor change to specificStyletoXDF. Small
  * change to constructors realated to inheritance
