@@ -3125,7 +3125,6 @@ while (iter.hasNext()) {
           } else {
 
               Log.errorln(" weird parent node $parent_node_name for fieldGroup");
-              System.exit(-1); // dump core :)
 
           }
 
@@ -3471,8 +3470,7 @@ while (iter.hasNext()) {
             }
 
           } else {
-            Log.warnln("Error: weird parent node "+parentNodeName+" for parameter, ignoring");
-            return (Object) null;
+             Log.warnln("Error: weird parent node "+parentNodeName+" for parameter, ignoring");
           }
 
           // add this object to all open groups
@@ -3534,8 +3532,7 @@ while (iter.hasNext()) {
 	      LastParamGroupObject.addParamGroup(newparamGroup);
           } else {
 
-              Log.errorln(" weird parent node $parent_node_name for parameterGroup");
-              System.exit(-1); // dump core :)
+              Log.errorln(" weird parent node "+parentNodeName+" for parameterGroup, ignoring");
 
           }
 
@@ -4055,8 +4052,7 @@ while (iter.hasNext()) {
                     Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
 		    lastAxisObject.addAxisValue(newvalue);
                  } else {
-                    Log.errorln("Error: weird parent node "+parentNodeName+" for value.");
-                    System.exit(-1); // fatal error, shut down 
+                    Log.errorln("Error: weird parent node "+parentNodeName+" for value. Ignoring.");
                  }
 
                  // Now add this object to all open groups
@@ -4148,8 +4144,7 @@ while (iter.hasNext()) {
 	      lastAxisObject.addAxisValue(newvalue);
 
           } else {
-             Log.errorln("Error: weird parent node "+parentNodeName+" for value.");
-             System.exit(-1); // fatal error, shut down 
+             Log.errorln("Error: weird parent node "+parentNodeName+" for value. Ignoring.");
           }
 
           // 4. add this object to all open groups
@@ -4208,8 +4203,7 @@ while (iter.hasNext()) {
 	     //             newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
 	     lastValueGroup.addValueGroup(newvalueGroup);
           } else {
-             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUEGROUP);
-             System.exit(-1); // fatal error, shut down 
+             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUEGROUP+". Ignoring");
           }
 
           // 4. add this object to all open value groups
@@ -4325,8 +4319,8 @@ while (iter.hasNext()) {
           } 
           else 
           {
-             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST+", aborting read.");
-             System.exit(-1);
+
+             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST+", Ignoring.");
           } 
 
           // now add valueObjects to groups 
@@ -4483,8 +4477,9 @@ while (iter.hasNext()) {
              }
 
           } else {
-             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST);
-             System.exit(-1); // fatal error, shut down 
+
+             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST+". Ignoring");
+
           }
 
           // 5. now add valueObjects to groups 
@@ -4522,6 +4517,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.55  2001/09/19 17:32:46  thomas
+ * changed weird parent handling, no need to dump core, we'll just ignore the miscreant object for now
+ *
  * Revision 1.54  2001/09/19 16:40:10  thomas
  * implemented better handling of file hrefs in different directories
  *
