@@ -177,10 +177,19 @@ public class Structure extends BaseObjectWithXMLElements {
   }
 
   /** Set the *arrayList* attribute
-      @deprecated You should use the add/remove methods to manipulate this list.
    */
-  public void setArrayList(List array) {
-     ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(array);
+  public void setArrayList (List arrayList) 
+  {
+
+     ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(Collections.synchronizedList(new ArrayList()));
+ //  ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(array);
+
+     Iterator iter = arrayList.iterator();
+     while(iter.hasNext()) {
+        Array thisArray = (Array) iter.next();
+        this.addArray(thisArray);
+     }
+      
   }
 
   /**
@@ -188,6 +197,12 @@ public class Structure extends BaseObjectWithXMLElements {
    */
   public List getArrayList() {
     return (List) ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
+  /** Set the *noteList* attribute.
+   */
+  public void setNoteList (List notes) {
+    ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
   }
 
   /** Set the *noteList* attribute
@@ -451,6 +466,15 @@ public class Structure extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.25  2001/10/02 19:52:32  thomas
+ * changed set*List methods somewhat
+ *
+ * Revision 1.24.4.2  2001/10/02 18:15:23  thomas
+ * made change to setArrayList
+ *
+ * Revision 1.24.4.1  2001/10/02 18:06:25  thomas
+ * added setNoteList
+ *
  * Revision 1.24  2001/09/19 17:51:32  thomas
  * made some set*List methods deprecated
  *
