@@ -63,13 +63,14 @@ public class CreateXdf
 	fieldGroup.setDescription("fieldGroup description");
 
 	IntegerDataFormat dateFormat = new IntegerDataFormat();
-	dateFormat.setWidth(new Integer(32));
+	dateFormat.setWidth(new Integer(2));
 
 	Field field1 = new Field ();
 	field1.setName("field1");
 	field1.setDescription("field1-description");
 	field1.setFieldId ("field1-id");
 	field1.setDataFormat(dateFormat);
+	field1.setNoDataValue("-9");
 
 	Field field2 = new Field ();
 	field2.setName("field2");
@@ -108,8 +109,19 @@ public class CreateXdf
 	href.setSystemId("xdf_table.dat");
 	array.setHref(href);
 
-	// the following 6 lines to set write out style: formatted style
-	// otherwise, data will be in tagged format
+	// the following 6 lines to set a different write out style.
+        // The default is TaggedXMLDataIOStyle, but below you can choose one
+        // of the other styles: formatted or delimited styles 
+        // choose only ONE of the next 2 commented out blocks
+
+        // uncomment block for delimited style
+	DelimitedXMLDataIOStyle xmlIOStyle = new DelimitedXMLDataIOStyle(array);
+        xmlIOStyle.setRecordTerminator(Constants.NEW_LINE);
+	array.setXMLDataIOStyle(xmlIOStyle);
+	/*
+        */
+
+        // uncomment block for formatted style
 	/*
 	FormattedXMLDataIOStyle xmlIOStyle = new FormattedXMLDataIOStyle(array);
 	List cmdList = new Vector();
