@@ -7,15 +7,6 @@
 	this package "BETA"
         ------------------------------------------------------------
 
-        - for all classes on all non-String Set attribute methods, do check 
-          to insure item is within reasonable bounds.
-
-        - make init protected for all main classes (to allow inheritance of classes
-          in other dataformats like FITSML).
-
-        - Group cloning needs to be finished (I think has been done, check??).
-          XMLDataIOStyle has clone method in it, correct? (I did this, please check kelly)
-
         - fix the repeatable attribute on string parsing. 
 
 	- Impliment octal/hex data read/write in SaxDocHandler.
@@ -39,6 +30,9 @@
 
         - set/get DataFormat methods on Array are confusing. Clear up meanings between these
           methods and getDataFormatList().
+
+        - for all classes on all non-String Set attribute methods, do check 
+          to insure item is within reasonable bounds.
 
 
 	A list of things that have to be done before we can consider
