@@ -38,7 +38,7 @@ import java.util.Hashtable;
   * The value of this unit (e.g. "m" or "cm" or "km", etc)
   */
 
- public class Unit extends BaseObject{
+ public class Unit extends BaseObject {
   //
   // Constructor and related methods
   //
