@@ -962,6 +962,18 @@ public class SaxDocumentHandler extends DefaultHandler {
                     readTaggedInputStreamIntoArray(in);
 
                 } 
+                else if (readObj instanceof DelimitedXMLDataIOStyle) 
+                { 
+
+                    String data = getCharacterDataFromInputStream(in);
+
+                    // add it to the datablock if it isnt all whitespace ?? 
+                    if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(data) )
+                    {
+                        DATABLOCK.append(data);
+                    }
+
+                } 
                 else 
                 { 
                    throw new SAXException("Cant load external data of XMLDataIOStyle type:"+readObj.getClass());
@@ -1022,12 +1034,11 @@ public class SaxDocumentHandler extends DefaultHandler {
        int offset = 0;
        while ( (chars_this_read = reader.read(data)) >= 0)
        {
-                buffer.append(data, 0, chars_this_read);
-                if (chars_this_read < size) {
-                   break; // short read? then thats all
-                }
-                offset += chars_this_read;
-
+          buffer.append(data, 0, chars_this_read);
+          if (chars_this_read < size) {
+             break; // short read? then thats all
+          }
+          offset += chars_this_read;
        }
 
        return buffer.toString();
@@ -1636,6 +1647,10 @@ Log.infoln(") ["+CurrentDataFormat+"]");
 
               // Integer number = new Integer (thisString);
 
+              // trim of leading/trailing whitespace as the Integer parser will throw
+              // a rod if it sees it
+              thisString = thisString.trim();
+
               if (intRadix == 16) // peal off leading "0x"
                   thisString = thisString.substring(2);
 
@@ -1759,6 +1774,7 @@ Log.infoln(") ["+CurrentDataFormat+"]");
                    valueString = valueListString.substring(start, end);
 
                    // add the value to arrayList 
+                   Log.debugln("Got Delimited DataCell:["+valueString+"]");
                    values.add(valueString);
 
                    // this is the last value so terminate the while loop 
@@ -1773,6 +1789,7 @@ Log.infoln(") ["+CurrentDataFormat+"]");
                    valueString = valueListString.substring(start, termend);
 
                    // add the value to arrayList 
+                   Log.debugln("Got Delimited DataCell ("+start+","+termend+"):["+valueString+"]");
                    values.add(valueString);
 
                    // this is the last value so terminate the while loop 
@@ -1867,6 +1884,7 @@ Log.errorln(" TValue:"+valueString);
                 valueString = valueListString.substring(start, end);
 
                 // add the value to arrayList 
+                Log.debugln("Got Delimited DataCell (repeatable):["+valueString+"]");
                 values.add(valueString);
 
                 // this is the last value so terminate the while loop 
@@ -1881,6 +1899,7 @@ Log.errorln(" TValue:"+valueString);
                 valueString = valueListString.substring(start, termend);
 
                 // add the value to arrayList 
+                Log.debugln("Got Delimited DataCell ("+start+","+termend+") (repeatable):["+valueString+"]");
                 values.add(valueString);
 
                 // this is the last value so terminate the while loop 
@@ -2775,8 +2794,12 @@ Log.errorln(" TValue:"+valueString);
           if(DataNodeLevel != 0)
              return;
 
+          XMLDataIOStyle formatObj = CurrentArray.getXMLDataIOStyle();
+
           // only add the data here if it was *not* read in from a file 
-          if (CurrentArray.getDataCube().getHref() != null) return;
+          // AND we are doing a read style other than delimited
+          if ( !(formatObj instanceof DelimitedXMLDataIOStyle)  
+               && CurrentArray.getDataCube().getHref() != null) return;
 
           // now we are ready to read in untagged data (both delimited/formmatted styles) 
           // from the DATABLOCK
@@ -2785,7 +2808,6 @@ Log.errorln(" TValue:"+valueString);
           // instead of a buffer read in formatted reads. Come back and
           // improve this later if possible.
 
-          XMLDataIOStyle formatObj = CurrentArray.getXMLDataIOStyle();
 
           if ( formatObj instanceof DelimitedXMLDataIOStyle ||
                formatObj instanceof FormattedXMLDataIOStyle ) 
@@ -4760,6 +4782,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.64  2001/10/01 17:03:00  thomas
+ * added capabilty to add external, delmited data; small fix to trim off whitespace before running the Integer.parseInt stuff in addData..
+ *
  * Revision 1.63  2001/09/27 17:22:33  thomas
  * added ability to write tagged data to an external file
  *
