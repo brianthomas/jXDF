@@ -4,16 +4,26 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-/** The Value class.
-    @author b.t. (thomas@adc.gsfc.nasa.gov)
-    @version $Revision$
-*/
+/** Value.java
+ * @version $Revision$
+  */
 
-public class Value {
+public class Value extends BaseObject{
 
-   public Value () {
+   protected String Value;
+   public Value (String strValue) {
+      Value = strValue;
+   }
 
+   public String getValue() {
+      return Value;
    }
 
 }
-
+/* Modification History:
+ *
+ * $Log$
+ * Revision 1.3  2000/10/11 18:41:41  kelly
+ * added modification history.  -k.z.
+ *
+ */
