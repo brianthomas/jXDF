@@ -92,7 +92,7 @@ public class Specification {
 
   /** The name of the relevant version of XDF DTD file for this package.
   */
-  private String XDFDTDName = "XDF_0.17.dtd";
+  private String XDFDTDName = "XDF_017.dtd";
 
   /** The name of the XMLAttribute which is written out as PCDATA rather than as
       a node attribute (String/Number type XMLAttributes) or child node (Object
@@ -245,6 +245,9 @@ public class Specification {
 /* Modification history
  *
  * $Log$
+ * Revision 1.5  2001/06/19 15:07:14  thomas
+ * updated DTD name to remove the extraneous '.'
+ *
  * Revision 1.4  2001/06/12 17:15:55  huang
  * added a static method
  *
