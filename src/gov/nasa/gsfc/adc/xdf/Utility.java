@@ -73,6 +73,9 @@ package gov.nasa.gsfc.adc.xdf;
     }
 
     public static boolean isValidDatatype(String strDatatype) {
+
+      if (strDatatype == null) return true;
+
       String[] dataTypeList = Constants.DATATYPE_LIST;
       int stop = dataTypeList.length;
       for (int i = 0; i < stop; i++) {
@@ -92,6 +95,15 @@ package gov.nasa.gsfc.adc.xdf;
       return false;
     }
 
+    public static boolean isValidRelationRole(String strRole) {
+       String[] roleList = Constants.RELATION_ROLE_LIST;
+       int stop = roleList.length;
+       for (int i = 0; i < stop; i++) {
+          if (strRole.equals(roleList[i])) return true;
+       }
+       return false;
+    }
+
     public static boolean isValidDataCompression(String strDataCompression) {
       String[] dataCompressionList = Constants.DATA_COMPRESSION_LIST;
       int stop = dataCompressionList.length;
@@ -102,7 +114,36 @@ package gov.nasa.gsfc.adc.xdf;
       return false;
     }
 
+    public static boolean isValidFloatBits (int bits) {
+      int[] bitList = Constants.FLOATING_POINT_BITS_LIST;
+      int stop = bitList.length;
+      for (int i = 0; i < stop; i++) {
+         if (bits == bitList[i]) return true;
+      }
+      return false;
+    }
+
+    public static boolean isValidIntegerBits (int bits) {
+      int[] bitList = Constants.INTEGER_BITS_LIST;
+      int stop = bitList.length;
+      for (int i = 0; i < stop; i++) {
+         if (bits == bitList[i]) return true;
+      }
+      return false;
+    }
+
+    public static boolean isValidBinaryIntegerSigned (String strSigned) {
+
+        if ( strSigned != null && 
+                (strSigned.equals("yes") || strSigned.equals("no")) ) 
+           return true;
+
+        return false;
+    }
+
+
     public static boolean isValidValueSpecial(String strValueSpecial) {
+      if (strValueSpecial == null) return true;
       String[] valueSpecialList = Constants.VALUE_SPECIAL_LIST;
       int stop = valueSpecialList.length;
       for (int i = 0; i < stop; i++) {
@@ -113,6 +154,7 @@ package gov.nasa.gsfc.adc.xdf;
     }
 
     public static boolean isValidValueInequality(String strValueInequality) {
+      if (strValueInequality == null) return true;
       String[] valueInequalityList = Constants.VALUE_INEQUALITY_LIST;
       int stop = valueInequalityList.length;
       for (int i = 0; i < stop; i++) {
@@ -122,6 +164,11 @@ package gov.nasa.gsfc.adc.xdf;
       return false;
     }
 
+    public static boolean isValidNumberObject (Object numberObj) 
+    {
+       if (numberObj != null && numberObj instanceof Number) return true;
+       return false;
+    }
 
 
   }  //end of Utility class
@@ -129,6 +176,9 @@ package gov.nasa.gsfc.adc.xdf;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2001/02/07 18:44:38  thomas
+ * Added new methods for binary write/read.
+ *
  * Revision 1.6  2000/11/08 20:20:55  thomas
  * Trimmed down import path to just needed classes -b.t
  *
