@@ -980,7 +980,7 @@ protected boolean  removeData (Locator locator) {
 
 
 
-  public void toXDFOutputStream (
+  public void toXMLOutputStream (
                                    OutputStream outputstream,
                                    Hashtable XMLDeclAttribs,
                                    String strIndent,
@@ -1282,6 +1282,13 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.9  2000/11/08 19:18:07  thomas
+  * Changed the name of toXDF* methods to toXML* to
+  * better reflect the nature of the output (its not XDF
+  * unless you call th emethod from strcuture object;
+  * otherwise, it wont validate as XDF; it is still XML
+  * however). -b.t.
+  *
   * Revision 1.8  2000/11/06 21:11:01  kelly
   * --added removeData method
   * --added deep cloning

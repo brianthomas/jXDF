@@ -41,7 +41,7 @@ public class NotesLocationOrder extends BaseObject {
    //
 
    // axisIdRefORder isnt an XMLAttribute because we have special 
-   // handling in the toXDFOutputStream method for it. -b.t.
+   // handling in the toXMLOutputStream method for it. -b.t.
    ArrayList axisIdRefOrder = new ArrayList();
  
    String indexNodeName = "index";
@@ -78,7 +78,7 @@ public class NotesLocationOrder extends BaseObject {
    // Protected Methods
    //
 
-   public void toXDFOutputStream (  OutputStream outputstream, 
+   public void toXMLOutputStream (  OutputStream outputstream, 
                                     Hashtable XMLDeclAttribs,
                                     String indent,
                                     boolean dontCloseNode,
@@ -144,6 +144,13 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/11/08 19:18:07  thomas
+ * Changed the name of toXDF* methods to toXML* to
+ * better reflect the nature of the output (its not XDF
+ * unless you call th emethod from strcuture object;
+ * otherwise, it wont validate as XDF; it is still XML
+ * however). -b.t.
+ *
  * Revision 1.1  2000/11/02 19:44:58  thomas
  * Initial Version. -b.t.
  *

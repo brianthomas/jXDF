@@ -143,7 +143,7 @@ public class Notes extends BaseObject {
 
    // quick little change to prevent this node from printing out
    // IF there are no note objects in its notelist
-   public void toXDFOutputStream ( OutputStream outputstream,
+   public void toXMLOutputStream ( OutputStream outputstream,
                                    Hashtable XMLDeclAttribs,
                                    String indent,
                                    boolean dontCloseNode,
@@ -153,7 +153,7 @@ public class Notes extends BaseObject {
    {
      
       if( getNoteList().size() > 0 ) { 
-          super.toXDFOutputStream ( outputstream, XMLDeclAttribs,
+          super.toXMLOutputStream ( outputstream, XMLDeclAttribs,
                                     indent, dontCloseNode,
                                     newNodeNameString, noChildObjectNodeName
                                    );
@@ -188,6 +188,13 @@ public class Notes extends BaseObject {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.5  2000/11/08 19:18:07  thomas
+  * Changed the name of toXDF* methods to toXML* to
+  * better reflect the nature of the output (its not XDF
+  * unless you call th emethod from strcuture object;
+  * otherwise, it wont validate as XDF; it is still XML
+  * however). -b.t.
+  *
   * Revision 1.4  2000/11/03 20:26:57  thomas
   * Updated toXDFOutputStream so that the node wont
   * print out IF there are no note objects held within it.

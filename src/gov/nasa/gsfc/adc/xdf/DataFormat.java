@@ -151,7 +151,7 @@ import java.io.OutputStream;
 
   /** override the base object method to add a little tailoring
    */
-  public void toXDFOutputStream (  OutputStream outputstream,
+  public void toXMLOutputStream (  OutputStream outputstream,
                                    Hashtable XMLDeclAttribs,
                                    String indent,
                                    boolean dontCloseNode,
@@ -199,6 +199,13 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/08 19:18:07  thomas
+ * Changed the name of toXDF* methods to toXML* to
+ * better reflect the nature of the output (its not XDF
+ * unless you call th emethod from strcuture object;
+ * otherwise, it wont validate as XDF; it is still XML
+ * however). -b.t.
+ *
  * Revision 1.4  2000/10/27 21:15:00  kelly
  * completed *toXDF*.  -k.z.
  *

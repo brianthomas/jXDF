@@ -37,7 +37,7 @@ import org.xml.sax.AttributeList;
     and writing out the XML-based properties of the XDF objects. It also
     provides fields/methods to allow all inheriting XDF objects be
     members of Group objects. Key parts to the BaseObject class include the
-    XMLAttributes and the toXDF* methods it provides.
+    XMLAttributes and the toXML* methods it provides.
  */
 public abstract class BaseObject implements Serializable, Cloneable {
 
@@ -45,7 +45,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   // Fields
   //
 
-  /** Stores whether nicely formatted XDF should be output from any toXDF*
+  /** Stores whether nicely formatted XDF should be output from any toXML*
       method. Nice formatting includes nested indentation and return characters
       to improve human readability of output XDF (but blows up the size of
       the XDF file!).
@@ -84,7 +84,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   */
   protected String classXDFNodeName;
 
-  /** The version of XML that will be output from a toXDF* method call.
+  /** The version of XML that will be output from a toXML* method call.
   */
   private static String sXMLSpecVersion = "1.0";
 
@@ -110,7 +110,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   */
   private static String sPCDATAAttribute = "value";
 
-  /** openGroupNodeHash is an internal field used by the toXDF* methods to track
+  /** openGroupNodeHash is an internal field used by the toXML* methods to track
       which group nodes are still open. Probably should go away.
   */
   protected Set openGroupNodeHash = Collections.synchronizedSet(new HashSet());
@@ -189,13 +189,13 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   /** Get the output XDF format style.
       @return: the value of sPrettyXDFOutput field  (which is true if nicely formatted
-               XML is to be outputted from any call to a toXDF* method, false if not).
+               XML is to be outputted from any call to a toXML* method, false if not).
   */
   public static boolean getPrettyXDFOutput() {
     return sPrettyXDFOutput;
   }
 
-  /** Set this to true for nicely formatted XML output from any call to a toXDF* method.
+  /** Set this to true for nicely formatted XML output from any call to a toXML* method.
       Setting this value will change the runtime behavior of all XDF Objects within an
       application.
       @return: the value of sPrettyXDFOutput field.
@@ -341,18 +341,18 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** Write this object out to the indicated file. The file will be clobbered
       by the output, so it is advisable to check for the existence of the file
       *before* using this method if you are worried about losing prior information.
-      Uses toXDFOutputStream. The passed hashtable will be used to initialize the
+      Uses toXMLOutputStream. The passed hashtable will be used to initialize the
       attributes of the XML declaration in the output XDF file.
   */
-  public void toXDFFile (String filename, Hashtable XMLDeclAttribs) {
+  public void toXMLFile (String filename, Hashtable XMLDeclAttribs) {
 
     // open file writer
     try {
       FileOutputStream fileout = new FileOutputStream(filename);
-      toXDFOutputStream(fileout, XMLDeclAttribs);
+      toXMLOutputStream(fileout, XMLDeclAttribs);
       fileout.close();
     } catch (IOException e) {
-      Log.error("Error: toXDFFile method hash trouble writing to "+ filename + " for writing.");
+      Log.error("Error: toXMLFile method hash trouble writing to "+ filename + " for writing.");
     }
 
   }
@@ -360,14 +360,14 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** A different invokation style. It has defaults for the XML Declaration
       setting standalone to "no" and version to the value of sXMLSpecVersion.
   */
-  public void toXDFFile (String filename) {
+  public void toXMLFile (String filename) {
 
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
      XMLDeclAttribs.put("version", (String) sXMLSpecVersion);
 
-     toXDFFile(filename, XMLDeclAttribs);
+     toXMLFile(filename, XMLDeclAttribs);
 
   }
 
@@ -378,7 +378,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
       get well-formmed XML output for ANY object). For obvious reasons, only
       Structure objects will create *valid XDF* output.
   */
-  public void toXDFOutputStream (
+  public void toXMLOutputStream (
                                    OutputStream outputstream,
                                    Hashtable XMLDeclAttribs,
                                    String indent,
@@ -474,7 +474,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
                 indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                 indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
                 String newindent = indent + sPrettyXDFOutputIndentation;
-                containedObj.toXDFOutputStream(outputstream, new Hashtable(), newindent);
+                containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
               }
             }
           }
@@ -488,7 +488,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
               indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
               indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
               String newindent = indent + sPrettyXDFOutputIndentation;
-              containedObj.toXDFOutputStream(outputstream, new Hashtable(), newindent);
+              containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
             }
           }
         } else {
@@ -552,41 +552,41 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** A different invokation style for writing this object out to
       the indicated OutputStream.
   */
-  public void toXDFOutputStream ( OutputStream outputstream,
+  public void toXMLOutputStream ( OutputStream outputstream,
                                   Hashtable XMLDeclAttribs,
                                   String indent
                                 )
   {
-     toXDFOutputStream(outputstream, XMLDeclAttribs, indent, false, null, null);
+     toXMLOutputStream(outputstream, XMLDeclAttribs, indent, false, null, null);
 
   }
 
   /** A different invokation style for writing this object out to
       the indicated OutputStream.
   */
-  public void toXDFOutputStream (OutputStream outputstream, Hashtable XMLDeclAttribs)
+  public void toXMLOutputStream (OutputStream outputstream, Hashtable XMLDeclAttribs)
   {
      //not reseanable to set the indent to sPrettyXDFOutputIndentation --k.z. 10/17
-     toXDFOutputStream(outputstream, XMLDeclAttribs, new String(""), false, null, null);
+     toXMLOutputStream(outputstream, XMLDeclAttribs, new String(""), false, null, null);
   }
 
   /** A different invokation style. It has defaults for the XML Declaration
       setting standalone to "no" and version to the value of sXMLSpecVersion.
   */
-  public void toXDFOutputStream (OutputStream outputstream, String indent)
+  public void toXMLOutputStream (OutputStream outputstream, String indent)
   {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
      XMLDeclAttribs.put("version", (String) sXMLSpecVersion);
-     toXDFOutputStream(outputstream, XMLDeclAttribs, indent);
+     toXMLOutputStream(outputstream, XMLDeclAttribs, indent);
   }
 
   /** A different invokation style. It has defaults for the XML Declaration
       setting standalone to "no" and version to the value of sXMLSpecVersion.
       Indentation starts as "".
   */
-  public void toXDFOutputStream (OutputStream outputstream)
+  public void toXMLOutputStream (OutputStream outputstream)
   {
 
      // prepare XMLDeclaration
@@ -594,7 +594,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
      XMLDeclAttribs.put("standalone", new String("no"));
      XMLDeclAttribs.put("version", (String) sXMLSpecVersion);
 
-     toXDFOutputStream(outputstream, XMLDeclAttribs);
+     toXMLOutputStream(outputstream, XMLDeclAttribs);
 
   }
 
@@ -715,7 +715,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   }
 
   /** Basically this rearranges XMLAttribute information into a more convient
-      order for the toXDFOutputstream method.
+      order for the toXMLOutputstream method.
       @return: Hashtable with 3 entries: attribList--attributes(strings, numbers)
                                          objRefList--the object this class owns
                                          PCDATA--the PCDATA of this element
@@ -826,7 +826,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
             // its *not* already open, so we bump up the indentation,
             // open it and add it to the open group node list.
             newIndent.append(sPrettyXDFOutputIndentation);
-            memberGroup.toXDFOutputStream(outputstream, new Hashtable(), newIndent.toString(), true, null, null);
+            memberGroup.toXMLOutputStream(outputstream, new Hashtable(), newIndent.toString(), true, null, null);
             this.openGroupNodeHash.add(memberGroup);
           }
         }
@@ -903,6 +903,13 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.25  2000/11/08 19:18:07  thomas
+ * Changed the name of toXDF* methods to toXML* to
+ * better reflect the nature of the output (its not XDF
+ * unless you call th emethod from strcuture object;
+ * otherwise, it wont validate as XDF; it is still XML
+ * however). -b.t.
+ *
  * Revision 1.24  2000/11/06 21:09:06  kelly
  * --minor fix.  wirteOut doesnt check if passed in String is null.
  * --more synchronization on clone.  -k.z.

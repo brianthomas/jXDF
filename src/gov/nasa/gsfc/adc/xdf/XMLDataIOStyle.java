@@ -170,7 +170,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   }
 
 
-  public void toXDFOutputStream (
+  public void toXMLOutputStream (
                                    OutputStream outputstream,
                                    Hashtable XMLDeclAttribs,
                                    String indent,
@@ -253,6 +253,13 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/08 19:18:07  thomas
+ * Changed the name of toXDF* methods to toXML* to
+ * better reflect the nature of the output (its not XDF
+ * unless you call th emethod from strcuture object;
+ * otherwise, it wont validate as XDF; it is still XML
+ * however). -b.t.
+ *
  * Revision 1.6  2000/11/06 21:15:20  kelly
  * minor fix in *toXDF*
  *

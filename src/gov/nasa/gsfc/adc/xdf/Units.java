@@ -156,7 +156,7 @@ import java.io.*;
   }
 
   /** getClassNoUnitChildNodeName
-   * return: Name of the child node to print in the toXDFOutputStream method when
+   * return: Name of the child node to print in the toXMLOutputStream method when
    * an  XDF::Units object contains NO XDF::Unit child objects.
    */
   public String getClassNoUnitChildName() {
@@ -229,14 +229,14 @@ import java.io.*;
   }
 
 
-  public void toXDFOutputStream  (
+  public void toXMLOutputStream  (
                                    OutputStream outputstream,
                                    Hashtable XMLDeclAttribs,
                                    String indent
                                  )
 
   {
-    super.toXDFOutputStream( outputstream,
+    super.toXMLOutputStream( outputstream,
                              XMLDeclAttribs,
                              indent,
                              false,
@@ -251,8 +251,15 @@ import java.io.*;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/08 19:18:07  thomas
+ * Changed the name of toXDF* methods to toXML* to
+ * better reflect the nature of the output (its not XDF
+ * unless you call th emethod from strcuture object;
+ * otherwise, it wont validate as XDF; it is still XML
+ * however). -b.t.
+ *
  * Revision 1.4  2000/10/27 21:22:48  kelly
- * fixed bug in *toXDF*  -k.z.
+ * fixed bug in *toXML*  -k.z.
  *
  * Revision 1.3  2000/10/11 14:37:17  kelly
  * complete value(), toXDFOutputStream(), added more documentation.
