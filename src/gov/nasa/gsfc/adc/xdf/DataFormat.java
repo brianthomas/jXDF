@@ -40,8 +40,14 @@ import java.util.Hashtable;
   //
   //Fields
   //
-  //store the subclass's particular nodeName, "string", "integer", etc.
-  String specificDataFormatName;
+
+  // stores the subclass's particular nodeName, "string", "integer", etc.
+  protected String specificDataFormatName;
+  protected String formatPattern;
+
+  //
+  // Constructors
+  //
 
   /** The no argument constructor.
    */
@@ -51,7 +57,7 @@ import java.util.Hashtable;
   }
 
   //
-  //ABSTRACT methods
+  // ABSTRACT methods
   //
 
   //return the number of bytes
@@ -64,6 +70,19 @@ import java.util.Hashtable;
   public  abstract void setInfiniteValue(Object Obj) ;
   public  abstract void setInfiniteNegativeValue(Object Obj) ;
   public  abstract void setNoDataValue(Object Obj) ;
+
+  //
+  // Public Get/Set Methods
+  //
+
+  /** The pattern is the (Message|Decimal)Format pattern that should 
+      be used to print out data within the slice of the array covered 
+      by this object. This method is used by the dataCube in its toXMLOutput method. 
+   */
+
+  public String getFormatPattern ( ) {
+     return formatPattern;
+  }
 
   /**
    * @return the current *lessThanValue* attribute
@@ -113,7 +132,6 @@ import java.util.Hashtable;
     return ((XMLAttribute) attribHash.get("infiniteNegativeValue")).getAttribValue();
   }
 
-
   /**
    * @return the current *noDataValue* attribute
    */
@@ -121,6 +139,10 @@ import java.util.Hashtable;
   {
     return ((XMLAttribute) attribHash.get("noDataValue")).getAttribValue();
   }
+
+  //
+  // Other Public Methods
+  //
 
   /** override the base object method to add a little tailoring
    */
@@ -206,6 +228,13 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/22 20:42:00  thomas
+ * beaucoup changes to make formatted reads work.
+ * DataFormat methods now store the "template" or
+ * formatPattern that will be needed to print them
+ * back out. Removed sprintfNotation, Perl regex and
+ * Perl attributes from DataFormat classes. -b.t.
+ *
  * Revision 1.9  2000/11/20 22:03:48  thomas
  * Split up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for

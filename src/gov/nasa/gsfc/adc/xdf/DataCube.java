@@ -28,10 +28,15 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Collections;
+
 import java.lang.reflect.*;
+
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
 
 /**Holds the data for a given Array object. It is designed
  *to flexibly expand as data is added/appended onto it.
@@ -276,12 +281,16 @@ public int decrementDimension() {
 }
 
 
-/**get String data of a requested datacell
+/** Regardless of what type of data is stored in the data cell we return the
+    String representation.
  */
-public String getStringData(Locator locator) throws NoDataException{
+public String getStringData(Locator locator) throws NoDataException 
+{
+
   List axisList = parentArray.getAxisList();
   List current = data;
   int numOfAxis = axisList.size();
+
   if (numOfAxis == 1) {
     int index = locator.getAxisLocation((Axis) axisList.get(0));
     try {
@@ -384,12 +393,15 @@ public int getIntData(Locator locator) throws NoDataException{
 
 }
 
-/**get double data of a requested datacell
+/** get doubleprecision data from a requested datacell. 
  */
-public double getDoubleData(Locator locator) throws NoDataException{
+public double getDoubleData(Locator locator) throws NoDataException {
+
   List axisList = parentArray.getAxisList();
   List current = data;
   int numOfAxis = axisList.size();
+
+  // one dimensional cube case
   if (numOfAxis == 1) {
     int index = locator.getAxisLocation((Axis) axisList.get(0));
     try {
@@ -403,6 +415,7 @@ public double getDoubleData(Locator locator) throws NoDataException{
     }
   }
 
+  // multi-dimensional case
   for (int i = numOfAxis-1 ; i >= 2; i--) {
     Axis axis = (Axis) axisList.get(i);
     int index =  locator.getAxisLocation(axis);
@@ -448,7 +461,7 @@ public double getDoubleData(Locator locator) throws NoDataException{
     String strData;
     try {
       strData = getStringData(locator);
-      strData +=strValue;
+      strData += strValue;
     }
     catch (NoDataException e) {
       strData = strValue;
@@ -1040,18 +1053,19 @@ protected boolean  removeData (Locator locator) {
     //stores the NoDataValues for the parentArray,
     //used in writing out when NoDataException is caught
     String NoDataValues[] = new String[fastestAxis.getLength()];
+
     if (parentArray.hasFieldAxis()) {
       DataFormat[] dataFormatList = parentArray.getDataFormatList();
       for (int i = 0; i < NoDataValues.length; i++) {
         DataFormat d =  dataFormatList[i];
-        if (d != null && d.getNoDataValue() != null)
+        if (d != null && d.getNoDataValue() != null) 
           NoDataValues[i]=d.getNoDataValue().toString();
       }
     }
     else {
       DataFormat d = parentArray.getDataFormat();
       for (int i = 0; i < NoDataValues.length; i++) {
-        if (d!=null && d.getNoDataValue() != null)
+        if (d!=null && d.getNoDataValue() != null) 
           NoDataValues[i] = d.getNoDataValue().toString();
       }
     }
@@ -1094,7 +1108,7 @@ protected boolean  removeData (Locator locator) {
                            currentLocator,
                            (FormattedXMLDataIOStyle) readObj,
                            fastestAxis,
-                           NoDataValues);
+                           NoDataValues );
        }
     }
 
@@ -1210,17 +1224,19 @@ protected void writeTaggedData(OutputStream outputstream,
     do {
       dataNum ++;
       try {
-        writeOut(outputstream, getStringData(locator));
+        
+         writeOut(outputstream, getStringData(locator));
+
+      } catch (NoDataException e) {  //double check, a bug here, "yes" is already printed
+
+         String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
+         if (noData == null) {
+            readObj.setRepeatable("no");
+         } else {
+           writeOut(outputstream, noData);
+         }
       }
-      catch (NoDataException e) {  //double check, a bug here, "yes" is already printed
-        String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
-        if (noData == null) {
-          readObj.setRepeatable("no");
-        }
-        else {
-          writeOut(outputstream, noData);
-        }
-      }
+
       //write out delimiter anyway
       writeOut(outputstream, delimiter);
       if (dataNum == fastestAxisLength) {
@@ -1232,78 +1248,179 @@ protected void writeTaggedData(OutputStream outputstream,
     writeOut(outputstream, "]]>");
   }
 
-  /**write formatted data
+  /** Write formatted data
    */
-  private void writeFormattedData(OutputStream outputstream ,
-                                 Locator locator,
-                                 FormattedXMLDataIOStyle readObj,
-                                 AxisInterface fastestAxis,
-                                 String[] noDataValues)
-  {
-     writeOut(outputstream, "<![CDATA[");
-     List commands = readObj.getCommands();
+   private void writeFormattedData(OutputStream outputstream ,
+                                   Locator locator,
+                                   FormattedXMLDataIOStyle readObj,
+                                   AxisInterface fastestAxis,
+                                   String[] noDataValues )
+   {
 
-     synchronized (data) { //double check on sync
-      hasMoreData = locator.hasNext();
-      while (hasMoreData)
-       recursiveWriteFormattedData(outputstream, locator, commands, fastestAxis, noDataValues);
-     writeOut(outputstream, "]]>");
-    }
-  }
+      // print opening CDATA statement
+      writeOut(outputstream, "<![CDATA[");
 
-  private void recursiveWriteFormattedData(OutputStream outputstream,
-                                           Locator locator,
-                                           List commands,
-                                           AxisInterface fastestAxis,
-                                           String[] noDataValues)
-  {
-    int stop = commands.size();
-    for (int i = 0; i<stop; i++) {
-      FormattedIOCmd command = (FormattedIOCmd) commands.get(i);
-      if (command instanceof RepeatFormattedIOCmd) {
-        int end = ((RepeatFormattedIOCmd) command).getCount().intValue();
-        List repeatCommandList = ((RepeatFormattedIOCmd)command).getCommands();
-        for (int j = 0; j < end; j ++) {
-          recursiveWriteFormattedData(outputstream, locator, repeatCommandList, fastestAxis, noDataValues);
-        }
-      }
-      else {
-        if (command instanceof SkipCharFormattedIOCmd) {
-          try {
-            if (hasMoreData)   {
-              writeOut(outputstream, getStringData(locator));
+      // print out the data as appropriate for the format
+      // QUESTION: don't we need to syncronize on readObj too?
+      synchronized (data) 
+      { 
+
+        List commands = readObj.getCommands(); // returns expanded list (no repeat cmds) 
+        int nrofCommands = commands.size();
+        int currentCommand = 0;
+
+        DataFormat dataFormats[] = parentArray.getDataFormatList(); 
+        int nrofDataFormats = dataFormats.length;
+        int currentDataFormat = 0;
+
+        // loop thru all of the dataCube until finished with all data and commands 
+        boolean atEndOfDataCube = false;
+        boolean backToStartOfDataCube = false;
+        while (!backToStartOfDataCube)
+        { 
+
+             FormattedIOCmd command = (FormattedIOCmd) commands.get(currentCommand);
+
+             if(atEndOfDataCube && locator.getAxisLocation(fastestAxis) == 0) 
+                 backToStartOfDataCube = true;
+
+             if (command instanceof ReadCellFormattedIOCmd)
+             {
+
+                if (backToStartOfDataCube) break; // dont bother, we'd be re-printing data 
+
+                try {
+                   doReadCellFormattedIOCmdOutput( outputstream,
+                                                   dataFormats[currentDataFormat],
+                                                   locator );
+                } catch (NoDataException e) {
+
+                    // no data here, hurm. Print the noDataValue. 
+                    // Is this always appropriate, seems questionable? -b.t. 
+                    String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
+                    if (noData != null)
+                         writeOut(outputstream, noData);
+                    else
+                       Log.errorln("Cant print out null data: noDataValue NOT defined.");
+
+                }
+
+                // advance the data location 
+                locator.next();
+
+                // advance the DataFormat to be used  
+                if(nrofDataFormats > 1)
+                {
+                   currentDataFormat++;
+                   if ( currentDataFormat == nrofDataFormats)
+                      currentDataFormat = 0;
+                }
+
+             }
+             else if (command instanceof SkipCharFormattedIOCmd)
+             {
+
+                doSkipCharFormattedIOCmdOutput ( outputstream, (SkipCharFormattedIOCmd) command);
+
+             }
+             else
+             {
+                Log.errorln("DataCube cannot write out, unimplemented format command:"+
+                              command.toString());
+                System.exit(-1);
+             }
+
+             if(nrofCommands > 1)
+             { 
+                currentCommand++;
+                if ( currentCommand == nrofCommands) { 
+                   currentCommand = 0;
+                }
+             }
+
+             if(!atEndOfDataCube && !locator.hasNext()) atEndOfDataCube = true;
+
+
+         } // end of while loop 
+
+      } // end of sync loop
+
+      // print closing CDATA statement
+      writeOut(outputstream, "]]>");
+
+   }
+
+   private void doSkipCharFormattedIOCmdOutput ( OutputStream outputstream, 
+                                                 SkipCharFormattedIOCmd skipCharCommand)
+   {
+       writeOut(outputstream, skipCharCommand.getOutput());
+   }
+
+
+   // Prints out data as appropriate when we get a ReadCellFormattedIOCmd
+   // We make use of the Java Message|Decimal Formats here, seems wasteful
+   // because we have to convert datatypes around to accomodate these classes.
+   // should look into buffered type of IO ala JavaFits to find better 
+   // performance. -b.t. 
+   private void doReadCellFormattedIOCmdOutput ( OutputStream outputstream,
+                                                 DataFormat thisDataFormat, 
+                                                 Locator locator
+                                               ) 
+   throws NoDataException
+   {
+
+         String output = null;
+         String pattern = thisDataFormat.getFormatPattern();
+         int formatsize = thisDataFormat.numOfBytes();
+
+         // format the number for output
+         if ( thisDataFormat instanceof FixedDataFormat ||
+              thisDataFormat instanceof IntegerDataFormat ||
+              thisDataFormat instanceof ExponentialDataFormat)
+         {
+
+            DecimalFormat formatter = new DecimalFormat(pattern);
+            Double thisDatum = new Double(getDoubleData(locator));
+            output = formatter.format(thisDatum);
+
+         } else if (thisDataFormat instanceof StringDataFormat)
+         {
+
+            output = getStringData(locator);
+            // hmm. check to see we dont exceed the allowed width of this field
+            // trim down the string IF that is the case.
+            if(output.length() > formatsize)
+               output = output.substring(0,formatsize);
+
+         } else {
+            Log.errorln("Unknown Dataformat:"+thisDataFormat.getClass().toString()
+                        +" is not implemented for formatted writes. Aborting.");
+            System.exit(-1);
+         }
+
+         if (output != null) {
+
+            // pad with leading spaces
+            int actualsize = output.length();
+            while (actualsize < formatsize)
+            {
+               writeOut(outputstream, " ");
+               actualsize++;
             }
-            else
-              return;
-          }
-          catch (NoDataException e) {
-            String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
-            if (noData != null) {
-              writeOut(outputstream, noData);
-            }
-          }
-          String output=((SkipCharFormattedIOCmd) command).getOutput();
-          if (output == null) {
-            writeOut(outputstream, SkipCharFormattedIOCmd.DefaultOutput) ;
-          }
-          else {
+
+            // now write the data out
             writeOut(outputstream, output);
-          }
-          if (!locator.next())  {    //no more data, we are done
-            hasMoreData = false;
-            return;
-          }
-        } //done dealing with SkipCharFormattedIOCmd
-      }
 
-    } //end of outer for loop
- }
+         } else {
+            // throw error
+            Log.printStackTrace(new IOException());
+         }
 
+   } 
 
-
-  //
-  //PROTECTED methods
-  //
+   //
+   // PROTECTED methods
+   //
 
   /**deep copy of this Data object
    */
@@ -1375,6 +1492,13 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.17  2000/11/22 20:42:00  thomas
+  * beaucoup changes to make formatted reads work.
+  * DataFormat methods now store the "template" or
+  * formatPattern that will be needed to print them
+  * back out. Removed sprintfNotation, Perl regex and
+  * Perl attributes from DataFormat classes. -b.t.
+  *
   * Revision 1.16  2000/11/20 22:06:08  thomas
   * plit up XMLAttribute type NUMBER_TYPE into
   * INTEGER_TYPE and DOUBLE_TYPE. This allows for

@@ -25,38 +25,25 @@
 
 
 package gov.nasa.gsfc.adc.xdf;
-import java.util.Hashtable;
-import java.io.OutputStream;
+
+import org.xml.sax.AttributeList;
 
 /**
-    describes string data.
+   This class describes string data.
    @version $Revision$
  */
 
 
 public class StringDataFormat extends DataFormat {
-  //
-  //Fields
-  //
-  public static final String PerlSprintfFieldString = "s";
-  public static final String PerlRegexFieldString = ".";
-  private String parentClassXDFNodeName;
 
-
-   /** The no argument constructor.
+  //
+  // Constructors
+  //
+  /** The no argument constructor.
    */
   public StringDataFormat ()  //DataFormat no-arg constructor should be been called
   {
     init();
-  }
-
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init() {
-    specificDataFormatName = "string";
-    attribOrder.add(0, "length");  //add length as the first attribute;
-    attribHash.put("length", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
   }
 
   //
@@ -118,9 +105,17 @@ public class StringDataFormat extends DataFormat {
   {
     return (Integer) ((XMLAttribute) attribHash.get("length")).getAttribValue();
   }
+
   //
   //Other PUBLIC Methods
   //
+
+   // We need this here so that we will properly update the
+   // templateNotation of the class. -b.t. 
+   public void setXMLAttributes (AttributeList attrs) {
+      super.setXMLAttributes(attrs);
+      generateFormatPattern();
+   }
 
   /** A convenience method.
    * @return the number of bytes this StringDataFormat holds.
@@ -129,42 +124,42 @@ public class StringDataFormat extends DataFormat {
     return getLength().intValue();
   }
 
-  public String templateNotation(String strEndian, String strEncoding)  {
-    return "A" + numOfBytes();
+   //
+   // Private Method
+   //
+
+   // separate method to minimize the number of times we do this.
+   private void generateFormatPattern ( ) {
+      formatPattern = "{0}";
+   }
+
+   /** Special private method used by constructor methods to
+       conviently build the XML attribute list for a given class.
+    */
+  private void init() {
+
+     specificDataFormatName = "string";
+
+     attribOrder.add(0, "length");  //add length as the first attribute;
+
+     attribHash.put("length", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
+
+     generateFormatPattern();
+
   }
-
-  public String regexNotation() {
-    String notation = "(";
-    int width = numOfBytes();
-    int beforeWhiteSpace = width - 1;
-    if (beforeWhiteSpace > 0)
-      notation += "\\s{0," + beforeWhiteSpace + "}";
-    notation +=PerlRegexFieldString + "{1," + width + "}";
-    notation +=")";
-    return notation;
-  }
-
-  /** sprintfNotation: returns sprintf field notation
-   *
-   */
-  public String sprintfNotation() {
-
-  return  "%" + numOfBytes() + PerlSprintfFieldString;
 
 }
 
-  /** fortranNotation: The fortran style notation for this object.
-   */
-  public String fortranNotation() {
-    return "A"+ numOfBytes();
-  }
-
-  /** override the base object method to add a little tailoring
-   */
-}
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/22 20:42:00  thomas
+ * beaucoup changes to make formatted reads work.
+ * DataFormat methods now store the "template" or
+ * formatPattern that will be needed to print them
+ * back out. Removed sprintfNotation, Perl regex and
+ * Perl attributes from DataFormat classes. -b.t.
+ *
  * Revision 1.9  2000/11/20 22:03:48  thomas
  * Split up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for

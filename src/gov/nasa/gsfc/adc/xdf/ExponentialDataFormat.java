@@ -24,7 +24,8 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.Hashtable;
+import org.xml.sax.AttributeList;
+
 
 /**
  *  describes exponential (ASCII) floating point numbers
@@ -34,14 +35,10 @@ import java.util.Hashtable;
 
 
 public class ExponentialDataFormat extends DataFormat {
+
   //
   //Fields
   //
-  public static final String PerlSprintfFieldExponent = "e";
-  public static final String PerlRegexFieldExponent ="[Ed][+-]?";
-  public static final String PerlRegexFieldFixed = "\\d";
-  public static final String PerlRegexFieldInteger = "\\d";
-
   public static final int ExponentSize = 2;  //double check
 
 
@@ -50,27 +47,6 @@ public class ExponentialDataFormat extends DataFormat {
   public ExponentialDataFormat ()  //DataFormat no-arg constructor should be been called
   {
     init();
-  }
-
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init() {
-     specificDataFormatName = "exponent";
-    //add attributes
-    /**precision:
-     * The precision of this exponential field from the portion to the
-     * right of the '.' to the exponent that follows the 'E'.
-     */
-    attribOrder.add(0,"precision");
-    /**width: The entire width of this exponential field, including the 'E'
-     * and its exponential number.
-     */
-    attribOrder.add(0, "width");
-
-    attribHash.put("width", new XMLAttribute( null, Constants.INTEGER_TYPE));
-    attribHash.put("precision", new XMLAttribute(null, Constants.INTEGER_TYPE));
-
   }
 
   //
@@ -120,28 +96,34 @@ public class ExponentialDataFormat extends DataFormat {
      ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
   }
 
-  /** set the *width* attribute
+  /** Set the entire width of this exponential field, including the 'E'
+      and its exponential number.
    */
   public void setWidth(Integer numWidth) {
      ((XMLAttribute) attribHash.get("width")).setAttribValue(numWidth);
-
+     generateFormatPattern();
   }
-  /**
-   * @return the current *width* attribute
+
+  /** The entire width of this exponential field, including the 'E'
+      and its exponential number.
+      @return the current *width* attribute
    */
   public Integer getWidth()
   {
     return (Integer) ((XMLAttribute) attribHash.get("width")).getAttribValue();
   }
 
-  /** set the *precision* attribute
+  /** Set the precision of this exponential field from the portion to the  
+      right of the '.' to the exponent that follows the 'E'.
    */
   public void setPrecision(Integer precision) {
      ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
-
+     generateFormatPattern();
   }
-  /**
-   * @return the current *precision* attribute
+
+  /** Get the precision of this exponential field from the portion to the  
+      right of the '.' to the exponent that follows the 'E'.
+      @return the current *precision* attribute
    */
   public Integer getPrecision()
   {
@@ -152,6 +134,13 @@ public class ExponentialDataFormat extends DataFormat {
   //Other PUBLIC Methods
   //
 
+  // We need this here so that we will properly update the
+  // templateNotation of the class. -b.t. 
+   public void setXMLAttributes (AttributeList attrs) {
+      super.setXMLAttributes(attrs);
+      generateFormatPattern();
+   }
+
   /**  A convenience method.
    * @return the number of bytes this ExponentialDataFormat holds.
    */
@@ -159,50 +148,71 @@ public class ExponentialDataFormat extends DataFormat {
     return getWidth().intValue();
   }
 
+  // separate method to minimize the number of times we do this.
+  private void generateFormatPattern ( ) {
 
-  public String templateNotation(String strEndian, String strEncoding) {
-    return "A"+numOfBytes();
+     StringBuffer leftpattern = new StringBuffer();
+     StringBuffer rightpattern = new StringBuffer();
+     StringBuffer etemplate = new StringBuffer();
+
+     // precision is the size of the exponent excluding 'E'
+     int esize = getPrecision().intValue();
+     // width including 'E' and exponent
+     int wsize = getWidth().intValue() - esize - 1;
+
+Log.errorln("EXPONENT WIDTH:"+wsize+" Precision:"+esize);
+   
+     if(wsize > 2) 
+        etemplate.append("#");
+
+     leftpattern.append("0.");
+
+     while (wsize-- > 3)
+        leftpattern.append("0");
+
+     rightpattern.append("E0");
+     while (esize-- > 1)
+        rightpattern.append("0");
+
+     // finish building the template
+     etemplate.append(leftpattern.toString()+rightpattern.toString());
+     etemplate.append(";-"+leftpattern.toString()+rightpattern.toString());
+
+     formatPattern = etemplate.toString();
   }
 
-  public String regexNotation() {
-
-    int width = numOfBytes();
-    int precision = getPrecision().intValue();
-    String notation = "(";
-    int beforeWhiteSpace = width - precision - 1;
-    if (beforeWhiteSpace > 0)
-      notation += "\\s{0," + beforeWhiteSpace + "}";
-    int leadingLength = width-precision;
-    notation +=PerlRegexFieldFixed + "{1," + leadingLength + "}\\.";
-    notation +=PerlRegexFieldFixed + "{1," + precision + "}";
-    notation +=PerlRegexFieldExponent;
-
-    notation +=PerlRegexFieldInteger + "{1," + ExponentSize + "}";
-
-    notation +=")";
-    return notation;
-  }
-
-  /** sprintfNotation: returns sprintf field notation
-   *
+  //
+  // Private Methods
+  //
+  /** Special private method used by constructor methods to
+   *  conviently build the XML attribute list for a given class.
    */
-  public String sprintfNotation() {
+  private void init() {
 
-  return  "%" + numOfBytes() + "." + getPrecision().intValue() + PerlSprintfFieldExponent  ;
+     specificDataFormatName = "exponent";
+    //add attributes
+    attribOrder.add(0,"precision");
+    attribOrder.add(0, "width");
+
+    attribHash.put("width", new XMLAttribute( new Integer(0), Constants.INTEGER_TYPE));
+    attribHash.put("precision", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
+
+    generateFormatPattern();
+
+  }
 
 }
 
-  /** fortranNotation: The fortran style notation for this object.
-   */
-  public String fortranNotation() {
-    return "E"+ numOfBytes() + "." + getPrecision().intValue();
-  }
-
-
-}
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/22 20:42:00  thomas
+ * beaucoup changes to make formatted reads work.
+ * DataFormat methods now store the "template" or
+ * formatPattern that will be needed to print them
+ * back out. Removed sprintfNotation, Perl regex and
+ * Perl attributes from DataFormat classes. -b.t.
+ *
  * Revision 1.7  2000/11/20 22:03:48  thomas
  * Split up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for

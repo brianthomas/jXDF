@@ -26,6 +26,8 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
+import org.xml.sax.AttributeList;
+
 /**
  * IntegerDataFormat.java:IntegerDataFormat class describes the data format
  * of objects which require such description (Field, Array).
@@ -34,44 +36,15 @@ package gov.nasa.gsfc.adc.xdf;
 
 
 public class IntegerDataFormat extends DataFormat {
+
   //
-  //Fields
+  // Constructors
   //
-
-
-  //This is used by the 'decimal' type
-  public static final String PerlSprintfFieldInteger = "d";
-
-  // using long octal format. Technically, should be an error
-  // to have Octal on Exponent and Fixed formats but we will
-  // return the value as regular number
-  public static final String OctalPerlSprintfFieldInteger = "lo";
-
-  // using long hex format. Should be an error
-  public static final String HexPerlSprintfFieldInteger = "lx";
-  public static final String PerlRegexFieldInteger = "\\d";
-
-
   /** The no argument constructor.
    */
   public IntegerDataFormat ()  //DataFormat no-arg constructor should be been called
   {
     init();
-  }
-
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init() {
-     specificDataFormatName = "integer";
-    //add attributes
-    attribOrder.add(0,"width");
-    attribOrder.add(0, "type");
-
-
-    attribHash.put("type", new XMLAttribute(new String(Constants.INTEGER_TYPE_DECIMAL), Constants.STRING_TYPE));
-    attribHash.put("width", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
-
   }
 
   //
@@ -149,6 +122,7 @@ public class IntegerDataFormat extends DataFormat {
    */
   public void setWidth(Integer width) {
      ((XMLAttribute) attribHash.get("width")).setAttribValue(width);
+     generateFormatPattern();
   }
 
   /**
@@ -158,9 +132,17 @@ public class IntegerDataFormat extends DataFormat {
   {
     return (Integer) ((XMLAttribute) attribHash.get("width")).getAttribValue();
   }
+
   //
   //Other PUBLIC Methods
   //
+
+   // We need this here so that we will properly update the
+   // templateNotation of the class. -b.t. 
+   public void setXMLAttributes (AttributeList attrs) {
+      super.setXMLAttributes(attrs);
+      generateFormatPattern();
+   }
 
   /** A convenience method.
    * @return the number of bytes this IntegerDataFormat holds.
@@ -191,58 +173,67 @@ public class IntegerDataFormat extends DataFormat {
   public static String typeDecimal() {
    return Constants.INTEGER_TYPE_DECIMAL;
   }
-  /**this method will probably go away
+
+  /** Template is the MessageFormat that should be used to print out data
+      within the slice of the array covered by this object. This method is
+      used by the dataCube in its toXMLOutput method. 
    */
-  //pass in param??? double check???
-  public String templateNotation(String strEndian, String strEncoding) {
-     return "A"+getWidth();
+  // separate method to minimize the number of times we do this.
+  private void generateFormatPattern ( ) {
+
+     StringBuffer leftpattern = new StringBuffer();
+     StringBuffer etemplate = new StringBuffer();
+
+     int wsize = getWidth().intValue() - 1;
+
+     if (wsize > 1)
+        etemplate.append("#");
+
+     while (wsize-- > 2)
+        leftpattern.append("#");
+     leftpattern.append("0");
+
+     // finish building the template
+     etemplate.append(leftpattern.toString());
+     etemplate.append(";-"+leftpattern.toString());
+
+     formatPattern = etemplate.toString();
   }
 
-  /**this method will probably go away
+  // 
+  // Private Methods
+  //
+  /** Special private method used by constructor methods to
+   *  conviently build the XML attribute list for a given class.
    */
-  public String regexNotation() {
-    int width = numOfBytes();
-    String symbol;
-    if (getType().equals(Constants.INTEGER_TYPE_DECIMAL))
-      symbol = "\\.";
-    else
-      symbol = PerlRegexFieldInteger;
+  private void init() {
 
-    String notation = "(";
-    int beforeWhiteSpace = width - 1;
-    if (beforeWhiteSpace > 0)
-      notation += "\\s{0," + beforeWhiteSpace + "}";
-    notation +=symbol + "{1," + width + "}";
-    notation +=")";
-    return notation;
+    specificDataFormatName = "integer";
+
+    //add attributes
+    attribOrder.add(0,"width");
+    attribOrder.add(0, "type");
+
+
+    attribHash.put("type", new XMLAttribute(new String(Constants.INTEGER_TYPE_DECIMAL), Constants.STRING_TYPE));
+    attribHash.put("width", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
+
+    generateFormatPattern();
+
   }
 
-  /**  returns sprintf field notation
-   *
-   */
-  public String sprintfNotation() {
-    String fieldSymbol=null;
-    String type = getType();
-    if (type.equals(Constants.INTEGER_TYPE_DECIMAL))
-      fieldSymbol = PerlSprintfFieldInteger;
-    if (type.equals(Constants.INTEGER_TYPE_OCTAL))
-      fieldSymbol = OctalPerlSprintfFieldInteger;
-    if (type.equals(Constants.INTEGER_TYPE_HEX))
-      fieldSymbol = HexPerlSprintfFieldInteger;
-    return "%" + getWidth()+ fieldSymbol;
 }
 
-  /**  The fortran style notation for this object.
-   */
-  public String fortranNotation() {
-    return "I"+ getWidth();
-  }
-
-
-}
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/22 20:42:00  thomas
+ * beaucoup changes to make formatted reads work.
+ * DataFormat methods now store the "template" or
+ * formatPattern that will be needed to print them
+ * back out. Removed sprintfNotation, Perl regex and
+ * Perl attributes from DataFormat classes. -b.t.
+ *
  * Revision 1.7  2000/11/20 22:03:48  thomas
  * Split up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for

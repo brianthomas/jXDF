@@ -34,11 +34,10 @@ import java.util.Hashtable;
 
 
 public class BinaryFloatDataFormat extends DataFormat {
+
   //
   //Fields
   //
-  public static final String PerlSprintfFieldBinaryFloat = "s";
-  public static final String PerlRegexFieldBinaryFloat = "\\.";
   public static final int DefaultBinaryFloatBits = 32;
 
 
@@ -47,16 +46,6 @@ public class BinaryFloatDataFormat extends DataFormat {
   public BinaryFloatDataFormat ()  //DataFormat no-arg constructor should be been called
   {
     init();
-  }
-
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init() {
-    specificDataFormatName = "binaryFloat";
-    attribOrder.add(0, "bits");  //add bits as the first attribute;
-
-    attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryFloatBits), Constants.INTEGER_TYPE));
   }
 
   //
@@ -141,43 +130,30 @@ public class BinaryFloatDataFormat extends DataFormat {
     return getBits().intValue()/8;
   }
 
-  //pass in param??? double check???
-  public String templateNotation(String strEndian, String strEncoding ) {
-    return "d";   //we always use double to prevent perl rounding
-                  // that can occur for using the 32-bit "f"
-  }
+   //
+   // Private Methods
+   //
+   /** Special private method used by constructor methods to
+       conviently build the XML attribute list for a given class.
+    */
+   private void init() {
+      specificDataFormatName = "binaryFloat";
+      attribOrder.add(0, "bits");  //add bits as the first attribute;
 
-  public String regexNotation() {
-    String notation = "(";
-    int width = numOfBytes();
-    int beforeWhiteSpace = width - 1;
-    if (beforeWhiteSpace > 0)
-      notation += "\\s{0," + beforeWhiteSpace + "}";
-    notation +=PerlRegexFieldBinaryFloat + "{1," + width + "}";
-    notation +=")";
-    return notation;
-  }
-
-  /** sprintfNotation: returns sprintf field notation
-   *
-   */
-  public String sprintfNotation() {
-
-  return  "%" + numOfBytes() + PerlSprintfFieldBinaryFloat;
-
-}
-
-  /** fortranNotation: The fortran style notation for this object.
-   */
-  public void fortranNotation() {
-    Log.error("There is not FORTRAN representation for binary data");
-  }
-
+      attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryFloatBits), Constants.INTEGER_TYPE));
+   }
 
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/22 20:42:00  thomas
+ * beaucoup changes to make formatted reads work.
+ * DataFormat methods now store the "template" or
+ * formatPattern that will be needed to print them
+ * back out. Removed sprintfNotation, Perl regex and
+ * Perl attributes from DataFormat classes. -b.t.
+ *
  * Revision 1.6  2000/11/20 22:05:50  thomas
  * plit up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for

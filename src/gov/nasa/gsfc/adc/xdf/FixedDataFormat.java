@@ -25,7 +25,7 @@
 
 package gov.nasa.gsfc.adc.xdf;
   
-import java.util.Hashtable;
+import org.xml.sax.AttributeList;
 
 
 /**
@@ -35,38 +35,20 @@ import java.util.Hashtable;
 
 
 public class FixedDataFormat extends DataFormat {
-  //
-  //Fields
-  //
-  public static final String PerlSprintfFieldFixed = "f";
-  public static final String PerlRegexFieldFixed ="\\d";
 
+   //
+   // Fields
+   // 
+   private String Template;  
 
+  //
+  // Constructors
+  //
   /** The no argument constructor.
    */
   public FixedDataFormat ()  //DataFormat no-arg constructor should be been called
   {
     init();
-  }
-
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init() {
-     specificDataFormatName = "fixed";
-    //add attributes
-    /**precision:The precision of this fixed field which is the number of digits
-     * to the right of the '.'.
-     */
-    attribOrder.add(0,"precision");
-
-    /**width: The entire width of this fixed field
-     */
-    attribOrder.add(0, "width");
-
-    attribHash.put("width", new XMLAttribute( new Integer(0), Constants.INTEGER_TYPE));
-    attribHash.put("precision", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
-
   }
 
   //
@@ -121,8 +103,9 @@ public class FixedDataFormat extends DataFormat {
    */
   public void setWidth(Integer numWidth) {
      ((XMLAttribute) attribHash.get("width")).setAttribValue(numWidth);
-
+     generateFormatPattern();
   }
+
   /**
    * @return the current *width* attribute
    */
@@ -135,8 +118,9 @@ public class FixedDataFormat extends DataFormat {
    */
   public void setPrecision(Integer precision) {
      ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
-
+     generateFormatPattern();
   }
+
   /**
    * @return the current *precision* attribute
    */
@@ -146,7 +130,7 @@ public class FixedDataFormat extends DataFormat {
   }
 
   //
-  //Other PUBLIC Methods
+  // Other PUBLIC Methods
   //
 
   /** A convenience method that return the number of bytes this FixedDataFormat holds.
@@ -155,53 +139,79 @@ public class FixedDataFormat extends DataFormat {
     return getWidth().intValue();
   }
 
-  /**probably this method will go away
-   */
+   // We need this here so that we will properly update the
+   // templateNotation of the class. -b.t. 
+   public void setXMLAttributes (AttributeList attrs) {
+      super.setXMLAttributes(attrs);
+      generateFormatPattern();
+   }
 
-  public String templateNotation(String strEndian, String strEncoding) {
-    return "A"+numOfBytes();
+  //
+  // Private Methods 
+  //
+
+  // separate method to minimize the number of times we do this.
+  private void generateFormatPattern ( ) {
+
+     StringBuffer leftpattern = new StringBuffer();
+     StringBuffer rightpattern = new StringBuffer();
+     StringBuffer etemplate = new StringBuffer();
+
+     int psize = getPrecision().intValue();
+     int wsize = getWidth().intValue() - psize - 1;
+
+     if (wsize > 1)
+        etemplate.append("#");
+
+     while (wsize-- > 2)
+        leftpattern.append("#");
+     leftpattern.append("0.");
+
+     while (psize-- > 0)
+        rightpattern.append("0");
+
+     // finish building the template
+     etemplate.append(leftpattern.toString()+rightpattern.toString());
+     etemplate.append(";-"+leftpattern.toString()+rightpattern.toString());
+
+     formatPattern = etemplate.toString();
   }
 
-  /**probably this method will go away
+  /** Special private method used by constructor methods to
+   *  conviently build the XML attribute list for a given class.
    */
+  private void init() {
+     specificDataFormatName = "fixed";
+    //add attributes
+    /**precision:The precision of this fixed field which is the number of digits
+     * to the right of the '.'.
+     */
+    attribOrder.add(0,"precision");
 
-  public String regexNotation() {
+    /**width: The entire width of this fixed field
+     */
+    attribOrder.add(0, "width");
 
-    int width = numOfBytes();
-    int precision = getPrecision().intValue();
-    String notation = "(";
-    int beforeWhiteSpace = width - precision - 1;
-    if (beforeWhiteSpace > 0)
-      notation += "\\s{0," + beforeWhiteSpace + "}";
-    int leadingLength = width-precision;
-    notation +="[+-]?" + PerlRegexFieldFixed + "{1," + leadingLength + "}\\.";
-    notation +=PerlRegexFieldFixed + "{1," + precision + "}";
+    attribHash.put("width", new XMLAttribute( new Integer(0), Constants.INTEGER_TYPE));
+    attribHash.put("precision", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
 
-    notation +=")";
-    return notation;
+    generateFormatPattern();
+
   }
 
-  /**probably this method will go away
-   */
-
-  public String sprintfNotation() {
-
-  return  "%" + numOfBytes() + "." + getPrecision().intValue() + PerlSprintfFieldFixed  ;
 
 }
 
-/**probably this method will go away
-   */
-
-  public String fortranNotation() {
-    return "F"+ numOfBytes() + "." + getPrecision().intValue();
-  }
-
-
-}
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/22 20:42:00  thomas
+ * beaucoup changes to make formatted reads work.
+ * DataFormat methods now store the "template" or
+ * formatPattern that will be needed to print them
+ * back out. Removed sprintfNotation, Perl regex and
+ * Perl attributes from DataFormat classes. -b.t.
+ *
  * Revision 1.7  2000/11/20 22:03:48  thomas
  * Split up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for

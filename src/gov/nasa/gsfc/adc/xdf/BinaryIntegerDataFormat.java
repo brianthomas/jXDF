@@ -34,13 +34,12 @@ import java.util.Hashtable;
 
 
 public class BinaryIntegerDataFormat extends DataFormat {
+
   //
   //Fields
   //
-  public static final String PerlSprintfFieldBinaryInteger = "s";
-  public static final String PerlRegexFieldBinaryInteger = "\\.";
-  public static final int DefaultBinaryIntegerBits = 32;
-  public static final boolean DefaultBinaryIntegerSigned = true;
+  int DefaultBinaryIntegerBits = 64;
+  String DefaultBinaryIntegerSigned = "yes";
 
 
   /** The no argument constructor.
@@ -48,19 +47,6 @@ public class BinaryIntegerDataFormat extends DataFormat {
   public BinaryIntegerDataFormat ()  //DataFormat no-arg constructor should be been called
   {
     init();
-  }
-
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init() {
-     specificDataFormatName = "binaryInteger";
-    //add attributes
-    attribOrder.add(0,"bits");
-    attribOrder.add(0, "signed");
-    attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryIntegerBits), Constants.INTEGER_TYPE));
-    attribHash.put("signed", new XMLAttribute("yes", Constants.STRING_TYPE));
-
   }
 
   //
@@ -156,57 +142,37 @@ public class BinaryIntegerDataFormat extends DataFormat {
     return getBits().intValue()/8;
   }
 
-  //pass in param??? double check???
-  public String templateNotation(String strEndian, String strEncoding) {
-    if (numOfBytes() >4) {
-      Log.error("BinaryInteger cant handle > 32 bit Integer Numbers");
-      Log.error("returning null");
-      return null;
-    }
+   //
+   // Private Methods
+   //
 
-    if (!Utility.isValidEndian(strEndian)) {
-      Log.error("not a valid endian, returning null");
-      return null;
-    }
-
-    // we hardwired 'BigEndian" response here. Bad!
-    if (strEndian.equals(Constants.BIG_ENDIAN))
-      return "N";
-    else
-      return "V";
-  }
-
-  public String regexNotation() {
-    String notation = "(";
-    int width = numOfBytes();
-    int beforeWhiteSpace = width - 1;
-    if (beforeWhiteSpace > 0)
-      notation += "\\s{0," + beforeWhiteSpace + "}";
-    notation +=PerlRegexFieldBinaryInteger + "{1," + width + "}";
-    notation +=")";
-    return notation;
-  }
-
-  /** sprintfNotation: returns sprintf field notation
-   *
+  /** Special private method used by constructor methods to
+      conviently build the XML attribute list for a given class.
    */
-  public String sprintfNotation() {
+   private void init() {
+      specificDataFormatName = "binaryInteger";
+     //add attributes
+     attribOrder.add(0,"bits");
+     attribOrder.add(0, "signed");
 
-  return  "%" + numOfBytes() + PerlSprintfFieldBinaryInteger;
+     attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryIntegerBits), Constants.INTEGER_TYPE));
+     attribHash.put("signed", new XMLAttribute(DefaultBinaryIntegerSigned, Constants.STRING_TYPE));
 
-}
-
-  /** fortranNotation: The fortran style notation for this object.
-   */
-  public void fortranNotation() {
-    Log.error("There is not FORTRAN representation for binary data");
   }
 
 
 }
+
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/22 20:42:00  thomas
+ * beaucoup changes to make formatted reads work.
+ * DataFormat methods now store the "template" or
+ * formatPattern that will be needed to print them
+ * back out. Removed sprintfNotation, Perl regex and
+ * Perl attributes from DataFormat classes. -b.t.
+ *
  * Revision 1.7  2000/11/20 22:05:50  thomas
  * plit up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
