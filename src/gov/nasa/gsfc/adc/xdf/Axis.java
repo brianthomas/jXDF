@@ -45,6 +45,8 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
    private int length;
 
+   private Array parentArray;
+
    /** This field stores object references to those value group objects
       to which this axis object belongs
     */
@@ -248,6 +250,12 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
     return length;
   }
 
+  /** set the parentArray
+  */
+  public void setParentArray (Array parent)
+  {
+     parentArray = parent;
+  }
 
   //
   //Other PUBLIC methods
@@ -259,13 +267,23 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
    */
 
    public Value addAxisValue(Value valueObj) {
-    if (valueObj == null) {
-      Log.warn("in Axis, addAxisValue(), the Value passed in is null");
-      return null;
-    }
-    getValueList().add(valueObj);
-    length++;  //bump up length
-    return valueObj;
+
+      if (valueObj == null) {
+         Log.warn("in Axis, addAxisValue(), the Value passed in is null");
+         return null;
+      }
+
+      // ok to add
+      getValueList().add(valueObj);
+      length++;  //bump up length
+
+      // inform parent array of the change
+      if ( parentArray != null) {
+         parentArray.needToUpdateLongArrayMult = true;
+      }
+
+      return valueObj;
+
    }
 
 
@@ -333,13 +351,21 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
    */
 
    public UnitDirection addAxisUnitDirection(UnitDirection unitDirectionObj) {
-    if (unitDirectionObj == null) {
-      Log.warn("in Axis, addAxisUnitDirection(), the UnitDirection object passed in is null");
-      return null;
-    }
-    getValueList().add(unitDirectionObj);
-    length++;  //bump up length
-    return unitDirectionObj;
+
+      if (unitDirectionObj == null) {
+         Log.warn("in Axis, addAxisUnitDirection(), the UnitDirection object passed in is null");
+         return null;
+      }
+
+      getValueList().add(unitDirectionObj);
+      length++;  //bump up length
+
+      // inform parent array of the change
+      if ( parentArray != null) {
+         parentArray.needToUpdateLongArrayMult = true;
+      }
+
+      return unitDirectionObj;
    }
 
    /**removes a Value object from the list of values in this Axis object
@@ -538,6 +564,10 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.22  2001/06/26 19:44:58  thomas
+ * added stuff to allow updating of dataCube in situations
+ * where the axis size has changed.
+ *
  * Revision 1.21  2001/05/16 22:47:30  huang
  * added/modified several conveniencemethods
  *

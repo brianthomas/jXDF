@@ -30,15 +30,21 @@ package gov.nasa.gsfc.adc.xdf;
 
 public interface AxisInterface extends BaseObjectWithXMLElementsInterface {
 
-  public int getLength();
-  public String getAxisId();
-  public String getAlign();
+   public int getLength();
+   public String getAxisId();
+   public String getAlign();
+   /* ugh. shouldnt be public method */
+   public void setParentArray(Array parent);
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2001/06/26 19:44:59  thomas
+ * added stuff to allow updating of dataCube in situations
+ * where the axis size has changed.
+ *
  * Revision 1.6  2001/05/04 20:17:15  thomas
  * Now extends BaseObjectWithXMLElementsInterface
  *

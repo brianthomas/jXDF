@@ -113,11 +113,20 @@ extends BaseObjectWithXMLElementsInterface,
 
    public Locator createLocator();
 
+   /* ugh. stupid interface, we shouldnt have these as public methods */
+   public int getLongArrayIndex (Locator locator);
+   public int getShortArrayIndex (Locator locator);
+   public int getShortAxisSize ();
+
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/06/26 19:44:58  thomas
+ * added stuff to allow updating of dataCube in situations
+ * where the axis size has changed.
+ *
  * Revision 1.2  2001/06/18 17:09:09  thomas
  * added setAxisList to interface.
  *

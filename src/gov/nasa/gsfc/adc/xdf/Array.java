@@ -132,7 +132,11 @@ import java.util.Vector;
      /**the list of locators whose parentArray is this Array object
       */
      protected List locatorList = new Vector();
+
      protected boolean hasFieldAxis = false;
+
+     public boolean needToUpdateLongArrayMult = true;
+     private int[] longIndexMult;
 
      //
      // Constructors
@@ -561,11 +565,13 @@ import java.util.Vector;
               updateChildLocators((Axis) axis, "add");
               updateNotesLocationOrder(); // reset to the current order of the axes
               getXMLDataIOStyle().getIOAxesOrder().add(axis); // tack this axis on the end
+              axis.setParentArray(this); // set this as the parent array of the object
 
            }
         
            // update readAxisOrder by taking on new axis.
            getXMLDataIOStyle().getIOAxesOrder().add(axis); 
+
 
         } else {  
            return null;
@@ -982,6 +988,7 @@ import java.util.Vector;
        // IF we had an object, update the locators
        if (fieldAxis != null) {
           updateChildLocators(fieldAxis, "add");
+          fieldAxis.setParentArray(this); // set this as the parent array of the object
        } else { 
           hasFieldAxis = false; 
        }
@@ -1165,6 +1172,107 @@ import java.util.Vector;
                 childLocator.removeAxis(index);
          }
    }
+
+   // This whole routine should probably be in the locator.
+   // and update ONLY when the current location is changed.
+   // Note that because of complications in storing values from fieldAxis
+   // which is always the at the 0 index position (if it exists)
+   // we can't simply treat index0 as the short axis. Instead, we
+   // have to use the axis at index1 (if it exists).
+   public int getLongArrayIndex (Locator locator) {
+
+      int longIndex = 0;
+
+      List axisList = getAxes();
+      int numOfAxes = axisList.size(); // should be internal variable updated on add/removeAxis in Array 
+      if (numOfAxes > 0) {
+         AxisInterface axis = (AxisInterface) axisList.get(0);
+         longIndex = locator.getAxisIndex(axis);
+
+         if (numOfAxes >= 2) {
+            // safety
+            if (this.longIndexMult == null || this.needToUpdateLongArrayMult ) {
+                 updateLongIndexMultArray(); 
+            }
+
+            // we skip over axis at index 1, that is the "short axis"
+            // each of the higher axes contribute 2**(i-1) * index
+            // to the overall long axis value.
+            for (int i = 2; i < numOfAxes; i++) {
+               axis = (AxisInterface) axisList.get(i);
+               longIndex += locator.getAxisIndex(axis) * longIndexMult[i];
+            }
+         }
+      }
+
+      return (longIndex*2); // double value to allow for shadow byte array 
+   }
+
+   private void updateLongIndexMultArray () {
+
+      List axisList = getAxes();
+      int numOfAxes = axisList.size(); // should be internal variable updated on add/removeAxis in Array 
+      if (numOfAxes > 1) {
+
+         longIndexMult = new int[numOfAxes+1];
+
+         // we skip axis #1 (its the short axis) and just get
+         // axis 0 as prev axis for axis #2
+         int mult = ((AxisInterface) axisList.get(0)).getLength();
+         longIndexMult[2] = mult;
+
+         // algorithm for higher dimension axes 
+         for (int i = 3; i < numOfAxes; i++) {
+             mult *= ((AxisInterface) axisList.get(i-1)).getLength();
+             longIndexMult[i] = mult;
+         }
+
+      } else
+         longIndexMult = null;
+
+      this.needToUpdateLongArrayMult = false;
+
+   }
+
+
+   // Should be hardwired w/ private variable. Only
+   // updates when addAxis is called by parentArray.
+   public int getShortArrayIndex (Locator locator) {
+      int shortIndex = 0;
+
+      AxisInterface shortaxis = getShortAxis();
+      if (shortaxis != null) {
+         shortIndex = locator.getAxisIndex(shortaxis);
+      }
+
+      return shortIndex;
+   }
+
+   // get the axis that represents the short axis
+   // short axis is axis "1" (not "0"; causes complications when
+   // we have a fieldAxis, which is at 0).
+   private AxisInterface getShortAxis () {
+      AxisInterface shortAxis = null;
+
+      List axisList = getAxes();
+      if (axisList.size() > 1) {
+         shortAxis = (AxisInterface) axisList.get(1);
+      }
+      return shortAxis;
+   }
+
+   public int getShortAxisSize () {
+
+      AxisInterface shortAxis = getShortAxis();
+      if (shortAxis != null) {
+         return shortAxis.getLength();
+      } else {
+         return -1;
+      }
+   }
+
+
+
    
    // Need to do this operation after every axis add
    // reset to the current order of the axes.
@@ -1192,6 +1300,10 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.31  2001/06/26 19:44:58  thomas
+  * added stuff to allow updating of dataCube in situations
+  * where the axis size has changed.
+  *
   * Revision 1.30  2001/06/19 15:51:06  thomas
   * minor edit
   *

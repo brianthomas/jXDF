@@ -60,6 +60,7 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
     */
    protected Set fieldGroupOwnedHash = Collections.synchronizedSet(new HashSet());
 
+   private Array parentArray;
 
    //
    // Constructors
@@ -205,6 +206,13 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
     return fieldGroupOwnedHash;
   }
 
+  /** set the parentArray 
+  */
+  public void setParentArray (Array parent)
+  {
+     parentArray = parent;
+  }
+
   /** return the length of this axis (eg number of axis value objects)
    *
    */
@@ -222,9 +230,16 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
    *
    */
   public Field addField (Field field) {
-    getFieldList().add(field);
-    length++;
-    return field;
+
+     getFieldList().add(field);
+     length++;
+
+     // inform parent array of the change
+     if ( parentArray != null) {
+         parentArray.needToUpdateLongArrayMult = true;
+     }
+
+     return field;
   }
 
   /** returns the field object at specified index on success, null on failure
@@ -361,6 +376,10 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
  /**
   * Modification History:
   * $Log$
+  * Revision 1.17  2001/06/26 19:44:58  thomas
+  * added stuff to allow updating of dataCube in situations
+  * where the axis size has changed.
+  *
   * Revision 1.16  2001/05/16 22:47:30  huang
   * added/modified several conveniencemethods
   *
