@@ -42,9 +42,10 @@ import java.lang.Character;
 
 // Import needed SAX stuff
 import org.xml.sax.Attributes;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
 
 // Java IO stuff
 // import java.io.Reader;
@@ -90,6 +91,8 @@ public class SaxDocumentHandler extends DefaultHandler {
     private Hashtable endElementHandlerHashtable;   // end node handler
     private Hashtable defaultHandlerHashtable;      // default handlers 
 
+    private boolean ForceSetXMLHeaderStuff = false;
+
     // References to the current working structure/array
     private Structure CurrentStructure;   
     private Array CurrentArray;   
@@ -122,6 +125,8 @@ public class SaxDocumentHandler extends DefaultHandler {
     // so we know which datacell in the current datacube to shunt the 
     // data to.
     private Hashtable DataTagCount = new Hashtable();
+
+    private Hashtable DoctypeObjectAttributes;
 
     private int BASEINPUTREADSIZE =     4096; // base byte buffer for reads 
     private int MAXINPUTREADSIZE  = 16777216; // maximum byte buffer for reads
@@ -294,6 +299,14 @@ public class SaxDocumentHandler extends DefaultHandler {
        defaultHandlerHashtable.put("charData", handler);
     }
 
+
+    /** If true it tells this DocumentHandler that it should go ahead and insert XMLHeader
+        stuff even if the current parser doesnt support DTD events using reasonable
+        values.
+     */
+    public void setForceSetXMLHeaderStuffOnXDFObject (boolean value) {
+       ForceSetXMLHeaderStuff = value;
+    }
 
     //
     // Methods that describe the current parsing
@@ -569,17 +582,65 @@ public class SaxDocumentHandler extends DefaultHandler {
     throws SAXException
     {
         // do nothing
+        Log.debugln("H_StartDocument:[]");
+    }
+
+    public void error (SAXParseException e)
+    throws SAXException
+    {
+        Log.errorln(e.getMessage());
+    }
+
+    public void fatalError (SAXParseException e)
+    throws SAXException
+    {
+        Log.errorln(e.getMessage());
+    }
+
+    public void warning (SAXParseException e)
+    throws SAXException
+    {
+        Log.warnln(e.getMessage());
     }
 
     public void endDocument()
     throws SAXException
     {
 
+        Log.debugln("H_EndDocument:[]");
+
+        if (DoctypeObjectAttributes != null || ForceSetXMLHeaderStuff ) {
+            
+           // bah, this doesnt belong here
+           XMLDeclaration xmlDecl = new XMLDeclaration();
+           xmlDecl.setStandalone("no");
+
+           DocumentType doctype = new DocumentType(XDF);
+
+           // set the values of the DocumentType object appropriately
+           if (!ForceSetXMLHeaderStuff) {
+              if (DoctypeObjectAttributes.containsKey("sysId")) 
+                  doctype.setSystemId((String) DoctypeObjectAttributes.get("sysId")); 
+              if (DoctypeObjectAttributes.containsKey("pubId")) 
+                 doctype.setPublicId((String) DoctypeObjectAttributes.get("pubId")); 
+           } else {
+              // we have to guess values
+              doctype.setSystemId(Constants.XDF_DTD_NAME); 
+           }
+
+           XDF.setXMLDeclaration (xmlDecl);
+           XDF.setDocumentType(doctype);
+        }
+
         // Now that it exists, lets
         // set the notation hash for the XDF structure
         Iterator iter = Notation.iterator();
         while (iter.hasNext()) {
            Hashtable initValues = (Hashtable) iter.next(); 
+           if (XDF.getDocumentType() == null) {
+              // force having document type
+              XDF.setDocumentType(new DocumentType(XDF)); 
+           }
            XDF.getDocumentType().addNotation(new NotationNode(initValues));
         }
 
@@ -639,8 +700,21 @@ public class SaxDocumentHandler extends DefaultHandler {
         UnParsedEntity.put(name, information);
     }
 
+    // Report the start of DTD declarations, if any.
+    public void startDTD(String name, String publicId, String systemId) 
+    throws SAXException
+    {
+        Log.debugln("H_DTD_Start:["+name+","+publicId+","+systemId+"]");
+
+        DoctypeObjectAttributes = new Hashtable();
+        DoctypeObjectAttributes.put("name", name);
+        DoctypeObjectAttributes.put("pubId", publicId);
+        DoctypeObjectAttributes.put("sysId", systemId);
+    }
+
     /* Hurm, why doesnt this method treat 'base'?? */
     public void notationDecl (String name, String publicId, String systemId )
+    throws SAXException
     {
         Log.debugln("H_NOTATION: "+name+" "+publicId+" "+systemId);
 
@@ -1416,14 +1490,16 @@ Log.errorln("");
 
 // this stuff slows down the parser too much to leave commented in.
 // uncomment as needed
-Log.error("Add Data:["+thisString+"] (");
+/*
+Log.info("Add Data:["+thisString+"] (");
 List axes = dataLocator.getIterationOrder();
 Iterator liter = axes.iterator();
 while (liter.hasNext()) {
    AxisInterface axis = (AxisInterface) liter.next();
-   Log.error(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
+   Log.info(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
 }
-Log.errorln(") ");
+Log.infoln(") ");
+*/
 
        // Note that we dont treat binary data at all here 
        try {
@@ -4428,6 +4504,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.51  2001/09/14 18:21:20  thomas
+ * Added in  XDF object XMLheader stuff and a few odd error handlers (not really needed but im feeling anal today :)
+ *
  * Revision 1.50  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
