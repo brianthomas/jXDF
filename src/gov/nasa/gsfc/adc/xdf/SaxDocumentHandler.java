@@ -889,7 +889,7 @@ public class SaxDocumentHandler extends DefaultHandler {
                       // pour out remaining buffer into the current array
                      addByteDataToCurrentArray(data, bytes_read, endian );
 
-Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
+// Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
 
                       break; // EOF reached
                   }
@@ -900,7 +900,7 @@ Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
                   if ( bytes_read == INPUTREADSIZE) 
                   { 
 
-Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
+// Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
 
                      // pour out buffer into array
                      addByteDataToCurrentArray(data, bytes_read, endian );
@@ -928,7 +928,7 @@ Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
         int nrofIOCmd = commandList.size();
         int bytes_added = 0;
 
-Log.errorln("Adding "+amount+" bytes of data to current array");
+// Log.errorln("Adding "+amount+" bytes of data to current array");
 
         while (bytes_added < amount) {
 
@@ -940,26 +940,26 @@ Log.errorln("Adding "+amount+" bytes of data to current array");
                DataFormat currentDataFormat = DataFormatList[CurrentDataFormatIndex];
                int bytes_to_add = currentDataFormat.numOfBytes();
 
-Log.errorln("Adding "+bytes_to_add+" bytes of data to current array");
+// Log.errorln("Adding "+bytes_to_add+" bytes of data to current array");
 //Object objectToAdd = null;
 
                if ( currentDataFormat instanceof IntegerDataFormat) {
 
                } else if (currentDataFormat instanceof FloatDataFormat) {
 
-Log.errorln("Got Href Data Float:["+new String(data,bytes_added,bytes_added+bytes_to_add)+ "]["+bytes_added+"]["+bytes_to_add+"]");
+//Log.errorln("Got Href Data Float:["+new String(data,bytes_added,bytes_added+bytes_to_add)+ "]["+bytes_added+"]["+bytes_to_add+"]");
 
                } else if (currentDataFormat instanceof BinaryFloatDataFormat) {
 
                   if (bytes_to_add == 4) { 
   
                      Float myValue = convert4bytesToFloat(endian, data, bytes_added);
-Log.errorln("Got Href Data BFloatSingle:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+//Log.errorln("Got Href Data BFloatSingle:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
 
                   } else if (bytes_to_add == 8) { 
 
                     Double myValue = convert8bytesToDouble(endian, data, bytes_added);
-Log.errorln("Got Href Data BFloatDouble:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+// Log.errorln("Got Href Data BFloatDouble:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
 
                   } else {
                      Log.errorln("Error: got floating point with bit size != (32|64). Ignoring data.");
@@ -967,16 +967,19 @@ Log.errorln("Got Href Data BFloatDouble:["+myValue.toString()+"]["+bytes_added+"
 
                } else if (currentDataFormat instanceof BinaryIntegerDataFormat) {
 
-                  Integer myValue = convert2bytesToInteger (endian, data, bytes_added);
+                  //  Integer myValue = convert2bytesToInteger (endian, data, bytes_added);
+                  Integer numOfBits = ((BinaryIntegerDataFormat) currentDataFormat).getBits();
+                  int numOfBytes = numOfBits.intValue()/8;
+                  Integer myValue = convertBytesToInteger (numOfBytes, endian, data, bytes_added);
 
-Log.errorln("Got Href Data Integer:["+myValue.toString()+ "]["+bytes_added+"]["+bytes_to_add+"]");
+// Log.errorln("Got Href Data Integer:["+myValue.toString()+ "]["+bytes_added+"]["+bytes_to_add+"]");
 
                } else if (currentDataFormat instanceof StringDataFormat) {
 
 // char[] charList = bytesTo8BitChars(data,bytes_added,bytes_added+bytes_to_add);
 
-Log.errorln("String byte range is :"+bytes_added+" to "+(bytes_added+bytes_to_add));
-Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+bytes_to_add))+ "]["+bytes_added+"]["+bytes_to_add+"]");
+// Log.errorln("String byte range is :"+bytes_added+" to "+(bytes_added+bytes_to_add));
+// Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+bytes_to_add))+ "]["+bytes_added+"]["+bytes_to_add+"]");
 
                }
 
@@ -1011,6 +1014,40 @@ Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+by
 
     }
 
+    private Integer convertBytesToInteger (int numOfBytes, String endianStyle, byte[] bb, int sbyte) {
+
+        // is it better to use a dispatch table here?
+        switch (numOfBytes) {
+
+           case '1': // 8-bit 
+              return convert1byteToInteger (bb, sbyte);
+           case '2': // 16-bit 
+              return convert2bytesToInteger (endianStyle, bb, sbyte);
+           case '3': // 24-bit (unusual) 
+              return convert3bytesToInteger (endianStyle, bb, sbyte);
+           case '4': // 32-bit
+              return convert4bytesToInteger (endianStyle, bb, sbyte);
+              // This will most likely break the Java Integer. Lets not pretend
+              // that we support it yet. Will have to contemplate BigInteger implementation for this. 
+           /*
+           case '8': // 64-bit 
+               return convert8bytesToInteger (endianStyle, bb, sbyte);
+              break;
+           */
+           default:
+              Log.errorln("XDF Can't handle binary integers of byte size:"+numOfBytes+". Ignoring Request");
+              return (Integer) null;
+        }
+    }
+
+    // for 8-bit Int
+    private Integer convert1byteToInteger (byte[] bb, int sbyte) {
+
+       int i = bb[sbyte]&0xFF;
+       return new Integer(i);
+
+    }
+
     // for 16-bit Int
     private Integer convert2bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
       
@@ -1019,6 +1056,19 @@ Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+by
            i = (bb[sbyte]&0xFF) << 8  | (bb[sbyte+1]&0xFF);
        else
            i = (bb[sbyte+1]&0xFF) << 8  | (bb[sbyte]&0xFF);
+
+       return new Integer(i);
+
+    }
+
+    // for 24-bit Int
+    private Integer convert3bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
+
+       int i;
+       if(endianStyle.equals(Constants.BIG_ENDIAN))
+           i = (bb[sbyte]&0xFF) << 16  | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte+2]&0xFF);
+       else
+           i = (bb[sbyte+2]&0xFF) << 16  | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
 
        return new Integer(i);
 
@@ -4285,6 +4335,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.47  2001/09/04 21:19:19  thomas
+ * added in 8,24,32 bit BInary integers
+ *
  * Revision 1.46  2001/08/31 20:01:25  thomas
  * bug fix to integer parsing, couldnt understand values that began w/ + signcvs diff SaxDocumentHandler.java and added estructureEndElementHandler funct
  *
