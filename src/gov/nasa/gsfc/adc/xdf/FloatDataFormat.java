@@ -61,7 +61,6 @@ public class FloatDataFormat extends NumberDataFormat {
    //
    // Fields
    // 
-//   private String Template;  
 
    /* XML attribute names */
    private static final String WIDTH_XML_ATTRIBUTE_NAME = "width";
@@ -73,7 +72,17 @@ public class FloatDataFormat extends NumberDataFormat {
    public static final int DEFAULT_PRECISION = 0;
    public static final int DEFAULT_EXPONENT = 0;
 
+   // next 3 are used to determine isPrimativeFloat 
+   protected static final int MAX_FLOAT_WIDTH = 9;
+   protected static final int MAX_FLOAT_EXPONENT = 37;
+   protected static final int MIN_FLOAT_EXPONENT = -44;
+
    private String negativeExponentFormatPattern;
+
+   private boolean isPrimativeFloat = false; // does this dataformat object really 
+                                             // require a primative double (by the Java Standard) 
+                                             // to store the values without loss?
+
 
    //
    // Constructors
@@ -100,6 +109,7 @@ public class FloatDataFormat extends NumberDataFormat {
        {
           ((Attribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).setAttribValue(numWidth);
           generateFormatPattern();
+          determineIfIsPrimativeFloat();
        } else 
          Log.warnln("Invalid value for FloatDataFormat.setWidth(). Ignoring set request.");
 
@@ -123,8 +133,15 @@ public class FloatDataFormat extends NumberDataFormat {
 
       if (Utility.isValidNumberObject(precision))
       {
-         ((Attribute) attribHash.get(PRECISION_XML_ATTRIBUTE_NAME)).setAttribValue(precision);
-         generateFormatPattern();
+          ((Attribute) attribHash.get(PRECISION_XML_ATTRIBUTE_NAME)).setAttribValue(precision);
+          if (precision.intValue() > getWidth().intValue()) {
+             int current_width = getWidth().intValue(); 
+             int new_width = precision.intValue()+1;
+             Log.infoln("Declared precision of "+precision+"is larger than current format width of "+current_width+", bumping up width to"+new_width);
+             setWidth(new Integer(new_width));
+          }
+          generateFormatPattern();
+          // determineIfIsPrimativeFloat();
       } else 
          Log.warnln("Invalid value for FloatDataFormat.setPrecision(). Ignoring set request.");
 
@@ -177,6 +194,14 @@ public class FloatDataFormat extends NumberDataFormat {
    //
    // Other PUBLIC Methods
    //
+
+   /** Indicates whether this DataFormat describes a primative float (if true). If the value
+       is false then a primative double should be used to store these numbers. 
+    */
+   public boolean isPrimativeFloat() 
+   { 
+      return isPrimativeFloat;
+   } 
 
    /** A convenience method that return the number of bytes this FloatDataFormat holds.
     */
@@ -254,6 +279,25 @@ public class FloatDataFormat extends NumberDataFormat {
 
   }
 
+  // determine whether or not this value will fit into a primative float
+  // or if it needs to be in a primative double instead
+  private void determineIfIsPrimativeFloat() {
+
+     if (getWidth().intValue() > MAX_FLOAT_WIDTH
+         || getExponent().intValue() > MAX_FLOAT_EXPONENT 
+         || getExponent().intValue() < MIN_FLOAT_EXPONENT 
+//         || getPrecision().intValue() > maxFloatPrecision 
+        ) {
+       isPrimativeFloat = false;
+     } else {
+       isPrimativeFloat = true;
+     } 
+  }
+ 
+  // 
+  // Protected Methods
+  // 
+
   /** Special protected method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
@@ -293,6 +337,9 @@ public class FloatDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2001/09/13 22:18:37  thomas
+ * added isPrimiativeFloat() method and some checking on width when precision is set
+ *
  * Revision 1.6  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
