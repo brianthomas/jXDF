@@ -2109,7 +2109,7 @@ Log.errorln(" TValue:"+valueString);
                    else if (data instanceof String ) 
                        arrayToAppendTo.setData(origLocator, (String) data);
                    else
-                       Log.errorln("Cant understand class of data !(Double|Integer|String). Ignoring append.");
+                       Log.errorln("Dont understand this class of data !(Double|Integer|String). Ignoring append.");
 
                 } catch (SetDataException e) {
                    Log.errorln(e.getMessage()+". Ignoring append");
@@ -2968,12 +2968,12 @@ while (iter.hasNext()) {
                        CurrentReadBytes += bytes_to_skip.intValue();
                    }
                 }
-             } else if (readObj instanceof DelimitedXMLDataIOStyle
-                         || readObj instanceof TaggedXMLDataIOStyle 
-                       ) 
-             {
-                throw new SAXException("Cant parse delimited or tagged data from external file (yet).");
-             }
+             } 
+
+//             else if (readObj instanceof DelimitedXMLDataIOStyle) 
+//             {
+//                throw new SAXException("Cant parse delimited data from an external file (yet).");
+//             }
 
              if (CurrentReadBytes > MAXINPUTREADSIZE) {
                 Log.errorln("This XDF file has single record that is too big (greater than "+MAXINPUTREADSIZE+" bytes in a record) to parse by this code");
@@ -4720,6 +4720,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.62  2001/09/24 19:50:32  thomas
+ * fixed bug: reads tagged data again(!)
+ *
  * Revision 1.61  2001/09/24 19:44:15  thomas
  * bug fix: CurrentReadBytes wasnt being correctly calculated for Formatted data!
  *
