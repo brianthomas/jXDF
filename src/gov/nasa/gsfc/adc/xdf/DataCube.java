@@ -1770,8 +1770,10 @@ protected boolean  removeData (Locator locator) {
    /** init -- special private method used by constructor methods to
        convienently build the XML attribute list for a given class.
     */
-   private void init()
+   protected void init()
    {
+
+    resetXMLAttributes();
 
     classXDFNodeName = "data";
 
@@ -1857,6 +1859,10 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.29  2001/05/10 21:08:51  thomas
+  * init method is now protected. Added resetXMLAttributes
+  * call to init.
+  *
   * Revision 1.28  2001/05/04 20:22:01  thomas
   * Minor bugfixes. Implement ArrayInterface for parentArray. Implement
   * AxisInterface in places, but not complete with this work.
