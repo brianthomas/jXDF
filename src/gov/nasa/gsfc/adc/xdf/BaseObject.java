@@ -87,7 +87,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   protected List attribOrder;
 
   // stores notation entries for the XMLDeclaration
-  private HashSet XMLNotationHash = new HashSet();
+  protected HashSet XMLNotationHash = new HashSet();
 
   //
   // Constructor Methods
@@ -306,8 +306,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
         // is or has as a superclass xdf.Structure instead of the 'string check' below.
 
         // check is class Strucuture & XMLDeclAttribs populated?
-        if ( nodeNameString.equals(Specification.getInstance().getXDFStructureNodeName()) && !XMLDeclAttribs.isEmpty() )
+/*
+        if ( nodeNameString.equals(Specification.getInstance().getXDFStructureNodeName()) 
+             && !XMLDeclAttribs.isEmpty() )
           nodeNameString = Specification.getInstance().getXDFRootNodeName();
+*/
 
         writeOut(outputstream,"<" + nodeNameString);   // print opening statement
 
@@ -980,6 +983,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.40  2001/05/04 20:18:58  thomas
+ * Small changes to accomodate new XDF class.
+ *
  * Revision 1.39  2001/03/28 21:59:46  thomas
  * Forgot to declare an empty hashset for XMLNotationHash
  * on init. This resulted in bomb on toXMLOutputStream
