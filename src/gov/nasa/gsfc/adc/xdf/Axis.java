@@ -20,7 +20,7 @@ import java.util.Iterator;
  * Each axis declaration defines the values of ALL the indices
  * along that dimension. Values of the indices in that axis need
  * not follow any algorthm for progression BUT each must be unique
- * within the axis. A unit may be assocated with the axis.
+ * within the axis. A unit may be associated with the axis.
  * Note that the unit specified for the axis indices is not the
  * same as the unit of the data held within the data cube.
    @version $Revision$
@@ -71,7 +71,7 @@ public class Axis extends BaseObject implements AxisInterface {
  /** init -- special private method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
-  protected void init()
+  private void init()
   {
 
     classXDFNodeName = "axis";
@@ -90,7 +90,7 @@ public class Axis extends BaseObject implements AxisInterface {
      //set up the attribute hashtable key with the default initial value
 
      //set the minimum array size(essentially the size of the axis)
-    attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList(super.sDefaultDataArraySize)), Constants.LIST_TYPE));
+    attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList(Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE));
     attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("align", new XMLAttribute(null, Constants.STRING_TYPE));  //double check???
@@ -120,8 +120,8 @@ public class Axis extends BaseObject implements AxisInterface {
      ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
-   /**getName
-   * @return: the current *name* attribute
+   /**
+   * @return the current *name* attribute
    */
   public String getName()
   {
@@ -136,8 +136,8 @@ public class Axis extends BaseObject implements AxisInterface {
 
   }
 
-  /**getDescription
-   * @return: the current *description* attribute
+  /**
+   * @return the current *description* attribute
    */
   public String getDescription() {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
@@ -153,8 +153,8 @@ public class Axis extends BaseObject implements AxisInterface {
       Log.warnln("Datatype is not valid, ignoring set request.");
   }
 
-  /**getAxisDatatype
-   * @return: the current *axisDatatype* attribute
+  /**
+   * @return the current *axisDatatype* attribute
    */
   public String getDatatype()
   {
@@ -168,8 +168,8 @@ public class Axis extends BaseObject implements AxisInterface {
      ((XMLAttribute) attribHash.get("axisUnits")).setAttribValue(units);
   }
 
-  /**getAxisUnits
-   * @return: the current *axisUnits* attribute
+  /**
+   * @return the current *axisUnits* attribute
    */
   public Units getAxisUnits()
   {
@@ -184,8 +184,8 @@ public class Axis extends BaseObject implements AxisInterface {
 
   }
 
-   /**getAxisId
-   * @return: the current *axisId* attribute
+   /**
+   * @return the current *axisId* attribute
    */
   public String getAxisId()
   {
@@ -200,8 +200,8 @@ public class Axis extends BaseObject implements AxisInterface {
 
   }
 
-   /**getAxisIdRef
-   * @return: the current *axisIdRef* attribute
+   /**
+   * @return the current *axisIdRef* attribute
    */
   public String getAxisIdRef()
   {
@@ -214,28 +214,28 @@ public class Axis extends BaseObject implements AxisInterface {
      ((XMLAttribute) attribHash.get("valueList")).setAttribValue(value);
   }
 
-  /**getValueList
-   * @return: the current *valueList* attribute
+  /**
+   * @return the current *valueList* attribute
    */
   public List getValueList() {
     return (List) ((XMLAttribute) attribHash.get("valueList")).getAttribValue();
   }
 
-  /** setValueGroupOwnedHash
+  /** set the ValueGroupOwnedHash
   */
   public void setValueGroupOwnedHash(Set valueGroup)
   {
     valueGroupOwnedHash = valueGroup;
   }
 
-  /** getValueGroupOwnedHash
+  /** get the ValueGroupOwnedHash
   */
   public Set getValueGroupOwnedHash()
   {
     return valueGroupOwnedHash;
   }
 
-  /**getLength: Get the length of this axis (eg number of axis value objects)
+  /** Get the length of this axis (eg number of axis value objects)
    *
    */
   public int getLength() {
@@ -249,9 +249,9 @@ public class Axis extends BaseObject implements AxisInterface {
   //Other PUBLIC methods
   //
 
-  /** addAxisValue: Add an XDF::Value object to this axis.
-   * @param: ref to Value object
-   * @return: ref to Value object if successful, null if not
+  /** Add a Value object to this axis.
+   * @param valueObj - Value object to be added
+   * @return ref to Value object if successful, null if not
    */
 
    public Value addAxisValue(Value valueObj) {
@@ -266,8 +266,8 @@ public class Axis extends BaseObject implements AxisInterface {
 
 
 
-   /**setAxisValue: Set the value of this axis at the given index.
-    *  @param: Value, index
+   /**Set the value of this axis at the given index.
+    *  @param index, valueObj
     */
 
     public void setAxisValue(int index, Value valueObj) {
@@ -297,7 +297,7 @@ public class Axis extends BaseObject implements AxisInterface {
 
 
     /** Set the value of this axis at the given index.
-    * @param: UnitDirection, index
+    * @param UnitDirectionObj, index
     */
 
     public void setAxisValue(int index, UnitDirection unitDirectionObj) {
@@ -323,9 +323,9 @@ public class Axis extends BaseObject implements AxisInterface {
 
     }
 
-  /** addAxisUnitDirection: Add an XDF::UnitDirection object to this axis.
-   * @param: ref to UnitDirection object
-   * @return: ref to UnitDirection object if successful, null if not
+  /**Add an UnitDirection object to this axis.
+   * @param unitDirectionObj - UnitDirection to be added
+   * @return ref to UnitDirection object if successful, null if not
    */
 
    public UnitDirection addAxisUnitDirectoin(UnitDirection unitDirectionObj) {
@@ -338,9 +338,9 @@ public class Axis extends BaseObject implements AxisInterface {
     return unitDirectionObj;
    }
 
-   /**removeAxisValue: removes an XDF::Value from the list of values in this Axis object
-   * @param: Value to be removed
-   * @return: true on success, false on failure
+   /**removes a Value object from the list of values in this Axis object
+   * @param what - Value to be removed
+   * @return true on success, false on failure
    */
    public boolean removeAxisValue(Value what) {
       boolean isRemoveSuccess = removeFromList(what, getValueList(), "valueList");
@@ -351,9 +351,9 @@ public class Axis extends BaseObject implements AxisInterface {
 
 
 
-  /**removeAxisValue: removes an XDF::Value from the list of values in this Axis object
-   * @param: list index number
-   * @return: true on success, false on failure
+  /**removes an Value from the list of values in this Axis object
+   * @param index - list index number of the Value object to be removed
+   * @return true on success, false on failure
    */
   public boolean removeAxisValue(int index) {
      boolean isRemoveSuccess = removeFromList(index, getValueList(), "valueList");
@@ -362,9 +362,9 @@ public class Axis extends BaseObject implements AxisInterface {
       return isRemoveSuccess;
   }
 
-  /**removeAxisValue: removes an XDF::UnitDirection from the list of values in this Axis object
-   * @param: UnitDirection to be removed
-   * @return: true on success, false on failure
+  /**removes an UnitDirection from the list of values in this Axis object
+   * @param what - UnitDirection to be removed
+   * @return true on success, false on failure
    */
    public boolean removeAxisValue(UnitDirection what) {
       boolean isRemoveSuccess = removeFromList(what, getValueList(), "valueList");
@@ -373,8 +373,9 @@ public class Axis extends BaseObject implements AxisInterface {
       return isRemoveSuccess;
   }
 
-  /**getAxisValue
-   * Returns the axis XDF::Value or XDF: UnitDirection object at the specified index.
+  /**
+   * Returns the Value or XDF: UnitDirection object at the specified index
+     along this axis object.
    */
 
    public Object getAxisValue(int index) {
@@ -385,7 +386,7 @@ public class Axis extends BaseObject implements AxisInterface {
       return getValueList().get(index);
    }
 
-   /**getAxisValues
+   /**
     * This is a convenience method which returns all of the values (as strings) on this axis.
     */
    public String getAxisValues() {
@@ -393,80 +394,62 @@ public class Axis extends BaseObject implements AxisInterface {
     return null;
    }
 
-   /**addUnit: Insert an XDF::Unit object into the L<XDF::Units> object
+   /**Insert an Unit object into the L<Units> object
    * held in this object.
-   * @param: Unit to be added
-   * @return: an XDF::Unit object if successfull, null if not.
+   * @param unit - Unit to be added
+   * @return an Unit object
    */
   public Unit addUnit(Unit unit) {
-    if (unit == null) {
-      Log.warn("in Parameter.addUnit(), the Unit passed in is null");
-      return null;
-    }
     return  getAxisUnits().addUnit(unit);
   }
 
-  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
+  /** Remove an Unit object from the Units object held in
    * this object
-   * @param: Unit to be removed
-   * @return: true if successful, false if not
+   * @param what - Unit to be removed
+   * @return true if successful, false if not
    */
   public boolean removeUnit(Unit what) {
     return getAxisUnits().removeUnit(what);
   }
 
-  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
+  /**Remove an Unit object from the Units object held in
    * this object
-   * @param: list index number
-   * @return: true if successful, false if not
+   * @param index - list index number of the Unit object to be removed
+   * @return true if successful, false if not
    */
   public boolean removeUnit(int index) {
     return getAxisUnits().removeUnit(index);
   }
 
-  /**addValueGroup: Insert a ValueGroup object into this object to group the axisValues.
-   * @Value: ValueGroup to be added
-   * @return:an XDF::ValueGroup object reference on success, null on failure.
+  /**Insert a ValueGroup object into this object to group the axisValues.
+   * @Value: group - ValueGroup to be added
+   * @returnan a ValueGroup object reference
    */
   public ValueGroup addValueGroup (ValueGroup group) {
-    if (group !=null) {
       //add the group to the groupOwnedHash
       valueGroupOwnedHash.add(group);
       return group;
-    }
-    else {
-      Log.warn("in Axis,addValueGroup(). ValueGroup passed in is null");
-      return null;
-    }
+
   }
 
-  /**removeValueGroup: remove a ValueGroup object from this object
-   * @Value: ValueGroup to be removed
-   * @return: true on success, false on failure
+  /**remove a ValueGroup object from this object
+   * @Value: group - ValueGroup to be removed
+   * @return true on success, false on failure
    */
   public boolean removeValueGroup(ValueGroup group) {
-    if (group == null) {
-      Log.warn("in Axis,removeValueGroup().  ValueGroup passed in is null");
-      return false;
-    }
     return valueGroupOwnedHash.remove(group);
   }
 
-  /**getIndexFromValue:  Return the axis index for the given (scalar) value.
+  /**Return the axis index for the given (scalar) value.
    * Does not currently work for unitDirection objects that reside
    * on an axis.
-   * @return: index if successful,
+   * @return index if successful,
    *          -1 if it cant find an index for the given value.
    *
    */
 
     public int getIndexFromAxisValue(Value valueObj) {
-      if (valueObj == null) {
-        Log.error("in Axis, getIndexFromAxisValue, Value passed in is null, returning -1");
-        return -1;
-      }
-
-      List values = getValueList();
+     List values = getValueList();
       int size = values.size();
       for (int i = 0; i< size; i++){
         if (((Value) values.get(i)).getValue().equals(valueObj.getValue())) //if found
@@ -479,6 +462,8 @@ public class Axis extends BaseObject implements AxisInterface {
 
     }
 
+  /**deep copy of the Axis object
+   */
   public Object clone() throws CloneNotSupportedException {
     Axis cloneObj = (Axis) super.clone();
 
@@ -488,7 +473,7 @@ public class Axis extends BaseObject implements AxisInterface {
         cloneObj.valueGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.valueGroupOwnedHash.size()));
         Iterator iter = this.valueGroupOwnedHash.iterator();
         while (iter.hasNext()) {
-          cloneObj.valueGroupOwnedHash.add(iter.next());
+          cloneObj.valueGroupOwnedHash.add(((Group)iter.next()).clone());
         }
       }
     }
@@ -501,9 +486,8 @@ public class Axis extends BaseObject implements AxisInterface {
 /* Modification History:
  *
  * $Log$
- * Revision 1.14  2000/11/10 06:23:15  thomas
- * Updated init() method to be protected so inheriting
- * classes may use. -b.t.
+ * Revision 1.15  2000/11/16 19:45:34  kelly
+ * fixed documentation.
  *
  * Revision 1.13  2000/11/09 04:24:11  thomas
  * Implimented small efficiency improvements to traversal
