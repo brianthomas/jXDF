@@ -21,52 +21,108 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-/** Value.java
-   @version $Revision$
-  */
+/** Value.java: holds mathematical values. ErroredValue inherits
+ *  from this object; this object is also used
+ * at every indice on an Axis object to denote the coordinate
+ * value of a given index. The Value class can hold a scalar value.
+ * To hold a vector (unit direction) value use XDF::UnitDirection instead.
+ *  @version $Revision$
+ */
 public class Value extends BaseObject {
 
    //
    // Constructors
    //
 
-   /** Passed string sets the *value* attribute (PCDATA) 
+   /** Passed string sets the *value* attribute (PCDATA)
        of this object.
     */
 
    public Value (String strValue) {
       init();
-      setValue(strValue); // set value attribute from passed argument 
+      setValue(strValue); // set value attribute from passed argument
    }
 
-   /** No-argument constructor. 
-    */
-   public Value () {
+   //
+   //no-arg constructor
+   //
+    public Value () {
       init();
    }
-
    //
    // Public Methods
    //
 
-   /**getValue: get the *value* (PCDATA) attribute. 
+   /**getValue: get the *value* (PCDATA) attribute.
    */
    public String getValue() {
       return (String) ((XMLAttribute) attribHash.get("value")).getAttribValue();
    }
 
-   /**
+   /**setValue: set the *value* attribute.
     */
-
-   /**setValue: set the *value* attribute. 
-      @return: the current *value* attribute (PCDATA) 
-   */
    public void setValue (String strValue)
    {
       ((XMLAttribute) attribHash.get("value")).setAttribValue(strValue);
    }
 
-   // 
+  /**getValueId: get the *valueId* attribute.
+   */
+   public String getValueId() {
+      return (String) ((XMLAttribute) attribHash.get("valueId")).getAttribValue();
+   }
+
+   /**setValueId: set the *valueId* attribute.
+    */
+   public void setValueId (String strValueId)
+   {
+      ((XMLAttribute) attribHash.get("valueId")).setAttribValue(strValueId);
+   }
+
+   /**getValueRef: get the *valueRef* attribute.
+   */
+   public String getValueRef() {
+      return (String) ((XMLAttribute) attribHash.get("valueRef")).getAttribValue();
+   }
+
+   /**setValueRef: set the *valueRef* attribute.
+   */
+   public void setValueRef (String strValueRef)
+   {
+      ((XMLAttribute) attribHash.get("valueRef")).setAttribValue(strValueRef);
+   }
+
+    /**getInequality: get the *inequality*   attribute.
+    */
+   public String getInequality() {
+      return (String) ((XMLAttribute) attribHash.get("inequality")).getAttribValue();
+   }
+
+
+   /**setInequality: set the *inequality* attribute.
+    */
+   public void setInequality (String strInequality)
+   {
+      if (Utility.isValidValueInequality(strInequality))
+        ((XMLAttribute) attribHash.get("inequality")).setAttribValue(strInequality);
+   }
+
+  /**getSpecial: get the *special* attribute.
+   */
+   public String getSpecial() {
+      return (String) ((XMLAttribute) attribHash.get("special")).getAttribValue();
+   }
+
+   /**setSpecial: set the *special* attribute.
+    */
+   public void setSpecial (String strSpecial)
+   {
+      if (Utility.isValidValueSpecial(strSpecial))
+       ((XMLAttribute) attribHash.get("special")).setAttribValue(strSpecial);
+   }
+
+
+   //
    // Private Methods
    //
 
@@ -80,18 +136,29 @@ public class Value extends BaseObject {
 
        // order matters! these are in *reverse* order of their
        // occurence in the XDF DTD
-       attribOrder.add(0,"value");
+      attribOrder.add(0,"value");
+      attribOrder.add(0,"inequality");
+      attribOrder.add(0,"special");
+      attribOrder.add(0,"valueRef");
+      attribOrder.add(0,"valueId");
+
 
        //set up the attribute hashtable key with the default initial value
        attribHash.put("value", new XMLAttribute(null, Constants.STRING_TYPE));
-
-   };
+       attribHash.put("inequality", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put("special", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put("valueRef", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put("valueId", new XMLAttribute(null, Constants.STRING_TYPE));
+   }
 
 
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/02 20:33:49  kelly
+ * finished the class
+ *
  * Revision 1.5  2000/11/02 18:39:24  thomas
  * Made changes. forget what.. -b.t.
  *
