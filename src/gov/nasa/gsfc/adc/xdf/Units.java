@@ -45,7 +45,8 @@ import java.io.IOException;
   //
 
   private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
-  private static final String SYSTEM_XML_ATTRIBUTE_NAME = new String("system");
+  private static final String FACTOR_XML_ATTRIBUTE_NAME = new String("factor");
+  private static final String UNITSLIST_XML_ATTRIBUTE_NAME = new String("unitsList");
   protected String XDFNodeName;
 
   //double check
@@ -110,29 +111,14 @@ import java.io.IOException;
    * @return the current *factor* attribute
    */
   public void setFactor (Double factor) {
-    ((Attribute) attribHash.get("factor")).setAttribValue(factor);
+    ((Attribute) attribHash.get(FACTOR_XML_ATTRIBUTE_NAME)).setAttribValue(factor);
   }
 
   /**
    * @return the current *factor* attribute
    */
   public Double getFactor () {
-    return (Double) ((Attribute) attribHash.get("factor")).getAttribValue();
-  }
-
-  /**set the *system* attribute
-     @param String
-     @return the current *system* attribute
-   */
-  public void setSystem (String system) {
-    ((Attribute) attribHash.get(SYSTEM_XML_ATTRIBUTE_NAME)).setAttribValue(system);
-  }
-
-  /**
-   * @return the current *system* attribute
-   */
-  public String getSystem () {
-    return (String) ((Attribute) attribHash.get(SYSTEM_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (Double) ((Attribute) attribHash.get(FACTOR_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** Set the *unitList* attribute
@@ -140,14 +126,14 @@ import java.io.IOException;
       @deprecated You should use the add/remove methods to manipulate this list.
    */
   public void setUnitList(List units) {
-    ((Attribute) attribHash.get("unitList")).setAttribValue(units);
+    ((Attribute) attribHash.get(UNITSLIST_XML_ATTRIBUTE_NAME)).setAttribValue(units);
   }
 
   /**
    * @return the current *unitList* attribute
    */
   public List getUnitList() {
-    return (List) ((Attribute) attribHash.get("unitList")).getAttribValue();
+    return (List) ((Attribute) attribHash.get(UNITSLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** convenience method that returns the list of units this object holds
@@ -176,7 +162,7 @@ import java.io.IOException;
    * @return true if successful, false if not
    */
    public boolean removeUnit(Unit what) {
-     return removeFromList(what, getUnitList(), "unitList");
+     return removeFromList(what, getUnitList(), UNITSLIST_XML_ATTRIBUTE_NAME);
   }
 
   /**Remove an Unit object from the list of units held in
@@ -185,7 +171,7 @@ import java.io.IOException;
    * @return true if successful, false if not
    */
   public boolean removeUnit(int index) {
-     return removeFromList(index, getUnitList(), "unitList");
+     return removeFromList(index, getUnitList(), UNITSLIST_XML_ATTRIBUTE_NAME);
   }
 
   /** 
@@ -264,13 +250,12 @@ import java.io.IOException;
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
     attribOrder.add(0,DESCRIPTION_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0,"unitList");
-    attribOrder.add(0,SYSTEM_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0,"factor");
+    attribOrder.add(0,UNITSLIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0,FACTOR_XML_ATTRIBUTE_NAME);
 
-    attribHash.put("unitList", new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put(SYSTEM_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-    attribHash.put("factor", new Attribute(null, Constants.DOUBLE_TYPE));
+    attribHash.put(UNITSLIST_XML_ATTRIBUTE_NAME, 
+        new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put(FACTOR_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.DOUBLE_TYPE));
     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
   }
 
