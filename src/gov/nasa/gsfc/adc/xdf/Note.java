@@ -33,13 +33,13 @@ import java.util.Collections;
  */
 public class Note extends BaseObject implements Cloneable {
 
-   // 
+   //
    // Fields
-   // 
+   //
 
-   // 
-   // Constructors 
-   // 
+   //
+   // Constructors
+   //
 
    /** The no-argument constructor.
     */
@@ -50,7 +50,7 @@ public class Note extends BaseObject implements Cloneable {
 
    /**  This constructor takes a string as an initializer of
         the value of this note. The string is inserted as the
-        note text. 
+        note text.
     */
    public Note (String text)
    {
@@ -77,69 +77,69 @@ public class Note extends BaseObject implements Cloneable {
    // Get/Set Methods
    //
 
-   /** get the *location* attribute. 
+   /** get the *location* attribute.
       @return: the current *location* attribute.
     */
    public String getLocation() {
       return (String) ((XMLAttribute) attribHash.get("location")).getAttribValue();
    }
 
-   /**set the *location* attribute. 
+   /**set the *location* attribute.
    */
    public void setLocation(String strValue)
    {
       ((XMLAttribute) attribHash.get("location")).setAttribValue(strValue);
    }
 
-  /** get the *mark* attribute. 
+  /** get the *mark* attribute.
       @return: the current *mark* attribute.
     */
    public String getMark() {
       return (String) ((XMLAttribute) attribHash.get("mark")).getAttribValue();
    }
-   
-   /**set the *mark* attribute. 
+
+   /**set the *mark* attribute.
    */
    public void setMark (String strValue)
-   {  
+   {
       ((XMLAttribute) attribHash.get("mark")).setAttribValue(strValue);
    }
 
-   /** get the *noteId* attribute. 
+   /** get the *noteId* attribute.
       @return: the current *noteId* attribute.
     */
    public String getNoteId() {
       return (String) ((XMLAttribute) attribHash.get("noteId")).getAttribValue();
    }
-   
-   /**set the *noteId* attribute. 
+
+   /**set the *noteId* attribute.
    */
    public void setNoteId (String strValue)
-   {  
+   {
       ((XMLAttribute) attribHash.get("noteId")).setAttribValue(strValue);
    }
 
-   /** get the *noteIdRef* attribute. 
+   /** get the *noteIdRef* attribute.
       @return: the current *noteIdRef* attribute.
     */
    public String getNoteIdRef() {
       return (String) ((XMLAttribute) attribHash.get("noteIdRef")).getAttribValue();
    }
 
-   /**set the *noteIdRef* attribute. 
+   /**set the *noteIdRef* attribute.
    */
    public void setNoteIdRef (String strValue)
    {
       ((XMLAttribute) attribHash.get("noteIdRef")).setAttribValue(strValue);
    }
 
-   /** get the *value* (PCDATA) attribute. 
+   /** get the *value* (PCDATA) attribute.
     */
    public String getValue() {
       return (String) ((XMLAttribute) attribHash.get("value")).getAttribValue();
    }
 
-   /**set the *value* attribute (PCDATA). 
+   /**set the *value* attribute (PCDATA).
    */
    public void setValue (String strValue)
    {
@@ -147,12 +147,12 @@ public class Note extends BaseObject implements Cloneable {
    }
 
    //
-   // Other Public Methods 
+   // Other Public Methods
    //
 
    /** append text into this Note instance.
     */
-  
+
   // wish I could use String.concat(String) here, but it doesnt seem
   // to work. Ho hum, perhaps investigate why later on. -b.t.
    public void addText (String text) {
@@ -163,24 +163,28 @@ public class Note extends BaseObject implements Cloneable {
       if ( (currentValue = getValue()) != null ) // yes, this can happen
          newValue.append(currentValue);
 
-      newValue.append(text); // append in new text 
+      newValue.append(text); // append in new text
 
-      setValue(newValue.toString()); // (re)set the PCDATA string 
+      setValue(newValue.toString()); // (re)set the PCDATA string
 
    }
-  
+
    /** Indicate the datacell that this note applies to within an array.
     */
    public void setLocator (Locator noteLocation) {
       Log.errorln("Note.setLocation method not implemented yet.");
    }
 
-   /** Get a locator set to the coordinates that this note identifies as its 
+   /** Get a locator set to the coordinates that this note identifies as its
        location within a given array.
     */
    public Locator getLocator () {
       Log.errorln("Note.getLocation method not implemented yet (returning null).");
       return (Locator) null;
+   }
+
+   public Object clone() throws CloneNotSupportedException {
+    return super.clone();
    }
 
    //
