@@ -2512,7 +2512,7 @@ Log.errorln(" TValue:"+valueString);
                     // override attrs with those in passed list
                     newaxis.setAttributes(attrs);
                     // give the clone a unique Id and remove IdRef 
-//                    newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId(), AxisAliasId)); 
+                    newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId(), AxisAliasId)); 
                     newaxis.setAxisIdRef(null);
 
                     // add this into the list of axis objects
@@ -4697,6 +4697,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.59  2001/09/21 14:08:58  thomas
+ * *** empty log message ***
+ *
  * Revision 1.58  2001/09/20 21:00:58  thomas
  * action handlers now throw SAXExceptions
  *
