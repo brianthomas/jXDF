@@ -1,9 +1,9 @@
-
 // XDF AxisInterface Class
 // CVS $Id$
 
 // AxisInterface.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+
 
 /*
     This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,9 @@
 */
 
 package gov.nasa.gsfc.adc.xdf;
+/** AxisInterface.java: AxisInterface aggregates the common signature of Axis
+ *   and FieldAxis
+ */
 
 public interface AxisInterface {
   public int getLength();
@@ -32,6 +35,9 @@ public interface AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/11/09 23:21:53  kelly
+ * added more documentation  -k.z.
+ *
  * Revision 1.2  2000/11/08 19:25:30  thomas
  * Added GPL/CVS header to file. -b.t.
  *
