@@ -25,7 +25,7 @@
 
 package gov.nasa.gsfc.adc.xdf.DOM;
 
-import gov.nasa.gsfc.adc.xdf.Specification;
+import gov.nasa.gsfc.adc.xdf.Constants;
 import gov.nasa.gsfc.adc.xdf.Reader;
 import gov.nasa.gsfc.adc.xdf.XDF;
 import gov.nasa.gsfc.adc.xdf.Log;
@@ -67,7 +67,7 @@ implements Element
    public XDFElementImpl (Document owner, Element baseElement ) 
    throws java.io.IOException
    {
-      super((CoreDocumentImpl) owner, Specification.getInstance().getXDFRootNodeName());
+      super((CoreDocumentImpl) owner, Constants.XDF_ROOT_NODE_NAME);
       // now use passed element to initialize XDF object held by this node
 
       Reader reader = new Reader ();
@@ -97,7 +97,7 @@ implements Element
       if (myXDFObject != null) {
          return myXDFObject.toXMLString();
       } else {
-         String rootNodeName = "<" + Specification.getInstance().getXDFRootNodeName() +"/>";
+         String rootNodeName = "<" + Constants.XDF_ROOT_NODE_NAME +"/>";
          return rootNodeName; 
       }
    }
@@ -145,6 +145,9 @@ implements Element
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/09/05 22:04:45  thomas
+ * small changes related to moving info from Specification to Constants class
+ *
  * Revision 1.1  2001/08/31 19:57:47  thomas
  * Initial Version
  *
