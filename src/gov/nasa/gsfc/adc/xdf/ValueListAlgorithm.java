@@ -189,8 +189,10 @@ public class ValueListAlgorithm implements ValueListInterface,Cloneable {
       if (valueListOverflow != null) outputWriter.write(" overflowValue=\""+valueListOverflow+"\"");
       outputWriter.write("/>");
 
+/*
       if (Specification.getInstance().isPrettyXDFOutput())
           outputWriter.write(Constants.NEW_LINE);
+*/
 
       return "valueList";
    }
@@ -234,6 +236,9 @@ public class ValueListAlgorithm implements ValueListInterface,Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/09/14 18:22:33  thomas
+ * removed extraneous newline from output in basicXMLWriter
+ *
  * Revision 1.4  2001/09/06 15:56:41  thomas
  * changed basicXMLWriter to return String (nodeName)
  *
