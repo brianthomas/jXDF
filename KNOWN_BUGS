@@ -19,13 +19,6 @@
              <value>three</value>
           </axis>
  
-        - The Java DecimalFormat code for exponential fields has unfortunate behavior.
-          There can be no maximum exponent size specified, this means that the width of
-          the exponential after being formated may exceed the specified dataFormat width.
-          Our present 'solution' is to trim fields that are too big. An example of how this
-          may happen: negative exponents in the exponential format. We need to implement
-          by hand our own exponential formatter code to fix this. 
-
         - problem carrying over some parameter entities from the DTD.
 
         - Automatic Unique Id generation may fail when a later node has an id that matches
