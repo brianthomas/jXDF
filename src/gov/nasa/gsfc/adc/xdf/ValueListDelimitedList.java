@@ -100,12 +100,12 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
 
       setDelimiter(delimiter);
 
-      setNoData(noDataValue);
-      setNotANumber(notANumberValue);
-      setInfinite(infiniteValue);
-      setInfiniteNegative(infiniteNegativeValue);
-      setUnderflow(underflowValue);
-      setOverflow(overflowValue);
+      setNoDataValue(noDataValue);
+      setNotANumberValue(notANumberValue);
+      setInfiniteValue(infiniteValue);
+      setInfiniteNegativeValue(infiniteNegativeValue);
+      setUnderflowValue(underflowValue);
+      setOverflowValue(overflowValue);
 
       setValues(values);
 
@@ -114,7 +114,31 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
    // 
    // Public Methods
    //
+
+   // accessor methods
+   public void setDelimiter (String value) { valueListDelimiter = value; }
+   public String getDelimiter () { return valueListDelimiter; }
+
+   public String getNoDataValue () { return valueListNoData; }
+   public void setNoDataValue(String value) { valueListNoData = value; }
+
+   public String getInfiniteValue () { return valueListInfinite; }
+   public void setInfiniteValue (String value) { valueListInfinite = value; }
+
+   public String getInfiniteNegativeValue () { return valueListInfiniteNegative; }
+   public void setInfiniteNegativeValue (String value) { valueListInfiniteNegative = value; }
+
+   public String getNotANumberValue () { return valueListNotANumber; }
+   public void setNotANumberValue(String value) { valueListNotANumber = value; }
+
+   public String getOverflowValue () { return valueListOverflow; }
+   public void setOverflowValue (String value) { valueListOverflow= value; }
+
+   public String getUnderflowValue () { return valueListUnderflow; }
+   public void setUnderflowValue (String value) { valueListUnderflow= value; }
+
    public List getValues () { return values; }
+   public void setValues (List valueList) { values = valueList; }
 
    public void toXMLOutputStream (OutputStream outputstream, String indent)
    throws java.io.IOException
@@ -250,14 +274,6 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
       }
    }
 
-   private void setValues (List valueList) { values = valueList; }
-   private void setInfinite (String value) { valueListInfinite = value; }
-   private void setInfiniteNegative (String value) { valueListInfiniteNegative = value; }
-   private void setUnderflow (String value) { valueListUnderflow= value; }
-   private void setOverflow (String value) { valueListOverflow= value; }
-   private void setNoData(String value) { valueListNoData = value; }
-   private void setNotANumber(String value) { valueListNotANumber = value; }
-   private void setDelimiter (String value) { valueListDelimiter = value; }
-
 }
+
 
