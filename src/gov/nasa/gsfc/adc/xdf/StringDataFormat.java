@@ -42,7 +42,7 @@ public class StringDataFormat extends DataFormat {
   private String parentClassXDFNodeName;
 
 
-  /** The no argument constructor.
+   /** The no argument constructor.
    */
   public StringDataFormat ()  //DataFormat no-arg constructor should be been called
   {
@@ -53,122 +53,62 @@ public class StringDataFormat extends DataFormat {
    *  conviently build the XML attribute list for a given class.
    */
   private void init() {
-
-    parentClassXDFNodeName = super.getClassXDFNodeName(); 
-    classXDFNodeName = "string";
+    classXDFNodeName = super.getClassXDFNodeName()+ "||" + "string";
     attribOrder.add(0, "length");  //add length as the first attribute;
-
-    attribHash.put("lessThanValue", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("lessThanOrEqualValue", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("greaterThanValue", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("greaterThanOrEqualValue", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("infiniteValue", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("infiniteNegativeValue", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("noDataValue", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("length", new XMLAttribute(new Integer(0), Constants.NUMBER_TYPE));
-
   }
 
   //
-  //Get/Set Methods
+  //Set Methods
   //
 
   /**setLessThanValue: set the *lessThanValue* attribute
    * @return: the current *lessThanValue* attribute
    */
-  public String setLessThanValue(String strLessThanValue) {
+  public Object setLessThanValue(Object strLessThanValue) {
     return (String) ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(strLessThanValue);
-  }
-  /**getLessThanValue
-   * @return: the current *lessThanValue* attribute
-   */
-  public String getLessThanValue()
-  {
-    return (String) ((XMLAttribute) attribHash.get("lessThanValue")).getAttribValue();
   }
 
   /**setLessThanValueOrEqualValue: set the *lessThanValueOrEqualValue* attribute
    * @return: the current *lessThanOrEqualValue* attribute
    */
-  public String setLessThanOrEqualValue(String strLessThanOrEqualValue) {
+  public Object setLessThanOrEqualValue(Object strLessThanOrEqualValue) {
     return (String) ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(strLessThanOrEqualValue);
-  }
-  /**getlessThanOrEqualValue
-   * @return: the current *lessThanOrEqualValue* attribute
-   */
-  public String getlessThanOrEqualValue()
-  {
-    return (String) ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).getAttribValue();
   }
 
   /**setgreaterThanValue: set the *greaterThanValue* attribute
    * @return: the current *greaterThanValue* attribute
    */
-  public String setGreaterThanValue(String strGreaterThanValue) {
+  public Object setGreaterThanValue(Object strGreaterThanValue) {
     return (String) ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(strGreaterThanValue);
-  }
-  /**getGreaterThanValue
-   * @return: the current *greaterThanValue* attribute
-   */
-  public String getGreaterThanValue()
-  {
-    return (String) ((XMLAttribute) attribHash.get("greaterThanValue")).getAttribValue();
   }
 
   /**setGreaterThanOrEqualValue: set the *greaterThanOrEqualValue* attribute
    * @return: the current *greaterThanOrEqualValue* attribute
    */
-  public String setGreaterThanOrEqualValue(String strGreaterThanOrEqualValue) {
+  public Object setGreaterThanOrEqualValue(Object strGreaterThanOrEqualValue) {
     return (String) ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(strGreaterThanOrEqualValue);
-  }
-  /**getGreaterThanOrEqualValue
-   * @return: the current *greaterThanOrEqualValue* attribute
-   */
-  public String getGreaterThanOrEqualValue()
-  {
-    return (String) ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).getAttribValue();
   }
 
   /**setInfiniteValue: set the *infiniteValue* attribute
    * @return: the current *infiniteValue* attribute
    */
-  public String setInfiniteValue(String strInfiniteValue) {
+  public Object setInfiniteValue(Object strInfiniteValue) {
     return (String) ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(strInfiniteValue);
-  }
-  /**getInfiniteValue
-   * @return: the current *infiniteValue* attribute
-   */
-  public String getInfiniteValue()
-  {
-    return (String) ((XMLAttribute) attribHash.get("infiniteValue")).getAttribValue();
   }
 
   /**setInfiniteNegativeValue: set the *infiniteNegativeValue* attribute
    * @return: the current *infiniteNegativeValue* attribute
    */
-  public String setInfiniteNegativeValue(String strInfiniteNegativeValue) {
+  public Object setInfiniteNegativeValue(Object strInfiniteNegativeValue) {
     return (String) ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(strInfiniteNegativeValue);
-  }
-  /**getInfiniteNegativeValue
-   * @return: the current *infiniteNegativeValue* attribute
-   */
-  public String getInfiniteNegativeValue()
-  {
-    return (String) ((XMLAttribute) attribHash.get("infiniteNegativeValue")).getAttribValue();
   }
 
   /**setNoDataValue: set the *noDataValue* attribute
    * @return: the current *noDataValue* attribute
    */
-  public String setNoDataValue(String strNoDataValue) {
+  public Object setNoDataValue(Object strNoDataValue) {
     return (String) ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(strNoDataValue);
-  }
-  /**getNoDataValue
-   * @return: the current *noDataValue* attribute
-   */
-  public String getNoDataValue()
-  {
-    return (String) ((XMLAttribute) attribHash.get("noDataValue")).getAttribValue();
   }
 
   /**setlength: set the *length* attribute
@@ -184,7 +124,6 @@ public class StringDataFormat extends DataFormat {
   {
     return (Number) ((XMLAttribute) attribHash.get("length")).getAttribValue();
   }
-
   //
   //Other PUBLIC Methods
   //
@@ -237,26 +176,26 @@ public class StringDataFormat extends DataFormat {
   ) {
 
      boolean wasPretty = false;
-     //String dataFormatNodeName = super.getClassXDFNodeName(); 
+     //String dataFormatNodeName = super.getClassXDFNodeName();
      String dataFormatNodeName = parentClassXDFNodeName;
 
      if (sPrettyXDFOutput) writeOut(outputstream, indent); // indent node if desired
 
      // open a "dataformat" tag
-     writeOut(outputstream, "<" + dataFormatNodeName + ">"); 
+     writeOut(outputstream, "<" + dataFormatNodeName + ">");
      // now use normal method, but no pretty output
-     if (sPrettyXDFOutput) 
+     if (sPrettyXDFOutput)
         wasPretty = true;
      // turn off pretty output so no newline, or indenting
      this.setPrettyXDFOutput(false);
-     super.toXDFOutputStream( outputstream, XMLDeclAttribs, 
+     super.toXDFOutputStream( outputstream, XMLDeclAttribs,
                               indent, dontCloseNode,
                               newNodeNameString, noChildObjectNodeName );
      // return to pretty output if that was what we had before
-     if (wasPretty) 
+     if (wasPretty)
         this.setPrettyXDFOutput(true);
      // close the "dataformat" tag
-     writeOut(outputstream, "</" + dataFormatNodeName + ">"); 
+     writeOut(outputstream, "</" + dataFormatNodeName + ">");
 
      if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
 
@@ -266,6 +205,9 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/10/26 20:18:33  kelly
+ * get methods are now in superclass DataFormat, implement set methods itself -k.z.
+ *
  * Revision 1.4  2000/10/26 16:31:45  thomas
  * removed silly errorln in toXDFOutput method. -b.t.
  *
