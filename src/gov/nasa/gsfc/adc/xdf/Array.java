@@ -116,6 +116,10 @@ import java.util.Vector;
      private static final String INFINITEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteValue");
      private static final String INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteNegativeValue");
      private static final String NODATAVALUE_XML_ATTRIBUTE_NAME = new String("noDataValue");
+     private static final String NOTANUMBERVALUE_XML_ATTRIBUTE_NAME = new String("notANumberValue");
+     private static final String OVERFLOWVALUE_XML_ATTRIBUTE_NAME = new String("overflowValue");
+     private static final String UNDERFLOWVALUE_XML_ATTRIBUTE_NAME = new String("underflowValue");
+     private static final String DISABLEDVALUE_XML_ATTRIBUTE_NAME = new String("disabledValue");
      private static final String PARAMETERLIST_XML_ATTRIBUTE_NAME = new String("paramList");
      private static final String UNITS_XML_ATTRIBUTE_NAME = new String("units");
      private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = new String("dataFormat");
@@ -310,6 +314,62 @@ import java.util.Vector;
        return ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
    
+   /** set the *notANumberValue* attribute
+    */
+   public void setNotANumberValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
+
+   /*
+    * @return the current *notANumberValue* attribute
+    */
+   public Object getNotANumberValue() {
+      return ((XMLAttribute) attribHash.get(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   /** set the *overflowValue* attribute
+    */
+   public void setOverflowValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(OVERFLOWVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
+
+   /*
+    * @return the current *overflowValue* attribute
+    */
+   public Object getOverflowValue() {
+      return ((XMLAttribute) attribHash.get(OVERFLOWVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   /** set the *underflowValue* attribute
+    */
+   public void setUnderflowValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
+
+   /*
+    * @return the current *underflowValue* attribute
+    */
+   public Object getUnderflowValue() {
+      return ((XMLAttribute) attribHash.get(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   /** set the *disabledValue* attribute
+    */
+   public void setDisabledValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(DISABLEDVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
+
+   /*
+    * @return the current *disabledValue* attribute
+    */
+   public Object getDisabledValue() {
+      return ((XMLAttribute) attribHash.get(DISABLEDVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
    
      /** set the *arrayId* attribute
       */
@@ -1083,6 +1143,10 @@ import java.util.Vector;
        attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, PARAMETERLIST_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, DISABLEDVALUE_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, UNDERFLOWVALUE_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, OVERFLOWVALUE_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, NOTANUMBERVALUE_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, NODATAVALUE_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, INFINITEVALUE_XML_ATTRIBUTE_NAME);
@@ -1104,6 +1168,10 @@ import java.util.Vector;
        attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));
        attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));
        attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+       attribHash.put(DISABLEDVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(OVERFLOWVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
        attribHash.put(NODATAVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
        attribHash.put(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
        attribHash.put(INFINITEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
@@ -1300,6 +1368,10 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.33  2001/07/02 21:19:29  thomas
+  * changed attribs to match XDF DTD: now has notAnumber,
+  * disabledValue, overflow/underflowValue.
+  *
   * Revision 1.32  2001/06/26 21:22:25  huang
   * changed return type to boolean for all addObject()
   *

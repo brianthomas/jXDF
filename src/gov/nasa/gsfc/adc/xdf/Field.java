@@ -37,11 +37,11 @@
  * noteList--
  * a list of the Note objects held by this field.
  * dataFormat--
- * a OBJECT REF of the DataFormat object for data within this field.
+ * an OBJECT REF of the DataFormat object for data within this field.
  * relation--
- * a  OBJECT REF  of the Relationship object for this field.
+ * an OBJECT REF  of the Relationship object for this field.
  * units--
- * a OBJECT REF of the Units object of this field. The Units object
+ * an OBJECT REF of the Units object of this field. The Units object
  * is used to hold the  Unit objects.
  */
 
@@ -75,6 +75,10 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
    private static final String INFINITEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteValue");
    private static final String INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteNegativeValue");
    private static final String NODATAVALUE_XML_ATTRIBUTE_NAME = new String("noDataValue");
+   private static final String NOTANUMBERVALUE_XML_ATTRIBUTE_NAME = new String("notANumberValue");
+   private static final String OVERFLOWVALUE_XML_ATTRIBUTE_NAME = new String("overflowValue");
+   private static final String UNDERFLOWVALUE_XML_ATTRIBUTE_NAME = new String("underflowValue");
+   private static final String DISABLEDVALUE_XML_ATTRIBUTE_NAME = new String("disabledValue");
    private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = "dataFormat";
    private static final String UNITS_XML_ATTRIBUTE_NAME = "units";
    private static final String RELATION_XML_ATTRIBUTE_NAME = "relation";
@@ -181,103 +185,159 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
       ((XMLAttribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).setAttribValue(units);
    }
 
-     /** set the *lessThanValue* attribute
-      */
-     public void setLessThanValue (Object strDesc)
-     {
-        ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
-     }
+   /** set the *lessThanValue* attribute
+    */
+   public void setLessThanValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
 
-      /*
-      * @return the current *lessThanValue* attribute
-      */
-     public Object getLessThanValue() {
-       return ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-     }
+   /*
+    * @return the current *lessThanValue* attribute
+    */
+   public Object getLessThanValue() {
+      return ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
 
-     /** set the *lessThanOrEqualValue* attribute
-      */
-     public void setLessThanOrEqualValue (Object strDesc)
-     {
-        ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
-     }
+   /** set the *lessThanOrEqualValue* attribute
+    */
+   public void setLessThanOrEqualValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
 
-      /*
-      * @return the current *lessThanOrEqualValue* attribute
-      */
-     public Object getLessThanOrEqualValue() {
-       return ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-     }
+   /*
+    * @return the current *lessThanOrEqualValue* attribute
+    */
+   public Object getLessThanOrEqualValue() {
+      return ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
 
-     /*
-      * @return the current *lessThanValue* attribute
-      */
-     public Object getGreaterThanValue() {
-       return ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-     }
+   /*
+    * @return the current *lessThanValue* attribute
+    */
+   public Object getGreaterThanValue() {
+      return ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
 
-     /** set the *greaterThanValue* attribute
-      */
-     public void setGreaterThanValue (Object strDesc)
-     {
-        ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
-     }
+   /** set the *greaterThanValue* attribute
+    */
+   public void setGreaterThanValue (Object strDesc)
+   {
+       ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
 
-     /** set the *greaterThanOrEqualValue* attribute
-      */
-     public void setGreaterThanOrEqualValue (Object strDesc)
-     {
-        ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
-     }
+   /** set the *greaterThanOrEqualValue* attribute
+    */
+   public void setGreaterThanOrEqualValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
 
-     /*
-      * @return the current *greaterThanOrEqualValue* attribute
-      */
-     public Object getGreaterThanOrEqualValue() {
-       return ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-     }
+   /*
+    * @return the current *greaterThanOrEqualValue* attribute
+    */
+   public Object getGreaterThanOrEqualValue() {
+      return ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
 
-     /** set the *infiniteValue* attribute
-      */
-     public void setInfiniteValue (Object strDesc)
-     {
-        ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
-     }
+   /** set the *infiniteValue* attribute
+    */
+   public void setInfiniteValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
 
-     /*
-      * @return the current *infiniteValue* attribute
-      */
-     public Object getInfiniteValue() {
-       return ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-     }
+   /*
+    * @return the current *infiniteValue* attribute
+    */
+   public Object getInfiniteValue() {
+     return ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
 
-     /** set the *infiniteNegativeValue* attribute
-      */
-     public void setInfiniteNegativeValue (Object strDesc)
-     {
-        ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
-     }
+   /** set the *infiniteNegativeValue* attribute
+    */
+   public void setInfiniteNegativeValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
 
-     /*
-      * @return the current *infiniteNegativeValue* attribute
-      */
-     public Object getInfiniteNegativeValue() {
-       return ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-     }
+   /*
+    * @return the current *infiniteNegativeValue* attribute
+    */
+   public Object getInfiniteNegativeValue() {
+      return ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
 
-     /** set the *noDataValue* attribute
-      */
-     public void setNoDataValue (Object strDesc)
-     {
-        ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
-     }
+   /** set the *noDataValue* attribute
+    */
+   public void setNoDataValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
 
-     /*
-      * @return the current *noDataValue* attribute
-      */
-     public Object getNoDataValue() {
-       return ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-     }
+   /*
+    * @return the current *noDataValue* attribute
+    */
+   public Object getNoDataValue() {
+      return ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   /** set the *notANumberValue* attribute
+    */
+   public void setNotANumberValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
+   
+   /*
+    * @return the current *notANumberValue* attribute
+    */
+   public Object getNotANumberValue() {
+      return ((XMLAttribute) attribHash.get(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   /** set the *overflowValue* attribute
+    */
+   public void setOverflowValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(OVERFLOWVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
+   
+   /*
+    * @return the current *overflowValue* attribute
+    */
+   public Object getOverflowValue() {
+      return ((XMLAttribute) attribHash.get(OVERFLOWVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   /** set the *underflowValue* attribute
+    */
+   public void setUnderflowValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
+
+   /*
+    * @return the current *underflowValue* attribute
+    */
+   public Object getUnderflowValue() {
+      return ((XMLAttribute) attribHash.get(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   /** set the *disabledValue* attribute
+    */
+   public void setDisabledValue (Object strDesc)
+   {
+      ((XMLAttribute) attribHash.get(DISABLEDVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+   }
+
+   /*
+    * @return the current *disabledValue* attribute
+    */
+   public Object getDisabledValue() {
+      return ((XMLAttribute) attribHash.get(DISABLEDVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
 
    /**
        @return the current *units* attribute
@@ -448,6 +508,10 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
      attribOrder.add(0, RELATION_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, DISABLEDVALUE_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, UNDERFLOWVALUE_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, OVERFLOWVALUE_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, NOTANUMBERVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, NODATAVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, INFINITEVALUE_XML_ATTRIBUTE_NAME);
@@ -468,6 +532,10 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
      attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
      attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));
      attribHash.put(CLASS_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(DISABLEDVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(OVERFLOWVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
      attribHash.put(NODATAVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
      attribHash.put(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
      attribHash.put(INFINITEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
@@ -488,6 +556,10 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/07/02 21:19:29  thomas
+ * changed attribs to match XDF DTD: now has notAnumber,
+ * disabledValue, overflow/underflowValue.
+ *
  * Revision 1.16  2001/06/26 21:22:25  huang
  * changed return type to boolean for all addObject()
  *
