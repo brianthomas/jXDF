@@ -112,7 +112,6 @@ class SaxDocumentHandler implements DocumentHandler {
     private int CurrentDataTagLevel = 0; // how nested we are within d0/d1/d2 data tags
     private int DataNodeLevel = 0; // how deeply nested we are within data nodes 
     private int DataTagLevel = 0; // the level where the actual char data is
-//my $CDATA_IS_ARRAY_DATA; # Tells us when we are accepting char_data as data 
     private Locator TaggedLocatorObj;
     private StringBuffer DATABLOCK;
     private boolean CDATAIsArrayData = false;
@@ -121,18 +120,11 @@ class SaxDocumentHandler implements DocumentHandler {
     private DataFormat DataFormatList[];       // list of CurrentArray.getDataFormatList();
     private int LastFastAxisCoordinate = 0;
     private AxisInterface FastestAxis;
+    private ArrayList AxisReadOrder;
 
     // lookup tables holding objects that have id/idref stuff
     private Hashtable AxisObj = new Hashtable();
     private Hashtable NoteObj = new Hashtable();
-
-    // DEFAULT settings. We really should be getting these 
-    // from the XDF DTD, NOT setting them here.
-    private String DefaultValueListDelimiter = " ";
-    private String DefaultValueListRepeatable = "yes";
-    private int DefaultValueListSize = 1;
-    private int DefaultValueListStart = 1;
-    private int DefaultValueListStep = 1;
 
     // this is a BAD thing. I have been having troubles distinguishing between
     // important whitespace (e.g. char data within a data node) and text nodes
@@ -479,6 +471,7 @@ class SaxDocumentHandler implements DocumentHandler {
        endElementHandlerHashtable.put(XDFNodeName.TD7, new dataTagEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.TD8, new dataTagEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListEndElementHandlerFunc());
 
     }
 
@@ -531,7 +524,7 @@ class SaxDocumentHandler implements DocumentHandler {
        // Note that we dont treat binary data at all 
        try {
           
-Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastestAxis)+"]");
+// Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastestAxis)+"]");
 
            if ( CurrentDataFormat instanceof StringDataFormat) {
               CurrentArray.setData(dataLocator, thisString);
@@ -680,35 +673,14 @@ Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastestAxis)
 
     // For the case where valueList is storing values in 
     // algorithmic fashion
-    private ArrayList getValueListNodeValues (AttributeList attrs) {
+    private ArrayList getValueListNodeValues () {
 
        ArrayList values = new ArrayList();
 
        // parameters for the algorithm
-       int size  = DefaultValueListSize;
-       int start = DefaultValueListStart;
-       int step  = DefaultValueListStep;
-
-       // Capture any overridding Valuelist attributes
-       // into algorithm parameters
-       for (int i = 0; i < attrs.getLength(); i++)
-       {
-           String name = attrs.getName(i);
-           if ( name.equals("size") ) { 
-               Integer tmp = new Integer (attrs.getValue(i));
-               size = tmp.intValue();
-           } else if ( name.equals("step")) {
-               Integer tmp = new Integer (attrs.getValue(i));
-               step = tmp.intValue();
-           } else if ( name.equals("start")) {
-               Integer tmp = new Integer (attrs.getValue(i));
-               start = tmp.intValue();
-           } else if ( name.equals("delimiter")) {
-              // IF delimiter is defined, then we ARENT using
-              // an algorthm, and should exit here without further ado.
-              return values;
-           }
-       }
+       int size  = Integer.valueOf((String) CurrentValueListParameter.get("size")).intValue();
+       int start = Integer.valueOf((String) CurrentValueListParameter.get("start")).intValue();
+       int step  = Integer.valueOf((String) CurrentValueListParameter.get("step")).intValue();
 
        // do the algorithm to populate the values in the ArrayList 
        int numberOfValues = 0;
@@ -1063,9 +1035,8 @@ Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastestAxis)
               }
 
               Locator myLocator = CurrentArray.createLocator();
+              myLocator.setIterationOrder(AxisReadOrder);
 
-AxisInterface axis0 = (AxisInterface) CurrentArray.getAxisList().get(0); 
-AxisInterface axis1 = (AxisInterface) CurrentArray.getAxisList().get(1); 
 
               CurrentDataFormatIndex = 0; 
 
@@ -1112,8 +1083,6 @@ AxisInterface axis1 = (AxisInterface) CurrentArray.getAxisList().get(1);
                              CurrentDataFormatIndex++;
                        }
                     }
-
-Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisLocation(axis1)+"]");
 
                     myLocator.next();
 
@@ -1417,7 +1386,18 @@ Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisL
 
     class forStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("FOR Start handler not implemented yet.");
+
+          // for node sets the iteration order for how we will setData
+          // in the datacube (important for delimited and formatted reads).
+      
+          for (int i = 0; i < attrs.getLength(); i++)
+          {
+             String name = attrs.getName(i);
+             if (name.equals("axisIdRef") ) {
+                AxisReadOrder.add(AxisObj.get(attrs.getValue(i)));
+             } else 
+                 Log.warnln("Warning: got weird attribute:"+name+" on for node");
+          } 
        }
     }
 
@@ -1754,6 +1734,10 @@ Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisL
           //  spot to do this).
           CurrentFormatObjectList = new ArrayList ();
 
+          // this will be used in formatted/delimited reads to
+          // set the iteration order of the locator that will populate
+          // the datacube 
+          AxisReadOrder = new ArrayList();
        }
     }
 
@@ -1915,8 +1899,9 @@ Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisL
           } else if ( gParentNodeName.equals(XDFNodeName.AXIS) )
           {
 
-              ArrayList axisList = (ArrayList) CurrentArray.getAxisList();
-              Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+              // yes, axis is correct here, cant add units to a fieldAxis 
+              // (only to fields!)
+              Axis lastAxisObject = (Axis) CurrentArray.getAxisList().get(CurrentArray.getAxisList().size()-1);
               newunit = lastAxisObject.addUnit(newunit);
 
           } else if ( gParentNodeName.equals(XDFNodeName.ARRAY) )
@@ -2049,16 +2034,26 @@ Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisL
     class valueListCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (char buf [], int offset, int len) {
 
+          // IF we get here, we have the delmited case for populating
+          // a value list.
+
+          // our string that we will parse
           String valueListString = new String (buf, offset, len);
+
+          String delimiter = (String) CurrentValueListParameter.get("delimiter");
+          String repeatable = (String) CurrentValueListParameter.get("repeatable");
+
+          // reconsitute information stored in CurrentValueListParameter table 
+          String parentNodeName = (String) CurrentValueListParameter.get("parentNodeName");
+
+// NOT currently complete. Adds values ONLY to axes. Need one for parameter too. 
+
           // get the last axis
           List axisList = (List) CurrentArray.getAxisList();
           Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
 
           // split up string into values based on declared delimiter
-          String delimiter = (String) CurrentValueListParameter.get("delimiter");
-          String repeatable = (String) CurrentValueListParameter.get("repeatable");
-
-          // snag the string representation of the values
+          // and snag the string representation of the values
           ArrayList strValueList = 
               splitStringIntoStringObjects(valueListString, delimiter, repeatable, null );
 
@@ -2081,6 +2076,8 @@ Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisL
              }
           }
 
+          CurrentValueListParameter.put("isDelimitedCase", "true"); // notify that we did the list 
+
        }
     }
 
@@ -2090,22 +2087,47 @@ Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisL
     class valueListStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
  
-           // 1. grab parent node name
+           // 1. re-init
+           CurrentValueListParameter = new Hashtable(); 
+
+           // 2. populate ValueListparameters w/ parent name 
            String parentNodeName = getParentNodeName();
+           CurrentValueListParameter.put("parentNodeName", parentNodeName);
 
-           // 2. try to determine values from attributes (e.g. algorithm method)
-           ArrayList values = getValueListNodeValues(attrs);
+           // populate ValueListparameters from attribute list 
+           for (int i = 0; i < attrs.getLength(); i++)
+           {
+               if (attrs.getValue(i) != null) 
+                  CurrentValueListParameter.put(attrs.getName(i), attrs.getValue(i));
+           }
+           CurrentValueListParameter.put("isDelimitedCase", "false"); 
+
+       }
+    }
+
+    class valueListEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action () {
+
+          // generate valuelist values from algoritm IF we need to
+          // (e.g. values where'nt in a delimited cdata list)
+          // check to see if we didnt alrealy parse from a delmited string.
+          if ( ((String) CurrentValueListParameter.get("isDelimitedCase")).equals("true") ) 
+             return; // we already did the list, leave here 
 
 
-           // 3. IT could be that no values exist because they are stored
-           // in PCDATA rather than as algorithm (treat in char data handler
-           // in this case).
-           if(values.size() > 0 ) { // algoritm case 
- 
-              ArrayList valueObjList = new ArrayList();
+          // 1. grab parent node name
+          String parentNodeName = (String) CurrentValueListParameter.get("parentNodeName");
 
-              if( parentNodeName.equals(XDFNodeName.AXIS) )
-              {
+          // 2. try to determine values from attributes (e.g. algorithm method)
+          ArrayList values = getValueListNodeValues();
+
+          // 3. Populate correct parent node w/ values 
+          if(values.size() > 0 ) { // needed safety?
+
+             ArrayList valueObjList = new ArrayList();
+
+             if( parentNodeName.equals(XDFNodeName.AXIS) )
+             {
 
                     // get the last axis
                     List axisList = (List) CurrentArray.getAxisList();
@@ -2118,14 +2140,14 @@ Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisL
                         valueObjList.add(lastAxisObject.addAxisValue(value));
                     }
 
-              } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
-              {
+             } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
+             {
 
-                   /*
-                    ValueGroup lastValueGroup = (ValueGroup)
-                         CurrentValueGroupList.get(CurrentValueGroupList.size()-1);
-                     newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
-                   */
+/*
+   ValueGroup lastValueGroup = (ValueGroup)
+   CurrentValueGroupList.get(CurrentValueGroupList.size()-1);
+   newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
+*/
 
                 if ( LastValueGroupParentObject instanceof Parameter )
                 {
@@ -2146,75 +2168,39 @@ Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisL
                     Axis myAxisObject = (Axis) LastValueGroupParentObject;
 
                     Iterator iter = values.iterator();
-                    while (iter.hasNext()) { 
+                    while (iter.hasNext()) {
                         String valuePCDATA = (String) iter.next();
                         Value value = new Value (valuePCDATA);
                         valueObjList.add(myAxisObject.addAxisValue(value));
                     }
 
                 } else {
-                   Log.errorln("Error: unknown valueGroupParent "+LastValueGroupParentObject+
+                    Log.warnln("Error: unknown valueGroupParent "+LastValueGroupParentObject+
                                " cant treat for "+XDFNodeName.VALUELIST);
-                   System.exit(-1); // fatal error, shut down 
+                    return; // bail 
 
                 }
 
-              } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
-              { 
+             } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
+             {
 
                  Iterator iter = values.iterator();
-                 while (iter.hasNext()) 
+                 while (iter.hasNext())
                  {
                     String valuePCDATA = (String) iter.next();
                     Value value = new Value (valuePCDATA);
                     valueObjList.add(LastParameterObject.addValue(value));
                  }
 
-
-              } else {
+             } else {
                  Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST);
                  System.exit(-1); // fatal error, shut down 
-              }
+             }
+          }
 
-              // add these new value objects to all open groups
-              Iterator iter1 = CurrentValueGroupList.iterator();
-              Iterator iter2 = valueObjList.iterator();
-              while (iter1.hasNext()) 
-              {
-                 ValueGroup nextValueGroupObj = (ValueGroup) iter1.next();
-                 while (iter2.hasNext()) 
-                 {
-                    Value nextValueObj = (Value) iter2.next();
-                    nextValueObj.addToGroup(nextValueGroupObj);
-                 }
-                 // reset iter2
-                 iter2 = valueObjList.iterator();
-              }
-
-           } else { // PCDATA case
+// Need to do something wi/ ValueObjList HERE
 
 
-              String delimiter = DefaultValueListDelimiter;
-              String repeatable = DefaultValueListRepeatable;
-
-              // pickup overriding values from attribute list
-              for (int i = 0; i < attrs.getLength(); i++)
-              {
-                   String name = attrs.getName(i); 
-                  if ( name.equals("delimiter") ) { 
-                     delimiter = attrs.getValue(i);
-                  } else if ( name.equals("repeatable")) {
-                     repeatable = attrs.getValue(i);
-                  }
-              }
-
-              CurrentValueListParameter = new Hashtable(); // re-init
-
-              CurrentValueListParameter.put("parentNode", parentNodeName);
-              CurrentValueListParameter.put("delimiter", delimiter);
-              CurrentValueListParameter.put("repeatable", repeatable);
-
-           }
        }
     }
 
@@ -2233,6 +2219,10 @@ Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisL
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/07 21:53:53  thomas
+ * 2 Fixes: null problem wi/ reading in axisUnits and
+ * reading in of valueList from an algoritm. -b.t.
+ *
  * Revision 1.8  2000/11/06 14:47:32  thomas
  * First Cut at delimited implimented. Problem in
  * Locator (?) prevents it from being fully functional.
