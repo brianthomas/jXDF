@@ -59,70 +59,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
   // Fields
   //
 
-  /** Stores whether nicely formatted XDF should be output from any toXML*
-      method. Nice formatting includes nested indentation and return characters
-      to improve human readability of output XDF (but blows up the size of
-      the XDF file!).
-  */
-  public static boolean sPrettyXDFOutput = false;
-
-  /** The indentation string that will be used for every nesting level within an
-      output XDF. For example, if the sPrettyXDFOutputIndentation string consists
-      of 3 spaces, then a doubly nested node will be indented 6 spaces, its parent
-      node will be indented 3 spaces and the root node will not be indented at all.
-      You can be creative with the indentation: any sequence of characters is valid
-      (no need to just use spaces!).
-  */
-  public static String sPrettyXDFOutputIndentation = "  ";
-
-  /** The default allocation size for each dimension within all XDF arrays.
-      The practical meaning of this field is that it indicates the initial
-      size of each XDF Axis/FieldAxis (the number of axis values/fields along
-      the axis) and the number of data cells within a dimension of the XDF
-      DataCube object. If more axis values/fields/datacells are placed on a
-      given Axis/FieldAxis or data in a unallocated spot within the dataCube
-      then the package allocates the needed memory and enlarges the
-      DataCube/Axis/FieldAxis objects as it is needed.
-
-      This automated allocation is slow however, so it is desirable, IF you
-      know how big your arrays will be, to pre-set this value to encompass your
-      data set. Doing so will to improve efficency in some cases. Note that if
-      you are having keeping all of your data in memory (a multi-dimensional
-      dataset) it may be desirable to DECREASE the value.
-  */
-  public static int sDefaultDataArraySize = 1000;
-
   /** The XDF (element) node name for a given XDF class. Not all XDF classes
       have a defined node name (ie map to the XDF DTD). The BaseObject class
       is an example of this case.
   */
   protected String classXDFNodeName;
-
-  /** The version of XML that will be output from a toXML* method call.
-  */
-  private static String sXMLSpecVersion = "1.0";
-
-  /** The root node name for any XDF document. The root node is a structure
-      node with a different name as specified here.
-  */
-  private static String sXDFRootNodeName = "XDF";
-
-  /** The XDF node name for the structure class.
-  */
-  private static String sXDFStructureNodeName = "structure"; // bad. we should call the
-                                                             // class to find this out. -b.t.
-
-  /** The name of the relevant version of XDF DTD file for this package.
-  */
-  private static String sXDFDTDName = "XDF_0.17.dtd";
-
-  /** The name of the XMLAttribute which is written out as PCDATA rather than as
-      a node attribute (String/Number type XMLAttributes) or child node (Object
-      and List type XMLAttributes). At this time only String-type XMLAttributes
-      should be named 'value' (yes, it would be an interesting experiment to call
-      an Object-type XMLAttribute 'value'!).
-  */
-  private static String sPCDATAAttribute = "value";
 
   /** openGroupNodeHash is an internal field used by the toXML* methods to track
       which group nodes are still open. Probably should go away.
@@ -167,18 +108,15 @@ public abstract class BaseObject implements Serializable, Cloneable {
   // Get/Set Methods
   //
 
-
-
-
   /** The class XDF node name may (or may not exist) for a given XDF java object.
-     @return: String on success, null (String Object) on if the node name doesnt exist.
+     @return String on success, null (String Object) if the node name doesnt exist.
   */
   public String getClassXDFNodeName() {
     return classXDFNodeName;
   }
 
   /** Return the hashtable of XMLAttribute names and their values.
-      @return: Hashtable on success, an empty hashtable is passed back if their
+      @return Hashtable on success, an empty hashtable is passed back if their
                are no XMLAttributes within a given XDF object class.
   */
   public Hashtable getAttribHash() {
@@ -193,89 +131,14 @@ public abstract class BaseObject implements Serializable, Cloneable {
   }
 
   /** Return a list of the proper ordering of the XML attributes of this object.
-      @return: List on success, on failure an empty List object is passed back if
+      @return List on success, on failure an empty List object is passed back if
                there are no XMLAttributes within a XDF given object class.
   */
   public List getAttribOrder() {
     return attribOrder;
   }
 
-  /** Get the output XDF format style.
-      @return: the value of sPrettyXDFOutput field  (which is true if nicely formatted
-               XML is to be outputted from any call to a toXML* method, false if not).
-  */
-  public static boolean getPrettyXDFOutput() {
-    return sPrettyXDFOutput;
-  }
-
-  /** Set this to true for nicely formatted XML output from any call to a toXML* method.
-      Setting this value will change the runtime behavior of all XDF Objects within an
-      application.
-      @return: the value of sPrettyXDFOutput field.
-  */
-  public static void setPrettyXDFOutput (boolean turnOnPrettyOutput) {
-    sPrettyXDFOutput = turnOnPrettyOutput;
-  }
-
-  /**
-      Gets the indentation string that will be used for every nesting level within an
-      output XDF. For example, if the string consists of 3 spaces, then a doubly nested
-               node will be indented 6 spaces, its parent node will be indented 3 spaces and the
-               root node will not be indented at all.
-      @return: String object containing XDF output indentation.
-  */
-  public static String getPrettyXDFOutputIndentation() {
-    return sPrettyXDFOutputIndentation;
-  }
-
-  /** Set the indentation string for PrettyXDFOutput. You aren't limited to just spaces
-     here, ANY sequence of characters may be used to indent your XDF documents.
-      @return: String object containing XDF output indentation.
-  */
-  public static void setPrettyXDFOutputIndentation(String indentString) {
-     sPrettyXDFOutputIndentation = indentString;
-  }
-
-  /** Get the default allocation size of each dimension within all XDF arrays.
-      @return: non-negative integer with the dimension size.
-  */
-  public static int getDefaultDataArraySize(){
-    return sDefaultDataArraySize;
-  }
-
-  /** Set the default allocation size of each dimension within all XDF arrays.
-      @return: non-negative integer with the dimension size.
-  */
-  public static void setDefaultDataArraySize(int arraySize) {
-    sDefaultDataArraySize = arraySize;
-  }
-
-  /** Get the XML version of this package.
-      This cooresponds to the XML spec version that this package
-      uses to write out XDF.
-  */
-  public static String getXMLSpecVersion() {
-    return sXMLSpecVersion;
-  }
-
-  /** Get the root node name for XDF.
-  */
-  public static String getXDFRootNodeName() {
-    return sXDFRootNodeName;
-  }
-
-  /** Get the name of the XDF DTD to which this package corresponds.
-  */
-  public static String getXDFDTDName() {
-    return sXDFDTDName;
-  }
-
-  /** Get the name of the XMLAttribute which will be written out as PCDATA.
-  */
-  public static String getPCDATAAttribute() {
-    return sPCDATAAttribute;
-  }
-
+  
   /** Get the Hashtable containing the XMLAttributes for this object.
   */
   public Hashtable getXMLAttributes() {
@@ -295,31 +158,22 @@ public abstract class BaseObject implements Serializable, Cloneable {
   }
 
   /** Add this object to the indicated Group object.
-      @return: Group added to on success, null (Group Object) on failure.
+      @return Group added to on success, null (Group Object) on failure.
   */
   public Group addToGroup(Group groupObject) {
-
-    if (groupObject != null) {
-      if (groupMemberHash.add(groupObject)) {  //add in successful
-        groupObject.addMemberObject(this);
-        return groupObject; // bad, should return based on success of adding
-      } else {
-        Log.error("Can't add to group.  already a member of the group" +
-                           groupObject.getName());
-        return null;
-      }
+    if (groupMemberHash.add(groupObject)) {  //add in successful
+      groupObject.addMemberObject(this);
+      return groupObject; // bad, should return based on success of adding
     } else {
-      Log.error("Error: the group object to add to is null");
-      return null;
+      Log.errorln("Can't add to group.  already a member of the group" + groupObject.getName());
+        return null;
     }
-
   }
 
   /** Remove this object from the indicated Group object.
-      @return: Group removed from on success, null (Group Object) on failure.
+      @return Group removed from on success, null (Group Object) on failure.
   */
   public Group removeFromGroup (Group groupObject) {
-    if (groupObject != null)  {
       if (groupMemberHash.contains(groupObject))  {
         //this object does belong to the indicated Group object
         groupObject.removeMemberObject((Object) this);
@@ -327,23 +181,17 @@ public abstract class BaseObject implements Serializable, Cloneable {
         return groupObject;
       }
       else {
-        Log.error("Can't delete from group.  not a member of the group" +
+        Log.errorln("Can't delete from group.  not a member of the group" +
                             groupObject.getName());
         return null;
       }
-
-    }
-    else {
-      Log.error("Error: The group to add to is null");
-      return null;
-    }
   }
 
   /** Determine if this object is a member of the indicated Group object.
-      @return: true is it is a member, false if it is not.
+      @return true is it is a member, false if it is not.
   */
   public boolean isGroupMember(Group groupObject) {
-    if ( (groupObject != null) && groupMemberHash.contains(groupObject))
+    if ( groupMemberHash.contains(groupObject))
       return true;
     else
       return false;
@@ -376,8 +224,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
-     XMLDeclAttribs.put("rootName", sXDFRootNodeName);
-     XMLDeclAttribs.put("dtdName", sXDFDTDName);
+     XMLDeclAttribs.put("rootName", Specification.getInstance().getXDFRootNodeName());
+     XMLDeclAttribs.put("dtdName", Specification.getInstance().getXDFDTDName());
 
      toXMLFile(filename, XMLDeclAttribs);
 
@@ -400,167 +248,169 @@ public abstract class BaseObject implements Serializable, Cloneable {
                                 )
   {
 
-    String nodeNameString = this.classXDFNodeName;
+    //while writing out, attribHash should not be changed
+    synchronized (attribHash) {
+      String nodeNameString = this.classXDFNodeName;
 
-    // Setup. Sometimes the name of the node we are opening is different from
-    // that specified in the classXDFNodeName (*sigh*)
-    if (newNodeNameString != null) nodeNameString = newNodeNameString;
+      // Setup. Sometimes the name of the node we are opening is different from
+      // that specified in the classXDFNodeName (*sigh*)
+      if (newNodeNameString != null) nodeNameString = newNodeNameString;
 
-    // 0. To be valid XML, we always start an XML block with an
-    //    XML declaration (e.g. somehting like "<?xml standalone="no"?>").
-    //    Here we deal with  printing out XML Declaration && its attributes
-    if ((XMLDeclAttribs !=null) &&(!XMLDeclAttribs.isEmpty())) {
+      // 0. To be valid XML, we always start an XML block with an
+      //    XML declaration (e.g. somehting like "<?xml standalone="no"?>").
+      //    Here we deal with  printing out XML Declaration && its attributes
+      if ((XMLDeclAttribs !=null) &&(!XMLDeclAttribs.isEmpty())) {
         indent = "";
         writeXMLDeclToOutputStream(outputstream, XMLDeclAttribs);
-    }
-
-    // 1. open this node, print its simple XML attributes
-    if (nodeNameString != null) {
-
-      if (sPrettyXDFOutput)
-        writeOut(outputstream, indent); // indent node if desired
-      // For printing the opening statement we need to invoke a little
-      // Voodoo to keep the DTD happy: the first structure node is always
-      // called by the root node name instead of the usual nodeNameString
-      // We can tell this by checking if this object is derived from class
-      // Structure and if XMLDeclAttrib defined/populated with information
-
-      // NOTE: This isnt really the way to do this. We need to check if 'this' is
-      // is or has as a superclass xdf.Structure instead of the 'string check' below.
-
-      // check is class Strucuture & XMLDeclAttribs populated?
-      if ( nodeNameString.equals(sXDFStructureNodeName) && !XMLDeclAttribs.isEmpty() )
-        nodeNameString = sXDFRootNodeName;
-
-      writeOut(outputstream,"<" + nodeNameString);   // print opening statement
-
-    }
-
-    // gather info about XMLAttributes in this object/node
-    Hashtable xmlInfo = getXMLInfo();
-
-    // 2. Print out string object XML attributes EXCEPT for the one that
-    //    matches PCDATAAttribute.
-    ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
-    // is synchronized here correct?
-    synchronized(attribs) {
-      int size = attribs.size();
-      for (int i = 0; i < size; i++) {
-        Hashtable item = (Hashtable) attribs.get(i);
-        writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
       }
-    }
 
-    // 3. Print out Node PCData or Child Nodes as specified by object ref
-    //    XML attributes. The way this stuff occurs will also affect how we
-    //    close the node.
-    ArrayList childObjs = (ArrayList) xmlInfo.get("childObjList");
-    String pcdata = (String) xmlInfo.get("PCDATA");
-
-    if ( childObjs.size() > 0 || pcdata != null || noChildObjectNodeName != null)
-    {
-
-      // close the opening tag
+      // 1. open this node, print its simple XML attributes
       if (nodeNameString != null) {
-        writeOut(outputstream, ">");
-        if ((sPrettyXDFOutput) && (pcdata == null))
-           writeOut(outputstream, Constants.NEW_LINE);
+
+        if (Specification.getInstance().isPrettyXDFOutput())
+          writeOut(outputstream, indent); // indent node if desired
+        // For printing the opening statement we need to invoke a little
+        // Voodoo to keep the DTD happy: the first structure node is always
+        // called by the root node name instead of the usual nodeNameString
+        // We can tell this by checking if this object is derived from class
+        // Structure and if XMLDeclAttrib defined/populated with information
+
+        // NOTE: This isnt really the way to do this. We need to check if 'this' is
+        // is or has as a superclass xdf.Structure instead of the 'string check' below.
+
+        // check is class Strucuture & XMLDeclAttribs populated?
+        if ( nodeNameString.equals(Specification.getInstance().getXDFStructureNodeName()) && !XMLDeclAttribs.isEmpty() )
+          nodeNameString = Specification.getInstance().getXDFRootNodeName();
+
+        writeOut(outputstream,"<" + nodeNameString);   // print opening statement
+
       }
 
-      // deal with object/list XML attributes, if any in our list
-      int size = childObjs.size();
-      for (int i = 0; i < size; i++) {
-        Hashtable item = (Hashtable) childObjs.get(i);
+      // gather info about XMLAttributes in this object/node
+      Hashtable xmlInfo = getXMLInfo();
 
-        if (item.get("type") == Constants.LIST_TYPE)
-        {
+      // 2. Print out string object XML attributes EXCEPT for the one that
+      //    matches PCDATAAttribute.
+      ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
+      // is synchronized here correct?
+      synchronized(attribs) {
+        int size = attribs.size();
+        for (int i = 0; i < size; i++) {
+          Hashtable item = (Hashtable) attribs.get(i);
+          writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
+        }
+      }
 
-          List objectList = (List) item.get("value");
-          // Im not sure this synchronized wrapper is needed, we are
-          // only accessing stuff here.. Also, should synchronzied wrapper
-          // occur back in the getXMLInfo method instead where the orig
-          // access occured?!?
-          synchronized(objectList) {
-            Iterator iter = objectList.iterator(); // Must be in synchronized block
-            while (iter.hasNext()) {
-              BaseObject containedObj = (BaseObject) iter.next();
-              if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
-                indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
-                indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
-                String newindent = indent + sPrettyXDFOutputIndentation;
-                containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
+      // 3. Print out Node PCData or Child Nodes as specified by object ref
+      //    XML attributes. The way this stuff occurs will also affect how we
+      //    close the node.
+      ArrayList childObjs = (ArrayList) xmlInfo.get("childObjList");
+      String pcdata = (String) xmlInfo.get("PCDATA");
+
+     if ( childObjs.size() > 0 || pcdata != null || noChildObjectNodeName != null)
+      {
+
+        // close the opening tag
+        if (nodeNameString != null) {
+          writeOut(outputstream, ">");
+          if ((Specification.getInstance().isPrettyXDFOutput()) && (pcdata == null))
+             writeOut(outputstream, Constants.NEW_LINE);
+        }
+
+        // deal with object/list XML attributes, if any in our list
+        int size = childObjs.size();
+        for (int i = 0; i < size; i++) {
+          Hashtable item = (Hashtable) childObjs.get(i);
+
+          if (item.get("type") == Constants.LIST_TYPE)
+          {
+
+            List objectList = (List) item.get("value");
+            // Im not sure this synchronized wrapper is needed, we are
+            // only accessing stuff here.. Also, should synchronzied wrapper
+            // occur back in the getXMLInfo method instead where the orig
+            // access occured?!?
+            synchronized(objectList) {
+              Iterator iter = objectList.iterator(); // Must be in synchronized block
+              while (iter.hasNext()) {
+                BaseObject containedObj = (BaseObject) iter.next();
+                if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
+                  indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
+                  indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
+                  String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
+                  containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
+                }
               }
             }
           }
-        }
-        else if (item.get("type") == Constants.OBJECT_TYPE)
-        {
-          BaseObject containedObj = (BaseObject) item.get("value");
-          if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
-            // shouldnt this be synchronized too??
-            synchronized(containedObj) {
-              indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
-              indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
-              String newindent = indent + sPrettyXDFOutputIndentation;
-              containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
+          else if (item.get("type") == Constants.OBJECT_TYPE)
+          {
+            BaseObject containedObj = (BaseObject) item.get("value");
+            if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
+              // shouldnt this be synchronized too??
+              synchronized(containedObj) {
+                indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
+                indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
+                String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
+                containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
+              }
             }
+          } else {
+            // error: weird type, actually shouldnt occur. Is this needed??
+            Log.errorln("Weird error: unknown XML attribute type for item:"+item);
           }
-        } else {
-          // error: weird type, actually shouldnt occur. Is this needed??
-          Log.errorln("Weird error: unknown XML attribute type for item:"+item);
+
         }
 
-      }
 
+        // print out PCDATA, if any
+        if(pcdata != null)  {
+          writeOut(outputstream, pcdata);
+        };
 
-      // print out PCDATA, if any
-      if(pcdata != null)  {
-        writeOut(outputstream, pcdata);
-      };
+        // if there are no PCDATA or child objects/nodes then
+        // we print out noChildObjectNodeName and close the node
+        if ( childObjs.size() == 0 && pcdata == null && noChildObjectNodeName != null)
+        {
 
-      // if there are no PCDATA or child objects/nodes then
-      // we print out noChildObjectNodeName and close the node
-      if ( childObjs.size() == 0 && pcdata == null && noChildObjectNodeName != null)
-      {
+          if (Specification.getInstance().isPrettyXDFOutput())
+            writeOut(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation());
 
-        if (sPrettyXDFOutput)
-                writeOut(outputstream, indent + sPrettyXDFOutputIndentation);
+          writeOut(outputstream, "<" + noChildObjectNodeName + "/>");
 
-        writeOut(outputstream, "<" + noChildObjectNodeName + "/>");
+          if (Specification.getInstance().isPrettyXDFOutput())
+            writeOut(outputstream, Constants.NEW_LINE);
 
-        if (sPrettyXDFOutput)
-          writeOut(outputstream, Constants.NEW_LINE);
+        }
 
-      }
+        // ok, now deal with closing the node
+        if (nodeNameString != null) {
 
-      // ok, now deal with closing the node
-      if (nodeNameString != null) {
+           indent = dealWithClosingGroupNodes((BaseObject) this, outputstream, indent);
 
-         indent = dealWithClosingGroupNodes((BaseObject) this, outputstream, indent);
-
-         if (sPrettyXDFOutput && pcdata == null)
+          if (Specification.getInstance().isPrettyXDFOutput() && pcdata == null)
                 writeOut(outputstream, indent);
 
-         if (!dontCloseNode)
-            writeOut(outputstream, "</"+nodeNameString+">");
+          if (!dontCloseNode)
+              writeOut(outputstream, "</"+nodeNameString+">");
 
-      }
+        }
 
-    } else {
-
-      if (dontCloseNode) {
-         // it may not have sub-objects, but we dont want to close it
-         // (happens for group objects)
-         writeOut(outputstream, ">");
       } else {
-        // no sub-objects, just close this node
-        writeOut(outputstream, "/>");
+
+        if (dontCloseNode) {
+           // it may not have sub-objects, but we dont want to close it
+          // (happens for group objects)
+          writeOut(outputstream, ">");
+        } else {
+          // no sub-objects, just close this node
+          writeOut(outputstream, "/>");
+        }
+
       }
 
-    }
-
-    if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
-
+      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+    }//synchronize
   }
 
   /** A different invokation style for writing this object out to
@@ -580,7 +430,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   */
   public void toXMLOutputStream (OutputStream outputstream, Hashtable XMLDeclAttribs)
   {
-     //not reseanable to set the indent to sPrettyXDFOutputIndentation --k.z. 10/17
+     //not reseanable to set the indent to Specification.getInstance().isPrettyXDFOutput()Indentation --k.z. 10/17
      toXMLOutputStream(outputstream, XMLDeclAttribs, new String(""), false, null, null);
   }
 
@@ -592,8 +442,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
-     XMLDeclAttribs.put("dtdName", sXDFDTDName);
-     XMLDeclAttribs.put("rootName", sXDFRootNodeName);
+     XMLDeclAttribs.put("dtdName", Specification.getInstance().getXDFDTDName());
+     XMLDeclAttribs.put("rootName", Specification.getInstance().getXDFRootNodeName());
      toXMLOutputStream(outputstream, XMLDeclAttribs, indent);
   }
 
@@ -607,14 +457,15 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
-     XMLDeclAttribs.put("dtdName", sXDFDTDName);
-     XMLDeclAttribs.put("rootName", sXDFRootNodeName);
+     XMLDeclAttribs.put("dtdName", Specification.getInstance().getXDFDTDName());
+     XMLDeclAttribs.put("rootName", Specification.getInstance().getXDFRootNodeName());
 
      toXMLOutputStream(outputstream, XMLDeclAttribs);
 
   }
 
-  /** Clone an XDF object.
+  /** deep copy of this XDF object
+      @return an exact copy  of this XDF object
    */
   protected Object clone () throws CloneNotSupportedException{
 
@@ -641,10 +492,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
           XMLAttribute XMLAttributeValue = (XMLAttribute) this.attribHash.get(key);
           cloneObj.attribHash.put(key, XMLAttributeValue.clone());
         }
+        return cloneObj;
       }
     }
 
-    return cloneObj;
   }
 
   //
@@ -662,133 +513,119 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
     Object attribute;
     Object obj;
+    synchronized (attribHash) {
+      int size = attribOrder.size();
+      for (int i = 0; i < size; i++)
+      {
+        attribute  = attribOrder.get(i);
+        obj = InitAttributeTable.get(attribute);
 
-    int size = attribOrder.size(); 
-    for (int i = 0; i < size; i++)
-    {
-      attribute  = attribOrder.get(i);
-      obj = InitAttributeTable.get(attribute);
+        // only if object exists
+        if (obj != null) {
+          XMLAttribute toRemove = (XMLAttribute) attribHash.remove(attribute);
+          attribHash.put(attribute, new XMLAttribute(obj, toRemove.getAttribType()));
+        }
 
-      // only if object exists
-      if (obj != null) {
-        XMLAttribute toRemove = (XMLAttribute) attribHash.remove(attribute);
-        attribHash.put(attribute, new XMLAttribute(obj, toRemove.getAttribType()));
       }
-
-    }
+    }//synchronize
 
   }
 
   /** A little convience method to save coding time elsewhere.
      Pass in an object to be removed from the indicated list.
-     @return: true on success, false on failure
+     @param what - the object to be removed
+            formList - the list to remove from
+            listName - the name of the list to remove from
+     @return true on success, false on failure
   */
   protected boolean removeFromList ( Object what, List fromList, String listName ) {
-
-    if (fromList != null) {
-      if ( what != null) {
-        int index = fromList.indexOf(what);
-        if (index !=-1) {  //object to be removed is found in the list
-          fromList.remove(index);
-          return true;
-        }
-        else {  //cant find the object in the list
-          Log.warn("warn: can't find object in" + listName +
-                             ", ignoring remove");
-          return false;
-        }
-      }
-      else {  //object to remove is null
-        Log.error("Error: object to remove is null");
-        return false;
-      }
+    int index = fromList.indexOf(what);
+    if (index !=-1) {  //object to be removed is found in the list
+      fromList.remove(index);
+      return true;
     }
-    else {  //the list to remove from is null
-      Log.error("Error: Passed list to remove from is null, no object to remove");
+    else {  //cant find the object in the list
+      Log.warn("warn: can't find object in" + listName +
+                             ", ignoring remove");
       return false;
     }
+
   }
 
   /** A little convience method to save coding time elsewhere.
-      Another way to remove an object from a list. Pass in index of
-      the object to be removed.
-      @return: true on success, false on failure
+      Another way to remove an object from a list.
+      @param listIndex--the index of the object to be removed
+            formList--the list to remove from
+            listName--the name of the list to remove from
+      @return true on success, false on failure
   */
   protected boolean removeFromList(int listIndex, List fromList, String listName ) {
-    if (fromList !=null) {
-      if ( (listIndex >=0) && (listIndex < fromList.size())) { //valid index number
-        fromList.remove(listIndex);
+    if ( (listIndex >=0) && (listIndex < fromList.size())) { //valid index number
+      fromList.remove(listIndex);
         return true;
-      }
-      else { //invalid index number
-        Log.error("Error: passed index out of range.");
-        return false;
-      }
     }
-    else {  //list to remove from is null
-      Log.error("Passed list to remove from is null, no object to remove.");
+    else { //invalid index number
+      Log.error("Error: passed index out of range.");
       return false;
     }
+
   }
 
   /** Basically this rearranges XMLAttribute information into a more convient
       order for the toXMLOutputstream method.
-      @return: Hashtable with 3 entries: attribList--attributes(strings, numbers)
+      @return Hashtable with 3 entries: attribList--attributes(strings, numbers)
                                          objRefList--the object this class owns
                                          PCDATA--the PCDATA of this element
   */
-
-  /**added another if clause to put attibutes of Number type in the attribList
-   * declare as protected, sub-class might use
-   * fixed the documentation--k.z. 10/17
-   */
   protected Hashtable getXMLInfo () {
 
     Hashtable xmlInfo = new Hashtable();
     ArrayList attribList = new ArrayList();
     ArrayList objRefList = new ArrayList();
 
-    int size = attribHash.size();
-    for (int i = 0; i < size; i++) {
-      String attribName = (String) attribOrder.get(i);
-      XMLAttribute obj = (XMLAttribute) attribHash.get(attribName);
-      if (obj != null && obj.attribValue != null) {
-        if ( obj.attribType == Constants.STRING_TYPE)
-        {
+    synchronized (attribHash) {
+      int size = attribHash.size();
+      for (int i = 0; i < size; i++) {
+        String attribName = (String) attribOrder.get(i);
+        XMLAttribute obj = (XMLAttribute) attribHash.get(attribName);
+        if (obj != null && obj.attribValue != null) {
+          if ( obj.attribType == Constants.STRING_TYPE)
+          {
 
-          if (attribName.equals(sPCDATAAttribute)) {
-            xmlInfo.put("PCDATA", obj.attribValue);
-          } else {
-            Hashtable item = new Hashtable();
-            item.put("name", attribName);
-            item.put("value", obj.attribValue);
-            attribList.add(item);
-          }
-        }
-        else {
-          if(obj.attribType == Constants.NUMBER_TYPE ||
-             obj.attribType == Constants.STRING_OR_NUMBER_TYPE) {  //it's an attribute of Number type
-            Hashtable item = new Hashtable();
-            item.put("name", attribName);
-            item.put("value", obj.attribValue.toString());
-            attribList.add(item);
-          }
-          else {// add to list if it is not an empty list  -k.z.
-            if ((obj.attribType !=Constants.LIST_TYPE) || (((List)obj.attribValue).size()!=0)) {
+            if (attribName.equals(Specification.getInstance().getPCDATAAttribute())) {
+              xmlInfo.put("PCDATA", obj.attribValue);
+            }else {
               Hashtable item = new Hashtable();
               item.put("name", attribName);
               item.put("value", obj.attribValue);
-              item.put("type", obj.attribType);
-              objRefList.add(item);
+              attribList.add(item);
+            }
+          }
+          else {
+            if(obj.attribType == Constants.NUMBER_TYPE ||
+               obj.attribType == Constants.STRING_OR_NUMBER_TYPE) {  //it's an attribute of Number type
+              Hashtable item = new Hashtable();
+              item.put("name", attribName);
+              item.put("value", obj.attribValue.toString());
+              attribList.add(item);
+            }
+            else {// add to list if it is not an empty list  -k.z.
+              if ((obj.attribType !=Constants.LIST_TYPE) || (((List)obj.attribValue).size()!=0)) {
+                Hashtable item = new Hashtable();
+                item.put("name", attribName);
+                item.put("value", obj.attribValue);
+                item.put("type", obj.attribType);
+                objRefList.add(item);
+              }
             }
           }
         }
       }
-    }
 
-    xmlInfo.put("attribList", attribList);
-    xmlInfo.put("childObjList", objRefList);
-    return xmlInfo;
+      xmlInfo.put("attribList", attribList);
+      xmlInfo.put("childObjList", objRefList);
+    } //synchronize
+      return xmlInfo;
   }
 
   /** Write message out to specified OutputStream Object.
@@ -807,21 +644,19 @@ public abstract class BaseObject implements Serializable, Cloneable {
   // NOTE: this is essentially the Perl update method
   protected void setXMLAttributes (AttributeList attrs) {
 
-     // set object attributes from an AttributeList
-     if (attrs != null) {
-        // whip thru the list, setting each value
-        int size = attrs.getLength();
-        for (int i = 0; i < size; i++) {
-           String name = attrs.getName(i);
-           String value = attrs.getValue(i);
-           if (this.attribHash.containsKey(name)) 
-           {  
-               ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
-           } else 
-             Log.errorln("Error: cant set XMLAttribute:["+name+"], doesnt exist in object:"+this);
-
-        }
-     }
+     synchronized (attribHash) {
+      // set object attributes from an AttributeList
+      if (attrs != null) {
+          // whip thru the list, setting each value
+          int size = attrs.getLength();
+          for (int i = 0; i < size; i++) {
+             String name = attrs.getName(i);
+            String value = attrs.getValue(i);
+            if (name != null && value != null)
+              ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
+          }
+      }
+     }//synchronize
   }
 
 
@@ -847,7 +682,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
           if(!this.openGroupNodeHash.contains(memberGroup)) {
             // its *not* already open, so we bump up the indentation,
             // open it and add it to the open group node list.
-            newIndent.append(sPrettyXDFOutputIndentation);
+            newIndent.append(Specification.getInstance().getPrettyXDFOutputIndentation());
             memberGroup.toXMLOutputStream(outputstream, new Hashtable(), newIndent.toString(), true, null, null);
             this.openGroupNodeHash.add(memberGroup);
           }
@@ -877,12 +712,12 @@ public abstract class BaseObject implements Serializable, Cloneable {
             // its *not* a member of this group and its still open,
             // so we need to close it.
 
-            if (sPrettyXDFOutput) writeOut(outputstream, indent);
+            if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, indent);
             writeOut(outputstream, "</" + openGroup.classXDFNodeName + ">");
-            if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
+            if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
             this.openGroupNodeHash.remove(openGroup);
             // peel off some indent
-            indent = indent.substring(0,indent.length() - sPrettyXDFOutputIndentation.length());
+            indent = indent.substring(0,indent.length() - Specification.getInstance().getPrettyXDFOutputIndentation().length());
           }
         }
       }
@@ -901,35 +736,35 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
     // initial statement
     writeOut(outputstream, "<?xml");
-    writeOut(outputstream, " version=\"" + sXMLSpecVersion + "\"");
+    writeOut(outputstream, " version=\"" + Specification.getInstance().getXMLSpecVersion() + "\"");
 
     // print attributes
     Enumeration keys = XMLDeclAttribs.keys();
     while ( keys.hasMoreElements() )
     {
       String attribName = (String) keys.nextElement();
-      if (attribName.equals("version") ) { 
+      if (attribName.equals("version") ) {
          Log.errorln("XMLDeclAttrib hash has version attribute, not allowed and ignoring.");
-      } else if ( attribName.equals("dtdName") || attribName.equals("rootName") ) { 
+      } else if ( attribName.equals("dtdName") || attribName.equals("rootName") ) {
          // skip over it
-      } else 
+      } else
          writeOut(outputstream, " " + attribName + "=\"" + XMLDeclAttribs.get(attribName) + "\"");
     }
     writeOut(outputstream, " ?>");
-    if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
+    if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
 
     // Print the DOCTYPE DECL only if right info exists
     if (XMLDeclAttribs.containsKey("rootName")
         && XMLDeclAttribs.containsKey("dtdName"))
     {
         // print the DOCTYPE DECL IF its a structure node
-        if(classXDFNodeName != null && classXDFNodeName.equals(sXDFStructureNodeName) ) {
-            writeOut(outputstream, "<!DOCTYPE " + XMLDeclAttribs.get("rootName") + " SYSTEM \"" 
+        if(classXDFNodeName != null && classXDFNodeName.equals(Specification.getInstance().getXDFStructureNodeName()) ) {
+            writeOut(outputstream, "<!DOCTYPE " + XMLDeclAttribs.get("rootName") + " SYSTEM \""
                                    + XMLDeclAttribs.get("dtdName") + "\">");
         }
-      if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
-    } else 
-      Log.errorln("Passed XMLDeclAttributes table lacks either dtdName, rootName entries, ignoring DOCTYPE line printout"); 
+      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+    } else
+      Log.errorln("Passed XMLDeclAttributes table lacks either dtdName, rootName entries, ignoring DOCTYPE line printout");
 
   }
 
@@ -938,11 +773,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
- * Revision 1.31  2000/11/10 05:48:42  thomas
- * Bug fix to setXMLAttributes, allow setting to
- * null value in an attribute, enhanced error reporting
- * when a class doesnt contain XMLAttribute to set.
- * -b.t.
+ * Revision 1.32  2000/11/16 19:55:35  kelly
+ * fixed documentation.  -k.z. and singleton related stuff.
  *
  * Revision 1.30  2000/11/09 23:04:56  thomas
  * Updated version, made changes to allow extension
