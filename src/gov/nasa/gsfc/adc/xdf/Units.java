@@ -56,7 +56,7 @@ import java.util.*;
   private void init()
   {
 
-    classXMLName = "units";
+    classXDFNodeName = "units";
     XDFNodeName = "units";
 
     // order matters! these are in *reverse* order of their
