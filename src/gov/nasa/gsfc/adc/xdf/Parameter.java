@@ -50,8 +50,8 @@ import java.util.Set;
   * a string holding the param Id of this object.
   * paramIdRef--
   * a  string holding the parameter id reference to another parameter.
-  * datatype--
-  * holds object reference to a single datatype (DataFormat) object for this axis.
+  * dataFormat--
+  * holds object reference to a single DataFormat object for this object.
   * units--
   * reference of the Units object of this parameter. The Units object
   * is used to hold the Unit objects.
