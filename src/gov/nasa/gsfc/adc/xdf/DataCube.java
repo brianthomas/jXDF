@@ -1431,8 +1431,7 @@ protected boolean  removeData (Locator locator) {
 
          // format the number for output
          if ( thisDataFormat instanceof FixedDataFormat ||
-              thisDataFormat instanceof IntegerDataFormat ||
-              thisDataFormat instanceof ExponentialDataFormat)
+              thisDataFormat instanceof IntegerDataFormat )
          {
 
             DecimalFormat formatter = new DecimalFormat(pattern);
@@ -1447,6 +1446,24 @@ protected boolean  removeData (Locator locator) {
             // trim down the string IF that is the case.
             if(output.length() > formatsize)
                output = output.substring(0,formatsize);
+
+         } else if ( thisDataFormat instanceof ExponentialDataFormat)
+         {
+
+            // Exponentials need special treatment. Why? because as of Java
+            // 1.2.2 and 1.3, the DecimalFormatter will not enforce a maximum
+            // exponent size on exponential numbers. This means that the output
+            // can violate the declared fix width of the field if the expontent
+            // on a number is negative (for example).
+            DecimalFormat formatter = new DecimalFormat(pattern);
+            Double thisDatum = new Double(getDoubleData(locator));
+            output = formatter.format(thisDatum);
+
+            // Our quick 'fix': trim down the size of the output if its exceeded.
+            if (output.length() > formatsize) { 
+               output = output.substring(0,formatsize);
+               Log.warnln("Warning: formatted exponential width too large, trimming trailing digits.\n");
+            }
 
          } else {
             Log.errorln("Unknown Dataformat:"+thisDataFormat.getClass().toString()
@@ -1548,6 +1565,10 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.20  2001/01/19 22:33:12  thomas
+  * Some small changes to the output when Href is
+  * used. -b.t.
+  *
   * Revision 1.19  2001/01/19 17:23:20  thomas
   * Fixed Href stuff to DTD standard. Now using
   * notation and entities at the beginning of the
