@@ -46,11 +46,11 @@
                        from consideration.
                      - Added append array functionality.
       
-0.17-beta0_1 3/28/01  bug fix
+0.17-beta0_1 3/28/01  1st Beta, Patch level 1
                       - bug in BaseObject class that caused crash for certain toXMLOutputStream 
                         calls (private field XMLNotationHash not properly declared). FIXED. 
 
-0.17-beta1   8/31/01  2nd Beta.
+0.17-beta1   9/24/01  ~ 2nd Beta 
                       - Added BaseObjectWithXMLElements class. Array, Field, Structure, Axis
                         classes may now hold new XMLElements.
                       - Added ability to add an arbitary XML attribute (e.g. previously undeclared 
@@ -61,7 +61,7 @@
                         level structure in an XDF object and (hopefully) clarifies some 
                         confusion over the nature of structure objects in general.
                         As part of this change I did away with XMLNotationHash garbage and implemented
-                        several new child classes for the XDF class: DocumentTYpe, XMLDeclaration.
+                        several new child classes for the XDF class: DocumentType, XMLDeclaration.
                       - Href class name changed to "Entity".
                       - Added get/set Long/Short Data methods in DataCube.
                       - Higher dimesional arrays not implemented correctly (!! in 3+ dimensions). Fixed.
@@ -87,7 +87,8 @@
                       - Support for correct output formatting under delimited and tagged data added.
                       - Better support for reading file href Entities that reside in different locations
                         from the metadata.
-                      - Added CreateXdf.java program. More sample data incl. the currently unreadable bzip2
-                        data style (XDF_sample10.xml).
+                      - Added CreateXdf.java program. 
+                      - Added More sample data incl. the currently unreadable bzip2 data style (XDF_sample10.xml).
                       - Improved error messaging. Throwing more exceptions as we should. Not optimal, but
                         better.
+
