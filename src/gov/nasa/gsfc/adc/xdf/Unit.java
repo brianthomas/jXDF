@@ -47,6 +47,12 @@ import java.util.*;
     init();
   }
 
+  public Unit(String value) {
+    init();
+    setValue(value);
+  }
+
+
   /**  This constructor takes a Java Hashtable as an initializer of
        the XML attributes of the object to be constructed. The
        Hashtable key/value pairs coorespond to the class XDF attribute
