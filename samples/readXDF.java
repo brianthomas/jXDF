@@ -2,6 +2,11 @@
 import gov.nasa.gsfc.adc.xdf.Structure;
 import gov.nasa.gsfc.adc.xdf.Specification;
 import gov.nasa.gsfc.adc.xdf.Reader;
+import gov.nasa.gsfc.adc.xdf.AxisInterface;
+import gov.nasa.gsfc.adc.xdf.Array;
+import gov.nasa.gsfc.adc.xdf.Locator;
+import gov.nasa.gsfc.adc.xdf.AxisLocationOutOfBoundsException;
+import gov.nasa.gsfc.adc.xdf.NoDataException;
 
 import java.util.Hashtable;
 import java.io.IOException;
@@ -44,7 +49,24 @@ public class readXDF {
     Specification.getInstance().setPrettyXDFOutput(true);
     Specification.getInstance().setPrettyXDFOutputIndentation("  ");
 
-    s.toXMLOutputStream(System.out);
+    Array arrayObj = (Array) s.getArrayList().get(0);
+
+    Locator locator = arrayObj.createLocator();
+    try {
+      locator.setAxisLocation((AxisInterface) arrayObj.getAxisList().get(0), 1);
+      locator.setAxisLocation((AxisInterface) arrayObj.getAxisList().get(1), 2);
+    } catch (AxisLocationOutOfBoundsException e) {
+    }
+ 
+    String value;
+    try { 
+      value = arrayObj.getStringData(locator);
+    } catch (NoDataException e) {
+      value = new String("");
+    }
+
+    System.out.println("Array 0 data cell (1,2):"+value);
+    // s.toXMLOutputStream(System.out);
 
   }
 }
