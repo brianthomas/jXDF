@@ -166,6 +166,7 @@ public class SaxDocumentHandler extends DefaultHandler {
     private int NrofDataFormats;
     private int[] IntRadix;
     private int LastFastAxisCoordinate;
+    private int LastFieldAxisCoordinate;
     private AxisInterface FastestAxis;
     private ArrayList AxisReadOrder;
 
@@ -567,17 +568,6 @@ public class SaxDocumentHandler extends DefaultHandler {
     // Public SAX methods we dont use
     //
 
-/*
-    public void setDocumentLocator (org.xml.sax.Locator l)
-    {
-
-        // we'd record this if we needed to resolve relative URIs
-        // in content or attributes, or wanted to give diagnostics.
-        // Right now, do nothing here.
-
-    }
-*/
-
     public void startDocument()
     throws SAXException
     {
@@ -585,18 +575,21 @@ public class SaxDocumentHandler extends DefaultHandler {
         Log.debugln("H_StartDocument:[]");
     }
 
+    // not really needed I think, as we have a separate documentError handler
     public void error (SAXParseException e)
     throws SAXException
     {
         Log.errorln(e.getMessage());
     }
 
+    // not really needed I think, as we have a separate documentError handler
     public void fatalError (SAXParseException e)
     throws SAXException
     {
         Log.errorln(e.getMessage());
     }
 
+    // not really needed I think, as we have a separate documentError handler
     public void warning (SAXParseException e)
     throws SAXException
     {
@@ -1048,7 +1041,11 @@ public class SaxDocumentHandler extends DefaultHandler {
 
     }
 
-// the problem: need to keep track of the formatting chars. 
+    // theoretically this is faster for binary (numbers) data. Character data
+    // is as slow as always due to the need to do the need for the line: 
+    //    String thisData = new String(byteArray,start,end);
+    // stuff. Another point: we are not handling the byte encoding issues here, but
+    // we should :P
     private void addByteDataToCurrentArray (Locator location, byte[] data, int amount, String endian) 
     throws SetDataException
     {
@@ -1073,13 +1070,14 @@ public class SaxDocumentHandler extends DefaultHandler {
                   ) {
 
                    String thisData = new String(data,bytes_added,bytes_to_add);
-Log.errorln("Got Href Formatted Number Data:["+thisData.trim()+ "]["+bytes_added+"]["+bytes_to_add+"]");
+// Log.errorln("Got Href Formatted Number Data:["+thisData.trim()+ "]["+bytes_added+"]["+bytes_to_add+"]");
 
                    addDataToCurrentArray(location, thisData.trim(), currentDataFormat, IntRadix[CurrentDataFormatIndex]);
 
                } else if (currentDataFormat instanceof StringDataFormat) {
+
                    String thisData = new String(data,bytes_added,bytes_to_add);
-Log.errorln("Got Href Formatted Character Data:["+thisData+ "]["+bytes_added+"]["+bytes_to_add+"]");
+// Log.errorln("Got Href Formatted Character Data:["+thisData+ "]["+bytes_added+"]["+bytes_to_add+"]");
                    addDataToCurrentArray(location, thisData, currentDataFormat, IntRadix[CurrentDataFormatIndex]);
 
                } else if (currentDataFormat instanceof BinaryFloatDataFormat) {
@@ -1093,7 +1091,6 @@ Log.errorln("Got Href Formatted Character Data:["+thisData+ "]["+bytes_added+"][
                   } else if (bytes_to_add == 8) { 
 
 // Log.errorln("Got Href Data BFloatDouble:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
-
                      double myValue = convert8bytesToDouble(endian, data, bytes_added);
                      CurrentArray.setData(location, myValue);
 
@@ -1103,15 +1100,12 @@ Log.errorln("Got Href Formatted Character Data:["+thisData+ "]["+bytes_added+"][
 
                } else if (currentDataFormat instanceof BinaryIntegerDataFormat) {
 
+//  Integer myValue = convert2bytesToInteger (endian, data, bytes_added);
 // Log.errorln("Got Href Data Integer:["+myValue.toString()+ "]["+bytes_added+"]["+bytes_to_add+"]");
 
-                  //  Integer myValue = convert2bytesToInteger (endian, data, bytes_added);
-                  Integer numOfBits = ((BinaryIntegerDataFormat) currentDataFormat).getBits();
-                  int numOfBytes = numOfBits.intValue()/8;
-                  int myValue = convertBytesToInteger (numOfBytes, endian, data, bytes_added);
+                  // int numOfBytes = ((BinaryIntegerDataFormat) currentDataFormat).numOfBytes();
+                  int myValue = convertBytesToInteger (bytes_to_add, endian, data, bytes_added);
                   CurrentArray.setData(location, myValue);
-
-//               return convert8bytesToLong (endianStyle, bb, sbyte);
 
                } 
 
@@ -1498,7 +1492,7 @@ while (liter.hasNext()) {
    AxisInterface axis = (AxisInterface) liter.next();
    Log.info(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
 }
-Log.infoln(") ");
+Log.infoln(") ["+CurrentDataFormat+"]");
 */
 
        // Note that we dont treat binary data at all here 
@@ -2504,8 +2498,7 @@ Log.errorln(" TValue:"+valueString);
     // DATATAG
     //
 
-    // REMINDER: these functions only get called when tagged data is being read..
-
+    // REMINDER: this function only gets called when tagged data is being read..
     class dataTagStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, Attributes attrs) { 
           CurrentDataTagLevel++;
@@ -2513,6 +2506,7 @@ Log.errorln(" TValue:"+valueString);
        }
     }
 
+    // REMINDER: this function only gets called when tagged data is being read..
     class dataTagEndElementHandlerFunc implements EndElementHandlerAction {
        public void action (SaxDocumentHandler handler) { 
 
@@ -2521,14 +2515,17 @@ Log.errorln(" TValue:"+valueString);
 
           // bump up DataFormat appropriately
           if (MaxDataFormatIndex > 0) { 
-             int currentFastAxisCoordinate = TaggedLocatorObj.getAxisIndex(FastestAxis);
-             if ( currentFastAxisCoordinate != LastFastAxisCoordinate ) 
+
+             int currentFieldAxisCoordinate = TaggedLocatorObj.getAxisIndex(CurrentArray.getFieldAxis());
+             if ( currentFieldAxisCoordinate != LastFieldAxisCoordinate ) 
              { 
-                LastFastAxisCoordinate = currentFastAxisCoordinate;
+
+                LastFieldAxisCoordinate = currentFieldAxisCoordinate;
                 if (CurrentDataFormatIndex == MaxDataFormatIndex)
                    CurrentDataFormatIndex = 0;
                 else
                    CurrentDataFormatIndex++;
+
              }
           }
 
@@ -2555,8 +2552,6 @@ Log.errorln(" TValue:"+valueString);
 
                 // dont add this data unless it has more than just whitespace
                 if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(thisString) ) {
-
-                   Log.debugln("ADDING TAGGED DATA to ("+TaggedLocatorObj+") : ["+thisString+"]");
 
                    DataTagLevel = CurrentDataTagLevel;
 
@@ -2693,7 +2688,7 @@ Log.errorln(" TValue:"+valueString);
               }
 
               Locator myLocator = CurrentArray.createLocator();
-              myLocator.setIterationOrder(AxisReadOrder);
+              myLocator.setIterationOrder(AxisReadOrder); // shouldnt be needed now, havent checked tho 
 
 /*
 Iterator thisIter = AxisReadOrder.iterator();
@@ -2835,6 +2830,7 @@ while(thisIter.hasNext()) {
                   
              // reset to start of which dataformat type we currently are reading
              CurrentDataFormatIndex = 0;    
+
              // reset to start of which IOCmd we currently are reading
              CurrentIOCmdIndex = 0;    
 
@@ -2880,14 +2876,19 @@ while(thisIter.hasNext()) {
 
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
           FastestAxis = (AxisInterface) CurrentArray.getAxes().get(0);
-          LastFastAxisCoordinate = -1;
+          LastFastAxisCoordinate = 0;   // for Delimited/Formatted Data
+          LastFieldAxisCoordinate = 0; // for TaggedData 
 
           if ( readObj instanceof TaggedXMLDataIOStyle) {
+
              TaggedLocatorObj = CurrentArray.createLocator();
+
           } else {
+
              // A safety. We clear datablock when this is the first datanode we 
              // have entered DATABLOCK is used in cases where we read in untagged data
              if (DataNodeLevel == 0) DATABLOCK = new StringBuffer ();
+
           }
 
           // tack in href data 
@@ -3061,7 +3062,8 @@ while(thisIter.hasNext()) {
              }
 
              // add this axis to the current array object
-             CurrentArray.setFieldAxis(newfieldaxis);
+             // CurrentArray.setFieldAxis(newfieldaxis);
+             CurrentArray.addAxis(newfieldaxis);
 
           } else {
              Log.errorln("FieldAxis object:"+newfieldaxis+" lacks either axisId or axisIdRef, ignoring!");
@@ -3190,7 +3192,7 @@ while(thisIter.hasNext()) {
              if (name.equals("axisIdRef") ) {
                 //int lastindex = AxisReadOrder.size();
                 //AxisReadOrder.add(lastindex, AxisObj.get(attrs.getValue(i)));
-                AxisReadOrder.add(0, AxisObj.get(attrs.getValue(i)));
+                 AxisReadOrder.add(0, AxisObj.get(attrs.getValue(i)));
                  Log.debugln("Adding AxisId:"+name);
              } else 
                  Log.warnln("Warning: got weird attribute:"+name+" on for node");
@@ -3624,6 +3626,7 @@ while(thisIter.hasNext()) {
                 // inside the clone method of the readObject, but its difficult to do, 
                 // as well questionable utility. 
                 // Note that this part is ONLY needed for Delmited/Formatted read Objects
+/*
                 ArrayList newAxisOrderList = new ArrayList();
                 Iterator iter = CurrentArray.getAxes().iterator();
                 while (iter.hasNext()) {
@@ -3640,6 +3643,7 @@ while(thisIter.hasNext()) {
                 }
                 // now set the new IO Axes order with correct axis refs 
                 readObj.setIOAxesOrder(newAxisOrderList);
+*/
 
                 // add read object to Current Array
                 CurrentArray.setXMLDataIOStyle(readObj);
@@ -4504,6 +4508,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.52  2001/09/18 17:46:45  thomas
+ * fixes for tagged data, small speed up for binary numbers fix
+ *
  * Revision 1.51  2001/09/14 18:21:20  thomas
  * Added in  XDF object XMLheader stuff and a few odd error handlers (not really needed but im feeling anal today :)
  *
