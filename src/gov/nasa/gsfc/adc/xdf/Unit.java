@@ -56,14 +56,24 @@ public class Unit extends BaseObject {
    */
   public Unit ()
   {
-    init();
+      this (null, null);
   }
 
   public Unit(String value) {
-    init();
-    setValue(value);
+      this (value,null);
   }
 
+  public Unit(String value, double power) {
+      this (value, new Double(power));
+  }
+
+  public Unit(String value, Double power) {
+    init();
+    if (value != null)
+       setValue(value);
+    if (power != null)
+       setPower(power);
+  }
 
   /**  This constructor takes a Java Hashtable as an initializer of
        the XML attributes of the object to be constructed. The
@@ -142,6 +152,9 @@ public class Unit extends BaseObject {
  /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/05/22 19:35:59  huang
+ * added several constructor methods
+ *
  * Revision 1.11  2001/05/10 21:42:26  thomas
  * added resetXMLAttributes to init().
  *
