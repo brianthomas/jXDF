@@ -67,14 +67,14 @@ public class Reader
        myDocumentHandler = new SaxDocumentHandler();
     }
 
-    /** Pass a structure object reference to use as the structure to load 
-        the file information into. Note that if the passed structure has
+    /** Pass a structure object reference to use as the XDF structure to load 
+        the file information into. Note that if the passed XDF structure has
         prior information in it, it will remain *unless* overridden by 
         conflicting information in the input source. 
      */
-    public Reader(gov.nasa.gsfc.adc.xdf.Structure structure) 
+    public Reader(XDFInterface xdfObject) 
     {
-       myDocumentHandler = new SaxDocumentHandler(structure);
+       myDocumentHandler = new SaxDocumentHandler(xdfObject);
     }
 
     //
@@ -116,22 +116,29 @@ public class Reader
 
     /** Set the structure object that the Reader will parse an InputSource into. 
     */
-    public gov.nasa.gsfc.adc.xdf.Structure getReaderStructureObj () 
+    public XDFInterface getReaderXDFStructureObj () 
     {
-      return myDocumentHandler.getReaderStructureObj();
+      return myDocumentHandler.getReaderXDFStructureObj();
     }
 
     /** Get the structure object that the Reader will parse an InputSource into. 
     */
-    public void setReaderStructureObj (Structure structure)
+    public void setReaderXDFStructureObj (XDFInterface XDFStructure)
     {
-       myDocumentHandler.setReaderStructureObj(structure);
+       myDocumentHandler.setReaderXDFStructureObj(XDFStructure);
+    }
+
+    /** Get the structure object that the Reader will parse an InputSource into. 
+    */
+    public void setReaderXDFStructureObj (XDF XDFStructure)
+    {
+       myDocumentHandler.setReaderXDFStructureObj((XDFInterface) XDFStructure);
     }
 
     /** Parse an InputSource into an XDF Structure object.
-        @return XDF Structure object
+        @return XDF (structure) object
      */
-    public Structure parse (InputSource inputsource) 
+    public XDFInterface parse (InputSource inputsource) 
     throws java.io.IOException
     {
         String parsername = Specification.getInstance().getXMLParser();
@@ -143,7 +150,7 @@ public class Reader
        Set to private because we want users to only set XML parser in
        the Specification object, not override it in the method call. -b.t. 
      */
-    private Structure parse (InputSource inputsource, String parsername) 
+    private XDFInterface parse (InputSource inputsource, String parsername) 
     throws java.io.IOException
     {
 
@@ -180,14 +187,14 @@ public class Reader
         }
 
         // return the parsed structure object
-        return myDocumentHandler.getReaderStructureObj();
+        return myDocumentHandler.getReaderXDFStructureObj();
 
     }
 
     /** Parse a file into an XDF Structure object.
-        @return XDF Structure object
+        @return XDF (structure) object
     */
-    public gov.nasa.gsfc.adc.xdf.Structure parsefile (String file)
+    public XDFInterface parsefile (String file)
     throws java.io.IOException
     {
 
@@ -264,6 +271,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/05/04 20:59:23  thomas
+ * put in interface stuff.
+ *
  * Revision 1.11  2001/01/29 16:59:22  thomas
  * Small change to bring into compliance with
  * jaxp.jar (drop SUN specific "Resolver" class).
