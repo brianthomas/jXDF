@@ -3,6 +3,7 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.*;
+import java.io.OutputStream;
 
 // DataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -33,6 +34,12 @@ import java.util.*;
 
 
  public abstract class DataFormat extends BaseObject {
+
+  //
+  //Fields
+  //
+  //store the subclass's particular nodeName, "string", "integer", etc.
+  String specificDataFormatName;
 
   /** The no argument constructor.
    */
@@ -142,11 +149,59 @@ import java.util.*;
     return ((XMLAttribute) attribHash.get("noDataValue")).getAttribValue();
   }
 
+  /** override the base object method to add a little tailoring
+   */
+  public void toXDFOutputStream (  OutputStream outputstream,
+                                   Hashtable XMLDeclAttribs,
+                                   String indent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
+  ) {
+
+    String nodeNameString = classXDFNodeName;
+    // 1. open this node, print its simple XML attributes
+      if (sPrettyXDFOutput)
+        writeOut(outputstream, indent); // indent node if desired
+
+      writeOut(outputstream,"<" + nodeNameString + ">");   // print opening statement
+
+      //writeOut the body of DataFormat
+      writeOut(outputstream, "<" + specificDataFormatName);
+
+    // gather info about XMLAttributes in this object/node
+    Hashtable xmlInfo = getXMLInfo();
+
+    // 2. Print out string object XML attributes EXCEPT for the one that
+    //    matches PCDATAAttribute.
+    ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
+
+    synchronized(attribs) {
+      int stop = attribs.size();
+      for (int i = 0; i < stop; i++) {
+        Hashtable item = (Hashtable) attribs.get(i);
+        writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
+      }
+    }
+
+    //writeout end of the boby
+    writeOut(outputstream, "/>");
+
+    //writeout closing node
+    writeOut(outputstream, "</" + nodeNameString+ ">");
+    if (sPrettyXDFOutput)
+      writeOut(outputstream, Constants.NEW_LINE);
+
+  }
+
  }  //end of DataFormat class
 
  /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/10/27 21:15:00  kelly
+ * completed *toXDF*.  -k.z.
+ *
  * Revision 1.3  2000/10/26 20:14:17  kelly
  * major fix.  get methods are now in this abstract class.  all set methods are declared as abstract.  -k.z.
  *
