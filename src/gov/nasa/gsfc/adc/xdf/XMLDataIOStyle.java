@@ -80,14 +80,13 @@ public abstract class XMLDataIOStyle extends BaseObject {
   //Get/Set Methods
   //
 
-  /**setReadId: set the *readId* attribute
-   * @return: the current *readId* attribute
+  /**set the *readId* attribute
+     @return: the current *readId* attribute
    */
-  public String setReadId (String strReadId)
-  {
-    return (String) ((XMLAttribute) attribHash.get("readId")).setAttribValue(strReadId);
-
-  }
+   public void setReadId (String strReadId)
+   {
+       ((XMLAttribute) attribHash.get("readId")).setAttribValue(strReadId);
+   }
 
   /**getReadId
    * @return: the current *readId* attribute
@@ -99,14 +98,13 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
 
 
-  /**setReadIdRef: set the *readIdRef* attribute
-   * @return: the current *readIdRef* attribute
+  /**set the *readIdRef* attribute
+     @return: the current *readIdRef* attribute
    */
-  public String setReadIdRef (String strReadIdRef)
-  {
-    return (String) ((XMLAttribute) attribHash.get("readIdRef")).setAttribValue(strReadIdRef);
-
-  }
+   public void setReadIdRef (String strReadIdRef)
+   {
+      ((XMLAttribute) attribHash.get("readIdRef")).setAttribValue(strReadIdRef);
+   }
 
   /**getReadIdRef
    * @return: the current *readIdRef* attribute
@@ -116,18 +114,17 @@ public abstract class XMLDataIOStyle extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("readIdRef")).getAttribValue();
   }
 
-  /**setEncoding: set the *encoding* attribute
+  /**set the *encoding* attribute
    * @return: the current *encoding* attribute
    */
-  public String setEncoding (String strEncoding)
-  {
-    if (!Utility.isValidIOEncoding(strEncoding)) {
-      Log.error("not valid encoding.  'set' request ingored. returning null");
-      return null;
+   public void setEncoding (String strEncoding)
+   {
+      if (!Utility.isValidIOEncoding(strEncoding)) {
+         Log.error("not valid encoding.  'set' request ingored. returning null");
+         return;
+      }
+      ((XMLAttribute) attribHash.get("encoding")).setAttribValue(strEncoding);
     }
-    return (String) ((XMLAttribute) attribHash.get("encoding")).setAttribValue(strEncoding);
-
-  }
 
   /**getEncoding
    * @return: the current *encoding* attribute
@@ -137,18 +134,17 @@ public abstract class XMLDataIOStyle extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("encoding")).getAttribValue();
   }
 
-  /**setEndian: set the *endian* attribute
-   * @return: the current *endian* attribute
+  /**set the *endian* attribute
+     @return: the current *endian* attribute
    */
-  public String setEndian (String strEndian)
-  {
-    if (!Utility.isValidEndian(strEndian)) {
-      Log.error("not valid endian.  'set' request ingored. returning null");
-      return null;
-    }
-    return (String) ((XMLAttribute) attribHash.get("endian")).setAttribValue(strEndian);
-
-  }
+   public void setEndian (String strEndian)
+   {
+       if (!Utility.isValidEndian(strEndian)) {
+          Log.error("not valid endian.  'set' request ingored. returning null");
+          return;
+       }
+       ((XMLAttribute) attribHash.get("endian")).setAttribValue(strEndian);
+   }
 
   /**getEndian
    * @return: the current *endian* attribute
@@ -158,21 +154,12 @@ public abstract class XMLDataIOStyle extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("endian")).getAttribValue();
   }
 
-  /**setParentArray:  set the parentArray.
-   * used when Array clones.
-   * should be protected, ie only classes in the same package see see this method
-   */
-  protected  Array setParentArray(Array parentArray) {
-    Log.debug("in XMLDataIOStyle, setParentArray()");
-    this.parentArray = parentArray;
-    return parentArray;
-  }
 
+  public Array getParentArray() { return parentArray; }
 
-  public Array getParentArray() {
-    return parentArray;
-  }
-
+  //
+  // Other Public Methods
+  //
 
   public void toXMLOutputStream (
                                    OutputStream outputstream,
@@ -230,6 +217,25 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
   }
 
+  // Kelly, is this needed?
+  public Object clone() throws CloneNotSupportedException { 
+     return super.clone(); 
+  }
+
+  // 
+  // Protected Methods
+  //
+
+  /** set the parentArray.
+   * used when Array clones.
+   * should be protected, ie only classes in the same package see see this method
+   */
+  protected void setParentArray(Array parentArray) {
+    Log.debug("in XMLDataIOStyle, setParentArray()");
+    this.parentArray = parentArray;
+  }
+
+
   protected abstract void specificIOStyleToXDF(OutputStream out, String indent);
 
   /** getReadAxisOrder:
@@ -249,14 +255,14 @@ public abstract class XMLDataIOStyle extends BaseObject {
     return readList;
   }
 
-  public Object clone() throws CloneNotSupportedException {
-    return super.clone();
-  }
 
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.8  2000/11/08 20:28:14  thomas
  * Trimmed down import path to just needed classes -b.t
  *

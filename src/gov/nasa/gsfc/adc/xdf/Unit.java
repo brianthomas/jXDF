@@ -94,12 +94,12 @@ import java.util.Hashtable;
   //Get/Set methods
   //
 
-  /**setPower: set the *power* attribute
+  /**set the *power* attribute
    * @param: Number
    * @return: the current *power* attribute
    */
-  public Number setPower(Number power) {
-    return (Number) ((XMLAttribute) attribHash.get("power")).setAttribValue(power);
+  public void setPower(Number power) {
+     ((XMLAttribute) attribHash.get("power")).setAttribValue(power);
   }
 
   /**getPower
@@ -109,12 +109,12 @@ import java.util.Hashtable;
     return (Number) ((XMLAttribute) attribHash.get("power")).getAttribValue();
   }
 
-  /**setValue: set the *value* attribute
+  /**set the *value* attribute
    * @param: String
    * @return: the current *value* attribute
    */
-  public String setValue(String value) {
-    return (String) ((XMLAttribute) attribHash.get("value")).setAttribValue(value);
+  public void setValue(String value) {
+     ((XMLAttribute) attribHash.get("value")).setAttribValue(value);
   }
 
   /**getValue
@@ -124,11 +124,14 @@ import java.util.Hashtable;
     return (String) ((XMLAttribute) attribHash.get("value")).getAttribValue();
   }
 
-  /**update: special for Value Objects
+// I dont think this is even used. commented out for now. -b.t. 
+  /*update: special for Value Objects
    * set its value attribute to the contents of passed string
    * overload the update in BaseObject which takes the Hashtable as param
    */
+/*
   public String update(String value) {
     return setValue(value);
   }
+*/
  }

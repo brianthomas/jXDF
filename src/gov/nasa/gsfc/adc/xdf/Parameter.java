@@ -136,13 +136,11 @@ public class Parameter extends BaseObject {
   //Get/Set Methods
   //
 
-  /**setName: set the *name* attribute
-   * @return: the current *name* attribute
+  /**set the *name* attribute
    */
-  public String setName (String strName)
+  public void setName (String strName)
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
-
+    ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
    /**getName
@@ -153,12 +151,11 @@ public class Parameter extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
   }
 
-   /**setDescription: set the *description* attribute
-   * @return: the current *description* attribute
+   /**set the *description* attribute
    */
-  public String setDescription (String strDesc)
+  public void setDescription (String strDesc)
   {
-    return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+    ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
 
   }
 
@@ -169,14 +166,13 @@ public class Parameter extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
   }
 
-  /**setParamId: set the *paramId* attribute
-   * @return: the current *paramId* attribute
+  /** set the *paramId* attribute
    */
-  public String setParamId (String strParam)
+  public void setParamId (String strParam)
   {
-    return (String) ((XMLAttribute) attribHash.get("paramId")).setAttribValue(strParam);
-
+     ((XMLAttribute) attribHash.get("paramId")).setAttribValue(strParam);
   }
+
   /**getParamId
    * @return: the current *paramId* attribute
    */
@@ -185,12 +181,11 @@ public class Parameter extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("paramId")).getAttribValue();
   }
 
-  /**setParamIdRef: set the *paramIdRef* attribute
-   * @return: the current *paramIdRef* attribute
+  /** set the *paramIdRef* attribute
    */
-  public String setParamIdRef (String strParam)
+  public void setParamIdRef (String strParam)
   {
-    return (String) ((XMLAttribute) attribHash.get("paramIdRef")).setAttribValue(strParam);
+    ((XMLAttribute) attribHash.get("paramIdRef")).setAttribValue(strParam);
 
   }
 
@@ -202,12 +197,11 @@ public class Parameter extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("paramIdRef")).getAttribValue();
   }
 
-  /**setUnits: set the *units* attribute
-   * @return: the current *units* attribute
+  /**set the *units* attribute
    */
-  public Units setUnits (Units units)
+  public void setUnits (Units units)
   {
-    return (Units) ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
+     ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
   }
 
   /**getUnits
@@ -218,15 +212,14 @@ public class Parameter extends BaseObject {
     return (Units) ((XMLAttribute) attribHash.get("units")).getAttribValue();
   }
 
-  /**setDatatype: set the *datatype* attribute
-   * @return: the current *datatype* attribute
+  /**set the *datatype* attribute
    */
-  public String setDatatype(String strDatatype)
+  public void setDatatype(String strDatatype)
   {
     if (Utility.isValidDatatype(strDatatype))
-      return (String) ((XMLAttribute) attribHash.get("datatype")).setAttribValue(strDatatype);
+       ((XMLAttribute) attribHash.get("datatype")).setAttribValue(strDatatype);
     else
-      return null;
+       Log.warnln("Datatype not valid, ignoring request to set.");
   }
 
   /**getDatatype
@@ -237,11 +230,10 @@ public class Parameter extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("datatype")).getAttribValue();
   }
 
-  /**setValueList: set the *valueList* attribute
-   * @return: the current *valueList* attribute
+  /**set the *valueList* attribute
    */
-  public List setValueList(List value) {
-    return (List)((XMLAttribute) attribHash.get("valueList")).setAttribValue(value);
+  public void setValueList(List value) {
+     ((XMLAttribute) attribHash.get("valueList")).setAttribValue(value);
   }
 
   /**getValueList
@@ -251,11 +243,10 @@ public class Parameter extends BaseObject {
     return (List) ((XMLAttribute) attribHash.get("valueList")).getAttribValue();
   }
 
-  /**setNoteList: set the *noteList* attribute
-   * @return: the current *noteList* attribute
+  /**set the *noteList* attribute
    */
-  public List setNoteList(List note) {
-    return (List)((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
+  public void setNoteList(List note) {
+     ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
   }
 
   /**getNoteList

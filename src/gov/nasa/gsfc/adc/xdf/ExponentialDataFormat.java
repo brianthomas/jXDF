@@ -77,61 +77,53 @@ public class ExponentialDataFormat extends DataFormat {
   //Set Methods
   //
 
-  /**setLessThanValue: set the *lessThanValue* attribute
-   * @return: the current *lessThanValue* attribute
+  /** set the *lessThanValue* attribute
    */
-  public Object setLessThanValue(Object numLessThanValue) {
-    return (Number) ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
+  public void setLessThanValue(Object numLessThanValue) {
+     ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
   }
 
-  /**setLessThanValueOrEqualValue: set the *lessThanValueOrEqualValue* attribute
-   * @return: the current *lessThanOrEqualValue* attribute
+  /** set the *lessThanValueOrEqualValue* attribute
    */
-  public Object setLessThanOrEqualValue(Object numLessThanOrEqualValue) {
-    return (Number) ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(numLessThanOrEqualValue);
+  public void setLessThanOrEqualValue(Object numLessThanOrEqualValue) {
+     ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(numLessThanOrEqualValue);
   }
 
-  /**setgreaterThanValue: set the *greaterThanValue* attribute
-   * @return: the current *greaterThanValue* attribute
+  /** set the *greaterThanValue* attribute
    */
-  public Object setGreaterThanValue(Object numGreaterThanValue) {
-    return (Number) ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(numGreaterThanValue);
+  public void setGreaterThanValue(Object numGreaterThanValue) {
+     ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(numGreaterThanValue);
   }
 
-  /**setGreaterThanOrEqualValue: set the *greaterThanOrEqualValue* attribute
-   * @return: the current *greaterThanOrEqualValue* attribute
+  /** set the *greaterThanOrEqualValue* attribute
    */
-  public Object setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
-    return (Number) ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
+  public void setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
+     ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
   }
 
-  /**setInfiniteValue: set the *infiniteValue* attribute
-   * @return: the current *infiniteValue* attribute
+  /** set the *infiniteValue* attribute
    */
-  public Object setInfiniteValue(Object numInfiniteValue) {
-    return (Number) ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(numInfiniteValue);
+  public void setInfiniteValue(Object numInfiniteValue) {
+     ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(numInfiniteValue);
   }
 
-  /**setInfiniteNegativeValue: set the *infiniteNegativeValue* attribute
-   * @return: the current *infiniteNegativeValue* attribute
+  /** set the *infiniteNegativeValue* attribute
    */
-  public Object setInfiniteNegativeValue(Object numInfiniteNegativeValue) {
-    return (Number) ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(numInfiniteNegativeValue);
+  public void setInfiniteNegativeValue(Object numInfiniteNegativeValue) {
+     ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(numInfiniteNegativeValue);
   }
 
 
-  /**setNoDataValue: set the *noDataValue* attribute
-   * @return: the current *noDataValue* attribute
+  /** set the *noDataValue* attribute
    */
-  public Object setNoDataValue(Object numNoDataValue) {
-    return (Number) ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
+  public void setNoDataValue(Object numNoDataValue) {
+     ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
   }
 
-  /**setWidth: set the *width* attribute
-   * @return: the current *width* attribute
+  /** set the *width* attribute
    */
-  public Object setWidth(Object numWidth) {
-    return (Number) ((XMLAttribute) attribHash.get("width")).setAttribValue(numWidth);
+  public void setWidth(Object numWidth) {
+     ((XMLAttribute) attribHash.get("width")).setAttribValue(numWidth);
 
   }
   /**getWidth
@@ -142,11 +134,10 @@ public class ExponentialDataFormat extends DataFormat {
     return (Number) ((XMLAttribute) attribHash.get("width")).getAttribValue();
   }
 
-  /**setPrecision: set the *precision* attribute
-   * @return: the current *precision* attribute
+  /** set the *precision* attribute
    */
-  public Number setPrecision(Number precision) {
-    return (Number) ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
+  public void setPrecision(Number precision) {
+     ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
 
   }
   /**getPrecision
@@ -212,6 +203,9 @@ public class ExponentialDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/08 22:30:12  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.4  2000/11/08 19:43:49  thomas
  * Re-arranged header info to standard format for package. -b.t.
  *

@@ -67,60 +67,52 @@ public class BinaryIntegerDataFormat extends DataFormat {
   //Set Methods
   //
 
-  /**setLessThanValue: set the *lessThanValue* attribute
-   * @return: the current *lessThanValue* attribute
+  /** set the *lessThanValue* attribute
    */
-  public Object setLessThanValue(Object numLessThanValue) {
-    return (Number) ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
+  public void setLessThanValue(Object numLessThanValue) {
+     ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
   }
 
-  /**setLessThanValueOrEqualValue: set the *lessThanValueOrEqualValue* attribute
-   * @return: the current *lessThanOrEqualValue* attribute
+  /** set the *lessThanValueOrEqualValue* attribute
    */
-  public Object setLessThanOrEqualValue(Object numLessThanOrEqualValue) {
-    return (Number) ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(numLessThanOrEqualValue);
+  public void setLessThanOrEqualValue(Object numLessThanOrEqualValue) {
+     ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(numLessThanOrEqualValue);
   }
 
-  /**setgreaterThanValue: set the *greaterThanValue* attribute
-   * @return: the current *greaterThanValue* attribute
+  /** set the *greaterThanValue* attribute
    */
-  public Object setGreaterThanValue(Object numGreaterThanValue) {
-    return (Number) ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(numGreaterThanValue);
+  public void setGreaterThanValue(Object numGreaterThanValue) {
+    ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(numGreaterThanValue);
   }
 
-  /**setGreaterThanOrEqualValue: set the *greaterThanOrEqualValue* attribute
-   * @return: the current *greaterThanOrEqualValue* attribute
+  /** set the *greaterThanOrEqualValue* attribute
    */
-  public Object setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
-    return (Number) ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
+  public void setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
+     ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
   }
 
-  /**setInfiniteValue: set the *infiniteValue* attribute
-   * @return: the current *infiniteValue* attribute
+  /** set the *infiniteValue* attribute
    */
-  public Object setInfiniteValue(Object numInfiniteValue) {
-    return (Number) ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(numInfiniteValue);
+  public void setInfiniteValue(Object numInfiniteValue) {
+     ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(numInfiniteValue);
   }
 
-  /**setInfiniteNegativeValue: set the *infiniteNegativeValue* attribute
-   * @return: the current *infiniteNegativeValue* attribute
+  /** set the *infiniteNegativeValue* attribute
    */
-  public Object setInfiniteNegativeValue(Object numInfiniteNegativeValue) {
-    return (Number) ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(numInfiniteNegativeValue);
+  public void setInfiniteNegativeValue(Object numInfiniteNegativeValue) {
+     ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(numInfiniteNegativeValue);
   }
 
-  /**setNoDataValue: set the *noDataValue* attribute
-   * @return: the current *noDataValue* attribute
+  /** set the *noDataValue* attribute
    */
-  public Object setNoDataValue(Object numNoDataValue) {
-    return (Number) ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
+  public void setNoDataValue(Object numNoDataValue) {
+     ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
   }
 
-  /**setBits: set the *bits* attribute
-   * @return: the current *bits* attribute
+  /** set the *bits* attribute
    */
-  public Number setBits(Number numBits) {
-    return (Number) ((XMLAttribute) attribHash.get("bits")).setAttribValue(numBits);
+  public void setBits(Number numBits) {
+     ((XMLAttribute) attribHash.get("bits")).setAttribValue(numBits);
 
   }
   /**getbits
@@ -131,20 +123,21 @@ public class BinaryIntegerDataFormat extends DataFormat {
     return (Number) ((XMLAttribute) attribHash.get("bits")).getAttribValue();
   }
 
-  /**setSigned: set the *signed* attribute
-   * @return: the current *signed* attribute
+  /** set the *signed* attribute
    */
-  public String setSigned(String strSigned) {
+  public void setSigned(String strSigned) {
 
     if (!strSigned.equals("yes")  && !strSigned.equals("yes") ) {
       Log.error("*signed* attribute can only be set to yes or no");
       Log.error("tend to set as" + strSigned);
       Log.error("invalid. ignoring request");
-      return null;
+      return;
     }
-    return (String) ((XMLAttribute) attribHash.get("signed")).setAttribValue(strSigned);
+
+    ((XMLAttribute) attribHash.get("signed")).setAttribValue(strSigned);
 
   }
+
   /**getSigned
    * @return: the current *signed* attribute
    */
@@ -214,6 +207,9 @@ public class BinaryIntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/08 22:30:12  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.4  2000/10/27 21:11:00  kelly
  * get rid of classXDFNodeName, added specificDataFormatName to suit its
  * supper class DataFormat *toXDF*.  -k.z.

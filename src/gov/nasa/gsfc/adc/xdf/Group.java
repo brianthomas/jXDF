@@ -84,13 +84,11 @@ public class Group extends BaseObject {
   //Get/Set Methods
   //
 
-  /**setName: set the *name* attribute
-   * @return: the current *name* attribute
+  /** set the *name* attribute
    */
-  public String setName (String strName)
+  public void setName (String strName)
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
-
+     ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
   /**getName
@@ -101,12 +99,11 @@ public class Group extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
   }
 
-   /**setDescription: set the *description* attribute
-   * @return: the current *description* attribute
+   /**set the *description* attribute
    */
-  public String setDescription (String strDesc)
+  public void setDescription (String strDesc)
   {
-    return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+     ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
   }
 
    /**getDescription

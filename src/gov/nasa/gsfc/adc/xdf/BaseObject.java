@@ -188,9 +188,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /**set the attributes of this object from the passed attribute Hash reference
    *
    */
-  public Hashtable setAttribHash(Hashtable hash) {
+  public void setAttribHash(Hashtable hash) {
     attribHash = hash;
-    return attribHash;
   }
 
   /** Return a list of the proper ordering of the XML attributes of this object.
@@ -214,9 +213,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
       application.
       @return: the value of sPrettyXDFOutput field.
   */
-  public static boolean setPrettyXDFOutput (boolean turnOnPrettyOutput) {
+  public static void setPrettyXDFOutput (boolean turnOnPrettyOutput) {
     sPrettyXDFOutput = turnOnPrettyOutput;
-    return sPrettyXDFOutput;
   }
 
   /**
@@ -234,9 +232,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
      here, ANY sequence of characters may be used to indent your XDF documents.
       @return: String object containing XDF output indentation.
   */
-  public static String setPrettyXDFOutputIndentation(String indentString) {
-    sPrettyXDFOutputIndentation = indentString;
-    return sPrettyXDFOutputIndentation;
+  public static void setPrettyXDFOutputIndentation(String indentString) {
+     sPrettyXDFOutputIndentation = indentString;
   }
 
   /** Get the default allocation size of each dimension within all XDF arrays.
@@ -249,9 +246,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** Set the default allocation size of each dimension within all XDF arrays.
       @return: non-negative integer with the dimension size.
   */
-  public static int setDefaultDataArraySize(int arraySize) {
+  public static void setDefaultDataArraySize(int arraySize) {
     sDefaultDataArraySize = arraySize;
-    return sDefaultDataArraySize;
   }
 
   /** Get the XML version of this package.
@@ -294,7 +290,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
    * the same as setAttribHash()
    */
   public Hashtable update(Hashtable hash) {
-    return setAttribHash(hash);
+    setAttribHash(hash);
+    return getAttribHash();
   }
 
   /** Add this object to the indicated Group object.
@@ -917,6 +914,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.27  2000/11/08 22:30:12  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.26  2000/11/08 19:33:30  thomas
  * Trimmed down import path to just needed classes. b.t.
  *

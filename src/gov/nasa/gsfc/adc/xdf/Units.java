@@ -98,22 +98,21 @@ import java.io.OutputStream;
   //
   //Get/Set Methods
 
-  /**setXDFNodeName: change the XDF node name for this object.
-   * @param: String
-   * @return: the current XDF node name
+  /**Change the XDF node name for this object.
+     @param: String
+     @return: the current XDF node name
    */
-  public String setXDFNodeName(String strName) {
+  public void setXDFNodeName(String strName) {
     XDFNodeName = strName;
-    return XDFNodeName;
   }
 
-  /**setFactor: set the *factor* attribute
+  /**set the *factor* attribute
    * @param: Number
    * @return: the current *factor* attribute
    */
-  public Number setFactor (Number factor) {
+  public void setFactor (Number factor) {
     Log.info("in Units.setFactor()");
-    return (Number) ((XMLAttribute) attribHash.get("factor")).setAttribValue(factor);
+    ((XMLAttribute) attribHash.get("factor")).setAttribValue(factor);
   }
 
   /**getFactor
@@ -123,12 +122,12 @@ import java.io.OutputStream;
     return (Number) ((XMLAttribute) attribHash.get("factor")).getAttribValue();
   }
 
-  /**setSystem: set the *system* attribute
-   * @param: String
-   * @return: the current *system* attribute
+  /**set the *system* attribute
+     @param: String
+     @return: the current *system* attribute
    */
-  public String setSystem (String system) {
-    return (String) ((XMLAttribute) attribHash.get("system")).setAttribValue(system);
+  public void setSystem (String system) {
+    ((XMLAttribute) attribHash.get("system")).setAttribValue(system);
   }
 
   /**getSystem
@@ -138,12 +137,12 @@ import java.io.OutputStream;
     return (String) ((XMLAttribute) attribHash.get("system")).getAttribValue();
   }
 
-  /**setUnitList: set the *unitList* attribute
-   * @param: List
-   * @return: the current *unitList* attribute
+  /**set the *unitList* attribute
+     @param: List
+     @return: the current *unitList* attribute
    */
-  public List setUnitList(List units) {
-    return (List)((XMLAttribute) attribHash.get("unitList")).setAttribValue(units);
+  public void setUnitList(List units) {
+    ((XMLAttribute) attribHash.get("unitList")).setAttribValue(units);
   }
 
   /**getUnitList
@@ -256,6 +255,9 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.6  2000/11/08 20:17:09  thomas
  * Trimmed down import path to just needed classes -b.t
  *

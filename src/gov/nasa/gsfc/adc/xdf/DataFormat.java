@@ -1,3 +1,4 @@
+
 // XDF DataFormat Class
 // CVS $Id$
 
@@ -83,13 +84,13 @@ import java.util.Hashtable;
   //return the number of bytes
   public abstract int numOfBytes();
 
-  public  abstract Object setLessThanValue(Object Obj);
-  public  abstract Object setLessThanOrEqualValue(Object Obj);
-  public  abstract Object setGreaterThanValue(Object Obj) ;
-  public  abstract Object setGreaterThanOrEqualValue(Object Obj) ;
-  public  abstract Object setInfiniteValue(Object Obj) ;
-  public  abstract Object setInfiniteNegativeValue(Object Obj) ;
-  public  abstract Object setNoDataValue(Object Obj) ;
+  public  abstract void setLessThanValue(Object Obj);
+  public  abstract void setLessThanOrEqualValue(Object Obj);
+  public  abstract void setGreaterThanValue(Object Obj) ;
+  public  abstract void setGreaterThanOrEqualValue(Object Obj) ;
+  public  abstract void setInfiniteValue(Object Obj) ;
+  public  abstract void setInfiniteNegativeValue(Object Obj) ;
+  public  abstract void setNoDataValue(Object Obj) ;
 
 
   /**getLessThanValue
@@ -199,6 +200,9 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/08 22:30:12  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.6  2000/11/08 19:38:57  thomas
  * Cleaned up import path. -b.t.
  *

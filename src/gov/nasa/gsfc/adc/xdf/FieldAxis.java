@@ -76,13 +76,11 @@ public class FieldAxis extends BaseObject implements AxisInterface{
   //Get/Set Methods
   //
 
-  /**setName: set the *name* attribute
-   * @return: the current *name* attribute
+  /** set the *name* attribute
    */
-  public String setName (String strName)
+  public void setName (String strName)
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
-
+     ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
    /**getName
@@ -93,13 +91,11 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
   }
 
-   /**setDescription: set the *description* attribute
-   * @return: the current *description* attribute
+   /** set the *description* attribute
    */
-  public String setDescription (String strDesc)
+  public void setDescription (String strDesc)
   {
-    return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
-
+     ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
   }
 
   /**getDescription
@@ -109,12 +105,11 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
   }
 
-  /**setAxisId: set the *axisId* attribute
-   * @return: the current *axisId* attribute
+  /** set the *axisId* attribute
    */
-  public String setAxisId (String strAxisId)
+  public void setAxisId (String strAxisId)
   {
-    return (String) ((XMLAttribute) attribHash.get("axisId")).setAttribValue(strAxisId);
+     ((XMLAttribute) attribHash.get("axisId")).setAttribValue(strAxisId);
 
   }
 
@@ -126,12 +121,11 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     return (String) ((XMLAttribute) attribHash.get("axisId")).getAttribValue();
   }
 
-  /**setAxisIdRef: set the *axisIdRef* attribute
-   * @return: the current *axisIdRef* attribute
+  /** set the *axisIdRef* attribute
    */
-  public String setAxisIdRef (String strAxisIdRef)
+  public void setAxisIdRef (String strAxisIdRef)
   {
-    return (String) ((XMLAttribute) attribHash.get("axisIdRef")).setAttribValue(strAxisIdRef);
+     ((XMLAttribute) attribHash.get("axisIdRef")).setAttribValue(strAxisIdRef);
 
   }
 
@@ -143,11 +137,10 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     return (String) ((XMLAttribute) attribHash.get("axisIdRef")).getAttribValue();
   }
 
-  /**setFieldList: set the *fieldList* attribute
-   * @return: the current *fieldList* attribute
+  /** set the *fieldList* attribute
    */
-  public List setFieldList(List field) {
-    return (List)((XMLAttribute) attribHash.get("fieldList")).setAttribValue(field);
+  public void setFieldList(List field) {
+     ((XMLAttribute) attribHash.get("fieldList")).setAttribValue(field);
   }
 
   /**getFieldList
@@ -157,12 +150,11 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     return (List) ((XMLAttribute) attribHash.get("fieldList")).getAttribValue();
   }
 
-  /** setFieldGroupOwnedHash
+  /** 
   */
-  public Set setFieldGroupOwnedHash(Set fieldGroup)
+  public void setFieldGroupOwnedHash(Set fieldGroup)
   {
     fieldGroupOwnedHash = fieldGroup;
-    return fieldGroupOwnedHash;
   }
 
   /** getFieldGroupOwnedHash
@@ -218,18 +210,18 @@ public class FieldAxis extends BaseObject implements AxisInterface{
   }
 
   /**setField: Set the field object at indicated index.
-   * @returns:  the field object on success, null on failure.
    */
 
-  public Field setField(int index, Field field) {
+  public void setField(int index, Field field) {
+
     if ((index < 0) || (index > getFieldList().size()-1))  //index out of range
-      return null;
-    if (index == getFieldList().size()-1)  { //add a field
-      getFieldList().add(field);
-      return field;
-    }
-    getFieldList().set(index, field);  //replace the old field with the new one
-    return field;
+      return;
+
+    if (index == getFieldList().size()-1) 
+       getFieldList().add(field); //add a field
+    else 
+       getFieldList().set(index, field);  //replace the old field with the new one
+
   }
 
   public Field removeField(int index) {
@@ -326,6 +318,9 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.10  2000/11/08 22:30:12  thomas
+  * Changed set methods to return void. -b.t.
+  *
   * Revision 1.9  2000/11/08 19:47:40  thomas
   * Updated header to include GPL blurb. -b.t.
   *

@@ -77,72 +77,65 @@ public class IntegerDataFormat extends DataFormat {
   //Get/Set Methods
   //
 
-  /**setLessThanValue: set the *lessThanValue* attribute
-   * @return: the current *lessThanValue* attribute
+  /** set the *lessThanValue* attribute
    */
-  public Object setLessThanValue(Object numLessThanValue) {
-    return (Number) ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
+  public void setLessThanValue(Object numLessThanValue) {
+     ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
   }
 
 
-  /**setLessThanValueOrEqualValue: set the *lessThanValueOrEqualValue* attribute
-   * @return: the current *lessThanOrEqualValue* attribute
+  /** set the *lessThanValueOrEqualValue* attribute
    */
-  public Object setLessThanOrEqualValue(Object numLessThanOrEqualValue) {
-    return (Number) ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(numLessThanOrEqualValue);
+  public void setLessThanOrEqualValue(Object numLessThanOrEqualValue) {
+     ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(numLessThanOrEqualValue);
   }
 
 
-  /**setgreaterThanValue: set the *greaterThanValue* attribute
-   * @return: the current *greaterThanValue* attribute
+  /** set the *greaterThanValue* attribute
    */
-  public Object setGreaterThanValue(Object numGreaterThanValue) {
-    return (Number) ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(numGreaterThanValue);
+  public void setGreaterThanValue(Object numGreaterThanValue) {
+     ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(numGreaterThanValue);
   }
 
-  /**setGreaterThanOrEqualValue: set the *greaterThanOrEqualValue* attribute
-   * @return: the current *greaterThanOrEqualValue* attribute
+  /** set the *greaterThanOrEqualValue* attribute
    */
-  public Object setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
-    return (Number) ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
-  }
-
-
-  /**setInfiniteValue: set the *infiniteValue* attribute
-   * @return: the current *infiniteValue* attribute
-   */
-  public Object setInfiniteValue(Object numInfiniteValue) {
-    return (Object) ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(numInfiniteValue);
-  }
-
-  /**setInfiniteNegativeValue: set the *infiniteNegativeValue* attribute
-   * @return: the current *infiniteNegativeValue* attribute
-   */
-  public Object setInfiniteNegativeValue(Object numInfiniteNegativeValue) {
-    return (Number) ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(numInfiniteNegativeValue);
-  }
-
-  /**setNoDataValue: set the *noDataValue* attribute
-   * @return: the current *noDataValue* attribute
-   */
-  public Object setNoDataValue(Object numNoDataValue) {
-    return (Number) ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
+  public void setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
+     ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
   }
 
 
-  /**setType: set the *type* attribute
-   * @return: the current *type* attribute if success, null if not
+  /** set the *infiniteValue* attribute
    */
-  public String setType(String strType) {
+  public void setInfiniteValue(Object numInfiniteValue) {
+     ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(numInfiniteValue);
+  }
+
+  /**set the *infiniteNegativeValue* attribute
+   */
+  public void setInfiniteNegativeValue(Object numInfiniteNegativeValue) {
+     ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(numInfiniteNegativeValue);
+  }
+
+  /** set the *noDataValue* attribute
+   */
+  public void setNoDataValue(Object numNoDataValue) {
+     ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
+  }
+
+
+  /** set the *type* attribute
+   */
+  public void setType(String strType) {
     if (!Utility.isValidIntegerType(strType)) {
       Log.error("invalid type for IntegerDataFormat");
       Log.error("returning null");
-      return null;
+      return;
     }
 
-    return (String) ((XMLAttribute) attribHash.get("type")).setAttribValue(strType);
+     ((XMLAttribute) attribHash.get("type")).setAttribValue(strType);
 
   }
+
   /**getType
    * @return: the current *type* attribute
    */
@@ -151,13 +144,12 @@ public class IntegerDataFormat extends DataFormat {
     return (String) ((XMLAttribute) attribHash.get("type")).getAttribValue();
   }
 
-  /**setWidth: set the *width* attribute
-   * @return: the current *width* attribute
+  /** set the *width* attribute
    */
-  public Number setWidth(Number width) {
-    return (Number) ((XMLAttribute) attribHash.get("width")).setAttribValue(width);
-
+  public void setWidth(Number width) {
+     ((XMLAttribute) attribHash.get("width")).setAttribValue(width);
   }
+
   /**getWidth
    * @return: the current *width* attribute
    */
@@ -247,6 +239,9 @@ public class IntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.4  2000/11/08 19:55:07  thomas
  * Trimmed import path to just needed classes (none!) -b.t.
  *

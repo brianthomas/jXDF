@@ -74,9 +74,8 @@ import java.util.List;
 
   /**setAxisLocation: set the index of an axis
    * @param: AxisInterface, int
-   * @return: index if successful
    */
-  public int setAxisLocation (AxisInterface axisObj, int index) throws AxisLocationOutOfBoundsException {
+  public void setAxisLocation (AxisInterface axisObj, int index) throws AxisLocationOutOfBoundsException {
     if ((!parentArray.getAxisList().contains(axisObj)) ||
         (index < 0) ||
         (index > axisObj.getLength()-1) ) {
@@ -84,7 +83,6 @@ import java.util.List;
     }
     //now update the axis and index pair in the hashtable
     locations.put(axisObj, new Integer(index));
-    return index;
   }
 
   /**getAxisLocation: get the index of an Axis in the Locator object
@@ -107,22 +105,21 @@ import java.util.List;
   }
 
 
-  /**setAxisLocationByAxisValue: set the index of an axis to the index of a value
+  /** set the index of an axis to the index of a value
    * along that axis
    * @return: index if successful, -1 if not
    */
-  public int setAxisLocationByAxisValue(Axis axisObj, Value valueObj) throws AxisLocationOutOfBoundsException{
+  public void setAxisLocationByAxisValue(Axis axisObj, Value valueObj) throws AxisLocationOutOfBoundsException{
     if ((!parentArray.getAxisList().contains(axisObj)) ||
         valueObj == null ) {
         Log.error("either axisObj is not an Axis ref contained in Locator's parentArray or Value is null");
         Log.error("regnore request");
-        return -1;
      }
     try {
-     return setAxisLocation(axisObj, axisObj.getIndexFromAxisValue(valueObj));
+       setAxisLocation(axisObj, axisObj.getIndexFromAxisValue(valueObj));
     }
     catch (AxisLocationOutOfBoundsException e) {
-      throw e;
+       throw e;
     }
   }
 
@@ -278,6 +275,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.10  2000/11/08 19:57:45  thomas
  * Trimmed down import path to just needed classes. -b.t.
  *

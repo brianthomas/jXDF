@@ -52,23 +52,22 @@ import java.util.ArrayList;
 
     /** Set the value of this XMLAttribute.
     */
-    public synchronized Object  setAttribValue(Object objValue) {
+    public synchronized void setAttribValue (Object objValue) {
       attribValue = objValue;
-      return attribValue;
     }
 
     /** Set the type of value held by this XMLAttribute.
     */
-    public synchronized String setAttribType(String strType) {
+    public synchronized void setAttribType (String strType) {
       if ( !Utility.isValidXMLAttributeType(strType))
       {
         Log.error("Type not a defined constant for XMLAttribute");
-        return null;
+        return;
       }
 
       // ok, set it
       attribType = strType;
-      return attribType;
+
     }
 
     /** Get the value of this XMLAttribute.
@@ -83,7 +82,7 @@ import java.util.ArrayList;
        return attribType;
     }
 
-    public Object clone () throws CloneNotSupportedException{
+    public Object clone () throws CloneNotSupportedException {
 
       synchronized (this) {
         XMLAttribute cloneObj = null;cloneObj= (XMLAttribute) super.clone();
@@ -128,6 +127,9 @@ import java.util.ArrayList;
 /* Modification History
  * 
  * $Log$
+ * Revision 1.8  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.7  2000/11/08 20:25:34  thomas
  * Added header information/log mod history -b.t.
  *

@@ -121,16 +121,15 @@ public class Reader
 
     /** Get the structure object that the Reader will parse an InputSource into. 
     */
-    public gov.nasa.gsfc.adc.xdf.Structure setReaderStructureObj
-           (gov.nasa.gsfc.adc.xdf.Structure structure)
+    public void setReaderStructureObj (Structure structure)
     {
-      return myDocumentHandler.setReaderStructureObj(structure);
+       myDocumentHandler.setReaderStructureObj(structure);
     }
 
     /** Parse an InputSource into an XDF Structure object.
         @return: XDF Structure object
      */
-    public gov.nasa.gsfc.adc.xdf.Structure parse (InputSource inputsource) 
+    public Structure parse (InputSource inputsource) 
     throws java.io.IOException
     {
 
@@ -221,6 +220,9 @@ class SaxErrorHandler extends HandlerBase
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.7  2000/10/25 18:06:23  thomas
  * Trimmed down the import path to be explicit. -b.t.
  *

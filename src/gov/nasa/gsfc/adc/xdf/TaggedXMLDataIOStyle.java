@@ -57,9 +57,8 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //
   //Get/Set Methods
   //
-  public Hashtable setTagHash(Hashtable tagHash) {
+  public void setTagHash(Hashtable tagHash) {
     this.tagHash = tagHash;
-    return this.tagHash;
   }
 
   public Hashtable getTagHash() {
@@ -69,7 +68,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //
   //Other PUBLIC Methods
   //
-/**setAxisTag: Set an association between an XDF data tag and axis reference.
+/**Set an association between an XDF data tag and axis reference.
  * One day we will hopefully be able to support user defined tags, but for the
  * time being you will have to stick to those specified by the XDF DTD
  * (e.g. "d0","d1", ... "d8"). Note that choosing the wrong tag name will break
@@ -78,13 +77,13 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
  * @parma: tag, axisId
  * @return: tag value if successful, null if not
  */
-  public String setAxisTag(String tag, String axisId) {
+  public void setAxisTag(String tag, String axisId) {
     if (tag == null || axisId== null) {
       Log.error("Missing information: need tag AND axisId for addAxisTag. Ignoring request. returning null");
-      return null;
+      return;
     }
     //insert in hash table, return tag value
-    return (String) tagHash.put(axisId, tag);
+    tagHash.put(axisId, tag);
   }
 
   /**getXMLDataIOStyleTags: Return an String array of tags to
@@ -158,6 +157,9 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.6  2000/11/08 20:12:39  thomas
  * Trimmed down import path to just needed classes -b.t
  *

@@ -28,8 +28,8 @@ import java.util.Hashtable;
 import java.io.OutputStream;
 
 /**
- * StringDataFormat.java:describes string data.
- * @version $Revision$
+   StringDataFormat.java:describes string data.
+   @version $Revision$
  */
 
 
@@ -62,60 +62,52 @@ public class StringDataFormat extends DataFormat {
   //Set Methods
   //
 
-  /**setLessThanValue: set the *lessThanValue* attribute
-   * @return: the current *lessThanValue* attribute
+  /**set the *lessThanValue* attribute
    */
-  public Object setLessThanValue(Object strLessThanValue) {
-    return (String) ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(strLessThanValue);
+  public void setLessThanValue(Object strLessThanValue) {
+     ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(strLessThanValue);
   }
 
-  /**setLessThanValueOrEqualValue: set the *lessThanValueOrEqualValue* attribute
-   * @return: the current *lessThanOrEqualValue* attribute
+  /**set the *lessThanValueOrEqualValue* attribute
    */
-  public Object setLessThanOrEqualValue(Object strLessThanOrEqualValue) {
-    return (String) ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(strLessThanOrEqualValue);
+  public void setLessThanOrEqualValue(Object strLessThanOrEqualValue) {
+     ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(strLessThanOrEqualValue);
   }
 
-  /**setgreaterThanValue: set the *greaterThanValue* attribute
-   * @return: the current *greaterThanValue* attribute
+  /**set the *greaterThanValue* attribute
    */
-  public Object setGreaterThanValue(Object strGreaterThanValue) {
-    return (String) ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(strGreaterThanValue);
+  public void setGreaterThanValue(Object strGreaterThanValue) {
+    ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(strGreaterThanValue);
   }
 
-  /**setGreaterThanOrEqualValue: set the *greaterThanOrEqualValue* attribute
-   * @return: the current *greaterThanOrEqualValue* attribute
+  /**set the *greaterThanOrEqualValue* attribute
    */
-  public Object setGreaterThanOrEqualValue(Object strGreaterThanOrEqualValue) {
-    return (String) ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(strGreaterThanOrEqualValue);
+  public void setGreaterThanOrEqualValue(Object strGreaterThanOrEqualValue) {
+    ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(strGreaterThanOrEqualValue);
   }
 
-  /**setInfiniteValue: set the *infiniteValue* attribute
-   * @return: the current *infiniteValue* attribute
+  /** set the *infiniteValue* attribute
    */
-  public Object setInfiniteValue(Object strInfiniteValue) {
-    return (String) ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(strInfiniteValue);
+  public void setInfiniteValue(Object strInfiniteValue) {
+    ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(strInfiniteValue);
   }
 
-  /**setInfiniteNegativeValue: set the *infiniteNegativeValue* attribute
-   * @return: the current *infiniteNegativeValue* attribute
+  /**set the *infiniteNegativeValue* attribute
    */
-  public Object setInfiniteNegativeValue(Object strInfiniteNegativeValue) {
-    return (String) ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(strInfiniteNegativeValue);
+  public void setInfiniteNegativeValue(Object strInfiniteNegativeValue) {
+    ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(strInfiniteNegativeValue);
   }
 
-  /**setNoDataValue: set the *noDataValue* attribute
-   * @return: the current *noDataValue* attribute
+  /**set the *noDataValue* attribute
    */
-  public Object setNoDataValue(Object strNoDataValue) {
-    return (String) ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(strNoDataValue);
+  public void setNoDataValue(Object strNoDataValue) {
+     ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(strNoDataValue);
   }
 
   /**setlength: set the *length* attribute
-   * @return: the current *length* attribute
    */
-  public Number setLength(Number numLength) {
-    return (Number) ((XMLAttribute) attribHash.get("length")).setAttribValue(numLength);
+  public void setLength(Number numLength) {
+     ((XMLAttribute) attribHash.get("length")).setAttribValue(numLength);
   }
   /**getLength
    * @return: the current *length* attribute
@@ -171,6 +163,9 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.6  2000/10/27 21:20:53  kelly
  * get rid of classXDFNodeName, added specificDataFormatName to suit its
  * supper class DataFormat *toXDF*.  -k.z.

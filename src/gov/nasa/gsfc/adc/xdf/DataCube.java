@@ -108,13 +108,11 @@ private void init()
 
   };
 
-  /**setHref: set the *href* attribute
-   * @return: the current *href* attribute
+  /** set the *href* attribute
    */
-  public String setHref (String strHref)
+  public void setHref (String strHref)
   {
-    return (String) ((XMLAttribute) attribHash.get("href")).setAttribValue(strHref);
-
+     ((XMLAttribute) attribHash.get("href")).setAttribValue(strHref);
   }
 
   /**getHref
@@ -122,32 +120,31 @@ private void init()
    */
   public String getHref()
   {
-    return (String) ((XMLAttribute) attribHash.get("href")).getAttribValue();
+     return (String) ((XMLAttribute) attribHash.get("href")).getAttribValue();
   }
 
-  /**setChecksum: set the *checksum* attribute
-   * @return: the current *checksum* attribute
+  /** set the *checksum* attribute
    */
-  public Number setChecksum (Number checksum) {
-    Log.info("in DataCube.setChecksum()");
-   return (Number) ((XMLAttribute) attribHash.get("checksum")).setAttribValue(checksum);
+  public void setChecksum (Number checksum) {
+     ((XMLAttribute) attribHash.get("checksum")).setAttribValue(checksum);
   }
 
   /**getChecksum
    * @return: the current *checksum* attribute
    */
-public Number getChecksum () {
-  return (Number) ((XMLAttribute) attribHash.get("checksum")).getAttribValue();
-}
+  public Number getChecksum () {
+     return (Number) ((XMLAttribute) attribHash.get("checksum")).getAttribValue();
+  }
 
-/**setEncoding: set the *encoding* attribute
-   * @return: the current *encoding* attribute
+   /** set the *encoding* attribute
    */
-  public String setEncoding (String strEncoding)
-  {
-    if (!Utility.isValidDataEncoding(strEncoding))
-      return null;
-    return (String) ((XMLAttribute) attribHash.get("encoding")).setAttribValue(strEncoding);
+   public void setEncoding (String strEncoding)
+   {
+
+      if (!Utility.isValidDataEncoding(strEncoding))
+         Log.warnln("Encoding is not valid, ignoring request to setEncoding.");
+      else 
+         ((XMLAttribute) attribHash.get("encoding")).setAttribValue(strEncoding);
 
   }
 
@@ -160,21 +157,22 @@ public Number getChecksum () {
   }
 
 
-  /**setCompression: set the *compression* attribute
-   * @return: the current *compression* attribute
+  /** set the *compression* attribute
    */
-public String setCompression (String strCompression)
+  public void setCompression (String strCompression)
   {
+
     if (!Utility.isValidDataCompression(strCompression))
-      return null;
-    return (String) ((XMLAttribute) attribHash.get("compression")).setAttribValue(strCompression);
+       Log.warnln("Data compression value is not valid, ignoring request to set it.");
+    else 
+      ((XMLAttribute) attribHash.get("compression")).setAttribValue(strCompression);
 
   }
 
   /**getCompression
    * @return: the current *compression* attribute
    */
-public String getCompression()
+  public String getCompression()
   {
     return (String) ((XMLAttribute) attribHash.get("compression")).getAttribValue();
   }
@@ -182,37 +180,33 @@ public String getCompression()
   /**getDimension
    * @return: the current dimension
    */
-public int getDimension() {
-  return dimension;
-}
+  public int getDimension() {
+     return dimension;
+  }
 
   /**getMaxDataIndex: get the max index along with dimension
    * @return: int[]
    */
-public int[] getMaxDataIndex() {
-  List axes = parentArray.getAxisList();
-  int[] maxDataIndices = new int[axes.size()];
+  public int[] getMaxDataIndex() {
+     List axes = parentArray.getAxisList();
+     int[] maxDataIndices = new int[axes.size()];
 
-  int stop = axes.size();
-  for(int i = 0; i < stop; i++) {
-    maxDataIndices[i]=((AxisInterface) axes.get(i)).getLength();
+     int stop = axes.size();
+     for(int i = 0; i < stop; i++) {
+        maxDataIndices[i]=((AxisInterface) axes.get(i)).getLength();
+     }
+
+     return maxDataIndices;
   }
 
-  return maxDataIndices;
-}
 
+  public Array getParentArray() {
+     return parentArray;
+  }
 
-
-
-public Array getParentArray() {
-  return parentArray;
-}
-
-protected void setParentArray(Array parentArray) {
-  this.parentArray = parentArray;
-}
-
-
+  protected void setParentArray(Array parentArray) {
+     this.parentArray = parentArray;
+  }
 
 
 
@@ -443,7 +437,7 @@ public double getDoubleData(Locator locator) throws NoDataException{
   /**appendData: Append the String value onto the requested datacell
    * double check: now to prevent the user from appending to an int or double?
    */
-  public String appendData (Locator locator, String strValue) throws SetDataException{
+  public void appendData (Locator locator, String strValue) throws SetDataException{
     String strData;
     try {
       strData = getStringData(locator);
@@ -452,7 +446,9 @@ public double getDoubleData(Locator locator) throws NoDataException{
     catch (NoDataException e) {
       strData = strValue;
     }
-    return setData(locator, strData);
+
+    setData(locator, strData);
+
   }
 
   /** setData: Set the SCALAR value of the requested datacell
@@ -460,7 +456,7 @@ public double getDoubleData(Locator locator) throws NoDataException{
    * Overwrites existing datacell value if any.
    */
 
-public double  setData (Locator locator, double numValue) throws SetDataException{
+public void setData (Locator locator, double numValue) throws SetDataException{
   List axisList = parentArray.getAxisList();
   List prev = data;
   List current = data;
@@ -498,6 +494,7 @@ public double  setData (Locator locator, double numValue) throws SetDataExceptio
       current.set(1, newArray);
       oldArray = null; //force garbage collection
     }
+
     try {
       //indicates its corresponding data cell holds vaid data
       byte b = 1;
@@ -505,11 +502,13 @@ public double  setData (Locator locator, double numValue) throws SetDataExceptio
 
       //put the data into the requested data cell
       java.lang.reflect.Array.setDouble(current.get(1), index, numValue);
-      return numValue;
+      return;
+
     }
     catch (Exception e) {
       throw new SetDataException();
     }
+
   } //  end of if (numOfAxis == 1)
 
   //contructs arraylist of arraylist to represent the multi-dimension
@@ -588,7 +587,7 @@ public double  setData (Locator locator, double numValue) throws SetDataExceptio
     java.lang.reflect.Array.setByte(current.get(newCoordinate), index1, realValue);
     //put data into the requested datacell
     java.lang.reflect.Array.setDouble(current.get(newCoordinate+1), index1, numValue);
-    return numValue;
+    return;
   }
   catch (Exception e) {
     throw new SetDataException();
@@ -599,7 +598,7 @@ public double  setData (Locator locator, double numValue) throws SetDataExceptio
    * (via L<XDF::DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
-public int setData(Locator locator, int numValue) throws SetDataException{
+public void setData(Locator locator, int numValue) throws SetDataException{
   List axisList = parentArray.getAxisList();
   List prev = data;
   List current = data;
@@ -644,7 +643,7 @@ public int setData(Locator locator, int numValue) throws SetDataException{
 
       //put the data into the requested data cell
       java.lang.reflect.Array.setInt(current.get(1), index, numValue);
-      return numValue;
+      return;
     }
     catch (Exception e) {
       throw new SetDataException();
@@ -728,7 +727,7 @@ public int setData(Locator locator, int numValue) throws SetDataException{
     java.lang.reflect.Array.setByte(current.get(newCoordinate), index1, realValue);
     //put data into the requested datacell
     java.lang.reflect.Array.setInt(current.get(newCoordinate+1), index1, numValue);
-    return numValue;
+    return;
   }
   catch (Exception e) {
     throw new SetDataException();
@@ -739,7 +738,7 @@ public int setData(Locator locator, int numValue) throws SetDataException{
    * (via L<XDF::DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
-public String  setData (Locator locator, String strValue) throws SetDataException{
+public void setData (Locator locator, String strValue) throws SetDataException{
   List axisList = parentArray.getAxisList();
   List prev = data;
   List current = data;
@@ -784,7 +783,7 @@ public String  setData (Locator locator, String strValue) throws SetDataExceptio
 
       //put the data into the requested data cell
       java.lang.reflect.Array.set(current.get(1), index, strValue);
-      return strValue;
+      return;
     }
     catch (Exception e) {
       throw new SetDataException();
@@ -869,7 +868,7 @@ public String  setData (Locator locator, String strValue) throws SetDataExceptio
     java.lang.reflect.Array.setByte(current.get(newCoordinate), index1, realValue);
     //put data into the requested datacell
     java.lang.reflect.Array.set(current.get(newCoordinate+1), index1, strValue);
-    return strValue;
+    return;
   }
   catch (Exception e) {
     throw new SetDataException();
@@ -1282,6 +1281,9 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.10  2000/11/08 22:30:12  thomas
+  * Changed set methods to return void. -b.t.
+  *
   * Revision 1.9  2000/11/08 19:18:07  thomas
   * Changed the name of toXDF* methods to toXML* to
   * better reflect the nature of the output (its not XDF

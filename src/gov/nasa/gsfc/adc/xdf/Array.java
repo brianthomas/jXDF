@@ -143,8 +143,7 @@ import java.util.Vector;
   //Get/Set Methods
   //
 
-  /**setName: set the *name* attribute
-   * @return: the current *name* attribute
+  /** set the *name* attribute
    */
   public void setName (String strName)
   {
@@ -159,8 +158,7 @@ import java.util.Vector;
     return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
   }
 
-   /**setDescription: set the *description* attribute
-   * @return: the current *description* attribute
+   /** set the *description* attribute
    */
   public void setDescription (String strDesc)
   {
@@ -174,8 +172,7 @@ import java.util.Vector;
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
   }
 
-  /**setParamList: set the *paramList* attribute
-   * @return: the current *paramList* attribute
+  /** set the *paramList* attribute
    */
   public void setParamList(List param) {
      ((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
@@ -188,8 +185,7 @@ import java.util.Vector;
     return (List) ((XMLAttribute) attribHash.get("paramList")).getAttribValue();
   }
 
-   /**setUnits: set the *units* attribute
-   * @return: the current *units* attribute
+   /** set the *units* attribute
    */
   public void setUnits (Units units)
   {
@@ -204,13 +200,12 @@ import java.util.Vector;
     return (Units) ((XMLAttribute) attribHash.get("units")).getAttribValue();
   }
 
-  /**setDataFormat: Sets the data format *type* for this array (an XDF::DataFormat object
+  /** Sets the data format *type* for this array (an XDF::DataFormat object
    * is held in the attribute $obj->dataFormat, its type is accessible
    * Takes a SCALAR object reference as its argument. Allowed objects to pass
-   * to this method include BinaryIntegerDataFormat>, BinaryFloatDataFormat>,
-   * ExponentDataFormat>, FixedDataFormat>, IntegerDataFormat>,
-   * or StringDataFormat>.
-   * RETURNS an object reference
+   * to this method include BinaryIntegerDataFormat, BinaryFloatDataFormat,
+   * ExponentDataFormat, FixedDataFormat, IntegerDataFormat,
+   * or StringDataFormat.
   */
   public void setDataFormat(DataFormat dataFormat)
   {
@@ -240,8 +235,7 @@ import java.util.Vector;
      return (Notes) ((XMLAttribute) attribHash.get("notes")).getAttribValue();
   }
 
-   /**setAxisList: set the *axisList* attribute
-   * @return: the current *axisList* attribute
+   /** set the *axisList* attribute
    */
   public void setAxisList(List axis) {
      ((XMLAttribute) attribHash.get("axisList")).setAttribValue(axis);
@@ -254,9 +248,8 @@ import java.util.Vector;
     return (List) ((XMLAttribute) attribHash.get("axisList")).getAttribValue();
   }
 
-  /**setXMLDataIOStyle: set the *xmlDataIOStyle* attribute
+  /** set the *xmlDataIOStyle* attribute
    * note we have to nsure that _parentArray is properly updated
-   * @return: the current *xmlDataIOStyle* attribute
    */
   public void setXMLDataIOStyle(XMLDataIOStyle xmlDataIOStyle)
   {
@@ -284,16 +277,14 @@ import java.util.Vector;
     return (XMLDataIOStyle) ((XMLAttribute) attribHash.get("xmlDataIOStyle")).getAttribValue();
   }
 
-  /* setDataCube: set the *dataCube* attribute
-   * @return: the current *dataCube* attribute
-   * double check, we should not allow user to set the datacube
+  /*  set the *dataCube* attribute
    */
 //
 // Hurm.. This is a dangerous method. All sorts of array meta-data arent updated
 // properly when this is used. Commenting it out for now. -b.t.
 //
 
-  protected void setDataCube(DataCube dataCube)
+  private void setDataCube(DataCube dataCube)
   {
      ((XMLAttribute) attribHash.get("dataCube")).setAttribValue(dataCube);
   }
@@ -308,7 +299,6 @@ import java.util.Vector;
   }
 
    /** Set the *noteList* attribute
-      @return: the current *noteList* attribute
     */
    public void setNoteList(List note) {
      ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
@@ -547,42 +537,43 @@ import java.util.Vector;
   /**appendData: Append the string value onto the requested datacell
    * (via DataCube> LOCATOR REF).
    */
-  public String  appendData (Locator locator, String strValue) throws SetDataException{
-    return getDataCube().appendData(locator, strValue);
+  public void appendData (Locator locator, String strValue) throws SetDataException{
+     getDataCube().appendData(locator, strValue);
   }
 
-  /** setData: Set the SCALAR value of the requested datacell
-   * (via DataCube> LOCATOR REF).
+  /** Set the SCALAR value of the requested datacell
+   * (via LOCATOR ).
    * Overwrites existing datacell value if any.
    */
+   public void setData (Locator locator, double numValue) throws SetDataException {
 
-
-   public double  setData (Locator locator, double numValue) throws SetDataException {
     try {
-      return getDataCube().setData(locator, numValue);
+      getDataCube().setData(locator, numValue);
+    }
+    catch (SetDataException e) {
+      throw e;
+    }
+
+  }
+
+  public void setData (Locator locator, int numValue) throws SetDataException {
+
+    try {
+      getDataCube().setData(locator, numValue);
     }
     catch (SetDataException e) {
       throw e;
     }
   }
 
-  public int  setData (Locator locator, int numValue) throws SetDataException {
-    try {
-      return getDataCube().setData(locator, numValue);
-    }
-    catch (SetDataException e) {
-      throw e;
-    }
-  }
 
-
-  /** setData: Set the SCALAR value of the requested datacell
-   * (via DataCube> LOCATOR REF).
+  /**  Set the SCALAR value of the requested datacell
+   * (via LOCATOR ).
    * Overwrites existing datacell value if any.
    */
-  public String setData (Locator locator, String strValue) throws SetDataException{
+  public void setData (Locator locator, String strValue) throws SetDataException{
     try {
-      return getDataCube().setData(locator, strValue);
+      getDataCube().setData(locator, strValue);
     }
     catch (SetDataException e) {
       throw e;
@@ -683,8 +674,8 @@ import java.util.Vector;
       return null;
   }
 
-  public FieldAxis setFieldAxis(FieldAxis fieldAxis) {
-    return addFieldAxis(fieldAxis);
+  public void setFieldAxis(FieldAxis fieldAxis) {
+     addFieldAxis(fieldAxis);
   }
 
   public boolean hasFieldAxis() {
@@ -799,6 +790,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.15  2000/11/08 22:30:12  thomas
+  * Changed set methods to return void. -b.t.
+  *
   * Revision 1.14  2000/11/08 19:22:06  thomas
   * Minor fix: import statement had 2 ArrayList entries. -b.t.
   *

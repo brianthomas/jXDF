@@ -159,21 +159,18 @@ class SaxDocumentHandler implements DocumentHandler {
     // Non-Sax Public Methods
     //
 
-    /** Set the structure object that the Reader will parse an InputSource into. 
+    /** Get the structure object that the Reader will parse an InputSource into. 
     */
     public Structure getReaderStructureObj () 
     {
       return XDF;
     }
 
-    /** Get the structure object that the Reader will parse an InputSource into. 
+    /** Set the structure object that the Reader will parse an InputSource into. 
     */
-    public Structure setReaderStructureObj (Structure structure)
+    public void setReaderStructureObj (Structure structure)
     {
-
        XDF = structure; // set the structure to read into to be passed ref. 
-       return XDF;
-
     }
 
     /** Merge in external map to the internal startElement handler Hashtable. 
@@ -2219,6 +2216,9 @@ class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.9  2000/11/07 21:53:53  thomas
  * 2 Fixes: null problem wi/ reading in axisUnits and
  * reading in of valueList from an algoritm. -b.t.

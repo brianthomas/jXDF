@@ -125,13 +125,12 @@ public class Structure extends BaseObject {
   //Get/Set Methods
   //
 
-  /**setName: set the *name* attribute
+  /**set the *name* attribute
    * @return: the current *name* attribute
    */
-  public String setName (String strName)
+  public void setName (String strName)
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
-
+    ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
   /**getName
@@ -142,12 +141,12 @@ public class Structure extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
   }
 
-   /**setDescription: set the *description* attribute
+   /**set the *description* attribute
    * @return: the current *description* attribute
    */
-  public String setDescription (String strDesc)
+  public void setDescription (String strDesc)
   {
-    return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+     ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
   }
 
    /**getDescription
@@ -157,11 +156,11 @@ public class Structure extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
   }
 
-  /**setParamList: set the *paramList* attribute
+  /**set the *paramList* attribute
    * @return: the current *paramList* attribute
    */
-  public List setParamList(List param) {
-    return (List)((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
+  public void setParamList(List param) {
+     ((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
   }
 
   /**getParamList
@@ -171,11 +170,11 @@ public class Structure extends BaseObject {
     return (List) ((XMLAttribute) attribHash.get("paramList")).getAttribValue();
   }
 
-  /**setStructList: set the *structList* attribute
+  /**set the *structList* attribute
    * @return: the current *structList* attribute
    */
-  public List setStructList(List struct) {
-    return (List)((XMLAttribute) attribHash.get("structList")).setAttribValue(struct);
+  public void setStructList(List struct) {
+    ((XMLAttribute) attribHash.get("structList")).setAttribValue(struct);
   }
 
   /**getStructList
@@ -185,11 +184,11 @@ public class Structure extends BaseObject {
     return (List) ((XMLAttribute) attribHash.get("structList")).getAttribValue();
   }
 
-  /**setArrayList: set the *arrayList* attribute
+  /**set the *arrayList* attribute
    * @return: the current *arrayList* attribute
    */
-  public List setArrayList(List array) {
-    return (List) ((XMLAttribute) attribHash.get("arrayList")).setAttribValue(array);
+  public void setArrayList(List array) {
+     ((XMLAttribute) attribHash.get("arrayList")).setAttribValue(array);
   }
 
   /**getArrayList
@@ -199,11 +198,11 @@ public class Structure extends BaseObject {
     return (List) ((XMLAttribute) attribHash.get("arrayList")).getAttribValue();
   }
 
-  /**setNoteList: set the *noteList* attribute
+  /**set the *noteList* attribute
    * @return: the current *noteList* attribute
    */
-  public List setNoteList(List note) {
-    return (List)((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
+  public void setNoteList(List note) {
+    ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
   }
 
   /**getNoteList
@@ -213,12 +212,11 @@ public class Structure extends BaseObject {
     return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
   }
 
-  /** setParamGroupOwnedHash
+  /** 
   */
-  public Set setParamGroupOwnedHash(Set paramGroup)
+  public void setParamGroupOwnedHash(Set paramGroup)
   {
     paramGroupOwnedHash = paramGroup;
-    return paramGroupOwnedHash;
   }
 
   /** getParamGroupOwnedHash
@@ -428,6 +426,9 @@ public class Structure extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2000/11/08 22:30:11  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.11  2000/11/08 20:10:04  thomas
  * Trimmed down import path to just needed classes -b.t
  *

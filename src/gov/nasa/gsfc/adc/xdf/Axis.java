@@ -113,13 +113,11 @@ public class Axis extends BaseObject implements AxisInterface {
   //Get/Set Methods
   //
 
-  /**setName: set the *name* attribute
-   * @return: the current *name* attribute
+  /** set the *name* attribute
    */
-  public String setName (String strName)
+  public void setName (String strName)
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
-
+     ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
    /**getName
@@ -130,12 +128,11 @@ public class Axis extends BaseObject implements AxisInterface {
     return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
   }
 
-   /**setDescription: set the *description* attribute
-   * @return: the current *description* attribute
+   /** set the *description* attribute
    */
-  public String setDescription (String strDesc)
+  public void setDescription (String strDesc)
   {
-    return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+     ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
 
   }
 
@@ -146,15 +143,14 @@ public class Axis extends BaseObject implements AxisInterface {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
   }
 
-  /**setAxisDataType: set the *axisDatatype* attribute
-   * @return: the current *axisDatatype* attribute
+  /** set the *axisDatatype* attribute
    */
-  public String setDatatype(String strDatatype)
+  public void setDatatype(String strDatatype)
   {
     if (Utility.isValidDatatype(strDatatype))
-      return (String) ((XMLAttribute) attribHash.get("axisDatatype")).setAttribValue(strDatatype);
+      ((XMLAttribute) attribHash.get("axisDatatype")).setAttribValue(strDatatype);
     else
-      return null;
+      Log.warnln("Datatype is not valid, ignoring set request.");
   }
 
   /**getAxisDatatype
@@ -165,12 +161,11 @@ public class Axis extends BaseObject implements AxisInterface {
     return (String) ((XMLAttribute) attribHash.get("axisDatatype")).getAttribValue();
   }
 
-  /**setAxisUnits: set the *axisUnits* attribute
-   * @return: the current *axisUnits* attribute
+  /** set the *axisUnits* attribute
    */
-  public Units setAxisUnits (Units units)
+  public void setAxisUnits (Units units)
   {
-    return (Units) ((XMLAttribute) attribHash.get("axisUnits")).setAttribValue(units);
+     ((XMLAttribute) attribHash.get("axisUnits")).setAttribValue(units);
   }
 
   /**getAxisUnits
@@ -181,12 +176,11 @@ public class Axis extends BaseObject implements AxisInterface {
     return (Units) ((XMLAttribute) attribHash.get("axisUnits")).getAttribValue();
   }
 
-  /**setAxisId: set the *axisId* attribute
-   * @return: the current *axisId* attribute
+  /** set the *axisId* attribute
    */
-  public String setAxisId (String strAxisId)
+  public void setAxisId (String strAxisId)
   {
-    return (String) ((XMLAttribute) attribHash.get("axisId")).setAttribValue(strAxisId);
+     ((XMLAttribute) attribHash.get("axisId")).setAttribValue(strAxisId);
 
   }
 
@@ -198,12 +192,11 @@ public class Axis extends BaseObject implements AxisInterface {
     return (String) ((XMLAttribute) attribHash.get("axisId")).getAttribValue();
   }
 
-  /**setAxisIdRef: set the *axisIdRef* attribute
-   * @return: the current *axisIdRef* attribute
+  /** set the *axisIdRef* attribute
    */
-  public String setAxisIdRef (String strAxisIdRef)
+  public void setAxisIdRef (String strAxisIdRef)
   {
-    return (String) ((XMLAttribute) attribHash.get("axisIdRef")).setAttribValue(strAxisIdRef);
+     ((XMLAttribute) attribHash.get("axisIdRef")).setAttribValue(strAxisIdRef);
 
   }
 
@@ -215,11 +208,10 @@ public class Axis extends BaseObject implements AxisInterface {
     return (String) ((XMLAttribute) attribHash.get("axisIdRef")).getAttribValue();
   }
 
-  /**setValueList: set the *valueList* attribute
-   * @return: the current *valueList* attribute
+  /** set the *valueList* attribute
    */
-  public List setValueList(List value) {
-    return (List)((XMLAttribute) attribHash.get("valueList")).setAttribValue(value);
+  public void setValueList(List value) {
+     ((XMLAttribute) attribHash.get("valueList")).setAttribValue(value);
   }
 
   /**getValueList
@@ -231,10 +223,9 @@ public class Axis extends BaseObject implements AxisInterface {
 
   /** setValueGroupOwnedHash
   */
-  public Set setValueGroupOwnedHash(Set valueGroup)
+  public void setValueGroupOwnedHash(Set valueGroup)
   {
     valueGroupOwnedHash = valueGroup;
-    return valueGroupOwnedHash;
   }
 
   /** getValueGroupOwnedHash
@@ -277,61 +268,57 @@ public class Axis extends BaseObject implements AxisInterface {
 
    /**setAxisValue: Set the value of this axis at the given index.
     *  @param: Value, index
-    * @return: Value ref if successful, null if not
     */
 
-    public Value setAxisValue(int index, Value valueObj) {
+    public void setAxisValue(int index, Value valueObj) {
+
       if (valueObj == null) {
         Log.error("in Axis, setAxisValue(), the Value passed in is null");
-        return null;
+        return;
       }
+
       List values = getValueList();
       if (index < 0 || index >length) {  //invalid index
         Log.error("in Axis, setAxisValue(), the index is out of range");
-        return null;
+        return;
       }
 
       if (index == length) {  //add value to the end of valueList
         Log.warn("the index is actually the current valueList length, bumping the length by 1");
         length++;
         values.add(valueObj);
-        return valueObj;
       }
       else {  //replace the value
          values.remove(index);
          values.add(index, valueObj);
-         return valueObj;
       }
 
     }
 
 
-    /**setAxisValue: Set the value of this axis at the given index.
+    /** Set the value of this axis at the given index.
     * @param: UnitDirection, index
-    * @return: UnitDirection ref if successful, null if not
     */
 
-    public UnitDirection setAxisValue(int index, UnitDirection unitDirectionObj) {
+    public void setAxisValue(int index, UnitDirection unitDirectionObj) {
       if (unitDirectionObj== null) {
         Log.error("in Axis, setAxisValue(), the unitDirectionObj passed in is null");
-        return null;
+        return;
       }
       List values = getValueList();
       if (index < 0 || index >length) {  //invalid index
         Log.error("in Axis, setAxisValue(), the index is out of range");
-        return null;
+        return;
       }
 
       if (index == length) {  //add value to the end of valueList
         Log.warn("the index is actually the current valueList length, bumping the length by 1");
         length++;
         values.add(unitDirectionObj);
-        return unitDirectionObj;
       }
       else {  //replace the value
          values.remove(index);
          values.add(index, unitDirectionObj);
-         return unitDirectionObj;
       }
 
     }
@@ -513,6 +500,9 @@ public class Axis extends BaseObject implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2000/11/08 22:30:12  thomas
+ * Changed set methods to return void. -b.t.
+ *
  * Revision 1.11  2000/11/08 19:24:56  thomas
  * Trimmed import statements to just needed classes. -b.t.
  *
