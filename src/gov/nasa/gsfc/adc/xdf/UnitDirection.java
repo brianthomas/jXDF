@@ -29,7 +29,7 @@ package gov.nasa.gsfc.adc.xdf;
  * @version $Revision$
   */
 
-public class UnitDirection extends BaseObject{
+public class UnitDirection extends BaseObject {
 
    public UnitDirection () {
 
@@ -44,6 +44,9 @@ public class UnitDirection extends BaseObject{
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/07/19 21:59:09  thomas
+ * trivial change to class decl. line.
+ *
  * Revision 1.3  2001/05/10 21:43:06  thomas
  * added resetXMLAttributes to init().
  *
