@@ -286,7 +286,7 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     attribHash.put("fieldList", new XMLAttribute(Collections.synchronizedList(new ArrayList(super.sDefaultDataArraySize)), Constants.LIST_TYPE));
     attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("aligh", new XMLAttribute(null, Constants.STRING_TYPE));  //double check??
+    attribHash.put("align", new XMLAttribute(null, Constants.STRING_TYPE));  //double check??
     attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
 
@@ -299,6 +299,9 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.7  2000/11/02 17:52:20  kelly
+  * minor mix
+  *
   * Revision 1.6  2000/11/01 21:59:58  thomas
   * Added add/removeFieldGroup methods. -b.t.
   *
