@@ -101,3 +101,7 @@
                       - small fixes needed by FITSML
 
 
+0.18-alpha  12/12/01  - added byte offset reading
+                      - fixed bug where various types of FTP/HTTP transfer could screw up metadata
+                        for reading some kinds of Delimited/Formatted IOStyles.
+
