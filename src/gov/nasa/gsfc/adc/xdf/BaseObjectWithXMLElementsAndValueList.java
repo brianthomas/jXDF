@@ -110,33 +110,19 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
    // Other Public Methods
    //
 
-   /** Write this object and all the objects it owns to the supplied
-       OutputStream object as XDF. This method overrides the BaseObject
-       version, allowing the XMLElementNode children to be written out, should
-       they exist in the object.
-       @deprecated Use the toXMLWriter method instead.
-    */
-   public void toXMLOutputStream (
-                                   OutputStream outputstream,
-                                   String indent,
-                                   boolean dontCloseNode,
-                                   String newNodeNameString,
-                                   String noChildObjectNodeName
-                                 )
-   throws java.io.IOException
-   {
 
-       Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
-       toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+   public Object clone() throws CloneNotSupportedException {
+      BaseObjectWithXMLElementsAndValueList cloneObj = (BaseObjectWithXMLElementsAndValueList) super.clone();
 
-      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
-      // on SUN and Linux platforms show that it is. Hopefully we can remove
-      // this in the future.
-      outputWriter.flush();
-
+      cloneObj.valueListObjects = (ArrayList) valueListObjects.clone();
+      return cloneObj;
    }
-   
-   public void toXMLWriter (
+
+   //
+   // Protected Methods
+   //
+
+   protected void basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -341,24 +327,12 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
    
          }
    
-         if (Specification.getInstance().isPrettyXDFOutput() && nodeNameString != null ) 
-	     outputWriter.write( Constants.NEW_LINE);
+//         if (Specification.getInstance().isPrettyXDFOutput() && nodeNameString != null ) 
+//	     outputWriter.write( Constants.NEW_LINE);
 
       } //end synchronize
 
    }
-
-
-   public Object clone() throws CloneNotSupportedException {
-      BaseObjectWithXMLElementsAndValueList cloneObj = (BaseObjectWithXMLElementsAndValueList) super.clone();
-
-      cloneObj.valueListObjects = (ArrayList) valueListObjects.clone(); 
-      return cloneObj;
-   }
-
-   //
-   // Protected Methods
-   //
 
    /** a special method used by constructor methods to
        conviently build the XML attribute list for a given class.
@@ -376,6 +350,9 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
 /** Modification Log 
   *
   * $Log$
+  * Revision 1.5  2001/09/05 22:05:38  thomas
+  * yanked toXMLWriter/toXMLOutputStream methods in favor of basicXMLWriter implementation
+  *
   * Revision 1.4  2001/09/04 21:17:16  thomas
   * added deprecated tag to toXMLOutputStream docs
   *

@@ -109,34 +109,23 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
       return getXMLElementNodeList().remove(element);
    }
 
-   /** Write this object and all the objects it owns to the supplied
-       OutputStream object as XDF. This method overrides the BaseObject
-       version, allowing the XMLElementNode children to be written out, should
-       they exist in the object.
-       @deprecated Use the toXMLWriter method instead.
-    */
-   public void toXMLOutputStream (
-                                   OutputStream outputstream,
-                                   String indent,
-                                   boolean dontCloseNode,
-                                   String newNodeNameString,
-                                   String noChildObjectNodeName
-                                 )
-   throws java.io.IOException
-   {
+   public Object clone() throws CloneNotSupportedException {
 
+      BaseObjectWithXMLElements cloneObj = (BaseObjectWithXMLElements) super.clone();
 
-       Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
-       toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
-
-       // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
-       // on SUN and Linux platforms show that it is. Hopefully we can remove
-       // this in the future.
-       outputWriter.flush();
-
+      cloneObj.xmlElementList = Collections.synchronizedList(new ArrayList());
+      int stop = this.xmlElementList.size();
+      for (int i = 0; i < stop; i++) {
+          cloneObj.xmlElementList.add( ((XMLElementNode) this.xmlElementList.get(i)).clone());
+      }
+      return cloneObj;
    }
 
-   public void toXMLWriter (
+   //
+   // Protected Methods
+   //
+
+   protected void basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -289,28 +278,12 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
    
          }
    
-         if (Specification.getInstance().isPrettyXDFOutput() && nodeNameString != null ) 
-	     outputWriter.write( Constants.NEW_LINE);
+         // if (Specification.getInstance().isPrettyXDFOutput() && nodeNameString != null ) 
+	 //    outputWriter.write( Constants.NEW_LINE);
 
       } //end synchronize
 
    }
-
-   public Object clone() throws CloneNotSupportedException {
-
-      BaseObjectWithXMLElements cloneObj = (BaseObjectWithXMLElements) super.clone();
-
-      cloneObj.xmlElementList = Collections.synchronizedList(new ArrayList());
-      int stop = this.xmlElementList.size();
-      for (int i = 0; i < stop; i++) {
-          cloneObj.xmlElementList.add( ((XMLElementNode) this.xmlElementList.get(i)).clone());
-      }
-      return cloneObj;
-   }
-
-   //
-   // Protected Methods
-   //
 
    /** a special method used by constructor methods to
        conviently build the XML attribute list for a given class.
