@@ -233,6 +233,10 @@ public class Log {
       e.printStackTrace((PrintStream) output); 
   }
 
+  public static void printStackTrace (Throwable t) {
+      t.printStackTrace((PrintStream) output); 
+  }
+
 }
 
 /**
