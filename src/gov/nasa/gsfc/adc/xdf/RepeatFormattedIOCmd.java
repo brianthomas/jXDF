@@ -35,7 +35,7 @@ import java.util.List;
 /** this class handles the repeat ELEMENT
    @version $Revision$
  */
-public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOCmd {
+public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
 
   //
   //Fields
@@ -57,7 +57,6 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   //no-arg constructor
   public RepeatFormattedIOCmd ()
   {
-
      init();
   }
 
@@ -69,11 +68,11 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   public void RepeatFormattedIOCmd ( Hashtable InitXDFAttributeTable )
   {
 
-    // init the XML attributes (to defaults)
-    init();
+     // init the XML attributes (to defaults)
+     init();
 
-    // init the value of selected XML attributes to HashTable values
-    hashtableInitXDFAttributes(InitXDFAttributeTable);
+     // init the value of selected XML attributes to HashTable values
+     hashtableInitXDFAttributes(InitXDFAttributeTable);
 
   }
 
@@ -149,19 +148,27 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
         int stop = formatCommandList.size();
         cloneObj.formatCommandList = Collections.synchronizedList(new ArrayList(stop));
         for (int i = 0; i <stop; i++) {
-          cloneObj.formatCommandList.add(((XMLDataIOStyle)formatCommandList.get(i)).clone());
+          cloneObj.formatCommandList.add(((BaseObject)formatCommandList.get(i)).clone());
         }
         return cloneObj;
       } //synchronize
     } //synchronize
    }
 
-  //
-  // Protected Methods
-  //
-
-  protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
+  public void toXMLOutputStream (
+                                   OutputStream outputstream,
+                                   Hashtable XMLDeclAttribs,
+                                   String indent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
+                                )
   {
+
+     if (Specification.getInstance().isPrettyXDFOutput()) {
+        writeOut(outputstream, indent);
+     }
+
      //open the code
      writeOut(outputstream, "<" + classXDFNodeName);
      writeOut(outputstream, " "+COUNT_XML_ATTRIBUTE_NAME+"=\"");
@@ -169,27 +176,29 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
      writeOut(outputstream, "\"");
 
      writeOut(outputstream, ">");
+     if (Specification.getInstance().isPrettyXDFOutput()) {
+         writeOut(outputstream, Constants.NEW_LINE);
+     }
 
      //write out nodes in formatCommandList
      synchronized (formatCommandList) {
-      int stop = formatCommandList.size();
-      String moreIndent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-      for (int i = 0; i <stop; i++) {
-         if (Specification.getInstance().isPrettyXDFOutput()) {
-            writeOut(outputstream, Constants.NEW_LINE);
-            writeOut(outputstream, moreIndent);
-         }
-        ((XMLDataIOStyle) formatCommandList.get(i)).specificIOStyleToXDF(outputstream, moreIndent);
-      }
+       int stop = formatCommandList.size();
+       String moreIndent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
+       for (int i = 0; i <stop; i++) {
+         ((BaseObject) formatCommandList.get(i)).toXMLOutputStream(outputstream, moreIndent);
+       }
      }
 
      //close the node
      if (Specification.getInstance().isPrettyXDFOutput()) {
-      writeOut(outputstream, Constants.NEW_LINE);
-      writeOut(outputstream, indent);
+       // writeOut(outputstream, Constants.NEW_LINE);
+        writeOut(outputstream, indent);
      }
      writeOut(outputstream, "</" + classXDFNodeName + ">");
 
+     if (Specification.getInstance().isPrettyXDFOutput()) {
+        writeOut(outputstream, Constants.NEW_LINE);
+     }
   }
 
   //
@@ -201,6 +210,9 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
    */
   protected void init()
   {
+
+    resetXMLAttributes();
+
     classXDFNodeName = "repeat";
 
     attribOrder.add(0, COUNT_XML_ATTRIBUTE_NAME);
@@ -213,6 +225,11 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/05/10 21:38:04  thomas
+ * added resetXMLAttributes to init().
+ * replaced specificIOStyleToXDF w/ appropriate
+ * toXMLOutputStream method.
+ *
  * Revision 1.7  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
  *

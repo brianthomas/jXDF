@@ -33,7 +33,7 @@ import java.util.List;
 /** this class handles the skipChar ELEMENT
    @version $Revision$
  */
-public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedIOCmd {
+public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd {
 
   //
   //Fields
@@ -54,7 +54,6 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
   //no-arg constructor
   public SkipCharFormattedIOCmd ()
   {
-
      init();
   }
 
@@ -109,7 +108,20 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
   // Protected Methods
   //
 
-  protected void specificIOStyleToXDF( OutputStream outputstream, String indent) {
+  public void toXMLOutputStream (
+                                   OutputStream outputstream,
+                                   Hashtable XMLDeclAttribs,
+                                   String indent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
+                                )
+  {
+
+    boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
+
+    if(niceOutput) writeOut(outputstream, indent);
+
     synchronized (attribHash) {
       //open the node
       writeOut(outputstream, "<" + classXDFNodeName);
@@ -134,6 +146,8 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
       writeOut(outputstream, "/>");
     }
 
+    if(niceOutput) writeOut(outputstream, Constants.NEW_LINE);
+
   }
 
   /** special method used by constructor methods to
@@ -141,6 +155,8 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
    */
   protected void init()
   {
+
+    resetXMLAttributes();
     classXDFNodeName = "skipChars";
 
     attribOrder.add(0, OUTPUT_STRING_XML_ATTRIBUTE_NAME);
@@ -157,6 +173,11 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/05/10 21:40:20  thomas
+ * added resetXMLAttributes to init().
+ * replaced specificIOStyleToXDF w/ appropriate
+ * toXMLOutputStream method.
+ *
  * Revision 1.7  2001/02/07 18:44:04  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These
