@@ -28,9 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
-  //
-  // Internal Classes
-  //
 
   /** Stores values of XML-based attributes of the XDF object.
       These attributes will be used to re-construct an XDF file/stream
@@ -127,6 +124,9 @@ import java.util.ArrayList;
 /* Modification History
  * 
  * $Log$
+ * Revision 1.9  2000/11/09 23:26:48  kelly
+ * fixed a little documentation.
+ *
  * Revision 1.8  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *
