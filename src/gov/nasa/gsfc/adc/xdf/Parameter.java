@@ -28,7 +28,7 @@ import java.util.*;
 
 /**
  * Parameter.java: An XDF::Parameter describes a scientific parameter assocated
- * with the L<XDF::Structure> or L<XDF::Array> that it is contained in.
+ * with the Structure or Array object that it is contained in.
  * Parameter is a flexible container for holding what is essentially information
  * about data but is not needed to read/write/manipulate the data in a
  *  mathematical sense.
@@ -45,20 +45,29 @@ import java.util.*;
   * paramIdRef--
   * a  string holding the parameter id reference to another parameter.
   * datatype--
-  * holds object reference to a single datatype (L<XDF::DataFormat>) object for this axis.
+  * holds object reference to a single datatype (DataFormat) object for this axis.
   * units--
-  * reference of the L<XDF::Units> object of this parameter. The XDF::Units object
+  * reference of the Units object of this parameter. The XDF::Units object
   * is used to hold the XDF::Unit objects.
   * noteList--
-  * list reference to the L<XDF::Note> objects held within this parameter.
+  * list reference to the Note objects held within this parameter.
   * valueList--
-  * list reference to the L<XDF::Value> objects held within in this parameter.
+  * list reference to the Value objects held within in this parameter.
   */
 
 
- public class Parameter extends BaseObject{
+public class Parameter extends BaseObject {
 
- //
+  //
+  // Fields
+  //
+
+  /** This field stores object references to those value group objects
+    * to which this object belongs
+    */
+  protected Set valueGroupOwnedHash = Collections.synchronizedSet(new HashSet());
+
+  //
   // Constructor and related methods
   //
 
@@ -272,6 +281,34 @@ import java.util.*;
      return removeFromList(what, getValueList(), "valueList");
   }
 
+
+   /**Insert a ValueGroup object into this object to group the parameter values.
+   * @Value: ValueGroup to be added
+   * @return:a ValueGroup object reference on success, null on failure.
+   */
+  public ValueGroup addValueGroup (ValueGroup group) {
+    if (group !=null) {
+      //add the group to the groupOwnedHash
+      valueGroupOwnedHash.add(group);
+      return group;
+    }
+    else {
+      Log.warn("in Parameter,addValueGroup(). ValueGroup passed in is null");
+      return null;
+    }
+  }
+
+  /**removeValueGroup: remove a ValueGroup object from this object
+   * @Value: ValueGroup to be removed
+   * @return: true on success, false on failure
+   */
+  public boolean removeValueGroup(ValueGroup group) {
+    if (group == null) {
+      Log.warn("in Axis,removeValueGroup().  ValueGroup passed in is null");
+      return false;
+    }
+    return valueGroupOwnedHash.remove(group);
+  }
 
 
   /**removeValue: removes an XDF::Value from the list of values in this Parameter object
