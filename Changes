@@ -74,3 +74,6 @@
                         be needed at all now. Note that we are not making full use of namespaces (yet).
                       - tightening of toXMLOutputstream method. Only XDF object may print notation hash,
                         DOCTYPE and xml decl statement.
+                      - added toXMLString method to BaseObject. All inheriting classes may now write
+                        their XML representation string when called.
+                      - added class XML attribute to FieldGroup.

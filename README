@@ -1,62 +1,84 @@
 
 
+   About XDF
+   ---------
+
+        XDF is the "eXtensible Data Format', an XML data format based on general 
+        mathematical principles including concepts such as errors, upper limits,
+        physical units, alignment of axes, parallel vectors, etc). It is capable
+        of handling nearly any species of scientific/mathematical data. Among the 
+        benefits of using XML to handle this type of data is the possibility of 
+        using a single format from data source (instrument) to the scientist, to 
+        the journal publication, to data centers, and to the public. The aim of 
+        XDF is to provides all of the needed constucts within XML to accomplish 
+        this goal. See the XDF homepage for more information about XDF:
+
+           http://xml.gsfc.nasa.gov/XDF/XDF_home.html
+
+
    About this package.
    ------------------
 
-	This is a beta release. This means that all forseen
-	functionality has been implemented, but many bugs may remain. Note
-        that we reserve the right to significantly revise the API as
-        need suits us.
+        This package is designed to provide an IO layer for XDF objects. It will
+        read/write XDF objects to disk. XDF objects themselves contain all the 
+        hooks needed to access/manipulate information within the XDF model.  
 
-	This code is released under the GNU GENERAL PUBLIC LICENSE
- 	and is freeware. Please refer to the GPL.TXT file included
-	in this distribution for more information on the terms of 
-	this license.
+	This package is a beta release. This means that all forseen functionality 
+        has been implemented, but many bugs may remain. Note that we reserve the 
+        right to significantly revise the API as need suits us.
 
-        To use the XDF package you will need to acquire the Java API 
-        for XML Processing (JAXP) Package (version 1.1) which provides 
-        the functionality for reading, manipulating, and generating 
-        XML documents that are the basis of XDF.
-        The JAXP package is available from SUN (http://developer.java.sun.com
-        or http://developer.java.sun.com/developer/earlyAccess/xml/ if you
-        can login already as Java Sun developer) which includes the crimson parser
-        which is the default XML parser for XDF. Note that XDF allows
-        you to use any other SAX2 compliant XML parser (such as Xerces
-        from the Apache project; http://xml.apache.org/xerces-j/index.html)
-        which do not ship with JAXP.
+	This code is released under the GNU GENERAL PUBLIC LICENSE and is 
+        freeware.  Please refer to the GPL.TXT file included in this distribution 
+        for more information on the terms of this license.
 
-	As you might guess from its name this package is currently somewhat
-        stable, with only infreqent modification to the interface of
-        available classes. Nevertheless, this package is NOT mature (yet),
-        and we are still chasing down bugs. Please keep this in mind if you are 
-        considering the adoption of this software for production enviroments.
+        To use the XDF package you will need to acquire the Java API for XML 
+        Processing (JAXP) Package (version 1.1) which provides the functionality
+        for 
+        reading, manipulating, and generating XML documents that are the basis of 
+        XDF.  The JAXP package is available from SUN: 
 
-	This package supports SAX1 parsering (e.g. no namespaces). SAX2 
-        and schema will be supported as soon as these become comfortably 
-        mature W3C recogmendations. 
+            http://developer.java.sun.com 
 
-	For more details on missing features/problems that remain in 
-	the package please refer to the TODO file.
+        or 
+
+            http://developer.java.sun.com/developer/earlyAccess/xml/ 
+
+        Use the later URL if you can login already as Java Sun developer. JAXP 
+        includes the crimson parser which is the default XML parser for XDF but 
+        note that XDF allows you to use any other SAX2 compliant XML parser (such 
+        as Xerces from the Apache project: 
+
+            http://xml.apache.org/xerces-j/index.html
+
+	As you might guess from its name this package is currently somewhat stable, 
+        with only infreqent modification to the interface of available classes. 
+        Nevertheless, this package is NOT mature (yet), and we are still chasing 
+        down bugs. Please keep this in mind if you are considering the adoption of 
+        this software for production enviroments.
+
+	This package supports SAX1 parsering (e.g. no namespaces). SAX2 and schema 
+        will be supported as soon as these become comfortably mature W3C 
+        recogmendations. 
+
+	For more details on missing features/problems that remain in the package 
+        please refer to the TODO file.
 
 	Please report bugs, patches, comments and feature requests to 
-        xdf-dev@xdf.gsfc.nasa.gov.
+
+           xdf-dev@xdf.gsfc.nasa.gov.
 
 	See the samples directory for sample code, a DTD and xml files.
-
-	See the XDF homepage for more information about XDF:
-
-	http://tarantella.gsfc.nasa.gov/xml/XDFhome.html
 
 
   CVS Repository and Guest FTP Access
   -----------------------------------
 
-	Read only access to the nightly snapshot is allowed for people who
-	have downloaded this code once from the main site. The CVS account
-	is "guest" which has a password "gu3stacc3ss". The XDF java package
-     	directory is "xml/XDF/Java_Package" and the CVSROOT directory is 
-	"/home/cvsadmin/src". Here is an example of how you can use this 
-	information to obtain a nightly CVS snapshot (UNIX tcsh):
+	Read only access to the nightly snapshot is allowed for people who have 
+        downloaded this code once from the main site. The CVS account is "guest" 
+        which has a password "gu3stacc3ss". The XDF java package directory is 
+        "xml/XDF/Java_Package" and the CVSROOT directory is "/home/cvsadmin/src". 
+        Here is an example of how you can use this information to obtain a nightly 
+        CVS snapshot (UNIX tcsh):
 
 	> setenv CVSROOT :pserver:guest@xdf.gsfc.nasa.gov:/home/cvsadmin/src
 
@@ -72,34 +94,34 @@
         available from xdf.gsfc.nasa.gov. Use your email address as a password to
         log in.
         
+   For further information concerning this code:
+   ---------------------------------------------
+
+       Email contact:
+
+           Brian Thomas <thomas@adc.gsfc.nasa.gov> 
+
+       Major release announcements occur on the xdf-announce mailing list, please 
+       join if you are interested in this information.
+
+       Mailing lists (and list archives) available at:
+
+           http://xdf.gsfc.nasa.gov/
+
 
    Credits
    -------
 
-       The Java XDF Package was developed by programmers at
-       Raytheon Technical Services Company, Lanham MD,  
-       and Century Computing, a Division of AppNet, Inc. under contract of
-       the Astronomical Data Center, Code 631, NASA/GSFC.
+       The Java XDF Package was developed by programmers at Raytheon Technical 
+       Services Company, Lanham MD,  and Century Computing, a Division of AppNet, 
+       Inc. under contract of the Astronomical Data Center, Code 631, NASA/GSFC.
 
        Individual credits for material included in this package :
 
-       Brian Thomas (Project design and lead programmer) 
-       Kelly Zeng   (Porting of Perl to Java, several new classes unforseen by Brian) 
-       Lynne Case   (Code review and critical comments) 
+       Brian Thomas (Project design and lead programmer)
+       Kelly Zeng   (Porting of Perl to Java, additional classes)  
+       Ping Huang   (additional convience methods)
+       Lynne Case   (Code review and critical comments)
        Ed Shaya     (XDF DTD development)
-
-
-   For information concerning this code:
-   ------------------------------------
-
-   Email contact:
-
-      Brian Thomas <thomas@adc.gsfc.nasa.gov> 
-
-   Major release announcements occur on the xdf-announce mailing list, 
-   please join if you are interested in this information.
-
-   Mailing lists (and list archives) available at:
-      http://xdf.gsfc.nasa.gov/
 
 

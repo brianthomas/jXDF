@@ -9,16 +9,21 @@
         that code.) 
         ------------------------------------------------------------
 
+        - consider getByte/getLogical (boolean) methods. Q: how to store internally?
+          using just a primative int array will waste memory but is a short-cut.
+
+	- move Endian attribute from XMLDataIOStyle to Binary dataformat classes.
+
         - XDF validator application.
 
 	- add logarithm attribute to Units class (per new DTD).
 
-        - UTF16 not implemented (at least not checked, reading *may* work).
+        - UTF16/iso8859-2/etc encoding not implemented for writing (reading *should* 
+          work). We need to snarf and hold onto the XMLDecl for encoding an use
+          appropriately in toXMLWriter methods.
 
-        - unique axisId's are not enforced, but should be.
-
-        - resolve issue with writing float/exponential data (e.g. the "-.9" to
-  	  "-0.9" issue. Does Java XDF have this problem?)
+        - unique axisId's are not enforced, but should be. Overall we should hide
+	  id/idref sillyness from the programmer.
 
         - Clean up debugging messages. Improve and make consistent error messaging
           within the package. Missing any Exception classes?
