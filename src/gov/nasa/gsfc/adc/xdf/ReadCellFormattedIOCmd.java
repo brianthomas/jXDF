@@ -64,24 +64,6 @@ public class ReadCellFormattedIOCmd extends BaseObject implements FormattedIOCmd
   // Protected Methods
   //
 
-/*
-  public void toXMLOutputStream (
-                                   OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
-                                   String indent,
-                                   boolean dontCloseNode,
-                                   String newNodeNameString,
-                                   String noChildObjectNodeName
-                                )
-  {
-     writeOut(outputstream, "<" + classXDFNodeName + "/>");
-  }
-*/
-
-  //
-  // Protected Methods
-  //
-
   /** special method used by constructor methods to
       convienently build the XML attribute list for a given class.
    */
@@ -97,6 +79,9 @@ public class ReadCellFormattedIOCmd extends BaseObject implements FormattedIOCmd
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/07/19 21:58:09  thomas
+ * removed commented out toXMLOutputStream stuff.
+ *
  * Revision 1.4  2001/05/10 21:24:44  thomas
  * added resetXMLAttributes to init().
  * replaced specificIOStyleToXDF w/ appropriate
