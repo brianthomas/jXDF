@@ -1010,8 +1010,9 @@ public class SaxDocumentHandler implements DocumentHandler {
 
                     // override attrs with those in passed list
                     newaxis.setXMLAttributes(attrs);
-                    // give the clone a unique axisId
+                    // give the clone a unique Id and remove IdRef 
                     newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId())); 
+                    newaxis.setAxisIdRef(null);
 
                     // add this into the list of axis objects
                     AxisObj.put(newaxis.getAxisId(), newaxis);
@@ -1412,8 +1413,10 @@ public class SaxDocumentHandler implements DocumentHandler {
 
                 // override attrs with those in passed list
                 newfield.setXMLAttributes(attrs);
-                // give the clone a unique fieldId
+
+                // give the clone a unique Id and remove IdRef 
                 newfield.setFieldId(findUniqueIdName(FieldObj, newfield.getFieldId())); 
+                newfield.setFieldIdRef(null);
 
                 // add this into the list of field objects
                 FieldObj.put(newfield.getFieldId(), newfield);
@@ -1488,8 +1491,10 @@ public class SaxDocumentHandler implements DocumentHandler {
 
                     // override attrs with those in passed list
                     newfieldaxis.setXMLAttributes(attrs);
-                    // give the clone a unique axisId
+
+                    // give the clone a unique Id and remove IdRef 
                     newfieldaxis.setAxisId(findUniqueIdName(AxisObj, newfieldaxis.getAxisId())); 
+                    newfieldaxis.setAxisIdRef(null);
 
                     // add this into the list of axis objects
                     AxisObj.put(newfieldaxis.getAxisId(), newfieldaxis);
@@ -1711,12 +1716,12 @@ public class SaxDocumentHandler implements DocumentHandler {
                     System.exit(-1);
                  }
 
-
-
                  // override attrs with those in passed list
                  newnote.setXMLAttributes(attrs);
-                 // give the clone a unique Id
+
+                 // give the clone a unique Id and remove IdRef 
                  newnote.setNoteId(findUniqueIdName(NoteObj, newnote.getNoteId())); 
+                 newnote.setNoteIdRef(null);
 
                  // add this into the list of note objects
                  NoteObj.put(newnote.getNoteId(), newnote);
@@ -2044,8 +2049,9 @@ public class SaxDocumentHandler implements DocumentHandler {
                    // override attrs with those in passed list
                    readObj.hashtableInitXDFAttributes(DataIOStyleAttribs);
 
-                   // give the clone a unique Id
+                   // give the clone a unique Id and remove IdRef 
                    readObj.setReadId(findUniqueIdName(ReadObj, readObj.getReadId()));
+                   readObj.setReadIdRef(null);
 
                    // add this into the list of note objects
                    ReadObj.put(readObj.getReadId(), readObj);
@@ -2640,6 +2646,11 @@ public class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2000/11/22 22:04:06  thomas
+ * Cloned objects for Id/IDRef stuff *shouldnt* have
+ * an idRef after cloning. Inserted line to set this
+ * attribute to null in the new object. -b.t.
+ *
  * Revision 1.18  2000/11/22 21:23:24  thomas
  * Implimented Formatted Reads. Fixed AxisId/IdRef
  * problem of not having unique id on cloned axis.
