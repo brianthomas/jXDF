@@ -1,7 +1,7 @@
 // XDF AxisInterface Class
 // CVS $Id$
 
-// AxisInterface.java Copyright (C) 2000 Brian Thomas,
+// AxisInterface.java Copyright (C) 2001 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
 
@@ -28,15 +28,20 @@ package gov.nasa.gsfc.adc.xdf;
  *   and FieldAxis
  */
 
-public interface AxisInterface {
+public interface AxisInterface extends BaseObjectWithXMLElementsInterface {
+
   public int getLength();
   public String getAxisId();
   public String getAlign();
+
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2001/05/04 20:17:15  thomas
+ * Now extends BaseObjectWithXMLElementsInterface
+ *
  * Revision 1.5  2001/02/07 18:42:57  thomas
  * No real change. -b.t.
  *
