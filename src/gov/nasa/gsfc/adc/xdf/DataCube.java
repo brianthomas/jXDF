@@ -388,6 +388,119 @@ throws NoDataException
 
 }
 
+/** Get short (16-bit) integer data from a requested datacell. 
+ */
+public short getShortData (Locator locator)
+throws NoDataException
+{
+  List axisList = parentArray.getAxes();
+  List current = data;
+  int numOfAxis = axisList.size();
+  if (numOfAxis == 1) {
+    int index = locator.getAxisIndex((Axis) axisList.get(0));
+    try {
+      if (java.lang.reflect.Array.getByte(data.get(0), index) !=1)
+        throw new NoDataException();
+      return java.lang.reflect.Array.getShort(data.get(1), index);
+    }
+    catch (Exception e) {  //the location we try to access is not allocated,
+      //i.e., no data in the cell
+      throw new NoDataException();
+    }
+  }
+
+  for (int i = numOfAxis-1 ; i >= 2; i--) {
+    Axis axis = (Axis) axisList.get(i);
+    int index =  locator.getAxisIndex(axis);
+    current = (List) current.get(index);
+    if (current == null) {  //the location we try to access is not allocated, no data
+      throw new NoDataException();
+    }
+  }
+
+  //special handling for the innermost two layers
+  int index0;
+  int index1;
+  if (parentArray.hasFieldAxis()) {
+    //FieldAxis is always the second to last innermost layer
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1));
+  }
+  else {
+    index0 = locator.getAxisIndex((Axis) axisList.get(1));
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
+  }
+
+  try {
+    if (java.lang.reflect.Array.getByte(current.get(2*index0), index1) !=1)
+      throw new NoDataException();  //the location we try to access contains noDataValue
+
+    return  java.lang.reflect.Array.getShort(current.get(2*index0+1), index1);
+  }
+  catch (Exception e) {  //the location we try to access is not allocated,
+    //i.e., no data in the cell
+    throw new NoDataException();
+  }
+
+}
+
+/** Get long (64-bit) integer data from a requested datacell. 
+ */
+public long getLongData (Locator locator)
+throws NoDataException
+{
+  List axisList = parentArray.getAxes();
+  List current = data;
+  int numOfAxis = axisList.size();
+  if (numOfAxis == 1) {
+    int index = locator.getAxisIndex((Axis) axisList.get(0));
+    try {
+      if (java.lang.reflect.Array.getByte(data.get(0), index) !=1)
+        throw new NoDataException();
+      return java.lang.reflect.Array.getLong(data.get(1), index);
+    }
+    catch (Exception e) {  //the location we try to access is not allocated,
+      //i.e., no data in the cell
+      throw new NoDataException();
+    }
+  }
+
+  for (int i = numOfAxis-1 ; i >= 2; i--) {
+    Axis axis = (Axis) axisList.get(i);
+    int index =  locator.getAxisIndex(axis);
+    current = (List) current.get(index);
+    if (current == null) {  //the location we try to access is not allocated, no data
+      throw new NoDataException();
+    }
+  }
+
+  //special handling for the innermost two layers
+  int index0;
+  int index1;
+  if (parentArray.hasFieldAxis()) {
+    //FieldAxis is always the second to last innermost layer
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1));
+  }
+  else {
+    index0 = locator.getAxisIndex((Axis) axisList.get(1));
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
+  }
+
+  try {
+    if (java.lang.reflect.Array.getByte(current.get(2*index0), index1) !=1)
+      throw new NoDataException();  //the location we try to access contains noDataValue
+
+    return  java.lang.reflect.Array.getLong(current.get(2*index0+1), index1);
+  }
+  catch (Exception e) {  //the location we try to access is not allocated,
+    //i.e., no data in the cell
+    throw new NoDataException();
+  }
+
+}
+
+
 /** get doubleprecision data from a requested datacell. 
  */
 public double getDoubleData(Locator locator) throws NoDataException {
@@ -484,8 +597,36 @@ public double getDoubleData(Locator locator) throws NoDataException {
    public void setData (Locator locator, Integer value)
    throws SetDataException
    {  
+
+      // should determine if short, long or int based on dataformat
+      // here  
       setData(locator, value.intValue());
    }
+
+  /** Set the value of the requested datacell. 
+   *  Overwrites existing datacell value if already populated with a value.
+   */ 
+   public void setData (Locator locator, Long value)
+   throws SetDataException
+   {
+
+      // should determine if short, long or int based on dataformat
+      // here  
+      setData(locator, value.longValue());
+   }
+
+  /** Set the value of the requested datacell. 
+   *  Overwrites existing datacell value if already populated with a value.
+   */
+   public void setData (Locator locator, Short value)
+   throws SetDataException
+   {
+
+      // should determine if short, long or int based on dataformat
+      // here  
+      setData(locator, value.shortValue());
+   }
+
 
   /** Set the value of the requested datacell. 
    *  Overwrites existing datacell value if already populated with a value.
@@ -785,6 +926,284 @@ throws SetDataException
     throw new SetDataException();
   }
 }
+
+public void setData(Locator locator, long numValue)
+throws SetDataException
+{
+  List axisList = parentArray.getAxes();
+  List prev = data;
+  List current = data;
+  int numOfAxis = axisList.size();
+  if (numOfAxis == 1) {
+    Axis axis = (Axis) axisList.get(0);
+    int index = locator.getAxisIndex(axis);
+
+    if (data.get(0) == null) {
+      //used to track if the corresponding cell stores valid data
+      data.set(0,new byte[axis.getLength()]);
+      data.set(1,new int[axis.getLength()]);
+    }
+
+    int arrayLength = ((byte[]) data.get(0)).length;
+    if ( arrayLength< index+1) {  //have to expand the array
+      int toExpandLength = (int) (arrayLength*1.3)+1;  //use 1.3 as the size multiplier
+      if (toExpandLength < index) {  //expand to the size of index (index > arrayLength*1.3)
+        toExpandLength = index+1;
+      }
+
+      //copy the old byte array into the expanded one
+      byte[] oldByteArray = (byte[]) current.get(0);
+      byte[] newByteArray = new byte[toExpandLength];
+      for (int k = 0; k <oldByteArray.length; k++)
+        newByteArray[k]=oldByteArray[k];
+      current.set(0, newByteArray);
+      oldByteArray = null; //force garbage collection
+
+      //copy the old int array into the expanded one
+      int[] oldArray = (int[]) current.get(1);
+      int[] newArray = new int[toExpandLength];
+      for (int k = 0; k <oldArray.length; k++)
+        newArray[k]=oldArray[k];
+      current.set(1, newArray);
+      oldArray = null; //force garbage collection
+    }
+    try {
+      //indicates its corresponding data cell holds vaid data
+      byte b = 1;
+      java.lang.reflect.Array.setByte(current.get(0), index, b);
+
+      //put the data into the requested data cell
+      java.lang.reflect.Array.setLong(current.get(1), index, numValue);
+      return;
+    }
+    catch (Exception e) {
+      throw new SetDataException();
+    }
+  } //  end of if (numOfAxis == 1)
+
+  //contructs arraylist of arraylist to represent the multi-dimension
+  for (int i = numOfAxis-1 ; i >=2; i--) {
+    Axis axis = (Axis) axisList.get(i);
+    int index =  locator.getAxisIndex(axis);
+    int end = axis.getLength() - prev.size();
+    for (int k = 0; k < end ; k++)  //expand it if prev.size < index+1
+      prev.add(null);
+    current = (List) prev.get(index);
+    if (current == null) {  //expand the datacube
+      int length = ((Axis) axisList.get(i-1)).getLength();
+      current = new ArrayList(length);
+      for (int j = 0; j < length; j++)
+        current.add(null);
+      prev.set(index, current);
+    }
+    prev = current;
+  }
+
+ //special handling for the innermost two layer
+ int index0;
+ int index1;
+ if (parentArray.hasFieldAxis()) { //fieldAxis is always the 2nd to last layer
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1));
+  }
+  else {
+    index0 = locator.getAxisIndex((Axis) axisList.get(1));
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
+  }
+
+  int stop = 2*(index0+1)-current.size();
+  for (int i = 0; i<stop; i++) {  //expand it if current.size < 2*(index0+1)
+    current.add(null);
+  }
+
+  int newCoordinate = 2*index0;  //internal index  = 2*index0
+  if (current.get(newCoordinate) == null) {
+    int length;
+    //expand array of byte and int
+    if (parentArray.hasFieldAxis())
+      length= ((Axis) axisList.get(1)).getLength();
+    else
+      length = ((Axis) axisList.get(0)).getLength();
+    current.set(newCoordinate, new byte[length]);
+    current.set(newCoordinate+1, new int[length]);
+
+  }
+
+  int arrayLength = ((int[]) current.get(newCoordinate+1)).length;
+  if ( arrayLength< index1+1) {  ////have to expand the array
+    int toExpandLength = (int) (arrayLength*1.3)+1;
+    if (toExpandLength < index1) {
+      toExpandLength = index1+1;
+    }
+
+    //copy old byte array to the expanded new one
+    byte[] oldByteArray = (byte[]) current.get(newCoordinate);
+    byte[] newByteArray = new byte[toExpandLength];
+    for (int k = 0; k <oldByteArray.length; k++)
+      newByteArray[k]=oldByteArray[k];
+    current.set(newCoordinate, newByteArray);
+    oldByteArray = null; //force garbage collection
+
+    //copy old int array to the expanded new one
+    int[] oldArray = (int[]) current.get(newCoordinate+1);
+    int[] newArray = new int[toExpandLength];
+    for (int k = 0; k <oldArray.length; k++)
+      newArray[k]=oldArray[k];
+    current.set(newCoordinate+1, newArray);
+    oldArray = null; //force garbage collection
+  }
+  try { //set data
+    byte realValue = 1;
+    //indicate its corresponding datacell holds valid data
+    java.lang.reflect.Array.setByte(current.get(newCoordinate), index1, realValue);
+    //put data into the requested datacell
+    java.lang.reflect.Array.setLong(current.get(newCoordinate+1), index1, numValue);
+    return;
+  }
+  catch (Exception e) {
+    throw new SetDataException();
+  }
+}
+
+public void setData(Locator locator, short numValue)
+throws SetDataException
+{
+  List axisList = parentArray.getAxes();
+  List prev = data;
+  List current = data;
+  int numOfAxis = axisList.size();
+  if (numOfAxis == 1) {
+    Axis axis = (Axis) axisList.get(0);
+    int index = locator.getAxisIndex(axis);
+
+    if (data.get(0) == null) {
+      //used to track if the corresponding cell stores valid data
+      data.set(0,new byte[axis.getLength()]);
+      data.set(1,new int[axis.getLength()]);
+    }
+
+    int arrayLength = ((byte[]) data.get(0)).length;
+    if ( arrayLength< index+1) {  //have to expand the array
+      int toExpandLength = (int) (arrayLength*1.3)+1;  //use 1.3 as the size multiplier
+      if (toExpandLength < index) {  //expand to the size of index (index > arrayLength*1.3)
+        toExpandLength = index+1;
+      }
+
+      //copy the old byte array into the expanded one
+      byte[] oldByteArray = (byte[]) current.get(0);
+      byte[] newByteArray = new byte[toExpandLength];
+      for (int k = 0; k <oldByteArray.length; k++)
+        newByteArray[k]=oldByteArray[k];
+      current.set(0, newByteArray);
+      oldByteArray = null; //force garbage collection
+
+      //copy the old int array into the expanded one
+      int[] oldArray = (int[]) current.get(1);
+      int[] newArray = new int[toExpandLength];
+      for (int k = 0; k <oldArray.length; k++)
+        newArray[k]=oldArray[k];
+      current.set(1, newArray);
+      oldArray = null; //force garbage collection
+    }
+    try {
+      //indicates its corresponding data cell holds vaid data
+      byte b = 1;
+      java.lang.reflect.Array.setByte(current.get(0), index, b);
+
+      //put the data into the requested data cell
+      java.lang.reflect.Array.setShort(current.get(1), index, numValue);
+      return;
+    }
+    catch (Exception e) {
+      throw new SetDataException();
+    }
+  } //  end of if (numOfAxis == 1)
+
+
+  //contructs arraylist of arraylist to represent the multi-dimension
+  for (int i = numOfAxis-1 ; i >=2; i--) {
+    Axis axis = (Axis) axisList.get(i);
+    int index =  locator.getAxisIndex(axis);
+    int end = axis.getLength() - prev.size();
+    for (int k = 0; k < end ; k++)  //expand it if prev.size < index+1
+      prev.add(null);
+    current = (List) prev.get(index);
+    if (current == null) {  //expand the datacube
+      int length = ((Axis) axisList.get(i-1)).getLength();
+      current = new ArrayList(length);
+      for (int j = 0; j < length; j++)
+        current.add(null);
+      prev.set(index, current);
+    }
+    prev = current;
+  }
+
+ //special handling for the innermost two layer
+ int index0;
+ int index1;
+ if (parentArray.hasFieldAxis()) { //fieldAxis is always the 2nd to last layer
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1));
+  }
+  else {
+    index0 = locator.getAxisIndex((Axis) axisList.get(1));
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
+  }
+
+  int stop = 2*(index0+1)-current.size();
+  for (int i = 0; i<stop; i++) {  //expand it if current.size < 2*(index0+1)
+    current.add(null);
+  }
+
+  int newCoordinate = 2*index0;  //internal index  = 2*index0
+  if (current.get(newCoordinate) == null) {
+    int length;
+    //expand array of byte and int
+    if (parentArray.hasFieldAxis())
+      length= ((Axis) axisList.get(1)).getLength();
+    else
+      length = ((Axis) axisList.get(0)).getLength();
+    current.set(newCoordinate, new byte[length]);
+    current.set(newCoordinate+1, new int[length]);
+
+  }
+
+  int arrayLength = ((int[]) current.get(newCoordinate+1)).length;
+  if ( arrayLength< index1+1) {  ////have to expand the array
+    int toExpandLength = (int) (arrayLength*1.3)+1;
+    if (toExpandLength < index1) {
+      toExpandLength = index1+1;
+    }
+
+    //copy old byte array to the expanded new one
+    byte[] oldByteArray = (byte[]) current.get(newCoordinate);
+    byte[] newByteArray = new byte[toExpandLength];
+    for (int k = 0; k <oldByteArray.length; k++)
+      newByteArray[k]=oldByteArray[k];
+    current.set(newCoordinate, newByteArray);
+    oldByteArray = null; //force garbage collection
+
+    //copy old int array to the expanded new one
+    int[] oldArray = (int[]) current.get(newCoordinate+1);
+    int[] newArray = new int[toExpandLength];
+    for (int k = 0; k <oldArray.length; k++)
+      newArray[k]=oldArray[k];
+    current.set(newCoordinate+1, newArray);
+    oldArray = null; //force garbage collection
+  }
+  try { //set data
+    byte realValue = 1;
+    //indicate its corresponding datacell holds valid data
+    java.lang.reflect.Array.setByte(current.get(newCoordinate), index1, realValue);
+    //put data into the requested datacell
+    java.lang.reflect.Array.setShort(current.get(newCoordinate+1), index1, numValue);
+    return;
+  }
+  catch (Exception e) {
+    throw new SetDataException();
+  }
+}
+
 
   /** setData: Set the SCALAR value of the requested datacell
    * (via L<DataCube> LOCATOR REF).
@@ -1859,6 +2278,9 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.30  2001/05/29 21:56:39  thomas
+  * added [set/get][Long/Short]Data methods.
+  *
   * Revision 1.29  2001/05/10 21:08:51  thomas
   * init method is now protected. Added resetXMLAttributes
   * call to init.
