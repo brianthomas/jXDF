@@ -84,7 +84,8 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
       return xmlElementList; 
    }
 
-   /**set the *location* attribute.
+   /** Set the *location* attribute.
+       @deprecated You should use add/remove methods instead.
    */
    public void setElementNodeList (List elements)
    {

@@ -82,8 +82,7 @@ public class Notes extends BaseObject {
     //
 
     /** set the *noteList* attribute
-        @return the current *noteList* attribute
-        @deprecated use the setNotes method.
+        @deprecated You should use the add/remove methods to manipulate this list.
      */
     public void setNoteList (List notes) {
        ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
@@ -198,6 +197,9 @@ public class Notes extends BaseObject {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.15  2001/09/19 17:51:32  thomas
+  * made some set*List methods deprecated
+  *
   * Revision 1.14  2001/09/14 21:09:50  thomas
   * Fixed printing out empty noteList for array when no notes exist
   *

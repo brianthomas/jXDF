@@ -226,7 +226,8 @@ implements AxisInterface
   }
 
   /** Set the values contained in this Axis from the passed List. The passed
-    * list may contain either Value or UnitDirection objects.
+      list may contain either Value or UnitDirection objects.
+      @deprecated You should use add/remove methods instead.
    */
   public void setValueList(List listOfAxisValues) {
      length = 0;
@@ -242,9 +243,10 @@ implements AxisInterface
      }
   }
 
-  /** Set the values contained in this Axis from the passed ValueList. 
-    * The passed values are construed as axisValues (e.g. NOT UnitDirection 
-    * objects).
+  /**  Set the values contained in this Axis from the passed ValueList. 
+       The passed values are construed as axisValues (e.g. NOT UnitDirection 
+       objects).
+       @deprecated You should use add/remove methods instead.
     */ 
    public void setAxisValueList (ValueListInterface valueListObj)
    {
@@ -719,6 +721,9 @@ implements AxisInterface
 /* Modification History:
  *
  * $Log$
+ * Revision 1.28  2001/09/19 17:51:32  thomas
+ * made some set*List methods deprecated
+ *
  * Revision 1.27  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *

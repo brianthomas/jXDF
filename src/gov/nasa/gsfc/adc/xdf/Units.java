@@ -134,9 +134,9 @@ import java.io.IOException;
     return (String) ((Attribute) attribHash.get("system")).getAttribValue();
   }
 
-  /**set the *unitList* attribute
-     @param List
-     @return the current *unitList* attribute
+  /** Set the *unitList* attribute
+      @param List
+      @deprecated You should use the add/remove methods to manipulate this list.
    */
   public void setUnitList(List units) {
     ((Attribute) attribHash.get("unitList")).setAttribValue(units);
@@ -277,6 +277,9 @@ import java.io.IOException;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.23  2001/09/19 17:51:32  thomas
+ * made some set*List methods deprecated
+ *
  * Revision 1.22  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *

@@ -222,6 +222,7 @@ public class Parameter extends BaseObjectWithValueList {
   }
 
   /** Set the list of values held by this Parameter from the passed list.
+      @deprecated You should use the add/remove methods to manipulate this list.
    */
   public void setValueList(List listOfValues) {
      resetValues();
@@ -231,9 +232,10 @@ public class Parameter extends BaseObjectWithValueList {
      }
   }
 
-  /** Set the list of values held by this Parameter 
-    *  using those held in the passed ValueList object.
+  /**  Set the list of values held by this Parameter 
+       using those held in the passed ValueList object.
     */
+       // @deprecated You should use the add/remove methods to manipulate this list.
    public void setValueList (ValueListInterface valueListObj)
    {
       resetValues();
@@ -531,6 +533,9 @@ public class Parameter extends BaseObjectWithValueList {
  /* Modification History
   *
   * $Log$
+  * Revision 1.21  2001/09/19 17:51:32  thomas
+  * made some set*List methods deprecated
+  *
   * Revision 1.20  2001/09/13 21:39:25  thomas
   * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
   *

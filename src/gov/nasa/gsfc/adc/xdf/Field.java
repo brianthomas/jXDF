@@ -363,8 +363,8 @@ public class Field extends BaseObjectWithXMLElements {
       return (DataFormat) ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
-   /** set the *noteList* attribute
-      @return the current *noteList* attribute
+   /** Set the *noteList* attribute
+       @deprecated You should use add/remove methods instead.
     */
    public void setNoteList(List note)
    {
@@ -556,6 +556,9 @@ public class Field extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/09/19 17:51:32  thomas
+ * made some set*List methods deprecated
+ *
  * Revision 1.19  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *

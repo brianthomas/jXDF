@@ -140,7 +140,8 @@ public class Structure extends BaseObjectWithXMLElements {
     return (String) ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /**set the *paramList* attribute
+  /** Set the *paramList* attribute
+      @deprecated You should use the add/remove methods to manipulate this list.
    */
   public void setParamList(List param) {
      ((Attribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).setAttribValue(param);
@@ -161,7 +162,8 @@ public class Structure extends BaseObjectWithXMLElements {
     return (List) ((Attribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /**set the *structList* attribute
+  /** Set the *structList* attribute
+      @deprecated You should use the add/remove methods to manipulate this list.
    */
   public void setStructList(List structList) {
     ((Attribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).setAttribValue(structList);
@@ -174,7 +176,8 @@ public class Structure extends BaseObjectWithXMLElements {
     return (List) ((Attribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /**set the *arrayList* attribute
+  /** Set the *arrayList* attribute
+      @deprecated You should use the add/remove methods to manipulate this list.
    */
   public void setArrayList(List array) {
      ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(array);
@@ -187,7 +190,8 @@ public class Structure extends BaseObjectWithXMLElements {
     return (List) ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /**set the *noteList* attribute
+  /** Set the *noteList* attribute
+      @deprecated You should use the add/remove methods to manipulate this list.
    */
   public void setNotes (List notes) {
     ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
@@ -447,6 +451,9 @@ public class Structure extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.24  2001/09/19 17:51:32  thomas
+ * made some set*List methods deprecated
+ *
  * Revision 1.23  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *

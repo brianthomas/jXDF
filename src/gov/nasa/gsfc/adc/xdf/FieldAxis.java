@@ -181,6 +181,7 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
   }
 
   /** set the *fieldList* attribute
+      @deprecated You should use add/remove methods instead.
    */
   public void setFieldList(List field) {
      ((Attribute) attribHash.get(FIELDLIST_XML_ATTRIBUTE_NAME)).setAttribValue(field);
@@ -378,6 +379,9 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
  /**
   * Modification History:
   * $Log$
+  * Revision 1.21  2001/09/19 17:51:32  thomas
+  * made some set*List methods deprecated
+  *
   * Revision 1.20  2001/09/13 21:39:25  thomas
   * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
   *

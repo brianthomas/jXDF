@@ -387,6 +387,7 @@ import java.util.Vector;
    
    
      /** set the *paramList* attribute
+         @deprecated You should use add/remove methods instead.
       */
      public void setParamList(List param) {
         ((Attribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).setAttribValue(param);
@@ -479,7 +480,8 @@ import java.util.Vector;
         return (Notes) ((Attribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
 
-     /* set the *axisList* attribute
+     /** Set the *axisList* attribute
+         @deprecated You should use add/remove methods instead.
       */
      public void setAxisList (List axisList) {
 	 // remove the existing axes
@@ -548,7 +550,7 @@ import java.util.Vector;
      }
    
       /** Set the *noteList* attribute
-       * @deprecated use setNotes instead
+          @deprecated You should use add/remove methods instead on the Notes object.
        */
       public void setNoteList (List note) {
          getArrayNotes().setNotes(note);
@@ -1420,6 +1422,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.39  2001/09/19 17:51:32  thomas
+  * made some set*List methods deprecated
+  *
   * Revision 1.38  2001/09/19 17:43:05  thomas
   * trival doc change
   *
