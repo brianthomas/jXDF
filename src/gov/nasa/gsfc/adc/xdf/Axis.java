@@ -200,7 +200,7 @@ public class Axis extends BaseObject implements Cloneable, AxisInterface {
   }
 
    /**getAxisIdRef
-   * @return: the current *axisId* attribute
+   * @return: the current *axisIdRef* attribute
    */
   public String getAxisIdRef()
   {
@@ -488,6 +488,9 @@ public class Axis extends BaseObject implements Cloneable, AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/10/31 21:48:46  kelly
+ * minor fix
+ *
  * Revision 1.7  2000/10/30 18:19:02  kelly
  * Axis now implements AxisInterface
  *
