@@ -501,7 +501,21 @@ public abstract class BaseObject implements Serializable {
       }
 
       // print out PCDATA, if any
-      if(pcdata != null) writeOut(outputstream, pcdata);
+      if(pcdata != null)  {
+        writeOut(outputstream, pcdata);
+        //write out closing node after PCDATA, leaving no space between them.
+        //k.z. 10/18/2000
+        if (!dontCloseNode)
+          if ( nodeNameString.equals(sXDFStructureNodeName) && !XMLDeclAttribs.isEmpty() )
+          {
+            writeOut(outputstream, "</"+sXDFRootNodeName+">");
+          } else {
+            writeOut(outputstream, "</"+nodeNameString+">");
+          }
+         if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
+         return ; //now we are done, return!
+        //k.z. 10/18/2000
+      };
 
       // if there are no PCDATA or child objects/nodes then
       // we print out noChildObjectNodeName
@@ -510,6 +524,7 @@ public abstract class BaseObject implements Serializable {
         if (sPrettyXDFOutput) writeOut(outputstream, indent);
         writeOut(outputstream, "<" + noChildObjectNodeName + "/>");
         if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
+
       }
 
       // ok, now deal with closing the node
@@ -909,6 +924,9 @@ public abstract class BaseObject implements Serializable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2000/10/18 15:06:53  kelly
+ * fixed the bug.  now, there is no space between PCDATA and its closing node.  -k.z.
+ *
  * Revision 1.11  2000/10/17 22:07:55  kelly
  * --enabled Number attribute in getXMLInfo() (added an if clause)
  * --declared writeOut() and getXMLInfo as protected
