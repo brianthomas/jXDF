@@ -33,6 +33,11 @@ CVS $Id$
 
   <!-- <target name="test" depends="compile"> -->
   <target name="test" depends="compile,initTest">
+
+    <!-- crimson parser isnt smart enough to follow the cheese. We have to 
+         copy the DTD up to the present directory in order to play ball
+      -->
+    <copy file="samples/XDF_017.dtd" todir="."/>
     <echo message="Running tests..." />
 
     <antcall target="runTests"><param name="file" value="samples/XDF_sample1.xml"/></antcall>
@@ -75,6 +80,7 @@ CVS $Id$
     <echo message="Cleaning up test files.." />
     <delete file="test1.xml"/>
     <delete file="test2.xml"/>
+    <delete file="XDF_017.dtd"/>
   </target>
 
 
@@ -124,12 +130,12 @@ CVS $Id$
 
   </target>
 
-  <target name="all" depends="compile,doc"/>
+  <target name="all" depends="compile,doc,test"/>
 
   <target name="help">
     <echo message="Invoke 'ant' with one of the following options:" />
     <echo message=" "/>
-    <echo message="   all       - do both 'jar' and 'doc' commands" />
+    <echo message="   all       - do the 'jar', 'doc' and 'test' commands" />
     <echo message="   compile   - compile XDF classes only (no jar file)" />
     <echo message="   clean     - clean up temporary directories" />
     <echo message="   doc       - compile XDF API documentation" />
