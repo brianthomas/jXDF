@@ -83,7 +83,7 @@ public class Reader extends SaxDocHandler
         return myStructure; // what is this?? 
     }
 
-    private setDocumentHandler ( ) {
+    private void setDocumentHandler (SaxDocHandler myHandler) {
 
     }
 
