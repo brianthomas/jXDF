@@ -1,5 +1,5 @@
 <!--  XDF.dtd - eXtensible Data Format - version 0.18
-	Date: July 11, 2001
+	Date: Nov 2, 2001
 	XML lanaguage Document Type Definition (DTD).
 
 	An XDF document contains arrays and data structures.  It  is
@@ -15,10 +15,11 @@
 	spaces, tables with column headers, and series of tables
 	with each table having a unique name. 
 
-	Recent changes:
 -->
+
 <!ENTITY space "&#32;">
-<!-- The entities _ADDITION allows subfield/specialty keywords to be added
+
+<!-- The entities _CHILDREN allows subfield/specialty keywords to be added
 to the elements: XDF, structure, array, and field.  Do not change here.
 Rather create a subfieldML.dtd that overrides this and XDF_TYPE and
 calls XDF.dtd by a parameter entity.
@@ -29,18 +30,19 @@ calls XDF.dtd by a parameter entity.
 <!ENTITY % STRUCTURE_CHILDREN " ">
 <!ENTITY % FIELD_CHILDREN " ">
 <!ENTITY % XDF_TYPE "basic">
-<!ELEMENT XDF (%XDF_CHILDREN;(structure | parameter | array | note)+)>
+
+<!ELEMENT XDF (%XDF_CHILDREN;(structure | parameter | parameterGroup | array | note)+)>
 <!ATTLIST XDF
 	name CDATA #IMPLIED
 	description CDATA #IMPLIED
-	type CDATA "%XDF_TYPE;"
+	type   CDATA  "%XDF_TYPE;"
 >
-<!ELEMENT structure (%STRUCTURE_CHILDREN;(structure | parameter | array | note)+)>
+<!ELEMENT structure (%STRUCTURE_CHILDREN;(structure | parameter | parameterGroup | array | note)+)>
 <!ATTLIST structure
 	name CDATA #IMPLIED
 	description CDATA #IMPLIED
 >
-<!ELEMENT parameter (units, value, note*)>
+<!ELEMENT parameter ((units, (value | valueList | valueGroup)+)?, note*)>
 <!ATTLIST parameter
 	name CDATA #IMPLIED
 	description CDATA #IMPLIED
@@ -96,7 +98,8 @@ calls XDF.dtd by a parameter entity.
 <!ATTLIST value
 	valueId ID #IMPLIED
 	valueRef IDREF #IMPLIED
-	special (infinite | infiniteNegative | noData | notANumber | underflow | overflow) #IMPLIED
+	special (infinite | infiniteNegative | noData | notANumber | underflow 
+	| overflow ) #IMPLIED
 	inequality (lessThan | lessThanOrEqual | greaterThan | greaterThanOrEqual) #IMPLIED
 	upperErrorValue NMTOKEN #IMPLIED
 	lowerErrorValue NMTOKEN #IMPLIED
@@ -112,16 +115,21 @@ calls XDF.dtd by a parameter entity.
 	size NMTOKEN #IMPLIED
 	delimiter CDATA "&space;"
 	repeatable (yes | no) "no"
-	start CDATA #IMPLIED
-	step CDATA #IMPLIED
+	start CDATA  #IMPLIED
+	step CDATA  #IMPLIED
 	valueListId ID #IMPLIED
 	valueListIdRef IDREF #IMPLIED
 	infiniteValue CDATA #IMPLIED
 	infiniteNegativeValue CDATA #IMPLIED
 	noDataValue CDATA #IMPLIED
-	notANumberValue CDATA #IMPLIED
-	underflowValue CDATA #IMPLIED
-	overflowValue CDATA #IMPLIED
+	notANumberValue   CDATA   #IMPLIED
+	underflowValue   CDATA   #IMPLIED
+	overflowValue     CDATA    #IMPLIED
+>
+<!ELEMENT parameterGroup ((parameter | parameterGroup)+)>
+<!ATTLIST parameterGroup
+	name CDATA #IMPLIED
+	description CDATA #IMPLIED
 >
 <!--  There are several ways to fill the valueList array:
 	1) delimited valueList
@@ -147,24 +155,24 @@ calls XDF.dtd by a parameter entity.
         on each axis of the current array to properly assemble it.
 
 -->
-<!ELEMENT array (%ARRAY_CHILDREN;(parameter | structure | array)*, (fieldAxis | (units, dataFormat,axis)),axis*, read, data, notes?)>
+<!ELEMENT array (%ARRAY_CHILDREN;(parameter | parameterGroup)*, axis*, (fieldAxis | (units, dataFormat)), axis*, read, data, notes?)>
 <!ATTLIST array
 	name CDATA #IMPLIED
 	description CDATA #IMPLIED
 	arrayId ID #IMPLIED
 	appendTo IDREF #IMPLIED
-	class (spatial | temporal) #IMPLIED
-	lessThanValue NMTOKEN #IMPLIED
-	lessThanOrEqualValue NMTOKEN #IMPLIED
-	greaterThanValue NMTOKEN #IMPLIED
-	greaterThanOrEqualValue NMTOKEN #IMPLIED
-	infiniteValue CDATA #IMPLIED
-	infiniteNegativeValue CDATA #IMPLIED
-	noDataValue CDATA #IMPLIED
-	notANumberValue CDATA #IMPLIED
-	underflowValue CDATA #IMPLIED
-	overflowValue CDATA #IMPLIED
-	disabledValue CDATA #IMPLIED
+	class (spatial|temporal) #IMPLIED
+	lessThanValue           NMTOKEN    #IMPLIED
+	lessThanOrEqualValue    NMTOKEN    #IMPLIED
+	greaterThanValue        NMTOKEN    #IMPLIED
+	greaterThanOrEqualValue NMTOKEN    #IMPLIED
+	infiniteValue           CDATA      #IMPLIED
+	infiniteNegativeValue   CDATA      #IMPLIED
+	noDataValue             CDATA      #IMPLIED
+	notANumberValue         CDATA      #IMPLIED
+	underflowValue          CDATA      #IMPLIED
+	overflowValue           CDATA      #IMPLIED
+	disabledValue           CDATA      #IMPLIED
 >
 <!--    Each dimension of an N-dimensional structure is introduced by
 	an axis element.  The order is not important because the read element
@@ -187,7 +195,7 @@ calls XDF.dtd by a parameter entity.
 <!ATTLIST axis
 	name CDATA #IMPLIED
 	description CDATA #IMPLIED
-	axisId ID #IMPLIED
+	axisId ID #REQUIRED
 	axisIdRef IDREF #IMPLIED
 	align IDREF #IMPLIED
 	axisDatatype (integer | float | exponential | string | url) #IMPLIED
@@ -234,18 +242,19 @@ calls XDF.dtd by a parameter entity.
 	description CDATA #IMPLIED
 	fieldId ID #IMPLIED
 	fieldIdRef IDREF #IMPLIED
-	class (spatial | temporal) #IMPLIED
-	lessThanValue NMTOKEN #IMPLIED
-	lessThanOrEqualValue NMTOKEN #IMPLIED
-	greaterThanValue NMTOKEN #IMPLIED
-	greaterThanOrEqualValue NMTOKEN #IMPLIED
-	infiniteValue CDATA #IMPLIED
-	infiniteNegativeValue CDATA #IMPLIED
-	noDataValue CDATA #IMPLIED
-	notANumberValue CDATA #IMPLIED
-	underflowValue CDATA #IMPLIED
-	overflowValue CDATA #IMPLIED
-	disabledValue CDATA #IMPLIED
+	class (spatial|temporal) #IMPLIED
+	lessThanValue           NMTOKEN    #IMPLIED
+	lessThanOrEqualValue    NMTOKEN    #IMPLIED
+	greaterThanValue        NMTOKEN    #IMPLIED
+	greaterThanOrEqualValue NMTOKEN    #IMPLIED
+	infiniteValue           CDATA      #IMPLIED
+	infiniteNegativeValue   CDATA      #IMPLIED
+	noDataValue             CDATA      #IMPLIED
+	notANumberValue         CDATA      #IMPLIED
+	underflowValue          CDATA      #IMPLIED
+	overflowValue           CDATA      #IMPLIED
+	disabledValue           CDATA      #IMPLIED
+
 >
 <!-- 	Relationships between fields in a fieldGroup can be expressed with 
 	the field/relation element.  
@@ -254,7 +263,9 @@ calls XDF.dtd by a parameter entity.
 <!ATTLIST relation
 	description CDATA #IMPLIED
 	fieldIdRefs IDREFS #REQUIRED
-	role (precision | positiveError | negativeError | error | sensitivity | weight | reference | noteMark | quality) #REQUIRED
+	role (precision | positiveError | negativeError | error | 
+		sensitivity | weight | reference | 
+		noteMark| quality ) #REQUIRED
 >
 <!--  Each array can contain notes to individual datum.
 -->
@@ -283,7 +294,7 @@ grouped together with name="position".
 <!ATTLIST fieldGroup
 	name CDATA #IMPLIED
 	description CDATA #IMPLIED
-	class (spatial | temporal) #IMPLIED
+	class (spatial|temporal) #IMPLIED
 >
 <!ELEMENT valueGroup ((value | valueList | valueGroup)+)>
 <!ATTLIST valueGroup
@@ -296,39 +307,45 @@ grouped together with name="position".
 	repeated until the end of the data. 
 -->
 <!ELEMENT dataFormat (float | integer | string | binaryInteger | binaryFloat)>
-<!ELEMENT read ((for | tagToAxis+)>
+
+<!ELEMENT read (taggedText | delimitedText | fixedWidthText | fixedWidthBinary ) >
 <!ATTLIST read
-	encoding (ANSI | ISO-8859-1 | UTF-8 | UTF-16) "ISO-8859-1"
-	endian (bigEndian | littleEndian) #IMPLIED
-	readId ID #IMPLIED
-	readIdRef IDREF #IMPLIED
+        encoding (ANSI | ISO-8859-1 | UTF-8 | UTF-16) "ISO-8859-1"
+        endian (BigEndian | LittleEndian) #IMPLIED
+        readId ID #IMPLIED
+        readIdRef IDREF #IMPLIED
 >
-<!--    read/for elements are instructions for reading in the data, 
+<!--    for elements are instructions for reading in the data, 
 	they refer to axis elements. The order 
 	for filling up n-dimensional variables is indicated by the nesing
 	with the most nested being the most rapidly moving index.  
 	The format information and the data appear inside the most 
 	nested read element.  
 -->
-<!ELEMENT for (for | delimitedText | fixedWidthText | binary | d0) >
+<!ELEMENT for (for | doReadInstructions)>
 <!ATTLIST for
 	axisIdRef IDREF #REQUIRED
-	variable (yes|no) #IMPLIED
 >
-<!ELEMENT fixedWidthText ((readCell | skip | repeat)+) > 
-<!ELEMENT delimitedText  (delimiter, skipRecordTerminator) >
-<!ELEMENT binary ((readCell | skip |  repeat)+ ) > 
+<!ELEMENT doReadInstructions EMPTY>
 
-<!ELEMENT skipRecordTerminator (#PCDATA | newLine)* >
+<!ELEMENT fixedWidthReadInstructions (readCell | skip | repeat)+ >
+<!ELEMENT delimitedReadInstructions (delimiter, recordTerminator)>
+
+<!ELEMENT taggedText (tagToAxis+) > 
+<!ELEMENT fixedWidthText (fixedWidthReadInstructions, for)> 
+<!ELEMENT delimitedText  (delimitedReadInstructions, for) >
+<!ELEMENT fixedWidthBinary (fixedWidthReadInstructions, for) >
+
+<!ELEMENT recordTerminator (#PCDATA | newLine)* >
 <!ELEMENT delimiter EMPTY >
 <!ATTLIST delimiter
 	repeatable (yes | no) "yes"
 	value  CDATA #REQUIRED
 >
+
 <!-- repeatable attribute (above) means that one or more of the delimiter 
      may occur as a single delimiter.  Here, especially, one must use
      a noData-value to indicate null. -->
-<!ELEMENT newLine EMPTY>
 <!ELEMENT readCell EMPTY>
 <!ELEMENT repeat ((repeat | readCell | skip)+)>
 <!ATTLIST repeat
@@ -338,13 +355,26 @@ grouped together with name="position".
 	A skip should be added to skip over superfluous characters
 	between data values and at the end of format statement
 	to skip over the new-Line character. The chars that are
-	skipped over are not kept.
+	skipped over are not kept. If a particular character output 
+        is desired, it may be specified using either the charOutput or
+        newLine child elements (but not both).
 -->
-<!ELEMENT skip (chars | newLine)+ >
-<!ATTLIST chars
+<!-- to avoid mixed content we have charOutput child -->
+<!ELEMENT skip ((charOutput | newLine)?) >
+<!ATTLIST skip
 	count NMTOKEN "1"
-	output CDATA "&space;"
 >
+<!-- note: all 'whitespace' isnt preserved by PCDATA (in charOutput). Use
+     'newLine' child element to have the newLine character (correct for the
+      archetechture) output.
+-->
+<!ELEMENT charOutput ( #PCDATA)>
+
+<!-- the 'logical' newline: may be '\r' or '\r\n' 
+     or '\n' depending on the machine.
+  -->
+<!ELEMENT newLine EMPTY>
+
 <!-- 
 The element float is used for text format of non-integer (floating point) 
 numbers.  If exponential format is to be used, supply the width of the exponent
@@ -355,13 +385,14 @@ are expected to be read or written as E-format.  One can not mix E and F-format.
 <!ATTLIST float
 	width NMTOKEN #REQUIRED
 	precision NMTOKEN #REQUIRED
-	exponent NMTOKEN #IMPLIED
+	exponent  NMTOKEN  #IMPLIED
 >
+
 <!ELEMENT integer EMPTY>
 <!ATTLIST integer
 	type (decimal | octal | hexadecimal) "decimal"
 	width NMTOKEN #REQUIRED
-	signed (yes | no) "yes"
+	signed (yes|no) "yes"
 >
 <!ELEMENT string EMPTY>
 <!ATTLIST string
