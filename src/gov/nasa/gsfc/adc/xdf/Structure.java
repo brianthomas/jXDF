@@ -128,9 +128,11 @@ public class Structure extends BaseObject {
 
 
   public Note setNote (Note note, int i) {
+    return note;
   }
 
   public Note removeNote (Note note, int i) {
+    return note;
   }
  
   public List setNoteList(List note) {
