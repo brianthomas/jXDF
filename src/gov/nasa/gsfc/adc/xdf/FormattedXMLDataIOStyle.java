@@ -52,7 +52,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 
   /** constructor
    */
-  public FormattedXMLDataIOStyle (Array parentArray)
+  public FormattedXMLDataIOStyle (ArrayInterface parentArray)
   {
     this.parentArray = parentArray;
     init();
@@ -64,7 +64,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
        Hashtable key/value pairs coorespond to the class XDF attribute
        names and their desired values.
     */
-  public FormattedXMLDataIOStyle ( Array parentArray, Hashtable InitXDFAttributeTable )
+  public FormattedXMLDataIOStyle ( ArrayInterface parentArray, Hashtable InitXDFAttributeTable )
   {
 
     this.parentArray = parentArray;
@@ -199,6 +199,8 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   protected void init()
   {
 
+     // super.init(); // DONT do this 
+
   }
 
   private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) {
@@ -258,6 +260,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/05/04 20:23:16  thomas
+ * Added Interface stuff.
+ *
  * Revision 1.12  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
  *

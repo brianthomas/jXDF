@@ -32,7 +32,7 @@ import java.util.Collections;
 /**
      holds a note object
  */
-public class Note extends BaseObject implements Cloneable {
+public class Note extends BaseObject implements Cloneable,NoteInterface {
 
    //
    // Fields

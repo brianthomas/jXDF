@@ -48,7 +48,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //
 
   //no-arg contructor
-  public TaggedXMLDataIOStyle(Array parentArray) {
+  public TaggedXMLDataIOStyle(ArrayInterface parentArray) {
     this.parentArray = parentArray;
   }
 
@@ -156,6 +156,9 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/05/04 20:23:40  thomas
+ * Added Interface stuff.
+ *
  * Revision 1.11  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
  *

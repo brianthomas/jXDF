@@ -53,7 +53,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    //
    // Constructors
    //
-   public DelimitedXMLDataIOStyle (Array parentArray)
+   public DelimitedXMLDataIOStyle (ArrayInterface parentArray)
    {
       this.parentArray = parentArray;
       init();
@@ -64,7 +64,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
         Hashtable key/value pairs coorespond to the class XDF attribute
         names and their desired values.
     */
-   public DelimitedXMLDataIOStyle ( Array parentArray, Hashtable InitXDFAttributeTable )
+   public DelimitedXMLDataIOStyle ( ArrayInterface parentArray, Hashtable InitXDFAttributeTable )
    {
 
       this.parentArray = parentArray;
@@ -208,6 +208,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
     */
    protected void init()
    {
+
+      // super.init(); // DONT do this. 
+
       classXDFNodeName = "textDelimiter";
 
       attribOrder.add(0, REPEATABLE_XML_ATTRIBUTE_NAME);
@@ -229,6 +232,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/05/04 20:22:52  thomas
+ * Added Interface stuff.
+ *
  * Revision 1.10  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
  *

@@ -37,7 +37,7 @@ import java.io.OutputStream;
  * @version $Revision$
  */
 
-public class Notes extends BaseObject {
+public class Notes extends BaseObject implements NotesInterface {
 
    //
    // Fields
@@ -80,8 +80,8 @@ public class Notes extends BaseObject {
     //
 
     /** set the *noteList* attribute
-        @param notes
         @return the current *noteList* attribute
+        @deprecated use the setNotes method.
      */
     public void setNoteList (List notes) {
        ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
@@ -89,9 +89,17 @@ public class Notes extends BaseObject {
 
     /**
         @return the current *noteList* attribute
+        @deprecated use the getNotes method.
      */
     public List getNoteList() {
        return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+    }
+
+    /** set the list of notes in this object.
+        @return the current list of notes in this object.
+     */
+    public void setNotes (List noteList) {
+       ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(noteList);
     }
 
     /**convenience method that returns the list of notes this object holds
@@ -115,7 +123,7 @@ public class Notes extends BaseObject {
        @param note - Note to be added
        @return a Note object if successfull, null if not.
     */
-   public Note addNote (Note note )
+   public NoteInterface addNote (NoteInterface note )
    {
       getNoteList().add(note);
       return note;
@@ -126,7 +134,7 @@ public class Notes extends BaseObject {
        @param Note to be removed
        @return true if successful, false if not
     */
-   public boolean removeNote(Note what) {
+   public boolean removeNote(NoteInterface what) {
       return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
    }
 
@@ -186,6 +194,9 @@ public class Notes extends BaseObject {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.8  2001/05/04 20:30:50  thomas
+  * Added Interface stuff.
+  *
   * Revision 1.7  2001/02/07 18:44:03  thomas
   * Converted XML attribute decl
   * to use constants (final static fields within the object). These

@@ -54,7 +54,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    /* other */
    protected String UntaggedInstructionNodeName = "for";
    protected String UntaggedInstructionAxisIdRefName = "axisIdRef";
-   protected Array parentArray;
+   protected ArrayInterface parentArray;
 
   //no-arg constructor
   public XMLDataIOStyle ()
@@ -142,7 +142,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   }
 
 
-  public Array getParentArray() { return parentArray; }
+  public ArrayInterface getParentArray() { return parentArray; }
 
   //
   // Other Public Methods
@@ -290,6 +290,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/05/04 20:27:02  thomas
+ * Added Interface stuff.
+ *
  * Revision 1.16  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
  *
