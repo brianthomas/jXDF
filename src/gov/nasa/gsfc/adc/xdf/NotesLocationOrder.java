@@ -29,6 +29,9 @@ import java.util.Hashtable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException; 
 
@@ -85,6 +88,27 @@ public class NotesLocationOrder extends BaseObject {
    throws java.io.IOException
    {
 
+      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+      toXMLWriter (outputWriter, indent, false, null, null);
+
+      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+      // on SUN and Linux platforms show that it is. Hopefully we can remove
+      // this in the future.
+      outputWriter.flush();
+
+   }
+
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+
+   throws java.io.IOException
+   {
+
       String nodeNameString = this.classXDFNodeName;
 
       // Setup. Sometimes the name of the node we are opening is different from
@@ -92,9 +116,9 @@ public class NotesLocationOrder extends BaseObject {
       if (newNodeNameString != null) nodeNameString = newNodeNameString;
 
       // 1. open this node, print its simple XML attributes
-      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, indent); // indent node if desired
-      writeOut(outputstream,"<" + nodeNameString + ">");   // print opening statement
-      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+      if (Specification.getInstance().isPrettyXDFOutput()) outputWriter.write(indent); // indent node if desired
+      outputWriter.write("<" + nodeNameString + ">");   // print opening statement
+      if (Specification.getInstance().isPrettyXDFOutput()) outputWriter.write(Constants.NEW_LINE);
 
       String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation(); // bump up the indentation
       // 2. Print out the axisIdRefs as child nodes 
@@ -102,18 +126,18 @@ public class NotesLocationOrder extends BaseObject {
       while (iter.hasNext()) {
          String axisIdRef = (String) iter.next();
 
-         if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, newindent); // indent node if desired
-         writeOut(outputstream,"<" + indexNodeName + " axisIdRef=\"");
-         writeOutAttribute(outputstream, axisIdRef);
-         writeOut(outputstream, "\"/>");
+         if (Specification.getInstance().isPrettyXDFOutput()) outputWriter.write(newindent); // indent node if desired
+         outputWriter.write("<" + indexNodeName + " axisIdRef=\"");
+         writeOutAttribute(outputWriter, axisIdRef);
+         outputWriter.write( "\"/>");
 
-         if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+         if (Specification.getInstance().isPrettyXDFOutput()) outputWriter.write(Constants.NEW_LINE);
       }
 
       // 3. Close this node
-      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, indent); // indent node if desired
-      writeOut(outputstream,"</" + nodeNameString + ">");   // print opening statement
-      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+      if (Specification.getInstance().isPrettyXDFOutput()) outputWriter.write(indent); // indent node if desired
+      outputWriter.write("</" + nodeNameString + ">");   // print opening statement
+      if (Specification.getInstance().isPrettyXDFOutput()) outputWriter.write( Constants.NEW_LINE);
 
    }
 
@@ -139,6 +163,10 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.9  2001/07/19 21:58:31  thomas
  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
  * in the XDF class)

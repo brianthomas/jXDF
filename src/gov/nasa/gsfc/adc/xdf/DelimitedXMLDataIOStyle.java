@@ -26,7 +26,8 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.Hashtable;
-import java.io.OutputStream;
+import java.io.Writer;
+// import java.io.OutputStream;
 
 /** DelimitedDataIOStyle is a class that indicates
    how delimited ASCII records are to be read in
@@ -129,16 +130,16 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    //PROTECTED methods
    //
 
-   protected void specificIOStyleToXDF( OutputStream outputstream,String indent) 
+   protected void specificIOStyleToXDF( Writer outputWriter, String indent) 
    throws java.io.IOException
    {
 
       int stop = getIOAxesOrder().size()-1;
       synchronized (attribHash) {
-         nestedToXDF(outputstream, indent, stop, 0);
+         nestedToXDF(outputWriter, indent, stop, 0);
       }
       if (Specification.getInstance().isPrettyXDFOutput()) {
-        writeOut(outputstream, Constants.NEW_LINE);
+        outputWriter.write( Constants.NEW_LINE);
       }
 
    }
@@ -147,7 +148,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    // PRIVATE methods
    //
 
-   private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) 
+   private void nestedToXDF(Writer outputWriter, String indent, int which, int stop) 
    throws java.io.IOException
    {
 
@@ -157,45 +158,45 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 
     if (which < stop) {
       if (Specification.getInstance().isPrettyXDFOutput()) {
-        writeOut(outputstream, Constants.NEW_LINE);
-        writeOut(outputstream, indent);
+        outputWriter.write( Constants.NEW_LINE);
+        outputWriter.write( indent);
       }
-      writeOut(outputstream, "<" + classXDFNodeName);
+      outputWriter.write( "<" + classXDFNodeName);
       if (delimiter !=null) { 
-        writeOut(outputstream, " "+DELIMITER_XML_ATTRIBUTE_NAME+"=\"");
-        writeOutAttribute(outputstream, delimiter);
-        writeOut(outputstream, "\"");
+        outputWriter.write( " "+DELIMITER_XML_ATTRIBUTE_NAME+"=\"");
+        writeOutAttribute(outputWriter, delimiter);
+        outputWriter.write( "\"");
       }
 
-      writeOut(outputstream, " "+REPEATABLE_XML_ATTRIBUTE_NAME+"=\"");
-      writeOutAttribute(outputstream, repeatable);
-      writeOut(outputstream, "\"");
+      outputWriter.write( " "+REPEATABLE_XML_ATTRIBUTE_NAME+"=\"");
+      writeOutAttribute(outputWriter, repeatable);
+      outputWriter.write( "\"");
 
       if (recordTerminator !=null) {
-         writeOut(outputstream, " "+END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME+"=\"");
-         writeOutAttribute(outputstream, recordTerminator);
-         writeOut(outputstream, "\"");
+         outputWriter.write( " "+END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputWriter, recordTerminator);
+         outputWriter.write( "\"");
       }
-      writeOut(outputstream, "/>");
+      outputWriter.write( "/>");
 
     }
     else {
       if (Specification.getInstance().isPrettyXDFOutput()) {
-        writeOut(outputstream, Constants.NEW_LINE);
-        writeOut(outputstream, indent);
+        outputWriter.write( Constants.NEW_LINE + indent);
+        // outputWriter.write( Constants.NEW_LINE);
+        // outputWriter.write( indent);
       }
-      writeOut(outputstream, "<" + UntaggedInstructionNodeName + " "+UntaggedInstructionAxisIdRefName+"=\"");
+      outputWriter.write( "<" + UntaggedInstructionNodeName + " "+UntaggedInstructionAxisIdRefName+"=\"");
 
-//      writeOut(outputstream, ((AxisInterface) parentArray.getAxes().get(which)).getAxisId() + "\">");
-      writeOut(outputstream, ((AxisInterface) getIOAxesOrder().get(which)).getAxisId() + "\">");
+//      outputWriter.write( ((AxisInterface) parentArray.getAxes().get(which)).getAxisId() + "\">");
+      outputWriter.write( ((AxisInterface) getIOAxesOrder().get(which)).getAxisId() + "\">");
       which--;
-      nestedToXDF(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation(), which, stop);
+      nestedToXDF(outputWriter, indent + Specification.getInstance().getPrettyXDFOutputIndentation(), which, stop);
 
       if (Specification.getInstance().isPrettyXDFOutput()) {
-        writeOut(outputstream, Constants.NEW_LINE);
-        writeOut(outputstream, indent);
+        outputWriter.write( Constants.NEW_LINE + indent);
       }
-       writeOut(outputstream, "</" + UntaggedInstructionNodeName + ">");
+      outputWriter.write( "</" + UntaggedInstructionNodeName + ">");
     }
 
    }
@@ -234,6 +235,10 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.15  2001/07/11 22:35:21  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *

@@ -26,7 +26,8 @@ package gov.nasa.gsfc.adc.xdf;
 
 import java.util.Hashtable;
 import java.util.List;
-import java.io.OutputStream;
+import java.io.Writer;
+// import java.io.OutputStream;
 import java.io.IOException; 
 
 /** handles tagged IO
@@ -120,7 +121,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //
   //PROTECTED Methods
   //
-   protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
+   protected void specificIOStyleToXDF( Writer outputWriter, String indent)
    throws java.io.IOException
    {
 
@@ -141,20 +142,20 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
          axisId = ((AxisInterface) axisList.get(i)).getAxisId();
          tag = tags[i];
          if (niceOutput) {
-            writeOut(outputstream, Constants.NEW_LINE);
-            writeOut(outputstream, indent);
+            outputWriter.write( Constants.NEW_LINE);
+            outputWriter.write( indent);
          }
-         writeOut(outputstream, "<" + TagToAxisNodeName + " axisIdRef=\"");
-         writeOutAttribute(outputstream, axisId);
-         writeOut(outputstream, "\"");
-         writeOut(outputstream, " tag=\"");
-         writeOutAttribute(outputstream, tag);
-         writeOut(outputstream, "\"/>");
+         outputWriter.write( "<" + TagToAxisNodeName + " axisIdRef=\"");
+         writeOutAttribute(outputWriter, axisId);
+         outputWriter.write( "\"");
+         outputWriter.write( " tag=\"");
+         writeOutAttribute(outputWriter, tag);
+         outputWriter.write( "\"/>");
       }
 
       // wrap up newline 
       if (niceOutput) {
-         writeOut(outputstream, Constants.NEW_LINE);
+         outputWriter.write( Constants.NEW_LINE);
       }
 
    }
@@ -173,6 +174,10 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.16  2001/07/11 22:35:21  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *

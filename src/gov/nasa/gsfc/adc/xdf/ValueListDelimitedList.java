@@ -25,6 +25,9 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -116,18 +119,48 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
    throws java.io.IOException
    {
 
+      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+      toXMLWriter (outputWriter, indent, false, null, null);
+
+      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+      // on SUN and Linux platforms show that it is. Hopefully we can remove
+      // this in the future.
+      outputWriter.flush();
+
+   }
+
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent
+                           )
+   throws java.io.IOException
+   {
+      toXMLWriter (outputWriter, indent, false, null, null);
+   }
+
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+
+   throws java.io.IOException
+   {
+
       if (Specification.getInstance().isPrettyXDFOutput())
-         writeOut(outputstream, indent); // indent node if desired
+         outputWriter.write(indent); // indent node if desired
 
       // no need to have repeatable set to 'yes' would just waste space even if we used this functionality.
-      writeOut(outputstream, "<valueList delimiter=\""+valueListDelimiter+"\" repeatable=\"no\"");
-      if (valueListNoData != null) writeOut(outputstream, " noDataValue=\""+valueListNoData+"\"");
-      if (valueListInfinite != null) writeOut(outputstream, " infiniteValue=\""+valueListInfinite+"\"");
-      if (valueListInfiniteNegative != null) writeOut(outputstream, " infiniteNegaiveValue=\""+valueListInfiniteNegative+"\"");
-      if (valueListNotANumber != null) writeOut(outputstream, " notANumberValue=\""+valueListNotANumber+"\"");
-      if (valueListUnderflow != null) writeOut(outputstream, " underflowValue=\""+valueListUnderflow+"\"");
-      if (valueListOverflow != null) writeOut(outputstream, " overflowValue=\""+valueListOverflow+"\"");
-      writeOut(outputstream, ">");
+      outputWriter.write("<valueList delimiter=\""+valueListDelimiter+"\" repeatable=\"no\"");
+      if (valueListNoData != null) outputWriter.write( " noDataValue=\""+valueListNoData+"\"");
+      if (valueListInfinite != null) outputWriter.write(" infiniteValue=\""+valueListInfinite+"\"");
+      if (valueListInfiniteNegative != null) outputWriter.write(" infiniteNegaiveValue=\""+valueListInfiniteNegative+"\"");
+      if (valueListNotANumber != null) outputWriter.write(" notANumberValue=\""+valueListNotANumber+"\"");
+      if (valueListUnderflow != null) outputWriter.write(" underflowValue=\""+valueListUnderflow+"\"");
+      if (valueListOverflow != null) outputWriter.write(" overflowValue=\""+valueListOverflow+"\"");
+      outputWriter.write(">");
 
       Iterator iter = values.iterator();
       while (iter.hasNext()) {
@@ -137,29 +170,29 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
          String specialValue = thisValue.getSpecial();
          if(specialValue != null) {
             if(specialValue.equals(Constants.VALUE_SPECIAL_INFINITE)) {
-               doValuePrint (outputstream, specialValue, valueListInfinite);
+               doValuePrint (outputWriter, specialValue, valueListInfinite);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_INFINITE_NEGATIVE)) {
-               doValuePrint (outputstream, specialValue, valueListInfiniteNegative);
+               doValuePrint (outputWriter, specialValue, valueListInfiniteNegative);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_NODATA)) {
-               doValuePrint (outputstream, specialValue, valueListNoData);
+               doValuePrint (outputWriter, specialValue, valueListNoData);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_NOTANUMBER)) {
-               doValuePrint (outputstream, specialValue, valueListNotANumber);
+               doValuePrint (outputWriter, specialValue, valueListNotANumber);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_UNDERFLOW)) {
-               doValuePrint (outputstream, specialValue, valueListUnderflow);
+               doValuePrint (outputWriter, specialValue, valueListUnderflow);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_OVERFLOW)) {
-               doValuePrint (outputstream, specialValue, valueListOverflow);
+               doValuePrint (outputWriter, specialValue, valueListOverflow);
             }
 
          } else {
-            writeOut(outputstream, thisValue.getValue());
+            outputWriter.write(thisValue.getValue());
          }
 
          if (iter.hasNext())
-            writeOut(outputstream, valueListDelimiter);
+            outputWriter.write(valueListDelimiter);
       }
-      writeOut(outputstream, "</valueList>");
+      outputWriter.write("</valueList>");
       if (Specification.getInstance().isPrettyXDFOutput())
-          writeOut(outputstream, Constants.NEW_LINE);
+          outputWriter.write(Constants.NEW_LINE);
 
    }
 
@@ -171,11 +204,11 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
    // Private Methods
    //
 
-   private void doValuePrint (OutputStream outputstream, String specialValue, String value) 
+   private void doValuePrint (Writer outputWriter, String specialValue, String value) 
    throws java.io.IOException
    {
       if (value != null) {
-         writeOut(outputstream, value);
+         outputWriter.write(value);
       } else {
          Log.errorln("Error: valueList doesnt have "+specialValue+" defined but value does. Ignoring value.");
       }
@@ -190,17 +223,15 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
    private void setNotANumber(String value) { valueListNotANumber = value; }
    private void setDelimiter (String value) { valueListDelimiter = value; }
 
-   private void writeOut ( OutputStream outputstream, String msg )
-   throws java.io.IOException
-   {
-      outputstream.write(msg.getBytes());
-   }
-
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.2  2001/07/12 17:53:15  thomas
  * minor bug fix, error handling incorrect in toXMLOutputStream
  *

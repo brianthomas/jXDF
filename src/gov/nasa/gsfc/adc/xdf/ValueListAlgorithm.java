@@ -25,6 +25,9 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -109,20 +112,51 @@ public class ValueListAlgorithm implements ValueListInterface,Cloneable {
    throws java.io.IOException
    {
 
-      if (Specification.getInstance().isPrettyXDFOutput())
-         writeOut(outputstream, indent); // indent node if desired
+      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+      toXMLWriter (outputWriter, indent, false, null, null);
 
-      writeOut(outputstream, "<valueList start=\""+valueListStart+"\" step=\""+valueListStep+"\" size=\""+valueListSize+"\"");
-      if (valueListNoData != null) writeOut(outputstream, " noDataValue=\""+valueListNoData+"\"");
-      if (valueListInfinite != null) writeOut(outputstream, " infiniteValue=\""+valueListInfinite+"\"");
-      if (valueListInfiniteNegative != null) writeOut(outputstream, " infiniteNegaiveValue=\""+valueListInfinite+"\"");
-      if (valueListNotANumber != null) writeOut(outputstream, " notANumberValue=\""+valueListNotANumber+"\"");
-      if (valueListUnderflow != null) writeOut(outputstream, " underflowValue=\""+valueListUnderflow+"\"");
-      if (valueListOverflow != null) writeOut(outputstream, " overflowValue=\""+valueListOverflow+"\"");
-      writeOut(outputstream, "/>");
+      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+      // on SUN and Linux platforms show that it is. Hopefully we can remove
+      // this in the future.
+      outputWriter.flush();
+
+   }
+
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent
+                           )
+   throws java.io.IOException
+   {
+      toXMLWriter (outputWriter, indent, false, null, null);
+   }
+
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+
+   throws java.io.IOException
+   {
 
       if (Specification.getInstance().isPrettyXDFOutput())
-          writeOut(outputstream, Constants.NEW_LINE);
+         outputWriter.write(indent); // indent node if desired
+
+      outputWriter.write("<valueList start=\""+valueListStart+"\" step=\""+valueListStep+"\" size=\""+valueListSize+"\"");
+      if (valueListNoData != null) outputWriter.write(" noDataValue=\""+valueListNoData+"\"");
+      if (valueListInfinite != null) outputWriter.write(" infiniteValue=\""+valueListInfinite+"\"");
+      if (valueListInfiniteNegative != null) outputWriter.write(" infiniteNegaiveValue=\""+valueListInfinite+"\"");
+      if (valueListNotANumber != null) outputWriter.write(" notANumberValue=\""+valueListNotANumber+"\"");
+      if (valueListUnderflow != null) outputWriter.write(" underflowValue=\""+valueListUnderflow+"\"");
+      if (valueListOverflow != null) outputWriter.write(" overflowValue=\""+valueListOverflow+"\"");
+      outputWriter.write("/>");
+
+      if (Specification.getInstance().isPrettyXDFOutput())
+          outputWriter.write(Constants.NEW_LINE);
+
    }
 
    public Object clone() throws CloneNotSupportedException {
@@ -159,18 +193,15 @@ public class ValueListAlgorithm implements ValueListInterface,Cloneable {
       }
    }
 
-   private void writeOut ( OutputStream outputstream, String msg )
-   throws java.io.IOException
-   {
-      outputstream.write(msg.getBytes());
-   }
-
-
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.1  2001/07/11 22:40:32  thomas
  * Initial Version
  *

@@ -25,6 +25,9 @@
 package gov.nasa.gsfc.adc.xdf;
 
 // import java.util.ArrayList;
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -146,38 +149,38 @@ public class XDF extends Structure {
    throws java.io.IOException
    {
 
-       //  To be valid XML, we always start an XML block with an
-       //  XML declaration (e.g. somehting like "<?xml standalone="no"?>").
-       //  Here we deal with  printing out XML Declaration && its attributes
-       if ((XMLDeclAttribs !=null) &&(!XMLDeclAttribs.isEmpty())) {
-          indent = "";
-          writeXMLDeclToOutputStream(outputstream, XMLDeclAttribs);
-       }
- 
-       super.toXMLOutputStream ( outputstream, indent,
-                                 dontCloseNode, newNodeNameString, 
-                                 noChildObjectNodeName);
+       Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+       toXMLWriter (outputWriter, XMLDeclAttribs, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+       // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+       // on SUN and Linux platforms show that it is. Hopefully we can remove
+       // this in the future.
+       outputWriter.flush();
+
    }
 
-   public void toXMLOutputStream (
-                                   OutputStream outputstream,
-                                   String indent,
-                                   boolean dontCloseNode,
-                                   String newNodeNameString,
-                                   String noChildObjectNodeName
-                                 )
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                Hashtable XMLDeclAttribs,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
    throws java.io.IOException
    {
 
-/*
-     // prepare XMLDeclaration
-      Hashtable XMLDeclAttribs = new Hashtable();
-      XMLDeclAttribs.put("standalone", new String("no"));
-      XMLDeclAttribs.put("dtdName", Specification.getInstance().getXDFDTDName());
-      XMLDeclAttribs.put("rootName", Specification.getInstance().getXDFRootNodeName());
-*/
 
-      this.toXMLOutputStream(outputstream, null, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+       //  To be valid XML, we always start an XML block with an
+       //  XML declaration (e.g. somehting like "<?xml standalone="no"?>").
+       //  Here we deal with  printing out XML Declaration && its attributes
+       if ((XMLDeclAttribs != null) &&(!XMLDeclAttribs.isEmpty())) {
+          indent = "";
+          writeXMLDeclToOutputWriter(outputWriter, XMLDeclAttribs);
+       }
+ 
+       toXMLWriter ( outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
    }
 
    public Object clone() throws CloneNotSupportedException{
@@ -231,15 +234,15 @@ public class XDF extends Structure {
 
  /** Write the XML Declaration to the indicated OutputStream.
    */
-  protected void writeXMLDeclToOutputStream ( OutputStream outputstream,
+  protected void writeXMLDeclToOutputWriter ( Writer outputWriter,
                                             Hashtable XMLDeclAttribs
                                           )
   throws java.io.IOException
   {
 
     // initial statement
-    writeOut(outputstream, "<?xml");
-    writeOut(outputstream, " version=\"" + Specification.getInstance().getXMLSpecVersion() + "\"");
+    outputWriter.write("<?xml");
+    outputWriter.write(" version=\"" + Specification.getInstance().getXMLSpecVersion() + "\"");
 
     // print attributes
     Enumeration keys = XMLDeclAttribs.keys();
@@ -251,12 +254,12 @@ public class XDF extends Structure {
       } else if ( attribName.equals("dtdName") || attribName.equals("rootName") ) {
          // skip over it
       } else
-         writeOut(outputstream, " " + attribName + "=\"" + XMLDeclAttribs.get(attribName) + "\"");
+         outputWriter.write(" " + attribName + "=\"" + XMLDeclAttribs.get(attribName) + "\"");
     }
-    writeOut(outputstream, " ?>");
+    outputWriter.write(" ?>");
 
     if (Specification.getInstance().isPrettyXDFOutput())
-        writeOut(outputstream, Constants.NEW_LINE); 
+        outputWriter.write(Constants.NEW_LINE); 
 
     // Print the DOCTYPE DECL only if right info exists
     if (XMLDeclAttribs.containsKey("rootName")
@@ -269,7 +272,7 @@ public class XDF extends Structure {
             classXDFNodeName.equals(Specification.getInstance().getXDFStructureNodeName()) )
         {
 */
-            writeOut(outputstream, "<!DOCTYPE " + XMLDeclAttribs.get("rootName") + " SYSTEM \""
+            outputWriter.write("<!DOCTYPE " + XMLDeclAttribs.get("rootName") + " SYSTEM \""
                                    + XMLDeclAttribs.get("dtdName") +"\"");
             // any entities need to now be written.
             // check for entities in href's
@@ -342,21 +345,21 @@ public class XDF extends Structure {
             }
 
             if(entityString.length() > 0 || notationString.length() > 0 ) {
-               writeOut(outputstream, " [");
+               outputWriter.write(" [");
                if(entityString.length() > 0)
-                  writeOut(outputstream, entityString.toString());
+                  outputWriter.write(entityString.toString());
                if (notationString.length() > 0 )
-                  writeOut(outputstream, notationString.toString());
-               writeOut(outputstream, "]");
+                  outputWriter.write(notationString.toString());
+               outputWriter.write("]");
             }
 
-            writeOut(outputstream, ">");
+            outputWriter.write(">");
 /*
         } // end of DOCTYPE decl 
 */
 
         if (Specification.getInstance().isPrettyXDFOutput())
-            writeOut(outputstream, Constants.NEW_LINE);
+            outputWriter.write(Constants.NEW_LINE);
 
     } else
       Log.errorln("Passed XMLDeclAttributes table lacks either dtdName or rootName entries, ignoring DOCTYPE line printout");
@@ -368,6 +371,10 @@ public class XDF extends Structure {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.5  2001/07/19 22:01:30  thomas
  * put XMLDeclAttribs into toXMLOutputStream (only needed
  * in the XDF class)

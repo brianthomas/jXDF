@@ -32,7 +32,10 @@ import java.util.Collections;
 
 import java.lang.reflect.*;
 
+import java.io.Writer;
+import java.io.BufferedWriter;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipEntry;
@@ -584,38 +587,61 @@ public class DataCube extends BaseObject {
 
    /**write out the data object to valid XML stream
     */
-    public void toXMLOutputStream (
+   public void toXMLOutputStream (
                                      OutputStream outputstream,
-                                     String strIndent,
+                                     String indent,
                                      boolean dontCloseNode,
                                      String newNodeNameString,
                                      String noChildObjectNodeName
                                   )
-    throws java.io.IOException
-    {
+   throws java.io.IOException
+   {
   
+      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+      toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+      // on SUN and Linux platforms show that it is. Hopefully we can remove
+      // this in the future.
+      outputWriter.flush();
+
+   }
+
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                String strIndent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+
+   throws java.io.IOException
+   {
+
+
+      // init some internals
       boolean writeHrefAttribute = false;
+      OutputStream dataOutputStream = null;
+      Writer dataOutputWriter = null;
       boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
       String indent = "";
+
+      // get the node name
       String nodeName = getClassXDFNodeName();
       if (newNodeNameString != null) nodeName = newNodeNameString;
   
       // indent up one 
       indent = indent + strIndent;
   
-  
       //open node
       if (niceOutput)
-        writeOut(outputstream, indent);
+        outputWriter.write( indent);
   
-      writeOut(outputstream, "<" + nodeName );
+      outputWriter.write("<" + nodeName );
   
       Href hrefObj = getHref();
   
-      //write out just the data
       XMLDataIOStyle readObj = parentArray.getXMLDataIOStyle();
-      OutputStream dataOutputStream = outputstream;
-  
   
       if (hrefObj != null) {  //write out to another file,
         String fileName = hrefObj.getSysId();
@@ -629,7 +655,9 @@ public class DataCube extends BaseObject {
         {
            writeHrefAttribute = true;
            try {
+
               dataOutputStream = new FileOutputStream(hrefObj.getSysId());
+
            }
            catch (IOException e) {
               //oops, something. is wrong, writ out to the passed in OutputStream
@@ -647,42 +675,43 @@ public class DataCube extends BaseObject {
   
       // write data node attributes
       if (writeHrefAttribute) {
-         writeOut(outputstream, " "+HREF_XML_ATTRIBUTE_NAME+"=\"");
-         writeOutAttribute(outputstream, hrefObj.getName());
-         writeOut(outputstream, "\"");
+         outputWriter.write( " "+HREF_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputWriter, hrefObj.getName());
+         outputWriter.write( "\"");
       }
   
       String checksum = getChecksum();
       if (checksum != null) {  
-         writeOut(outputstream, " "+CHECKSUM_XML_ATTRIBUTE_NAME+"=\"");
-         writeOutAttribute(outputstream, checksum.toString());
-         writeOut(outputstream, "\"");
+         outputWriter.write( " "+CHECKSUM_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputWriter, checksum.toString());
+         outputWriter.write( "\"");
       }
   
   
       String encoding = getEncoding();
       if (encoding!= null) {  
-         writeOut(outputstream, " "+ENCODING_XML_ATTRIBUTE_NAME+"=\"");
-         writeOutAttribute(outputstream, encoding.toString());
-         writeOut(outputstream, "\"");
+         outputWriter.write( " "+ENCODING_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputWriter, encoding.toString());
+         outputWriter.write( "\"");
       }
   
   
       String compress = getCompression();
-      if (compress != null) {  
-          writeOut(outputstream, " "+COMPRESSION_TYPE_XML_ATTRIBUTE_NAME+"=\"");
-          writeOutAttribute(outputstream, compress.toString());
-          writeOut(outputstream, "\"");
+      if (compress != null && dataOutputStream != null ) {  
+          outputWriter.write( " "+COMPRESSION_TYPE_XML_ATTRIBUTE_NAME+"=\"");
+          writeOutAttribute(outputWriter, compress.toString());
+          outputWriter.write( "\"");
  
           if (hrefObj == null) {
              Log.errorln("Cant write compressed data within the XML file (use href instead for an external file). Aborting write.");
              return;
           }
 
-          // change the data outputstream to match
+          // change the data outputWriter to match
           if (compress.equals(Constants.DATA_COMPRESSION_GZIP)) {
              try {
                 dataOutputStream = new GZIPOutputStream(dataOutputStream);
+
              } catch (java.io.IOException e) {
                 Log.errorln("Cant open compressed (GZIP) outputstream to write to an href. Aborting.");
                 return;
@@ -690,7 +719,7 @@ public class DataCube extends BaseObject {
           } else if (compress.equals(Constants.DATA_COMPRESSION_ZIP)) {
              dataOutputStream = new ZipOutputStream(dataOutputStream);
              try {
-                ((ZipOutputStream) dataOutputStream).putNextEntry(new ZipEntry(hrefObj.getName())); // write only to the first entry for now 
+                ((ZipOutputStream) dataOutputStream).putNextEntry(new ZipEntry(hrefObj.getSysId())); // write only to the first entry for now 
              } catch (java.io.IOException e) {
                 Log.errorln("Cant open compressed (ZIP) outputstream to write to an href. Aborting.");
                 return;
@@ -702,9 +731,9 @@ public class DataCube extends BaseObject {
       }
   
       if (writeHrefAttribute) 
-          writeOut(outputstream, "/>");  //we just close the data node now
+          outputWriter.write("/>");  //we just close the data node now
       else 
-          writeOut(outputstream, ">");  //end of opening code
+          outputWriter.write(">");  //end of opening code
   
       Locator currentLocator = parentArray.createLocator();
   
@@ -734,6 +763,17 @@ public class DataCube extends BaseObject {
             NoDataValues[0] = value;
       }
   
+      // init the dataOutputWriter properly. To a file or to the same writer as the
+      // rest of the XML metadata?
+      if (dataOutputStream != null) { 
+         // if this exists, then we are re-directing to an outside file.
+         // wrap the outputstream (compressed or otherwise) with bufferedWriter
+         dataOutputWriter = new BufferedWriter(new OutputStreamWriter(dataOutputStream));
+      } else {
+         // goes to same spot as meta-data, e.g. just use the XML output writer  
+         dataOutputWriter = outputWriter;
+      }
+
       if (readObj instanceof TaggedXMLDataIOStyle) {
          String[] tagOrder = ((TaggedXMLDataIOStyle)readObj).getAxisTags();
          int stop = tagOrder.length;
@@ -749,7 +789,7 @@ public class DataCube extends BaseObject {
          for (int i = 0; i < stop; i++) {
             axisLength[i] =axes[stop - 1 - i];
          }
-         writeTaggedData(dataOutputStream,
+         writeTaggedData(dataOutputWriter,
                         currentLocator,
                         indent,
                         axisLength,
@@ -757,12 +797,18 @@ public class DataCube extends BaseObject {
                         0,
                         fastestAxis,
                         NoDataValues);
+
+         // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+         // on SUN and Linux platforms show that it is. Hopefully we can remove
+         // this in the future.
+         dataOutputWriter.flush();
+
   
       }  //done dealing with with TaggedXMLDataIOSytle
       else {
 
          if (readObj instanceof DelimitedXMLDataIOStyle) {
-             writeDelimitedData( dataOutputStream, currentLocator,
+             writeDelimitedData( dataOutputWriter, currentLocator,
                                  (DelimitedXMLDataIOStyle) readObj,
                                  fastestAxis, NoDataValues,
                                  writeHrefAttribute ? false : true
@@ -770,7 +816,7 @@ public class DataCube extends BaseObject {
   
          }
          else {
-          writeFormattedData(  dataOutputStream,
+          writeFormattedData(  dataOutputWriter,
                                currentLocator,
                                (FormattedXMLDataIOStyle) readObj,
                                fastestAxis,
@@ -781,7 +827,8 @@ public class DataCube extends BaseObject {
 
          if (writeHrefAttribute) {
             try {
-               dataOutputStream.close();
+               // should work as flush() too, so no call needed here. 
+               dataOutputWriter.close();
             } catch (java.io.IOException e) {
                Log.errorln("Cant close dataOuputStream! Aborting.");
                return;
@@ -792,19 +839,18 @@ public class DataCube extends BaseObject {
   
       //close the data section appropriately
       if (!writeHrefAttribute && niceOutput) {
-        writeOut(outputstream, Constants.NEW_LINE);
-        writeOut(outputstream, indent);
+        outputWriter.write( Constants.NEW_LINE+indent);
       }
   
       // If we didnt write Href attribute, then means that data
       // were put into document. We need to close the open data
       // node appropriately.
       if (!writeHrefAttribute) 
-        writeOut(outputstream, "</" + nodeName + ">");
+        outputWriter.write( "</" + nodeName + ">");
   
       if (niceOutput)
-        writeOut(outputstream, Constants.NEW_LINE);
- 
+        outputWriter.write( Constants.NEW_LINE);
+
    }
 
    //
@@ -1035,7 +1081,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
   /**writeTaggedData: write out tagged data
    *
    */
-  private void writeTaggedData(OutputStream outputstream,
+  private void writeTaggedData(Writer outputWriter,
 			       Locator locator,
 			       String indent,
 			       int[] axisLength,
@@ -1059,22 +1105,20 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
       String tag1 = (String) tags[which+1];
       for (int count = 0; count < stop; count++) {
 	if (Specification.getInstance().isPrettyXDFOutput()) {
-	  writeOut(outputstream, Constants.NEW_LINE);
-	  writeOut(outputstream, indent);
+	  outputWriter.write( Constants.NEW_LINE+indent);
 	}
-	writeOut(outputstream, "<" + tag + ">");
+	outputWriter.write( "<" + tag + ">");
 	if (Specification.getInstance().isPrettyXDFOutput()) {
-	  writeOut(outputstream, Constants.NEW_LINE);
-	  writeOut(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation());
+	  outputWriter.write( Constants.NEW_LINE);
+	  outputWriter.write( indent + Specification.getInstance().getPrettyXDFOutputIndentation());
 	}
 
 	int fastestAxisLength = fastestAxis.getLength();
 	int dataNum = 0;
 	while (dataNum < fastestAxisLength) {
-          writeOut( outputstream, "<" + tag1 );
+          outputWriter.write(  "<" + tag1 );
   	  try {
-             writeOut( outputstream, ">" + getStringData(locator));
-             writeOut( outputstream, "</" + tag1 + ">");
+             outputWriter.write(  ">" + getStringData(locator) + "</" + tag1 + ">");
           }
           catch (NoDataException e) {
              // opps! no data in that location. Print out accordingly
@@ -1087,20 +1131,18 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
 
              if (noDataString != null)
              {
-                writeOut(outputstream, ">" + noDataString );
-                writeOut( outputstream, "</" + tag1 + ">");
+                outputWriter.write(">" + noDataString + "</" + tag1 + ">");
              } else
-                writeOut( outputstream, "/>");
+                outputWriter.write("/>");
 	  }
 
 	  dataNum ++;
 	  locator.next();
 	}
 	if (Specification.getInstance().isPrettyXDFOutput()) {
-	  writeOut(outputstream, Constants.NEW_LINE);
-	  writeOut(outputstream, indent);
+	  outputWriter.write( Constants.NEW_LINE + indent);
 	}
-	writeOut(outputstream, "</" + tag+ ">");
+	outputWriter.write("</" + tag+ ">");
 
       }
     }
@@ -1110,16 +1152,14 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
       which++;
       for (int i = 0; i < stop; i++) {
 	if (Specification.getInstance().isPrettyXDFOutput()) {
-	  writeOut(outputstream, Constants.NEW_LINE);
-	  writeOut(outputstream, indent);
+	  outputWriter.write(Constants.NEW_LINE+indent);
 	}
-	writeOut(outputstream, "<" + tag + ">");
-	writeTaggedData(outputstream, locator, indent, axisLength, tags, which, fastestAxis, noDataValues);
+	outputWriter.write("<" + tag + ">");
+	writeTaggedData(outputWriter, locator, indent, axisLength, tags, which, fastestAxis, noDataValues);
 	if (Specification.getInstance().isPrettyXDFOutput()) {
-	  writeOut(outputstream, Constants.NEW_LINE);
-	  writeOut(outputstream, indent);
+	  outputWriter.write(Constants.NEW_LINE+indent);
 	}
-	writeOut(outputstream, "</" + tag + ">");
+	outputWriter.write("</" + tag + ">");
       }
     }
   }
@@ -1127,7 +1167,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
   /** write delimited data
    *
    */
-  private void writeDelimitedData(  OutputStream outputstream,
+  private void writeDelimitedData(  Writer outputWriter,
                                     Locator locator,
                                     DelimitedXMLDataIOStyle readObj,
                                     AxisInterface fastestAxis, 
@@ -1145,13 +1185,13 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
     int dataNum = 0;
 
     if(writeCDATAStatement) 
-       writeOut(outputstream, "<![CDATA[");
+       outputWriter.write("<![CDATA[");
 
     do {
       dataNum ++;
       try {
         
-         writeOut(outputstream, getStringData(locator));
+         outputWriter.write(getStringData(locator));
 
       } catch (NoDataException e) {  //double check, a bug here, "yes" is already printed
 
@@ -1170,26 +1210,26 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                System.exit(-1);
             }
          } else {
-           writeOut(outputstream, noData);
+           outputWriter.write(noData);
          }
       }
 
       //write out delimiter anyway
-      writeOut(outputstream, delimiter);
+      outputWriter.write(delimiter);
       if (dataNum == fastestAxisLength) {
-        writeOut(outputstream, recordTerminator);
+        outputWriter.write(recordTerminator);
         dataNum = 0;
       }
     }
     while (locator.next());
 
     if (writeCDATAStatement) 
-       writeOut(outputstream, "]]>");
+       outputWriter.write("]]>");
   }
 
   /** Write formatted data
    */
-   private void writeFormattedData(OutputStream outputstream ,
+   private void writeFormattedData(Writer outputWriter,
                                    Locator locator,
                                    FormattedXMLDataIOStyle readObj,
                                    AxisInterface fastestAxis,
@@ -1203,7 +1243,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
 
       // print opening CDATA statement
       if (writeCDATAStatement) 
-         writeOut(outputstream, "<![CDATA[");
+         outputWriter.write("<![CDATA[");
 
       // print out the data as appropriate for the format
       // QUESTION: don't we need to syncronize on readObj too?
@@ -1254,7 +1294,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                 if (backToStartOfDataCube) break; // dont bother, we'd be re-printing data 
 
                 try {
-                   doReadCellFormattedIOCmdOutput( outputstream,
+                   doReadCellFormattedIOCmdOutput( outputWriter,
                                                    dataFormat[currentDataFormat],
                                                    numOfBytes[currentDataFormat],
                                                    pattern[currentDataFormat],
@@ -1274,7 +1314,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                         noData = noDataValues[0];
 
                     if (noData != null) { 
-                        writeOut(outputstream, noData);
+                        outputWriter.write( noData);
                     } else { 
                         Log.errorln("Can't print out null data: noDataValue NOT defined.");
                     }
@@ -1296,7 +1336,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
              else if (command instanceof SkipCharFormattedIOCmd)
              {
 
-                doSkipCharFormattedIOCmdOutput ( outputstream, (SkipCharFormattedIOCmd) command);
+                doSkipCharFormattedIOCmdOutput ( outputWriter, (SkipCharFormattedIOCmd) command);
 
              }
              else
@@ -1323,15 +1363,15 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
 
       // print closing CDATA statement
       if (writeCDATAStatement) 
-         writeOut(outputstream, "]]>");
+         outputWriter.write("]]>");
 
    }
 
-   private void doSkipCharFormattedIOCmdOutput ( OutputStream outputstream, 
+   private void doSkipCharFormattedIOCmdOutput ( Writer outputWriter, 
                                                  SkipCharFormattedIOCmd skipCharCommand)
    throws java.io.IOException
    {
-       writeOut(outputstream, skipCharCommand.getOutput());
+       outputWriter.write( skipCharCommand.getOutput());
    }
 
 
@@ -1340,7 +1380,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
    // because we have to convert datatypes around to accomodate these classes.
    // should look into buffered type of IO ala JavaFits to find better 
    // performance. -b.t. 
-   private void doReadCellFormattedIOCmdOutput ( OutputStream outputstream,
+   private void doReadCellFormattedIOCmdOutput ( Writer outputWriter,
                                                  DataFormat thisDataFormat, 
                                                  int formatsize,
                                                  String pattern,
@@ -1542,12 +1582,12 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
             int actualsize = output.length();
             while (actualsize < formatsize)
             {
-               writeOut(outputstream, " ");
+               outputWriter.write( " ");
                actualsize++;
             }
 
             // now write the data out
-            writeOut(outputstream, output);
+            outputWriter.write(output);
 
          } else {
             // throw error
@@ -1648,6 +1688,10 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.40  2001/07/26 15:55:42  thomas
+  * added flush()/close() statement to outputWriter object as
+  * needed to get toXMLOutputStream to work properly.
+  *
   * Revision 1.39  2001/07/19 21:52:39  thomas
   * yanked XMLDeclAttribs from toXMLOutputStream (only needed
   * in the XDF class)

@@ -33,6 +33,9 @@ import java.util.Set;
 import java.util.Hashtable;
 import java.util.Collections;
 
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException;
 
@@ -132,6 +135,27 @@ public abstract class BaseObjectWithValueList extends BaseObject
    throws java.io.IOException
    {
 
+
+      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+      toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+      // on SUN and Linux platforms show that it is. Hopefully we can remove
+      // this in the future.
+      outputWriter.flush();
+
+   }
+
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+   throws java.io.IOException
+   {
+
     //while writing out, attribHash should not be changed
     synchronized (attribHash) {
       String nodeNameString = this.classXDFNodeName;
@@ -144,8 +168,8 @@ public abstract class BaseObjectWithValueList extends BaseObject
       if (nodeNameString != null) {
 
         if (Specification.getInstance().isPrettyXDFOutput())
-          writeOut(outputstream, indent); // indent node if desired
-        writeOut(outputstream,"<" + nodeNameString);   // print opening statement
+          outputWriter.write( indent); // indent node if desired
+        outputWriter.write("<" + nodeNameString);   // print opening statement
 
       }
 
@@ -160,11 +184,11 @@ public abstract class BaseObjectWithValueList extends BaseObject
         int size = attribs.size();
         for (int i = 0; i < size; i++) {
           Hashtable item = (Hashtable) attribs.get(i);
-          writeOut(outputstream, " " + item.get("name") + "=\"");
+          outputWriter.write( " " + item.get("name") + "=\"");
           // this slows things down, should we use?
-          //writeOutAttribute(outputstream, (String) item.get("value"));
-          writeOut(outputstream, (String) item.get("value"));
-          writeOut(outputstream, "\"" );
+          writeOutAttribute(outputWriter, (String) item.get("value"));
+          // outputWriter.write((String) item.get("value"));
+          outputWriter.write( "\"" );
         }
       }
 
@@ -180,9 +204,9 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
         // close the opening tag
         if (nodeNameString != null) {
-          writeOut(outputstream, ">");
+          outputWriter.write( ">");
           if ((Specification.getInstance().isPrettyXDFOutput()) && (pcdata == null))
-             writeOut(outputstream, Constants.NEW_LINE);
+             outputWriter.write( Constants.NEW_LINE);
         }
 
         // deal with object/list XML attributes, if any in our list
@@ -229,16 +253,16 @@ public abstract class BaseObjectWithValueList extends BaseObject
                      if (canUseCompactValueDescription) {
 
                         // use compact description
-                        indent = dealWithClosingGroupNodes((BaseObject) valueObj, outputstream, indent);
-                        indent = dealWithOpeningGroupNodes((BaseObject) valueObj, outputstream, indent);
+                        indent = dealWithClosingGroupNodes((BaseObject) valueObj, outputWriter, indent);
+                        indent = dealWithOpeningGroupNodes((BaseObject) valueObj, outputWriter, indent);
                         String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
                         // now print the valuelist itself
-                        valueListObj.toXMLOutputStream(outputstream, newindent);
+                        valueListObj.toXMLWriter(outputWriter, newindent);
                      } else {
 
                         // use regular (long) method
                         List objectList = (List) item.get("value");
-                        indent = objectListToXMLOutputStream(outputstream, objectList, indent);
+                        indent = objectListToXMLWriter(outputWriter, objectList, indent);
 
                      }
 
@@ -248,7 +272,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
                   // use regular method
                   List objectList = (List) item.get("value");
-                  indent = objectListToXMLOutputStream(outputstream, objectList, indent);
+                  indent = objectListToXMLWriter(outputWriter, objectList, indent);
 
                }
           }
@@ -258,10 +282,10 @@ public abstract class BaseObjectWithValueList extends BaseObject
             if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
               // shouldnt this be synchronized too??
               synchronized(containedObj) {
-                indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
-                indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
+                indent = dealWithClosingGroupNodes(containedObj, outputWriter, indent);
+                indent = dealWithOpeningGroupNodes(containedObj, outputWriter, indent);
                 String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-                containedObj.toXMLOutputStream(outputstream, newindent);
+                containedObj.toXMLWriter(outputWriter, newindent);
               }
             }
           } else {
@@ -274,7 +298,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
         // print out PCDATA, if any
         if(pcdata != null)  {
-          writeOut(outputstream, pcdata);
+          outputWriter.write(pcdata);
         };
 
         // if there are no PCDATA or child objects/nodes then
@@ -283,25 +307,25 @@ public abstract class BaseObjectWithValueList extends BaseObject
         {
 
           if (Specification.getInstance().isPrettyXDFOutput())
-            writeOut(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation());
+            outputWriter.write(indent + Specification.getInstance().getPrettyXDFOutputIndentation());
 
-          writeOut(outputstream, "<" + noChildObjectNodeName + "/>");
+          outputWriter.write( "<" + noChildObjectNodeName + "/>");
 
           if (Specification.getInstance().isPrettyXDFOutput())
-            writeOut(outputstream, Constants.NEW_LINE);
+            outputWriter.write( Constants.NEW_LINE);
 
         }
 
         // ok, now deal with closing the node
         if (nodeNameString != null) {
 
-           indent = dealWithClosingGroupNodes((BaseObject) this, outputstream, indent);
+           indent = dealWithClosingGroupNodes((BaseObject) this, outputWriter, indent);
 
           if (Specification.getInstance().isPrettyXDFOutput() && pcdata == null)
-                writeOut(outputstream, indent);
+                outputWriter.write( indent);
 
           if (!dontCloseNode)
-              writeOut(outputstream, "</"+nodeNameString+">");
+              outputWriter.write( "</"+nodeNameString+">");
 
         }
 
@@ -311,17 +335,18 @@ public abstract class BaseObjectWithValueList extends BaseObject
             if (dontCloseNode) {
                 // it may not have sub-objects, but we dont want to close it
                 // (happens for group objects)
-                writeOut(outputstream, ">");
+                outputWriter.write( ">");
             } else {
                 // no sub-objects, just close this node
-                writeOut(outputstream, "/>");
+                outputWriter.write( "/>");
             }
         }
 
       }
 
       if (Specification.getInstance().isPrettyXDFOutput()  && nodeNameString != null)
-          writeOut(outputstream, Constants.NEW_LINE);
+          outputWriter.write( Constants.NEW_LINE);
+
     }//synchronize
 
    }
@@ -358,6 +383,10 @@ public abstract class BaseObjectWithValueList extends BaseObject
 /** Modification Log 
   *
   * $Log$
+  * Revision 1.4  2001/07/26 15:55:42  thomas
+  * added flush()/close() statement to outputWriter object as
+  * needed to get toXMLOutputStream to work properly.
+  *
   * Revision 1.3  2001/07/19 21:51:48  thomas
   * yanked XMLDeclAttribs from toXMLOutputStream (only needed
   * in the XDF class)

@@ -35,7 +35,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.Writer;
+import java.io.StringWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -221,8 +225,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
     // open file writer
  //   try {
-      FileOutputStream fileout = new FileOutputStream(filename);
-      toXMLOutputStream(fileout);
+      FileWriter fileout = new FileWriter(filename);
+      toXMLWriter(fileout);
       fileout.close();
 /*
     } catch (IOException e) {
@@ -249,6 +253,48 @@ public abstract class BaseObject implements Serializable, Cloneable {
   throws java.io.IOException
   {
 
+     Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+     toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+     // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+     // on SUN and Linux platforms show that it is. Hopefully we can remove
+     // this in the future.
+     outputWriter.close();
+
+  }
+ 
+  public void toXMLWriter ( 
+                                Writer outputWriter
+                          )
+  throws java.io.IOException
+  {
+
+      toXMLWriter(outputWriter, "", false, null, null);
+
+  }
+
+  public void toXMLWriter ( 
+                                Writer outputWriter,
+                                String indent
+                             )
+  throws java.io.IOException
+  {
+
+      toXMLWriter(outputWriter, indent, false, null, null);
+
+  }
+
+
+  public void toXMLWriter ( 
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+  throws java.io.IOException
+  {
+
     //while writing out, attribHash should not be changed
     synchronized (attribHash) {
       String nodeNameString = this.classXDFNodeName;
@@ -261,8 +307,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
       if (nodeNameString != null) {
 
         if (Specification.getInstance().isPrettyXDFOutput())
-          writeOut(outputstream, indent); // indent node if desired
-        writeOut(outputstream,"<" + nodeNameString);   // print opening statement
+          outputWriter.write(indent); // indent node if desired
+        outputWriter.write("<" + nodeNameString);   // print opening statement
 
       }
 
@@ -277,11 +323,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
         int size = attribs.size();
         for (int i = 0; i < size; i++) {
           Hashtable item = (Hashtable) attribs.get(i);
-          writeOut(outputstream, " " + item.get("name") + "=\"");
+          outputWriter.write(" " + item.get("name") + "=\"");
           // this slows things down, should we use?
-          //writeOutAttribute(outputstream, (String) item.get("value"));
-          writeOut(outputstream, (String) item.get("value"));
-          writeOut(outputstream, "\"" );
+          writeOutAttribute(outputWriter, (String) item.get("value"));
+        //  outputWriter.write((String) item.get("value"));
+          outputWriter.write("\"");
         }
       }
 
@@ -296,9 +342,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
         // close the opening tag
         if (nodeNameString != null) {
-          writeOut(outputstream, ">");
+          outputWriter.write(">");
           if ((Specification.getInstance().isPrettyXDFOutput()) && (pcdata == null))
-             writeOut(outputstream, Constants.NEW_LINE);
+             outputWriter.write(Constants.NEW_LINE);
         }
 
         // deal with object/list XML attributes, if any in our list
@@ -310,7 +356,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
           {
 
             List objectList = (List) item.get("value");
-            indent = objectListToXMLOutputStream (outputstream, objectList, indent);  
+            indent = objectListToXMLWriter(outputWriter, objectList, indent);  
           }
           else if (item.get("type") == Constants.OBJECT_TYPE)
           {
@@ -318,10 +364,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
             if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
               // shouldnt this be synchronized too??
               synchronized(containedObj) {
-                indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
-                indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
+                indent = dealWithClosingGroupNodes(containedObj, outputWriter, indent);
+                indent = dealWithOpeningGroupNodes(containedObj, outputWriter, indent);
                 String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-                containedObj.toXMLOutputStream(outputstream, newindent);
+                containedObj.toXMLWriter(outputWriter, newindent);
               }
             }
           } else {
@@ -334,7 +380,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
         // print out PCDATA, if any
         if(pcdata != null)  {
-          writeOut(outputstream, pcdata);
+          outputWriter.write(pcdata);
         };
 
         // if there are no PCDATA or child objects/nodes then
@@ -343,25 +389,25 @@ public abstract class BaseObject implements Serializable, Cloneable {
         {
 
           if (Specification.getInstance().isPrettyXDFOutput())
-            writeOut(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation());
+            outputWriter.write(indent + Specification.getInstance().getPrettyXDFOutputIndentation());
 
-          writeOut(outputstream, "<" + noChildObjectNodeName + "/>");
+          outputWriter.write("<" + noChildObjectNodeName + "/>");
 
           if (Specification.getInstance().isPrettyXDFOutput())
-            writeOut(outputstream, Constants.NEW_LINE);
+            outputWriter.write(Constants.NEW_LINE);
 
         }
 
         // ok, now deal with closing the node
         if (nodeNameString != null) {
 
-           indent = dealWithClosingGroupNodes((BaseObject) this, outputstream, indent);
+           indent = dealWithClosingGroupNodes((BaseObject) this, outputWriter, indent);
 
           if (Specification.getInstance().isPrettyXDFOutput() && pcdata == null)
-                writeOut(outputstream, indent);
+                outputWriter.write(indent);
 
           if (!dontCloseNode)
-              writeOut(outputstream, "</"+nodeNameString+">");
+              outputWriter.write("</"+nodeNameString+">");
 
         }
 
@@ -371,18 +417,20 @@ public abstract class BaseObject implements Serializable, Cloneable {
 	    if (dontCloseNode) {
 		// it may not have sub-objects, but we dont want to close it
 		// (happens for group objects)
-		writeOut(outputstream, ">");
+		outputWriter.write(">");
 	    } else {
 		// no sub-objects, just close this node
-		writeOut(outputstream, "/>");
+		outputWriter.write("/>");
 	    }
 	}
 
       }
 
       if (Specification.getInstance().isPrettyXDFOutput()  && nodeNameString != null) 
-	  writeOut(outputstream, Constants.NEW_LINE);
+	  outputWriter.write(Constants.NEW_LINE);
+
     }//synchronize
+
   }
 
   /** A different invokation style for writing this object out to
@@ -394,7 +442,6 @@ public abstract class BaseObject implements Serializable, Cloneable {
   throws java.io.IOException
   {
      toXMLOutputStream(outputstream, indent, false, null, null);
-
   }
 
   /** A different invokation style. It has defaults for the XML Declaration
@@ -495,6 +542,21 @@ public abstract class BaseObject implements Serializable, Cloneable {
    */
   public boolean addXMLAttribute (String name, String value) {
      return addXMLAttribute(name, (Object) value, Constants.STRING_TYPE);
+  }
+
+  /**
+       Return a string representation of the corresponnding XML representation of this object.
+   */
+  public String toXMLString () 
+  throws java.io.IOException
+  {
+
+     // hurm. Cant figure out how to use BufferedWriter here. fooey.
+     Writer outputWriter = (Writer) new StringWriter();
+     toXMLWriter(outputWriter, "", false, null, null);
+
+     return outputWriter.toString();
+
   }
 
   /** deep copy of this XDF object
@@ -606,7 +668,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   }
 
-   protected String objectListToXMLOutputStream (OutputStream outputstream, List objectList, String indent)
+   protected String objectListToXMLWriter(Writer outputWriter, List objectList, String indent)
    throws java.io.IOException
    {
 
@@ -619,10 +681,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
          while (iter.hasNext()) {
             BaseObject containedObj = (BaseObject) iter.next();
             if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
-               indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
-               indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
+               indent = dealWithClosingGroupNodes(containedObj, outputWriter, indent);
+               indent = dealWithOpeningGroupNodes(containedObj, outputWriter, indent);
                String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-               containedObj.toXMLOutputStream(outputstream, newindent);
+               containedObj.toXMLWriter(outputWriter, newindent);
             }
          }
       }
@@ -694,36 +756,30 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   /** Write message out to specified OutputStream Object.
   */
+/*
   //declare as proteced, sub-classes may use --k.z. 10/17/2000
   protected void writeOut ( OutputStream outputstream, String msg ) 
   throws java.io.IOException
   {
- //   try {
       outputstream.write(msg.getBytes());
-/*
-    } catch (IOException e) {
-      Log.error("Error: couldnt open OutputStream for writing");
-    }
-*/
   }
+*/
 
+/*
   protected void writeOut ( OutputStream outputstream, char c ) 
   throws java.io.IOException
   {
- //   try {
       outputstream.write(c);
-/*
-    } catch (IOException e) {
-      Log.error("Error: couldnt open OutputStream for writing");
-    }
-*/
   }
+*/
 
   /** Write out string object formatted so it may be a proper XML 
-      (XDF) string in a node attribute. Basically, newLine and carriageReturn
-      entities are substituted in for appropriate characters. 
+      (XDF) string in a node attribute. Basically, cannonical XML expects
+      entities for such characters as quotation, apostrophe, lessthan, greater
+      than signs and ampersands. Also, we entify the newLine and carriageReturn
+      characters too.
    */
-  protected void writeOutAttribute ( OutputStream outputstream, String text) 
+  protected void writeOutAttribute ( Writer outputWriter, String text) 
   throws java.io.IOException
   {
 
@@ -732,12 +788,19 @@ public abstract class BaseObject implements Serializable, Cloneable {
      for(char c = iter.first(); c != CharacterIterator.DONE; c = iter.next()) 
      {
 
-        if(c == '\n')
-           writeOut(outputstream, "&#010;");
-        else if(c == '\r')
-           writeOut(outputstream, "&#013;");
-        else
-           writeOut(outputstream, c);
+        switch (c) {
+           // do what "Canonical XML" expects
+           case '<':  outputWriter.write("&lt;"); continue;
+           case '>':  outputWriter.write("&gt;"); continue;
+           case '&':  outputWriter.write("&amp;"); continue;
+           case '\'': outputWriter.write("&apos;"); continue;
+           case '"':  outputWriter.write("&quot;"); continue;
+           // now for our XDF specific stuff
+           case '\n': outputWriter.write("&#010;"); continue;
+           case '\r': outputWriter.write("&#013;"); continue;
+           // all other characters
+           default:   outputWriter.write(c); continue;
+        }
 
      }
 
@@ -746,7 +809,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** Method determines if any of the group objects to which the passed object
       belongs are already opened and opens them If they arent already opened.
   */
-  protected String dealWithOpeningGroupNodes (BaseObject obj, OutputStream outputstream, String indent) 
+  protected String dealWithOpeningGroupNodes (BaseObject obj, Writer outputWriter, String indent) 
   throws java.io.IOException
   {
 
@@ -764,7 +827,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
             // its *not* already open, so we bump up the indentation,
             // open it and add it to the open group node list.
             newIndent.append(Specification.getInstance().getPrettyXDFOutputIndentation());
-            memberGroup.toXMLOutputStream(outputstream, newIndent.toString(), true, null, null);
+            memberGroup.toXMLWriter(outputWriter, newIndent.toString(), true, null, null);
             this.openGroupNodeHash.add(memberGroup);
           }
         }
@@ -777,7 +840,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** Method determines if any of the currently open group objects
       belong to the current object and closes them if they arent.
   */
-  protected String dealWithClosingGroupNodes (BaseObject obj, OutputStream outputstream, String indent) 
+  protected String dealWithClosingGroupNodes (BaseObject obj, Writer outputWriter, String indent) 
   throws java.io.IOException
   {
 
@@ -795,9 +858,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
             // its *not* a member of this group and its still open,
             // so we need to close it.
 
-            if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, indent);
-            writeOut(outputstream, "</" + openGroup.classXDFNodeName + ">");
-            if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+            if (Specification.getInstance().isPrettyXDFOutput()) 
+                outputWriter.write(indent);
+            outputWriter.write("</" + openGroup.classXDFNodeName + ">");
+            if (Specification.getInstance().isPrettyXDFOutput()) 
+                outputWriter.write(Constants.NEW_LINE);
             this.openGroupNodeHash.remove(openGroup);
             // peel off some indent
             indent = indent.substring(0,indent.length() - Specification.getInstance().getPrettyXDFOutputIndentation().length());
@@ -854,6 +919,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.52  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.51  2001/07/19 21:50:53  thomas
  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
  * in the XDF class)

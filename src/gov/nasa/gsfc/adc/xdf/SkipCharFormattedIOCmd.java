@@ -26,6 +26,9 @@ package gov.nasa.gsfc.adc.xdf;
 
 import java.util.Hashtable;
 import java.io.IOException;
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.ArrayList;
@@ -119,35 +122,56 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
   throws java.io.IOException
   {
 
+      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+      toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+      // on SUN and Linux platforms show that it is. Hopefully we can remove
+      // this in the future.
+      outputWriter.flush();
+
+   }
+
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+
+   throws java.io.IOException
+   {
+
     boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
 
-    if(niceOutput) writeOut(outputstream, indent);
+    if(niceOutput) outputWriter.write(indent);
 
     synchronized (attribHash) {
       //open the node
-      writeOut(outputstream, "<" + classXDFNodeName);
+      outputWriter.write("<" + classXDFNodeName);
 
       //writeOutAttributes
       Object attrib=null;
       if ( (attrib=getCount()) !=null) 
       { 
-         writeOut( outputstream, " "+COUNT_XML_ATTRIBUTE_NAME+"=\"");
-         writeOutAttribute(outputstream, ((Integer) attrib).toString());
-         writeOut(outputstream, "\"");
+         outputWriter.write(" "+COUNT_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputWriter, ((Integer) attrib).toString());
+         outputWriter.write("\"");
       }
 
       if ((attrib=getOutput()) !=null)
       { 
-         writeOut(outputstream, " "+OUTPUT_STRING_XML_ATTRIBUTE_NAME+"=\"");
-         writeOutAttribute(outputstream, (String) attrib);
-         writeOut(outputstream, "\"");
+         outputWriter.write(" "+OUTPUT_STRING_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputWriter, (String) attrib);
+         outputWriter.write("\"");
       }
 
       //close the node
-      writeOut(outputstream, "/>");
+      outputWriter.write("/>");
     }
 
-    if(niceOutput) writeOut(outputstream, Constants.NEW_LINE);
+    if(niceOutput) outputWriter.write(Constants.NEW_LINE);
 
   }
 
@@ -174,6 +198,10 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.10  2001/07/19 21:59:44  thomas
  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
  * in the XDF class)

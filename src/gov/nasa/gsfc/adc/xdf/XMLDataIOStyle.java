@@ -29,6 +29,9 @@ import java.util.Hashtable;
 import java.util.Collections;
 import java.util.List;
 
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException; 
 
@@ -175,6 +178,26 @@ public abstract class XMLDataIOStyle extends BaseObject {
   throws java.io.IOException
   {
 
+       Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+       toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+       // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+       // on SUN and Linux platforms show that it is. Hopefully we can remove
+       // this in the future.
+       outputWriter.flush();
+
+  }
+
+  public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+  throws java.io.IOException
+  {
+
     boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
     String myIndent;
     if (indent!=null)
@@ -185,10 +208,10 @@ public abstract class XMLDataIOStyle extends BaseObject {
     String moreIndent = myIndent + Specification.getInstance().getPrettyXDFOutputIndentation();
 
     if (niceOutput)
-      writeOut(outputstream, myIndent);
+      outputWriter.write( myIndent);
 
     //open the read block
-    writeOut(outputstream, "<read");
+    outputWriter.write( "<read");
 
     //write out attributes of read, ie.
 
@@ -196,48 +219,48 @@ public abstract class XMLDataIOStyle extends BaseObject {
       String attrib;
       if ( (attrib=getEncoding()) !=null)  
       { 
-         writeOut(outputstream, " "+ENCODING_XML_ATTRIBUTE_NAME+"=\"");
-         writeOut(outputstream, attrib);
-         writeOut(outputstream, "\"");
+         outputWriter.write( " "+ENCODING_XML_ATTRIBUTE_NAME+"=\"");
+         outputWriter.write( attrib);
+         outputWriter.write( "\"");
       }
 
       if ( (attrib=getEndian()) !=null)
       { 
-         writeOut(outputstream, " "+ENDIAN_XML_ATTRIBUTE_NAME+"=\"");
-         writeOut(outputstream, attrib);
-         writeOut(outputstream, "\"");
+         outputWriter.write( " "+ENDIAN_XML_ATTRIBUTE_NAME+"=\"");
+         outputWriter.write( attrib);
+         outputWriter.write( "\"");
       }
 
       if ( (attrib=getReadId()) !=null)
       { 
-         writeOut(outputstream, " "+ID_XML_ATTRIBUTE_NAME+"=\"");
-         writeOut(outputstream, attrib);
-         writeOut(outputstream, "\"");
+         outputWriter.write( " "+ID_XML_ATTRIBUTE_NAME+"=\"");
+         outputWriter.write( attrib);
+         outputWriter.write( "\"");
       }
 
       if ( (attrib=getReadIdRef()) !=null)
       { 
-         writeOut(outputstream, " "+IDREF_XML_ATTRIBUTE_NAME+"=\"");
-         writeOut(outputstream, attrib);
-         writeOut(outputstream, "\"");
+         outputWriter.write( " "+IDREF_XML_ATTRIBUTE_NAME+"=\"");
+         outputWriter.write( attrib);
+         outputWriter.write( "\"");
       }
 
 
     }
-    writeOut(outputstream, ">");
+    outputWriter.write( ">");
 
     //specific tailoring for childObj: Tagged, Delimited, Formated
-    specificIOStyleToXDF(outputstream, moreIndent);
+    specificIOStyleToXDF(outputWriter, moreIndent);
 
      //close the read block
     if (niceOutput) {
-      // writeOut(outputstream, Constants.NEW_LINE);
-      writeOut(outputstream, indent);
+      // outputWriter.write( Constants.NEW_LINE);
+      outputWriter.write( indent);
     }
 
-     writeOut(outputstream, "</read>");
+     outputWriter.write( "</read>");
     if (niceOutput) {
-      writeOut(outputstream,Constants.NEW_LINE);
+      outputWriter.write(Constants.NEW_LINE);
      }
 
   }
@@ -321,7 +344,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   }
 
 
-  protected abstract void specificIOStyleToXDF(OutputStream out, String indent)
+  protected abstract void specificIOStyleToXDF(Writer out, String indent)
   throws java.io.IOException; 
 
 }
@@ -329,6 +352,10 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.24  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.23  2001/07/19 21:59:44  thomas
  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
  * in the XDF class)

@@ -26,6 +26,9 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.Hashtable;
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException; 
 import java.util.Collections;
@@ -165,19 +168,38 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
   throws java.io.IOException
   {
 
+      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+      toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+     // on SUN and Linux platforms show that it is. Hopefully we can remove
+     // this in the future.
+     outputWriter.flush();
+
+   }
+
+   public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+
+   throws java.io.IOException
+   {
+
      if (Specification.getInstance().isPrettyXDFOutput()) {
-        writeOut(outputstream, indent);
+         outputWriter.write(indent);
      }
 
      //open the code
-     writeOut(outputstream, "<" + classXDFNodeName);
-     writeOut(outputstream, " "+COUNT_XML_ATTRIBUTE_NAME+"=\"");
-     writeOutAttribute(outputstream, getCount().toString());
-     writeOut(outputstream, "\"");
+     outputWriter.write("<"+classXDFNodeName+" "+COUNT_XML_ATTRIBUTE_NAME+"=\"");
+     writeOutAttribute(outputWriter, getCount().toString());
+     outputWriter.write("\">");
 
-     writeOut(outputstream, ">");
      if (Specification.getInstance().isPrettyXDFOutput()) {
-         writeOut(outputstream, Constants.NEW_LINE);
+         outputWriter.write(Constants.NEW_LINE);
      }
 
      //write out nodes in formatCommandList
@@ -185,20 +207,21 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
        int stop = formatCommandList.size();
        String moreIndent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
        for (int i = 0; i <stop; i++) {
-         ((BaseObject) formatCommandList.get(i)).toXMLOutputStream(outputstream, moreIndent);
+         ((BaseObject) formatCommandList.get(i)).toXMLWriter(outputWriter, moreIndent);
        }
      }
 
      //close the node
      if (Specification.getInstance().isPrettyXDFOutput()) {
-       // writeOut(outputstream, Constants.NEW_LINE);
-        writeOut(outputstream, indent);
+       // outputWriter.write(Constants.NEW_LINE);
+        outputWriter.write(indent);
      }
-     writeOut(outputstream, "</" + classXDFNodeName + ">");
+     outputWriter.write("</" + classXDFNodeName + ">");
 
      if (Specification.getInstance().isPrettyXDFOutput()) {
-        writeOut(outputstream, Constants.NEW_LINE);
+        outputWriter.write(Constants.NEW_LINE);
      }
+
   }
 
   //
@@ -225,6 +248,10 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.11  2001/07/19 21:59:44  thomas
  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
  * in the XDF class)

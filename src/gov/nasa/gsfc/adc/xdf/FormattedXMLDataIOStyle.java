@@ -28,7 +28,7 @@ package gov.nasa.gsfc.adc.xdf;
 
 import java.util.Hashtable;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +142,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   /**specific tailoring when writing out
    */
 
-  protected void specificIOStyleToXDF( OutputStream outputstream, String indent)
+  protected void specificIOStyleToXDF( Writer outputWriter, String indent)
   throws java.io.IOException
   {
 
@@ -152,17 +152,17 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
      for (int i = (numberOfAxes-1); i >= 0; i--) {
         AxisInterface axis = (AxisInterface) axisList.get(i);
         if (Specification.getInstance().isPrettyXDFOutput()) {
-           writeOut(outputstream, Constants.NEW_LINE);
-           writeOut(outputstream, indent);
+           outputWriter.write( Constants.NEW_LINE);
+           outputWriter.write( indent);
            indent = indent + Specification.getInstance().getPrettyXDFOutputIndentation(); 
         }
-        writeOut(outputstream, "<"+UntaggedInstructionNodeName+" "+UntaggedInstructionAxisIdRefName+"=\"");
-        writeOutAttribute(outputstream, axis.getAxisId());
-        writeOut(outputstream, "\">");
+        outputWriter.write( "<"+UntaggedInstructionNodeName+" "+UntaggedInstructionAxisIdRefName+"=\"");
+        writeOutAttribute(outputWriter, axis.getAxisId());
+        outputWriter.write( "\">");
      }
 
      if (Specification.getInstance().isPrettyXDFOutput()) 
-              writeOut(outputstream, Constants.NEW_LINE);
+              outputWriter.write( Constants.NEW_LINE);
 
      String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
 
@@ -171,11 +171,11 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         int stop = formatCommandList.size();
         for (int i = 0; i <stop; i++) {
            // if (Specification.getInstance().isPrettyXDFOutput()) {
-           //   writeOut(outputstream, Constants.NEW_LINE);
-           //   writeOut(outputstream, indent);
+           //   outputWriter.write( Constants.NEW_LINE);
+           //   outputWriter.write( indent);
           // }
-           // ((XMLDataIOStyle) formatCommandList.get(i)).specificIOStyleToXDF(outputstream, indent);
-           ((BaseObject) formatCommandList.get(i)).toXMLOutputStream(outputstream, newindent);
+           // ((XMLDataIOStyle) formatCommandList.get(i)).specificIOStyleToXDF(outputWriter, indent);
+           ((BaseObject) formatCommandList.get(i)).toXMLWriter(outputWriter, newindent);
         }
      } // end formatCommandList sync 
 
@@ -186,11 +186,11 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
            // peel off some indent
            indent = indent.substring(0,indent.length() - 
                           Specification.getInstance().getPrettyXDFOutputIndentation().length());
-           writeOut(outputstream, indent);
+           outputWriter.write( indent);
         }
-        writeOut(outputstream, "</"+UntaggedInstructionNodeName+">");
+        outputWriter.write( "</"+UntaggedInstructionNodeName+">");
         if (Specification.getInstance().isPrettyXDFOutput()) {
-           writeOut(outputstream, Constants.NEW_LINE);
+           outputWriter.write( Constants.NEW_LINE);
         }
      }
 
@@ -248,6 +248,10 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.19  2001/07/11 22:35:21  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *

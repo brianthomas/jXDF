@@ -25,6 +25,9 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -179,16 +182,37 @@ import java.util.Hashtable;
    ) 
    throws java.io.IOException
    {
+
+
+       Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
+       toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+       // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+       // on SUN and Linux platforms show that it is. Hopefully we can remove
+       // this in the future.
+       outputWriter.flush();
+
+   }
+
+   public void toXMLWriter (   Writer outputWriter,
+                               String indent,
+                               boolean dontCloseNode,
+                               String newNodeNameString,
+                               String noChildObjectNodeName
+                             )
+   throws java.io.IOException
+   {
+
  
      String nodeNameString = classXDFNodeName;
      // 1. open this node, print its simple XML attributes
        if (Specification.getInstance().isPrettyXDFOutput())
-         writeOut(outputstream, indent); // indent node if desired
+         outputWriter.write(indent); // indent node if desired
  
-       writeOut(outputstream,"<" + nodeNameString + ">");   // print opening statement
+       outputWriter.write("<" + nodeNameString + ">");   // print opening statement
  
-       //writeOut the body of DataFormat
-       writeOut(outputstream, "<" + specificDataFormatName);
+       //write out the body of DataFormat
+       outputWriter.write( "<" + specificDataFormatName);
  
      // gather info about XMLAttributes in this object/node
      Hashtable xmlInfo = getXMLInfo();
@@ -201,19 +225,19 @@ import java.util.Hashtable;
        int stop = attribs.size();
        for (int i = 0; i < stop; i++) {
          Hashtable item = (Hashtable) attribs.get(i);
-         writeOut(outputstream, " "+ item.get("name") + "=\"");
-         writeOutAttribute(outputstream, (String)item.get("value"));
-         writeOut(outputstream, "\"");
+         outputWriter.write( " "+ item.get("name") + "=\"");
+         outputWriter.write( (String)item.get("value"));
+         outputWriter.write( "\"");
        }
      }
  
      //writeout end of the boby
-     writeOut(outputstream, "/>");
+     outputWriter.write( "/>");
  
      //writeout closing node
-     writeOut(outputstream, "</" + nodeNameString+ ">");
+     outputWriter.write( "</" + nodeNameString+ ">");
      if (Specification.getInstance().isPrettyXDFOutput())
-       writeOut(outputstream, Constants.NEW_LINE);
+       outputWriter.write( Constants.NEW_LINE);
  
    }
  
@@ -262,6 +286,10 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/07/26 15:55:42  thomas
+ * added flush()/close() statement to outputWriter object as
+ * needed to get toXMLOutputStream to work properly.
+ *
  * Revision 1.17  2001/07/19 21:52:39  thomas
  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
  * in the XDF class)
