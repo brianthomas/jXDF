@@ -57,9 +57,22 @@ public abstract class XMLDataIOStyle extends BaseObject {
    protected ArrayInterface parentArray;
 
   //no-arg constructor
-  public XMLDataIOStyle ()
+  public XMLDataIOStyle (ArrayInterface parentArray)
   {
-    init();
+     this.parentArray = parentArray;
+     init();
+  }
+
+  public XMLDataIOStyle (ArrayInterface parentArray, Hashtable InitXDFAttributeTable)
+  {
+
+      this.parentArray = parentArray;
+
+      // init the XML attributes (to defaults)
+      init();
+
+      // init the value of selected XML attributes to HashTable values
+      hashtableInitXDFAttributes(InitXDFAttributeTable);
   }
 
   //
@@ -213,7 +226,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
      //close the read block
     if (niceOutput) {
-      writeOut(outputstream, Constants.NEW_LINE);
+      // writeOut(outputstream, Constants.NEW_LINE);
       writeOut(outputstream, indent);
     }
 
@@ -236,23 +249,25 @@ public abstract class XMLDataIOStyle extends BaseObject {
   /** init -- special method used by constructor methods to
    *  convienently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
 
-    classXDFNodeName = "read";
+     resetXMLAttributes();
 
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0, ENDIAN_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, ENCODING_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+     classXDFNodeName = "read";
+
+     // order matters! these are in *reverse* order of their
+     // occurence in the XDF DTD
+     attribOrder.add(0, ENDIAN_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, ENCODING_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
 
      //set up the attribute hashtable key with the default initial value
-    attribHash.put(ENDIAN_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENDIAN, Constants.STRING_TYPE));
-    attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENCODING, Constants.STRING_TYPE));
-    attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(ENDIAN_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENDIAN, Constants.STRING_TYPE));
+     attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENCODING, Constants.STRING_TYPE));
+     attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
   };
 
 
@@ -290,6 +305,10 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/05/10 21:45:33  thomas
+ * added resetXMLAttributes to init().
+ * small change to constructor related to inheritance.
+ *
  * Revision 1.17  2001/05/04 20:27:02  thomas
  * Added Interface stuff.
  *
