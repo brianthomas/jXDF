@@ -231,7 +231,6 @@ public abstract class XMLDataIOStyle extends BaseObject {
    * should be protected, ie only classes in the same package see see this method
    */
   protected void setParentArray(Array parentArray) {
-    Log.debug("in XMLDataIOStyle, setParentArray()");
     this.parentArray = parentArray;
   }
 
@@ -261,6 +260,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2000/11/27 20:07:11  thomas
+ * Removed minor debuging statement. -b.t.
+ *
  * Revision 1.12  2000/11/16 20:11:46  kelly
  * fixed documentation.  -k.z.
  *
