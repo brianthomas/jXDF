@@ -69,26 +69,31 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
     return (String) tagHash.put(axisId, tag);
   }
 
-  /**getXMLDataIOStyleTags: Return an axis ordered list (ARRAY REF) of tags to
-   *  be used to write tagged data.
+  /**getXMLDataIOStyleTags: Return an String array of tags to
+   *  be used to write tagged data, return the tags in the order of
+   * d0, d1, ..., d8
    */
 
-   public List getAxisTags() {
-    List tags = new ArrayList();
+   public String[] getAxisTags() {
+   List axisList = getParentArray().getAxisList();
+    int stop = axisList.size();
+    String[] tags = new String[stop];
     String tag;
     String axisId;
     String tempTag;
-    List axisList = getParentArray().getAxisList();
-    int counter = axisList.size();
-    for (int i = 0; i<axisList.size(); i++) {
+
+
+    int counter = stop;
+    for (int i = 0; i < stop; i++) {
       axisId = ((Axis)axisList.get(i)).getAxisId();
-      tag = "d" + counter--;  //the default tag
+      counter--;
+      tag = "d" + counter;  //the default tag
       //should it exist, we use whats in the tag hash
       //otherwise we go with the default as singed above
       tempTag = (String) tagHash.get(axisId);
       if (tempTag!=null)
         tag = tempTag;
-      tags.add(tag);
+      tags[i] = tag;
     }
     return tags;
    }
@@ -120,7 +125,8 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 
     ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
     synchronized(attribs) {  //sync, prevent the attribs' structure be changed
-      for (int i = 0; i < attribs.size(); i++) {
+      int stop = attribs.size();
+      for (int i = 0; i < stop; i++) {
         Hashtable item = (Hashtable) attribs.get(i);
         writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
       }
@@ -130,20 +136,23 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
       writeOut(outputstream, Constants.NEW_LINE);
 
     //write out the tags info
-    List tags = Collections.synchronizedList(getAxisTags());
+    String[] tags = getAxisTags();
     List axisList = parentArray.getAxisList();
     String axisId;
     String tag;
-    for (int i = 0; i <axisList.size(); i++) {
-     axisId = ((Axis) axisList.get(i)).getAxisId();
-     tag = (String)tags.get(i);
-     if (niceOutput) {
-      writeOut(outputstream, moreIndent);
-     }
-     writeOut(outputstream, "<" + TagToAxisNodeName + " axisIdRef=\\" + axisId + "\\" + "tag = \\" + tag + "\\/>");
-     if (niceOutput) {
-      writeOut(outputstream,Constants.NEW_LINE);
-     }
+    int stop = axisList.size();
+    synchronized (axisList) {
+      for (int i = 0; i <stop; i++) {
+        axisId = ((Axis) axisList.get(i)).getAxisId();
+        tag = tags[i];
+        if (niceOutput) {
+          writeOut(outputstream, moreIndent);
+        }
+        writeOut(outputstream, "<" + TagToAxisNodeName + " axisIdRef=\"" + axisId + "\"" + " tag = \"" + tag + "\"/>");
+        if (niceOutput) {
+          writeOut(outputstream,Constants.NEW_LINE);
+        }
+      }
     }
 
     //close the read block
@@ -174,6 +183,9 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/26 14:22:45  kelly
+ * fixed some for loops (use a simple variable for end condition now).  fixed a bug in *toXDF*.  -k.z.
+ *
  * Revision 1.2  2000/10/17 22:03:54  kelly
  * completed the class.  -k.z.
  *
