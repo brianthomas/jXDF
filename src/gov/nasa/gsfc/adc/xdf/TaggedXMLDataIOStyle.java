@@ -85,7 +85,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 
     int counter = stop;
     for (int i = 0; i < stop; i++) {
-      axisId = ((Axis)axisList.get(i)).getAxisId();
+      axisId = ((AxisInterface)axisList.get(i)).getAxisId();
       counter--;
       tag = "d" + counter;  //the default tag
       //should it exist, we use whats in the tag hash
@@ -143,7 +143,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
     int stop = axisList.size();
     synchronized (axisList) {
       for (int i = 0; i <stop; i++) {
-        axisId = ((Axis) axisList.get(i)).getAxisId();
+        axisId = ((AxisInterface) axisList.get(i)).getAxisId();
         tag = tags[i];
         if (niceOutput) {
           writeOut(outputstream, moreIndent);
@@ -183,6 +183,9 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/10/30 18:17:38  kelly
+ * Axis and FieldAxis now share common interface -k.z.
+ *
  * Revision 1.3  2000/10/26 14:22:45  kelly
  * fixed some for loops (use a simple variable for end condition now).  fixed a bug in *toXDF*.  -k.z.
  *
