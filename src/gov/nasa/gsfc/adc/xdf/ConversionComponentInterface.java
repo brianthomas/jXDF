@@ -34,7 +34,7 @@ public interface ConversionComponentInterface {
 
    public Double evaluate(Double value);
    public double evaluate(double value);
-   public void setValue (Double value);
+   //public void setValue (Double value);
    public void toXMLWriter (Writer outputWriter, String indent) throws java.io.IOException;
    public void toXMLOutputStream (OutputStream o, String indent) throws java.io.IOException;
    //public Object clone() throws CloneNotSupportedException;
