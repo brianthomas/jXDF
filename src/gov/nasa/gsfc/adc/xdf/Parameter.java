@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Parameter.java: An XDF::Parameter describes a scientific parameter assocated
+ * A Parameter describes a scientific parameter assocated
  * with the Structure or Array object that it is contained in.
  * Parameter is a flexible container for holding what is essentially information
  * about data but is not needed to read/write/manipulate the data in a
@@ -53,8 +53,8 @@ import java.util.Set;
   * datatype--
   * holds object reference to a single datatype (DataFormat) object for this axis.
   * units--
-  * reference of the Units object of this parameter. The XDF::Units object
-  * is used to hold the XDF::Unit objects.
+  * reference of the Units object of this parameter. The Units object
+  * is used to hold the Unit objects.
   * noteList--
   * list reference to the Note objects held within this parameter.
   * valueList--
@@ -143,8 +143,8 @@ public class Parameter extends BaseObject {
     ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
-   /**getName
-   * @return: the current *name* attribute
+   /**
+   * @return the current *name* attribute
    */
   public String getName()
   {
@@ -159,8 +159,8 @@ public class Parameter extends BaseObject {
 
   }
 
-  /**getDescription
-   * @return: the current *description* attribute
+  /**
+   * @return the current *description* attribute
    */
   public String getDescription() {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
@@ -173,8 +173,8 @@ public class Parameter extends BaseObject {
      ((XMLAttribute) attribHash.get("paramId")).setAttribValue(strParam);
   }
 
-  /**getParamId
-   * @return: the current *paramId* attribute
+  /**
+   * @return the current *paramId* attribute
    */
   public String getParamId()
   {
@@ -189,8 +189,8 @@ public class Parameter extends BaseObject {
 
   }
 
-  /**getParamIdRef
-   * @return: the current *paramIdRef* attribute
+  /**
+   * @return the current *paramIdRef* attribute
    */
   public String getParamIdRef()
   {
@@ -204,8 +204,8 @@ public class Parameter extends BaseObject {
      ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
   }
 
-  /**getUnits
-   * @return: the current *units* attribute
+  /**
+   * @return the current *units* attribute
    */
   public Units getUnits()
   {
@@ -222,8 +222,8 @@ public class Parameter extends BaseObject {
        Log.warnln("Datatype not valid, ignoring request to set.");
   }
 
-  /**getDatatype
-   * @return: the current *datatype* attribute
+  /**
+   * @return the current *datatype* attribute
    */
   public String getDatatype()
   {
@@ -236,8 +236,8 @@ public class Parameter extends BaseObject {
      ((XMLAttribute) attribHash.get("valueList")).setAttribValue(value);
   }
 
-  /**getValueList
-   * @return: the current *valueList* attribute
+  /**
+   * @return the current *valueList* attribute
    */
   public List getValueList() {
     return (List) ((XMLAttribute) attribHash.get("valueList")).getAttribValue();
@@ -249,8 +249,8 @@ public class Parameter extends BaseObject {
      ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
   }
 
-  /**getNoteList
-   * @return: the current *noteList* attribute
+  /**
+   * @return the current *noteList* attribute
    */
   public List getNoteList() {
     return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
@@ -260,22 +260,18 @@ public class Parameter extends BaseObject {
   //Other PUBLIC Methods
   //
 
-  /** addValue: insert an XDF::Value object into the valueList
-   * @param: XDF::Value
-   * @return: an XDF::Value object on success, null on failure
+  /** insert an Value object into the valueList
+   * @param v - Value to be added
+   * @return an Value object
    */
   public Value addValue(Value v) {
-    if (v == null) {
-      Log.warn("in Parameter.addValue(), the Value passed in is null");
-      return null;
-    }
     getValueList().add(v);
     return v;
   }
 
-  /**removeValue: removes an XDF::Value from the list of values in this Parameter object
-   * @param: Value to be removed
-   * @return: true on success, false on failure
+  /** removes an Value from the list of values in this Parameter object
+   * @param what - Value to be removed
+   * @return true on success, false on failure
    */
    public boolean removeValue(Value what) {
      return removeFromList(what, getValueList(), "valueList");
@@ -283,64 +279,52 @@ public class Parameter extends BaseObject {
 
 
    /**Insert a ValueGroup object into this object to group the parameter values.
-   * @Value: ValueGroup to be added
-   * @return:a ValueGroup object reference on success, null on failure.
+   * @param group - ValueGroup to be added
+   * @return a ValueGroup object
    */
   public ValueGroup addValueGroup (ValueGroup group) {
-    if (group !=null) {
       //add the group to the groupOwnedHash
       valueGroupOwnedHash.add(group);
       return group;
-    }
-    else {
-      Log.warn("in Parameter,addValueGroup(). ValueGroup passed in is null");
-      return null;
-    }
+
+
   }
 
-  /**removeValueGroup: remove a ValueGroup object from this object
-   * @Value: ValueGroup to be removed
-   * @return: true on success, false on failure
+  /** remove a ValueGroup object from this object
+   * @Value: group - ValueGroup to be removed
+   * @return true on success, false on failure
    */
   public boolean removeValueGroup(ValueGroup group) {
-    if (group == null) {
-      Log.warn("in Axis,removeValueGroup().  ValueGroup passed in is null");
-      return false;
-    }
     return valueGroupOwnedHash.remove(group);
   }
 
 
-  /**removeValue: removes an XDF::Value from the list of values in this Parameter object
-   * @param: list index number
-   * @return: true on success, false on failure
+  /** removes an Value from the list of values in this Parameter object
+   * @param index - list index number of the Value to be removed
+   * @return true on success, false on failure
    */
   public boolean removeValue(int index) {
      return removeFromList(index, getValueList(), "valueList");
   }
 
-  /**getValues: A convinience methods.  returns a list of values in this parameter
+  /** A convinience methods.  returns a list of values in this parameter
    */
   public List getValues() {
     return getValueList();
   }
 
- /** addNote: insert an XDF::Note object into the list of notes in this Parameter object
-   * @param: XDF::Note
-   * @return: an XDF::Note object on success, null on failure
+ /**  insert an Note object into the list of notes in this Parameter object
+   * @param Note
+   * @return an Note object
    */
   public Note addNote(Note n) {
-    if (n == null) {
-      Log.warn("in Parameter.addNote(), the Note passed in is null");
-      return null;
-    }
     getNoteList().add(n);
     return n;
   }
 
-  /**removeNote: removes an XDF::Note object from the list of notes in this Parameter object
-   * @param: Note to be removed
-   * @return: true on success, false on failure
+  /** removes an Note object from the list of notes in this Parameter object
+   * @param Note to be removed
+   * @return true on success, false on failure
    */
    public boolean removeNote(Note what) {
      return removeFromList(what, getNoteList(), "noteList");
@@ -348,43 +332,43 @@ public class Parameter extends BaseObject {
 
 
 
-   /**removeNote: removes an XDF::Note object from the list of notes in this Parameter object
-   * @param: list index number
-   * @return: true on success, false on failure
+   /** removes an Note object from the list of notes in this Parameter object
+   * @param index - list index number of the Note to be removed
+   * @return true on success, false on failure
    */
   public boolean removeNote(int index) {
      return removeFromList(index, getNoteList(), "noteList");
   }
 
-  /**getNotes: Convenience method which returns a list of the notes held by
+  /** Convenience method which returns a list of the notes held by
    * this object.
    */
   public List getNotes() {
     return getNoteList();
   }
 
-  /**addUnit: Insert an XDF::Unit object into the L<XDF::Units> object
+  /** Insert an Unit object into the L<Units> object
    * held in this object.
-   * @param: Unit to be added
-   * @return: an XDF::Unit object if successfull, null if not.
+   * @param Unit to be added
+   * @return an Unit object if successfull, null if not.
    */
   public Unit addUnit(Unit unit) {
     return  getUnits().addUnit(unit);
   }
 
-  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
+  /** Remove an Unit object from the Units object held in
    * this object
-   * @param: Unit to be removed
-   * @return: true if successful, false if not
+   * @param Unit to be removed
+   * @return true if successful, false if not
    */
   public boolean removeUnit(Unit what) {
     return getUnits().removeUnit(what);
   }
 
-  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
+  /** Remove an Unit object from the Units object held in
    * this object
-   * @param: list index number
-   * @return: true if successful, false if not
+   * @param list index number
+   * @return true if successful, false if not
    */
   public boolean removeUnit(int index) {
     return getUnits().removeUnit(index);
@@ -399,7 +383,7 @@ public class Parameter extends BaseObject {
         cloneObj.valueGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.valueGroupOwnedHash.size()));
         Iterator iter = this.valueGroupOwnedHash.iterator();
         while (iter.hasNext()) {
-          cloneObj.valueGroupOwnedHash.add(iter.next());
+          cloneObj.valueGroupOwnedHash.add(((Group)iter.next()).clone());
         }
       }
     }
