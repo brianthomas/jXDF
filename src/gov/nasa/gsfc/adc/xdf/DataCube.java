@@ -49,6 +49,12 @@ public class DataCube extends BaseObject {
   //Fields
   //
 
+  /* XML attribute names */
+  private static final String CHECKSUM_XML_ATTRIBUTE_NAME = "checksum";
+  private static final String COMPRESSION_TYPE_XML_ATTRIBUTE_NAME = "compression";
+  private static final String ENCODING_XML_ATTRIBUTE_NAME = "encoding";
+  private static final String HREF_XML_ATTRIBUTE_NAME = "href";
+
   private int dimension = 0;;
   private Array parentArray;
   private boolean hasMoreData;
@@ -69,10 +75,10 @@ public class DataCube extends BaseObject {
 
   /** The constructor that takes parentArray as param.
    */
-public DataCube(Array parentArray) {
-  this.parentArray = parentArray;
-  init();
-}
+  public DataCube(Array parentArray) {
+     this.parentArray = parentArray;
+     init();
+  }
 
   /**  This constructor takes a Java Hashtable as an initializer of
     the XML attributes of the object to be constructed. The
@@ -92,34 +98,11 @@ public DataCube(Array parentArray) {
     } */
 
 
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-private void init()
-  {
-
-    classXDFNodeName = "data";
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0, "compression");
-    attribOrder.add(0, "encoding");
-    attribOrder.add(0, "checksum");
-    attribOrder.add(0, "href");
-
-    //set up the attribute hashtable key with the default initial value
-    attribHash.put("compression", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("encoding", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("checksum", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("href", new XMLAttribute(null, Constants.OBJECT_TYPE));
-
-  };
-
   /** set the *href* attribute
    */
   public void setHref (Href hrefObj)
   {
-     ((XMLAttribute) attribHash.get("href")).setAttribValue(hrefObj);
+     ((XMLAttribute) attribHash.get(HREF_XML_ATTRIBUTE_NAME)).setAttribValue(hrefObj);
   }
 
   /**
@@ -127,20 +110,20 @@ private void init()
    */
   public Href getHref()
   {
-     return (Href) ((XMLAttribute) attribHash.get("href")).getAttribValue();
+     return (Href) ((XMLAttribute) attribHash.get(HREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *checksum* attribute
    */
-  public void setChecksum (Number checksum) {
-     ((XMLAttribute) attribHash.get("checksum")).setAttribValue(checksum);
+  public void setChecksum (String checksum) {
+     ((XMLAttribute) attribHash.get(CHECKSUM_XML_ATTRIBUTE_NAME)).setAttribValue(checksum);
   }
 
   /**
    * @return the current *checksum* attribute
    */
   public String getChecksum () {
-     return (String) ((XMLAttribute) attribHash.get("checksum")).getAttribValue();
+     return (String) ((XMLAttribute) attribHash.get(CHECKSUM_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /** set the *encoding* attribute
@@ -151,7 +134,7 @@ private void init()
       if (!Utility.isValidDataEncoding(strEncoding))
          Log.warnln("Encoding is not valid, ignoring request to setEncoding.");
       else
-         ((XMLAttribute) attribHash.get("encoding")).setAttribValue(strEncoding);
+         ((XMLAttribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).setAttribValue(strEncoding);
 
   }
 
@@ -160,7 +143,7 @@ private void init()
    */
   public String getEncoding()
   {
-    return (String) ((XMLAttribute) attribHash.get("encoding")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
 
@@ -172,7 +155,7 @@ private void init()
     if (!Utility.isValidDataCompression(strCompression))
        Log.warnln("Data compression value is not valid, ignoring request to set it.");
     else
-      ((XMLAttribute) attribHash.get("compression")).setAttribValue(strCompression);
+      ((XMLAttribute) attribHash.get(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strCompression);
 
   }
 
@@ -181,7 +164,7 @@ private void init()
    */
   public String getCompression()
   {
-    return (String) ((XMLAttribute) attribHash.get("compression")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**
@@ -210,11 +193,6 @@ private void init()
   public Array getParentArray() {
      return parentArray;
   }
-
-  protected void setParentArray(Array parentArray) {
-     this.parentArray = parentArray;
-  }
-
 
 
   //
@@ -281,10 +259,9 @@ public int decrementDimension() {
 }
 
 
-/** Regardless of what type of data is stored in the data cell we return the
-    String representation.
+/** We return whatever object is stored in the datacell.
  */
-public String getStringData(Locator locator) throws NoDataException 
+public Object getData (Locator locator) throws NoDataException
 {
 
   List axisList = parentArray.getAxisList();
@@ -292,21 +269,21 @@ public String getStringData(Locator locator) throws NoDataException
   int numOfAxis = axisList.size();
 
   if (numOfAxis == 1) {
-    int index = locator.getAxisLocation((Axis) axisList.get(0));
+    int index = locator.getAxisIndex((Axis) axisList.get(0));
     try {
       if (java.lang.reflect.Array.getByte(data.get(0), index) !=1)
         throw new NoDataException();
-      return java.lang.reflect.Array.get(data.get(1), index).toString();
+      return java.lang.reflect.Array.get(data.get(1), index);
     }
     catch (Exception e) {  //the location we try to access is not allocated,
       //i.e., no data in the cell
       throw new NoDataException();
     }
   }
-
+  
   for (int i = numOfAxis-1 ; i >= 2; i--) {
     Axis axis = (Axis) axisList.get(i);
-    int index =  locator.getAxisLocation(axis);
+    int index =  locator.getAxisIndex(axis);
     current = (List) current.get(index);
     if (current == null) {  //the location we try to access is not allocated, no data
       throw new NoDataException();
@@ -318,19 +295,19 @@ public String getStringData(Locator locator) throws NoDataException
   int index1;
   if (parentArray.hasFieldAxis()) {
     //FieldAxis is always the second to last innermost layer
-    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
-    index1 = locator.getAxisLocation((Axis) axisList.get(1));
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1));
   }
   else {
-    index0 = locator.getAxisLocation((Axis) axisList.get(1));
-    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+    index0 = locator.getAxisIndex((Axis) axisList.get(1));
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
   }
 
   try {
     if (java.lang.reflect.Array.getByte(current.get(2*index0), index1) !=1)
       throw new NoDataException();  //the location we try to access contains noDataValue
 
-    return  java.lang.reflect.Array.get(current.get(2*index0+1), index1).toString();
+    return java.lang.reflect.Array.get(current.get(2*index0+1), index1);
   }
   catch (Exception e) {  //the location we try to access is not allocated,
     //i.e., no data in the cell
@@ -339,14 +316,34 @@ public String getStringData(Locator locator) throws NoDataException
 
 }
 
-/**get integer data of a requested datacell
+/** Regardless of what type of data is stored in the data cell we return the
+    String representation.
  */
-public int getIntData(Locator locator) throws NoDataException{
+public String getStringData (Locator locator) 
+throws NoDataException 
+{
+
+  try {
+     Object data = getData(locator);
+     return data.toString();
+  }
+  catch (Exception e) {  //the location we try to access is not allocated,
+    //i.e., no data in the cell
+    throw new NoDataException();
+  }
+
+}
+
+/** Get integer data from a requested datacell. 
+ */
+public int getIntData (Locator locator) 
+throws NoDataException
+{
   List axisList = parentArray.getAxisList();
   List current = data;
   int numOfAxis = axisList.size();
   if (numOfAxis == 1) {
-    int index = locator.getAxisLocation((Axis) axisList.get(0));
+    int index = locator.getAxisIndex((Axis) axisList.get(0));
     try {
       if (java.lang.reflect.Array.getByte(data.get(0), index) !=1)
         throw new NoDataException();
@@ -360,7 +357,7 @@ public int getIntData(Locator locator) throws NoDataException{
 
   for (int i = numOfAxis-1 ; i >= 2; i--) {
     Axis axis = (Axis) axisList.get(i);
-    int index =  locator.getAxisLocation(axis);
+    int index =  locator.getAxisIndex(axis);
     current = (List) current.get(index);
     if (current == null) {  //the location we try to access is not allocated, no data
       throw new NoDataException();
@@ -372,12 +369,12 @@ public int getIntData(Locator locator) throws NoDataException{
   int index1;
   if (parentArray.hasFieldAxis()) {
     //FieldAxis is always the second to last innermost layer
-    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
-    index1 = locator.getAxisLocation((Axis) axisList.get(1));
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1));
   }
   else {
-    index0 = locator.getAxisLocation((Axis) axisList.get(1));
-    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+    index0 = locator.getAxisIndex((Axis) axisList.get(1));
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
   }
 
   try {
@@ -403,7 +400,7 @@ public double getDoubleData(Locator locator) throws NoDataException {
 
   // one dimensional cube case
   if (numOfAxis == 1) {
-    int index = locator.getAxisLocation((Axis) axisList.get(0));
+    int index = locator.getAxisIndex((Axis) axisList.get(0));
     try {
       if (java.lang.reflect.Array.getByte(data.get(0), index) !=1)
         throw new NoDataException();
@@ -418,7 +415,7 @@ public double getDoubleData(Locator locator) throws NoDataException {
   // multi-dimensional case
   for (int i = numOfAxis-1 ; i >= 2; i--) {
     Axis axis = (Axis) axisList.get(i);
-    int index =  locator.getAxisLocation(axis);
+    int index =  locator.getAxisIndex(axis);
     current = (List) current.get(index);
     if (current == null) {  //the location we try to access is not allocated, no data
       throw new NoDataException();
@@ -430,12 +427,12 @@ public double getDoubleData(Locator locator) throws NoDataException {
   int index1;
   if (parentArray.hasFieldAxis()) {
     //FieldAxis is always the second to last innermost layer
-    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
-    index1 = locator.getAxisLocation((Axis) axisList.get(1));
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1));
   }
   else {
-    index0 = locator.getAxisLocation((Axis) axisList.get(1));
-    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+    index0 = locator.getAxisIndex((Axis) axisList.get(1));
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
   }
 
   try {
@@ -455,9 +452,12 @@ public double getDoubleData(Locator locator) throws NoDataException {
 
 
   /**Append the String value onto the requested datacell
-   * double check: how to prevent the user from appending to an int or double?
    */
-  public void appendData (Locator locator, String strValue) throws SetDataException{
+// double check: how to prevent the user from appending to an int or double?
+  public void appendData (Locator locator, String strValue) 
+  throws SetDataException 
+  {
+
     String strData;
     try {
       strData = getStringData(locator);
@@ -471,19 +471,39 @@ public double getDoubleData(Locator locator) throws NoDataException {
 
   }
 
-  /** Set the SCALAR value of the requested datacell
-   * (via L<DataCube> LOCATOR REF).
-   * Overwrites existing datacell value if any.
+  /** Set the value of the requested datacell. 
+   *  Overwrites existing datacell value if already populated with a value.
+   */
+   public void setData (Locator locator, Double value) 
+   throws SetDataException
+   {
+      setData(locator, value.doubleValue());
+   }
+
+  /** Set the value of the requested datacell. 
+   *  Overwrites existing datacell value if already populated with a value.
+   */
+   public void setData (Locator locator, Integer value)
+   throws SetDataException
+   {  
+      setData(locator, value.intValue());
+   }
+
+  /** Set the value of the requested datacell. 
+   *  Overwrites existing datacell value if already populated with a value.
    */
 
-public void setData (Locator locator, double numValue) throws SetDataException{
+public void setData (Locator locator, double numValue) 
+throws SetDataException
+{
+
   List axisList = parentArray.getAxisList();
   List prev = data;
   List current = data;
   int numOfAxis = axisList.size();
   if (numOfAxis == 1) {
     Axis axis = (Axis) axisList.get(0);
-    int index = locator.getAxisLocation(axis);
+    int index = locator.getAxisIndex(axis);
 
     if (data.get(0) == null) {
       //used to track if the corresponding cell stores valid data
@@ -534,7 +554,7 @@ public void setData (Locator locator, double numValue) throws SetDataException{
   //contructs arraylist of arraylist to represent the multi-dimension
   for (int i = numOfAxis-1 ; i >=2; i--) {
     Axis axis = (Axis) axisList.get(i);
-    int index =  locator.getAxisLocation(axis);
+    int index =  locator.getAxisIndex(axis);
     int end = axis.getLength() - prev.size();
     for (int k = 0; k < end ; k++)  //expand it if prev.size < index+1
       prev.add(null);
@@ -553,12 +573,12 @@ public void setData (Locator locator, double numValue) throws SetDataException{
   int index0;
   int index1;
   if (parentArray.hasFieldAxis()) {
-    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
-    index1 = locator.getAxisLocation((Axis) axisList.get(1) );
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1) );
   }
   else {
-    index0 = locator.getAxisLocation((Axis) axisList.get(1) );
-    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+    index0 = locator.getAxisIndex((Axis) axisList.get(1) );
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
   }
 
   int stop = 2*(index0+1)-current.size();
@@ -601,6 +621,7 @@ public void setData (Locator locator, double numValue) throws SetDataException{
     current.set(newCoordinate+1, newArray);
     oldArray = null; //force garbage collection
   }
+
   try { //set data
     byte realValue = 1;
     //indicate its corresponding datacell holds valid data
@@ -612,20 +633,23 @@ public void setData (Locator locator, double numValue) throws SetDataException{
   catch (Exception e) {
     throw new SetDataException();
   }
+
 }
 
   /** setData: Set the SCALAR value of the requested datacell
    * (via L<DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
-public void setData(Locator locator, int numValue) throws SetDataException{
+public void setData(Locator locator, int numValue) 
+throws SetDataException 
+{
   List axisList = parentArray.getAxisList();
   List prev = data;
   List current = data;
   int numOfAxis = axisList.size();
   if (numOfAxis == 1) {
     Axis axis = (Axis) axisList.get(0);
-    int index = locator.getAxisLocation(axis);
+    int index = locator.getAxisIndex(axis);
 
     if (data.get(0) == null) {
       //used to track if the corresponding cell stores valid data
@@ -673,7 +697,7 @@ public void setData(Locator locator, int numValue) throws SetDataException{
   //contructs arraylist of arraylist to represent the multi-dimension
   for (int i = numOfAxis-1 ; i >=2; i--) {
     Axis axis = (Axis) axisList.get(i);
-    int index =  locator.getAxisLocation(axis);
+    int index =  locator.getAxisIndex(axis);
     int end = axis.getLength() - prev.size();
     for (int k = 0; k < end ; k++)  //expand it if prev.size < index+1
       prev.add(null);
@@ -692,12 +716,12 @@ public void setData(Locator locator, int numValue) throws SetDataException{
  int index0;
  int index1;
  if (parentArray.hasFieldAxis()) { //fieldAxis is always the 2nd to last layer
-    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
-    index1 = locator.getAxisLocation((Axis) axisList.get(1) );
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1) );
   }
   else {
-    index0 = locator.getAxisLocation((Axis) axisList.get(1) );
-    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+    index0 = locator.getAxisIndex((Axis) axisList.get(1) );
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
   }
 
   int stop = 2*(index0+1)-current.size();
@@ -758,14 +782,16 @@ public void setData(Locator locator, int numValue) throws SetDataException{
    * (via L<DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
-public void setData (Locator locator, String strValue) throws SetDataException{
+public void setData (Locator locator, String strValue) 
+throws SetDataException
+{
   List axisList = parentArray.getAxisList();
   List prev = data;
   List current = data;
   int numOfAxis = axisList.size();
   if (numOfAxis == 1) {
     Axis axis = (Axis) axisList.get(0);
-    int index = locator.getAxisLocation(axis);
+    int index = locator.getAxisIndex(axis);
 
     if (data.get(0) == null) {
       //used to track if the corresponding cell stores valid data
@@ -813,7 +839,7 @@ public void setData (Locator locator, String strValue) throws SetDataException{
   //contructs arraylist of arraylist to represent the multi-dimension
   for (int i = numOfAxis-1 ; i >=2; i--) {
     Axis axis = (Axis) axisList.get(i);
-    int index =  locator.getAxisLocation(axis);
+    int index =  locator.getAxisIndex(axis);
     int end = axis.getLength() - prev.size();
     for (int k = 0; k < end ; k++)  //expand it if prev.size < index+1
       prev.add(null);
@@ -833,12 +859,12 @@ public void setData (Locator locator, String strValue) throws SetDataException{
   int index1;
 
   if (parentArray.hasFieldAxis()) {
-    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
-    index1 = locator.getAxisLocation((Axis) axisList.get(1) );
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1) );
   }
   else {
-    index0 = locator.getAxisLocation((Axis) axisList.get(1) );
-    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+    index0 = locator.getAxisIndex((Axis) axisList.get(1) );
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
   }
 
   int stop = 2*(index0+1)-current.size();
@@ -906,7 +932,7 @@ protected boolean  removeData (Locator locator) {
   List current = data;
   int numOfAxis = axisList.size();
   if (numOfAxis == 1) {
-    int index = locator.getAxisLocation((Axis) axisList.get(0));
+    int index = locator.getAxisIndex((Axis) axisList.get(0));
     try {
       if (java.lang.reflect.Array.getByte(data.get(0), index) ==1) {
         //there is the data in the requested cell
@@ -940,7 +966,7 @@ protected boolean  removeData (Locator locator) {
 
   for (int i = numOfAxis-1 ; i >= 2; i--) {
     Axis axis = (Axis) axisList.get(i);
-    int index =  locator.getAxisLocation(axis);
+    int index =  locator.getAxisIndex(axis);
     current = (List) current.get(index);
     if (current == null) {
       //the location we try to access is not allocated, no data
@@ -953,12 +979,12 @@ protected boolean  removeData (Locator locator) {
   int index1;
   if (parentArray.hasFieldAxis()) {
     //FieldAxis is always the second to last innermost layer
-    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
-    index1 = locator.getAxisLocation((Axis) axisList.get(1));
+    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisIndex((Axis) axisList.get(1));
   }
   else {
-    index0 = locator.getAxisLocation((Axis) axisList.get(1));
-    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+    index0 = locator.getAxisIndex((Axis) axisList.get(1));
+    index1 = locator.getAxisIndex((Axis) axisList.get(0));
   }
 
   try {
@@ -1065,15 +1091,31 @@ protected boolean  removeData (Locator locator) {
 
     // write data node attributes
     if (writeHrefAttribute) {
-      writeOut(outputstream, " href=\"");
+      writeOut(outputstream, " "+HREF_XML_ATTRIBUTE_NAME+"=\"");
       writeOutAttribute(outputstream, hrefObj.getName());
       writeOut(outputstream, "\"");
     }
 
     String checksum = getChecksum();
     if (checksum != null) {  
-      writeOut(outputstream, " checksum=\"");
+      writeOut(outputstream, " "+CHECKSUM_XML_ATTRIBUTE_NAME+"=\"");
       writeOutAttribute(outputstream, checksum.toString());
+      writeOut(outputstream, "\"");
+    }
+
+
+    String encoding = getEncoding();
+    if (encoding!= null) {  
+      writeOut(outputstream, " "+ENCODING_XML_ATTRIBUTE_NAME+"=\"");
+      writeOutAttribute(outputstream, encoding.toString());
+      writeOut(outputstream, "\"");
+    }
+
+
+    String compress = getCompression();
+    if (compress != null) {  
+      writeOut(outputstream, " "+COMPRESSION_TYPE_XML_ATTRIBUTE_NAME+"=\"");
+      writeOutAttribute(outputstream, compress.toString());
       writeOut(outputstream, "\"");
     }
 
@@ -1087,9 +1129,10 @@ protected boolean  removeData (Locator locator) {
     AxisInterface fastestAxis = (AxisInterface) parentArray.getAxisList().get(0);
     //stores the NoDataValues for the parentArray,
     //used in writing out when NoDataException is caught
-    String NoDataValues[] = new String[fastestAxis.getLength()];
+    String[] NoDataValues;
 
     if (parentArray.hasFieldAxis()) {
+      NoDataValues = new String[fastestAxis.getLength()];
       DataFormat[] dataFormatList = parentArray.getDataFormatList();
       for (int i = 0; i < NoDataValues.length; i++) {
         DataFormat d =  dataFormatList[i];
@@ -1098,11 +1141,17 @@ protected boolean  removeData (Locator locator) {
       }
     }
     else {
+          NoDataValues = new String[1];
+          NoDataValues[0] = parentArray.getNoDataValue();
+/*
+     // what tis this?? If there is no fieldAxis, then no fields,
+     // and hence, only ONE noDataValue.
       DataFormat d = parentArray.getDataFormat();
       for (int i = 0; i < NoDataValues.length; i++) {
         if (d!=null && d.getNoDataValue() != null) 
           NoDataValues[i] = d.getNoDataValue().toString();
       }
+*/
     }
 
     if (readObj instanceof TaggedXMLDataIOStyle) {
@@ -1112,7 +1161,6 @@ protected boolean  removeData (Locator locator) {
 
       for (int i = stop-1; i >= 0 ; i--) {
         tags[stop-i-1]  = tagOrder[i];
-	// System.out.println(tagOrder.get(i));
       }
 
       int[] axes = getMaxDataIndex();
@@ -1172,7 +1220,7 @@ protected boolean  removeData (Locator locator) {
   /**writeTaggedData: write out tagged data
    *
    */
-  protected void writeTaggedData(OutputStream outputstream,
+  private void writeTaggedData(OutputStream outputstream,
 			       Locator locator,
 			       String indent,
 			       int[] axisLength,
@@ -1181,6 +1229,8 @@ protected boolean  removeData (Locator locator) {
                                AxisInterface fastestAxis,
                                String[] noDataValues)
   {
+
+    int nrofNoDataValues = noDataValues.length;
 
     String tag = (String) tags[which];
     if (Specification.getInstance().isPrettyXDFOutput()) {
@@ -1212,10 +1262,16 @@ protected boolean  removeData (Locator locator) {
           }
           catch (NoDataException e) {
              // opps! no data in that location. Print out accordingly
-             String noDataValueString = noDataValues[locator.getAxisLocation(fastestAxis)];
-             if (noDataValueString != null)
+             // sloppy algorithm as a result of clean up after Kelly 
+             String noDataString;
+             if (nrofNoDataValues > 1)
+                noDataString = noDataValues[locator.getAxisIndex(fastestAxis)];
+             else
+                noDataString = noDataValues[0];
+
+             if (noDataString != null)
              {
-                writeOut(outputstream, ">" + noDataValueString );
+                writeOut(outputstream, ">" + noDataString );
                 writeOut( outputstream, "</" + tag1 + ">");
              } else
                 writeOut( outputstream, "/>");
@@ -1263,6 +1319,9 @@ protected boolean  removeData (Locator locator) {
                                     boolean writeCDATAStatement
                                   ) 
   {
+
+    int nrofNoDataValues = noDataValues.length;
+
     String delimiter = readObj.getDelimiter();
     String recordTerminator = readObj.getRecordTerminator();
     int fastestAxisLength = fastestAxis.getLength();
@@ -1279,9 +1338,20 @@ protected boolean  removeData (Locator locator) {
 
       } catch (NoDataException e) {  //double check, a bug here, "yes" is already printed
 
-         String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
+         // sloppy algorithm as a result of clean up after Kelly 
+         String noData;
+         if (nrofNoDataValues > 1)
+             noData = noDataValues[locator.getAxisIndex(fastestAxis)];
+         else
+             noData = noDataValues[0];
+
          if (noData == null) {
-            readObj.setRepeatable("no");
+            if(readObj.getRepeatable().equals("yes"))
+            {
+               // should throw an error
+               Log.errorln("Error: you have not set noDataValue and have a repeatable delimiter. Can't write data. Aborting.");
+               System.exit(-1);
+            }
          } else {
            writeOut(outputstream, noData);
          }
@@ -1307,9 +1377,11 @@ protected boolean  removeData (Locator locator) {
                                    FormattedXMLDataIOStyle readObj,
                                    AxisInterface fastestAxis,
                                    String[] noDataValues,
-                                   boolean writeCDATAStatement
+                                   boolean writeCDATAStatement 
                                   )
    {
+
+      int nrofNoDataValues = noDataValues.length;
 
       // print opening CDATA statement
       if (writeCDATAStatement) 
@@ -1321,12 +1393,26 @@ protected boolean  removeData (Locator locator) {
       { 
 
         List commands = readObj.getCommands(); // returns expanded list (no repeat cmds) 
+        String endian = readObj.getEndian();
         int nrofCommands = commands.size();
         int currentCommand = 0;
 
-        DataFormat dataFormats[] = parentArray.getDataFormatList(); 
-        int nrofDataFormats = dataFormats.length;
+        // init important dataFormat information into arrays, this 
+        // will help speed up long writes.
+        DataFormat dataFormat[] = parentArray.getDataFormatList(); 
+        int nrofDataFormats = dataFormat.length;
         int currentDataFormat = 0;
+        String[] pattern = new String[nrofDataFormats];
+        String[] intFlag = new String[nrofDataFormats];
+        int[] numOfBytes = new int[nrofDataFormats];
+        for (int i=0; i< nrofDataFormats; i++) { 
+           pattern[i] = dataFormat[i].getFormatPattern();
+           numOfBytes[i] = dataFormat[i].numOfBytes();
+           if (dataFormat[i] instanceof IntegerDataFormat) 
+              intFlag[i] = ((IntegerDataFormat) dataFormat[i]).getType();
+           else 
+              intFlag[i] = null;
+        }
 
         // loop thru all of the dataCube until finished with all data and commands 
         boolean atEndOfDataCube = false;
@@ -1336,7 +1422,7 @@ protected boolean  removeData (Locator locator) {
 
              FormattedIOCmd command = (FormattedIOCmd) commands.get(currentCommand);
 
-             if(atEndOfDataCube && locator.getAxisLocation(fastestAxis) == 0) 
+             if(atEndOfDataCube && locator.getAxisIndex(fastestAxis) == 0) 
                  backToStartOfDataCube = true;
 
              if (command instanceof ReadCellFormattedIOCmd)
@@ -1346,17 +1432,28 @@ protected boolean  removeData (Locator locator) {
 
                 try {
                    doReadCellFormattedIOCmdOutput( outputstream,
-                                                   dataFormats[currentDataFormat],
+                                                   dataFormat[currentDataFormat],
+                                                   numOfBytes[currentDataFormat],
+                                                   pattern[currentDataFormat],
+                                                   endian,
+                                                   intFlag[currentDataFormat],
                                                    locator );
                 } catch (NoDataException e) {
 
                     // no data here, hurm. Print the noDataValue. 
-                    // Is this always appropriate, seems questionable? -b.t. 
-                    String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
-                    if (noData != null)
-                         writeOut(outputstream, noData);
-                    else
-                       Log.errorln("Cant print out null data: noDataValue NOT defined.");
+                    // sloppy algorithm as a result of clean up after Kelly 
+                    String noData;
+
+                    if (nrofNoDataValues > 1) 
+                        noData = noDataValues[locator.getAxisIndex(fastestAxis)];
+                    else 
+                        noData = noDataValues[0];
+
+                    if (noData != null) { 
+                        writeOut(outputstream, noData);
+                    } else { 
+                        Log.errorln("Can't print out null data: noDataValue NOT defined.");
+                    }
 
                 }
 
@@ -1420,14 +1517,16 @@ protected boolean  removeData (Locator locator) {
    // performance. -b.t. 
    private void doReadCellFormattedIOCmdOutput ( OutputStream outputstream,
                                                  DataFormat thisDataFormat, 
+                                                 int formatsize,
+                                                 String pattern,
+                                                 String endian,
+                                                 String intFlagType,
                                                  Locator locator
                                                ) 
    throws NoDataException
    {
 
          String output = null;
-         String pattern = thisDataFormat.getFormatPattern();
-         int formatsize = thisDataFormat.numOfBytes();
 
          // format the number for output
          if (thisDataFormat instanceof IntegerDataFormat )
@@ -1436,7 +1535,32 @@ protected boolean  removeData (Locator locator) {
 
             DecimalFormat formatter = new DecimalFormat(pattern);
             Integer thisDatum = new Integer (getIntData(locator));
-            output = formatter.format(thisDatum);
+
+            if (intFlagType.equals(Constants.INTEGER_TYPE_DECIMAL)) {
+
+               output = formatter.format(thisDatum);
+
+            } else if (intFlagType.equals(Constants.INTEGER_TYPE_OCTAL)) {
+
+               String intStrVal = Integer.toOctalString(thisDatum.intValue());
+               //output = formatter.format(Integer.toOctalString(thisDatum.intValue()));
+               int size = intStrVal.length();
+               while (size++ < formatsize) 
+                  intStrVal = new String ("0" + intStrVal);
+               output = intStrVal;
+
+            } else if (intFlagType.equals(Constants.INTEGER_TYPE_HEX)) {
+
+               String intStrVal = Integer.toHexString(thisDatum.intValue());
+               int size = intStrVal.length();
+               while (size++ < (formatsize-2)) 
+                  intStrVal = new String ("0" + intStrVal); 
+
+               // tack on leading stuff
+               output = "0x" + intStrVal;
+
+            } 
+
 
          } else if (thisDataFormat instanceof StringDataFormat)
          {
@@ -1447,7 +1571,8 @@ protected boolean  removeData (Locator locator) {
             if(output.length() > formatsize)
                output = output.substring(0,formatsize);
 
-         } else if ( thisDataFormat instanceof FloatDataFormat)
+         } 
+         else if ( thisDataFormat instanceof FloatDataFormat)
          {
 
             // Exponentials need special treatment. Why? because as of Java
@@ -1466,30 +1591,111 @@ protected boolean  removeData (Locator locator) {
                Log.warnln("["+output+"]");
             }
 
-/*
-         } else if ( thisDataFormat instanceof BinaryFloatDataFormat)
+         } 
+         else if ( thisDataFormat instanceof BinaryFloatDataFormat)
          {
          
-            Double thisDatum = new Double(getDoubleData(locator));
-            byte[] byteValues = new byte[1];
-            byteValues[0] = thisDatum.byteValue();
-            output = new String(byteValues);
+            int numOfBytes = thisDataFormat.numOfBytes();
+            byte[] byteBuf = new byte[numOfBytes];
+
+            if (numOfBytes == 8) 
+            {
+
+               long lbits = Double.doubleToLongBits(getDoubleData(locator));
+
+               byteBuf[0] = (byte) (lbits >>> 56);
+               byteBuf[1] = (byte) (lbits >>> 48);
+               byteBuf[2] = (byte) (lbits >>> 40);
+               byteBuf[3] = (byte) (lbits >>> 32);
+               byteBuf[4] = (byte) (lbits >>> 24);
+               byteBuf[5] = (byte) (lbits >>> 16);
+               byteBuf[6] = (byte) (lbits >>>  8);
+               byteBuf[7] = (byte)  lbits;
+
+            } 
+            else if (numOfBytes == 4) 
+            {
+
+               // Q: does this involve rounding??
+               float datum = (float) getDoubleData(locator);
+               int ibits = Float.floatToIntBits(datum);
+
+               byteBuf[0] = (byte) (ibits >>> 24);
+               byteBuf[1] = (byte) (ibits >>> 16);
+               byteBuf[2] = (byte) (ibits >>>  8);
+               byteBuf[3] = (byte)  ibits;
+
+            } 
+            else 
+            {
+               Log.errorln("Got weird number of bytes for BinaryFloatDataFormat:"+numOfBytes+" exiting.");
+               System.exit(-1);
+            }
+
+            // check for endianess
+            if (endian.equals(Constants.LITTLE_ENDIAN)) 
+            {
+               // reverse the byte order
+               byteBuf = reverseBytes ( byteBuf );
+            }
+
+            output = new String(byteBuf);
             
-         } else if ( thisDataFormat instanceof BinaryIntegerDataFormat)
+         } 
+         else if ( thisDataFormat instanceof BinaryIntegerDataFormat)
          {
 
-            Integer thisDatum = new Integer(getIntData(locator));
-            byte[] byteValues = new byte[1];
-            byteValues[0] = thisDatum.byteValue();
-            output = new String(byteValues);
-*/ 
+            int numOfBytes = thisDataFormat.numOfBytes();
+            byte[] byteBuf = new byte[numOfBytes];
+            int i = getIntData(locator);
 
-         } else {
+            // short
+            if (numOfBytes == 2) {
+
+               byteBuf[0] = (byte) (i >>>  8);
+               byteBuf[1] = (byte)  i;
+
+            } else if (numOfBytes == 4) {
+
+               byteBuf[0] = (byte) (i >>> 24);
+               byteBuf[1] = (byte) (i >>> 16);
+               byteBuf[2] = (byte) (i >>>  8);
+               byteBuf[3] = (byte)  i;
+
+            } else if (numOfBytes == 8) {
+
+               byteBuf[0] = (byte) (i >>> 56);
+               byteBuf[1] = (byte) (i >>> 48);
+               byteBuf[2] = (byte) (i >>> 40);
+               byteBuf[3] = (byte) (i >>> 32);
+               byteBuf[4] = (byte) (i >>> 24);
+               byteBuf[5] = (byte) (i >>> 16);
+               byteBuf[6] = (byte) (i >>>  8);
+               byteBuf[7] = (byte)  i;
+
+            } else {
+               Log.errorln("Got weird number of bytes for BinaryIntegerDataFormat:"+numOfBytes+" exiting.");
+               System.exit(-1);
+            }
+
+            if (endian.equals(Constants.LITTLE_ENDIAN)) 
+            {
+               // reverse the byte order
+               byteBuf = reverseBytes ( byteBuf );
+            }
+
+            output = new String(byteBuf);
+
+         } 
+         else 
+         {
+            // a failure to communicate :)
             Log.errorln("Unknown Dataformat:"+thisDataFormat.getClass().toString()
                         +" is not implemented for formatted writes. Aborting.");
             System.exit(-1);
          }
 
+         // if we have some output, write it
          if (output != null) {
 
             // pad with leading spaces
@@ -1514,6 +1720,11 @@ protected boolean  removeData (Locator locator) {
    // PROTECTED methods
    //
 
+  protected void setParentArray(Array parentArray) {
+     this.parentArray = parentArray;
+  }
+
+
   /**deep copy of this Data object
    */
   protected Object clone() throws CloneNotSupportedException {
@@ -1527,8 +1738,44 @@ protected boolean  removeData (Locator locator) {
   }
 
   //
-  //PRIVATE methods
+  // PRIVATE methods
   //
+
+   /** init -- special private method used by constructor methods to
+       convienently build the XML attribute list for a given class.
+    */
+   private void init()
+   {
+
+    classXDFNodeName = "data";
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0, COMPRESSION_TYPE_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, ENCODING_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, CHECKSUM_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, HREF_XML_ATTRIBUTE_NAME);
+
+    //set up the attribute hashtable key with the default initial value
+    attribHash.put(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(CHECKSUM_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(HREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));
+
+  };
+
+  /* reverse the byte order */
+  private byte[] reverseBytes ( byte[] bytes ) {
+
+     int bufsize = (bytes.length - 1);
+     byte[] rbytes = new byte[bufsize+1];
+
+     for (int i=0; i <= bufsize; i++) 
+        rbytes[bufsize-i] = bytes[i];
+
+     return rbytes;
+  }
+
   /**deepCopy: deep copy data
    * @param data - the data that needs to be copied
    *         currentLayer--which dimension we are copying
@@ -1584,6 +1831,11 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.23  2001/02/07 18:40:15  thomas
+  * Added new setData methods. Converted XML attribute decl
+  * to use constants (final static fields within the object). These
+  * are private decl for now. -b.t.
+  *
   * Revision 1.22  2001/01/29 19:29:34  thomas
   * Changes related to combining ExponentialDataFormat
   * and FloatDataFormat classes. -b.t.
