@@ -152,6 +152,9 @@ public abstract class BaseObject implements Serializable {
   // Get/Set Methods
   //
 
+
+
+
   /** The class XDF node name may (or may not exist) for a given XDF java object.
      @return: String on success, null (String Object) on if the node name doesnt exist.
   */
@@ -159,24 +162,32 @@ public abstract class BaseObject implements Serializable {
     return classXDFNodeName;
   }
 
-  /** Return the hashtable of XMLAttribute names and their values. 
-      @return: Hashtable on success, an empty hashtable is passed back if their 
+  /** Return the hashtable of XMLAttribute names and their values.
+      @return: Hashtable on success, an empty hashtable is passed back if their
                are no XMLAttributes within a given XDF object class.
   */
   public Hashtable getAttribHash() {
     return attribHash;
   }
 
+  /**set the attributes of this object from the passed attribute Hash reference
+   *
+   */
+  public Hashtable setAttribHash(Hashtable hash) {
+    attribHash = hash;
+    return attribHash;
+  }
+
   /** Return a list of the proper ordering of the XML attributes of this object.
-      @return: List on success, on failure an empty List object is passed back if 
+      @return: List on success, on failure an empty List object is passed back if
                there are no XMLAttributes within a XDF given object class.
   */
   public List getAttribOrder() {
     return attribOrder;
   }
 
-  /** Get the output XDF format style. 
-      @return: the value of sPrettyXDFOutput field  (which is true if nicely formatted 
+  /** Get the output XDF format style.
+      @return: the value of sPrettyXDFOutput field  (which is true if nicely formatted
                XML is to be outputted from any call to a toXDF* method, false if not).
   */
   public static boolean getPrettyXDFOutput() {
@@ -198,7 +209,7 @@ public abstract class BaseObject implements Serializable {
       output XDF. For example, if the string consists of 3 spaces, then a doubly nested
                node will be indented 6 spaces, its parent node will be indented 3 spaces and the
                root node will not be indented at all.
-      @return: String object containing XDF output indentation. 
+      @return: String object containing XDF output indentation.
   */
   public static String getPrettyXDFOutputIndentation() {
     return sPrettyXDFOutputIndentation;
@@ -206,7 +217,7 @@ public abstract class BaseObject implements Serializable {
 
   /** Set the indentation string for PrettyXDFOutput. You aren't limited to just spaces
      here, ANY sequence of characters may be used to indent your XDF documents.
-      @return: String object containing XDF output indentation. 
+      @return: String object containing XDF output indentation.
   */
   public static String setPrettyXDFOutputIndentation(String indentString) {
     sPrettyXDFOutputIndentation = indentString;
@@ -264,8 +275,15 @@ public abstract class BaseObject implements Serializable {
   // Other Public Methods
   //
 
+  /**set the attributes of this object from the passed attribute Hash reference
+   * the same as setAttribHash()
+   */
+  public Hashtable update(Hashtable hash) {
+    return setAttribHash(hash);
+  }
+
   /** Add this object to the indicated Group object.
-      @return: Group added to on success, null (Group Object) on failure. 
+      @return: Group added to on success, null (Group Object) on failure.
   */
   public Group addToGroup(Group groupObject) {
 
@@ -286,7 +304,7 @@ public abstract class BaseObject implements Serializable {
   }
 
   /** Remove this object from the indicated Group object.
-      @return: Group removed from on success, null (Group Object) on failure. 
+      @return: Group removed from on success, null (Group Object) on failure.
   */
   public Group removeFromGroup (Group groupObject) {
     if (groupObject != null)  {
@@ -773,8 +791,8 @@ public abstract class BaseObject implements Serializable {
            strType != Constants.STRING_TYPE ||
            strType != Constants.OBJECT_TYPE ||
            strType != Constants.NUMBER_TYPE ||
-           strType != Constants.LIST_TYPE 
-         ) 
+           strType != Constants.LIST_TYPE
+         )
       {
         Log.error("Type not a defined constant for XMLAttribute");
         return null;
