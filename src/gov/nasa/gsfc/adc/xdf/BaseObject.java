@@ -368,8 +368,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
               while (iter.hasNext()) {
                 BaseObject containedObj = (BaseObject) iter.next();
                 if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
-                  indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                   indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
+                  indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                   String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
                   containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
                 }
@@ -382,8 +382,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
             if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
               // shouldnt this be synchronized too??
               synchronized(containedObj) {
-                indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                 indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
+                indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                 String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
                 containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
               }
@@ -852,6 +852,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.47  2001/07/06 18:31:47  thomas
+ * Fixed bug in group printing in toXMLOutputStream.
+ *
  * Revision 1.46  2001/06/28 16:50:54  thomas
  * changed add method(s) to return boolean.
  *

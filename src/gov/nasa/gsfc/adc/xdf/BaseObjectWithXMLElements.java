@@ -224,8 +224,8 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
                  while (iter.hasNext()) {
                    BaseObject containedObj = (BaseObject) iter.next();
                    if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
-                     indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                      indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
+                     indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                      String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
                      containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
                    }
@@ -238,8 +238,8 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
                if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
                  // shouldnt this be synchronized too??
                  synchronized(containedObj) {
-                   indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                    indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
+                   indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                    String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
                    containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
                  }
