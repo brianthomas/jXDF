@@ -3,20 +3,71 @@
 package gov.nasa.gsfc.adc.xdf;
 import java.util.*;
 import java.io.*;
+
+// Log.java Copyright (C) 2000 Brian Thomas,
+// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+
+/*
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*/
+
+
 /**
- * Log.java: to handle debug, error msg, etc.
+ * Log.java: to handle debug, error msg, etc. There are four priority levels for
+ * messages--error|warn|debug|info with priority error>warn>debug>info. The
+ * default setting for msg handling is that only error msgs are printed out to
+ * standard System.out.  The user can supply a configuration file for this Log
+ * to read from.  A sample of the configuration file is included--XDFLogConfig.
+ * contributor: Kelly Zeng (kelly.zeng@commerceone.com)
  * @version $Revision$
+ */
+
+ /**
+ # this is a sample of the XDF log configuration file
+ # Output could be either a file for the log messages to write to or
+ # standard System.out, for example
+ # Output=C:/Data/XDF/gov/nasa/gsfc/adc/xdf/XDFLog or
+ # Output=System.out
+
+ Output=System.out
+
+ # four levels of priority, error>warn>debug>info
+ # 0: all levels are printed
+ # 1: priority >=debug are printed
+ # 2: priority >=warn are printed
+ # 3: priority >=error are printed
+
+ Priority=0
+
  */
 
 public class Log {
   //
   //Fields
   //
-  protected static int priority ; //hold the priority that is read from the configuration file
-  protected static OutputStream output ;  //hold the output stream
 
   public static final OutputStream DEFAULT_OUTPUTSTREAM = System.out;
   public static final int DEFAULT_PRIORITY = Priority.ERROR;
+
+
+  //hold the priority, initial is Priority.ERROR;
+  protected static int priority = DEFAULT_PRIORITY;
+  //hold the output stream, initial is System.out
+  protected static OutputStream output = DEFAULT_OUTPUTSTREAM;
+
 
   //
   //constructor and related methods
@@ -72,14 +123,16 @@ public class Log {
 
     String outputFormat = properties.getProperty("Output");
     String strPri = properties.getProperty("Priority");
+    String strTimestamp = properties.getProperty("Timestamp");
     if (strPri == null)
       priority = DEFAULT_PRIORITY;  //default priority
     else
       priority = Integer.parseInt(properties.getProperty("Priority"));
+
     if(outputFormat != null) {
       if ( outputFormat.equalsIgnoreCase("System.out")) {  //output is System.out
         //System.out.println("yes, config read in is System.out");
-        output = new PrintStream(System.out);
+        output = System.out;
       }
       else {  //output is a file
         try {
@@ -89,7 +142,7 @@ public class Log {
           System.out.println("error opening the log file to write to");
           System.out.println("logs are by default printed to System.out");
           // use default output
-          output = new PrintStream(DEFAULT_OUTPUTSTREAM);
+          output = DEFAULT_OUTPUTSTREAM;
         }
       }
     }
@@ -146,6 +199,22 @@ public class Log {
     catch (IOException e) {
       System.err.println("error in Log.error()");
       e.printStackTrace();
+    }
+  }
+
+  /**close: release the resources held by Log
+   * i.e., close the output if it is FileOutputStream
+   */
+  public static void close() {
+    if (output.getClass().getName().equalsIgnoreCase("java.io.FileOutputStream")) {
+      try {
+        output.close();
+      }
+      catch (IOException e) {
+        System.out.println("in Log.close().  error");
+        e.printStackTrace();
+        return;
+      }
     }
   }
 
