@@ -23,7 +23,7 @@
          <valueList delimiter=" " repeatable="yes">10  9 8 7 6 5 4 3 2 1</valueList>
       </axis>
       <read>
-         <fixedWidthText>
+         <fixedWidthStyle>
             <fixedWidthReadInstructions> 
                <repeat count="9">
                   <readCell/>
@@ -37,7 +37,7 @@
                   <doReadInstructions/>
                </for>
             </for>
-         </fixedWidthText>
+         </fixedWidthStyle>
       </read>
       <!-- note the recursive data node use -->
       <data>

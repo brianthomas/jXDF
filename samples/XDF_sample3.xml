@@ -68,10 +68,10 @@
       </axis>
       <!-- declare the ordering of how to read this in, assoc. of axis to data -->
       <read encoding="UTF-8" >
-        <taggedText>
+        <taggedStyle>
            <tagToAxis tag="d1" axisIdRef="columns" />
            <tagToAxis tag="d0" axisIdRef="rows" />
-        </taggedText>
+        </taggedStyle>
       </read>
       <data>
          <d0>

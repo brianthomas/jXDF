@@ -1,7 +1,7 @@
 <?xml version ="1.0"?>
-<!DOCTYPE XDF SYSTEM "XDF_017.dtd" [
+<!DOCTYPE XDF SYSTEM "XDF_018.dtd" [
   <!NOTATION xdf PUBLIC "application/xdf">
-  <!ENTITY ApJ "&#10;">
+  <!ENTITY newLine "&#10;">
   <!ENTITY table1 SYSTEM "binarytable0" NDATA xdf>
 ]>
 <XDF name="A sample XDF document" description="This shows how to put any data into XDF using formatted data IO Style.">
@@ -86,16 +86,21 @@
       </valueGroup>
     </axis>
     <read encoding="UTF-8" endian="LittleEndian">
-      <for axisIdRef="rows">
-        <for axisIdRef="fields">
+      <fixedWidthStyle>
+        <fixedWidthReadInstructions> 
           <repeat count="7">
             <readCell/>
-            <skipChars count="1" output=" "/>
+            <skip/>
           </repeat>
           <readCell/>
-          <skipChars count="1" output="&#10;"/>
+          <skip><newLine/></skip>
+        </fixedWidthReadInstructions> 
+        <for axisIdRef="rows">
+          <for axisIdRef="fields">
+             <doReadInstructions/>
+          </for>
         </for>
-      </for>
+      </fixedWidthStyle>
     </read>
     <data href="table1"></data> 
     <notes>

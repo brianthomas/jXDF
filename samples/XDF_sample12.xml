@@ -1,5 +1,5 @@
 <?xml version="1.0" standalone="no"?>
-<!DOCTYPE XDF SYSTEM "XDF_017.dtd" [
+<!DOCTYPE XDF SYSTEM "XDF_018.dtd" [
   <!ENTITY newline "&#10;">
 ]>
 <!-- An alternative tagged table with transposed axes (versus what is in sample 3). -->
@@ -67,8 +67,10 @@
 
      <!-- declare the ordering of how to read this in, assoc. of axis to data -->
       <read encoding="UTF-8" >
-        <tagToAxis tag="d0" axisIdRef="columns" />
-        <tagToAxis tag="d1" axisIdRef="rows" />
+        <taggedStyle>
+          <tagToAxis tag="d0" axisIdRef="columns" />
+          <tagToAxis tag="d1" axisIdRef="rows" />
+        </taggedStyle>
       </read>
 
       <data>

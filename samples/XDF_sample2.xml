@@ -62,7 +62,7 @@
       </axis>
      <!-- declare the ordering of how to read this in, assoc. of axis to data -->
       <read encoding="UTF-8">
-         <fixedWidthText>
+         <fixedWidthStyle>
             <fixedWidthReadInstructions>
                <repeat count="7">
                   <readCell/>
@@ -76,7 +76,7 @@
                   <doReadInstructions/>
                </for>
             </for>
-         </fixedWidthText>
+         </fixedWidthStyle>
       </read>
       <data><![CDATA[M31      230.1209877 -34.3424911 12.6  0.5 0 1.000E-3 ApJ Ref 1.
 M33      130.094     +36.0000001 14.6  1.5 3  0.100E3           
