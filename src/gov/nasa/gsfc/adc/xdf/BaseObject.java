@@ -623,26 +623,30 @@ public abstract class BaseObject implements Serializable {
 
   /** Clone an XDF object.
    */
-  protected Object clone () {
+  protected Object clone () throws CloneNotSupportedException{
 
      BaseObject cloneObj = null;
+     //shallow copy for fields
+     cloneObj = (BaseObject) super.clone();
 
-     try {
-       cloneObj = (BaseObject) super.clone();
+     // Clone the fields
+      cloneObj.attribOrder = Collections.synchronizedList(new ArrayList());
+      int stop = this.attribOrder.size();
+      for (int i = 0; i < stop; i++) {
+        cloneObj.attribOrder.add(new String((String) this.attribOrder.get(i)));
+      }
+     // XMLAttributes Clone
+     cloneObj.attribHash = new Hashtable();
+     Enumeration keys = this.attribHash.keys();
+     synchronized (this.attribHash) {
 
-Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
-
-       // Clone the fields
-
-       // XMLAttributes Clone
-       cloneObj.attribHash = new Hashtable();
-       Enumeration keys = this.attribHash.keys();
-       while ( keys.hasMoreElements() )
-       {
-           Object key = keys.nextElement();
-           XMLAttribute XMLAttributeValue = (XMLAttribute) this.attribHash.get((String) key);
-           cloneObj.attribHash.put((String) key, XMLAttributeValue.clone());
-       }
+      for (int i = 0; i < stop; i++)
+      {
+        String key = (String) cloneObj.attribOrder.get(i);
+        XMLAttribute XMLAttributeValue = (XMLAttribute) this.attribHash.get(key);
+        cloneObj.attribHash.put(key, XMLAttributeValue.clone());
+      }
+    }
 
 
 //       cloneObj.classXDFNodeName = this.classXDFNodeName;
@@ -653,12 +657,6 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
   /** This field stores object references to those group objects to which a given
       object belongs.
   */
-
-
-     } catch (java.lang.CloneNotSupportedException e) {
-        Log.errorln("Error: Clone not supported by class "+this.getClass().toString());
-     }
-
      return (Object) cloneObj;
   }
 
@@ -832,7 +830,6 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
      }
   }
 
-
   //
   // PRIVATE Methods
   //
@@ -925,87 +922,14 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
 
   }
 
-  //
-  // Internal Classes
-  //
-
-  /** Stores values of XML-based attributes of the XDF object.
-      These attributes will be used to re-construct an XDF file/stream
-      from the Java object.
-  */
-  public static class XMLAttribute implements Cloneable {
-
-    protected Object attribValue;
-    protected String attribType;
-
-    /** Constructor takes object reference and type.
-    */
-    // Shouldnt type be an emunerated list from the Constants class?
-    // NOT just any arbitrary string can go here.
-    public XMLAttribute (Object objValue, String strType) {
-      attribValue = objValue;
-      attribType = strType;
-    }
-
-    /** Set the value of this XMLAttribute.
-    */
-    public Object setAttribValue(Object objValue) {
-      attribValue = objValue;
-      return attribValue;
-    }
-
-    /** Set the type of value held by this XMLAttribute.
-    */
-    public String setAttribType(String strType) {
-      if ( !Utility.isValidXMLAttributeType(strType))
-      {
-        Log.error("Type not a defined constant for XMLAttribute");
-        return null;
-      }
-
-      // ok, set it
-      attribType = strType;
-      return attribType;
-    }
-
-    /** Get the value of this XMLAttribute.
-    */
-    public Object getAttribValue() {
-       return attribValue;
-    }
-
-    /** Get the XMLAttribute value type.
-    */
-    public String getAttribType() {
-       return attribType;
-    }
-
-    public Object clone () {
-
-       XMLAttribute cloneObj = null;
-
-       try {
-
-          cloneObj = (XMLAttribute) super.clone();
-
-          // need to clone the fields here too
-//          cloneObj.attribType = new String(this.attribType);
-//          cloneObj.attribValue = this.attribValue.clone();
-
-       } catch (java.lang.CloneNotSupportedException e) {
-          Log.errorln("Error: Clone not supported for XMLAttribute.");
-       }
-
-       return (Object) cloneObj;
-    }
-
-  } // end of internal Class XMLAttribute
-
 } // end of BaseObject Class
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2000/11/01 21:58:08  kelly
+ * moved XMLAttribute out of BaseObject -k.z
+ *
  * Revision 1.19  2000/10/31 22:09:08  kelly
  * minor fix.
  *
