@@ -18,7 +18,7 @@ import java.util.*;
      @version $Revision$
 */
 
-public class Axis extends BaseObject{
+public class Axis extends BaseObject implements Cloneable {
 
  //
  //Fields
@@ -485,6 +485,9 @@ public class Axis extends BaseObject{
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/10/24 21:33:29  thomas
+ * Made the class Cloneable. -b.t.
+ *
  * Revision 1.3  2000/10/11 18:43:32  kelly
  * finished most of the class, but getAxisValues() is not implemented,
  * getIndexFromValue() doesnt work for UnitDirection --k.z.
