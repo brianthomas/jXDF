@@ -1,46 +1,60 @@
 
 
-	This package is designed for use under Java 1.2.2. It shouldnt
-	have any problems running under 1.3, but let me know if thats
+	This package is designed for use under Java 1.3. It shouldnt
+	have any problems running under 1.2.2, but let me know if thats
 	not the case.
-	
-	You will need a SAX level 1 parser and the org.xml.sax package
-	to run this software.  Perhaps there are other locations to 
-	acquire this, but I know of but one at SUN: 
 
-	Java API for XML Parsing 1.0.1 may be downloaded at the URL 
-        http://java.sun.com/xml/download.html 
+        To use the XDF package you will need to acquire the Java API for XML 
+	Processing (JAXP) Package (version 1.1) which provides
+        the functionality for reading, manipulating, and generating XML documents that
+        are the basis of XDF.  The JAXP package is available from SUN:
 
-	Instructions on install: well, we are planning to better instruct
-	you than what is given below, however, I just havent had the time 
-	to compile the code under a broad series of platforms, only Linux 
-	is truely tested (but one developer regularly runs this code under
-	windows).
+            http://developer.java.sun.com
 
-	Good Luck. -b.t.
+        or
+
+            http://developer.java.sun.com/developer/earlyAccess/xml/
+
+        Use the later URL if you can login already as Java Sun developer. JAXP
+        includes the crimson parser which is the default XML parser for XDF.
+        You will also need to acquire the Xerces-J (version 1.4.3, not the upcoming 2)
+        package from
+
+            http://xml.apache.org/dist/xerces-j/
+
+        in order to use the classes in the sub-package: gov.nasa.gsfc.adc.xdf.DOM package.
+
+        Furthermore, we *only* support Xerces-1.4.3, so please download that version,
+        and YOU WILL NEED TO APPLY A PATCH: ElementState.java.patch (included in this
+        distribution) to the relevant Xerces class ElementState AND REBUILD the Xerces
+        distribution (not difficult). Having to patch the Xerces distribution is unfortunate,
+        however, the patch has been submitted to the Xerces-J mailing list, and hopefully it will
+        find its way into the next version of Xerces-J.
 
 
+        Steps to XDF fullfillment:
+
+        0. Unpack/move this archive into an appropriate spot.
+
+	1. Download and install ancillary packages JAXP and Xerces-J mentioned above
+
+	2. Patch and re-compile the Xerces-J distro.
+
+	3. Adjust your CLASSPATH to contain the JAXP and Xerces-J distros and the xdf.jar
+           file.
+
+	4. Run some XDF programs in the samples/ directory to test your functionality. 
+
+	Some people love to monkey with the source code. If you are one of these, then
 	To compile the code (UNIX) type :
-        =-===========================
 
-	make 
+	> make jar 
 
-	This will create the xdf.jar file, and HTML API documentation
+	This will create the xdf.jar file. To create the HTML API documentation
 	(in the doc directory).
 
+        > make doc
 
-	To compile under Windows/MSDOS:
-        =-===========================
-
-	You may have luck using NMAKE on NT/W98 systems with the 
-	make file (this is untested, so it may not work).
-
-	In a DOS shell in the unpacked directory type:
-
-	> nmake 
-
-	This *should* create the xdf.jar file, and HTML API documentation. 
-	Let me know if you have problems, or better yet, send me a patch
-	so it will work ;)
+	Note: There is currently no makefile support for XDF under non-UNIX platforms (sorry)
 
 

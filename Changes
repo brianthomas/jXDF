@@ -50,15 +50,13 @@
                       - bug in BaseObject class that caused crash for certain toXMLOutputStream 
                         calls (private field XMLNotationHash not properly declared). FIXED. 
 
-0.17-beta1   5/??/01  - Added BaseObjectWithXMLElements class. Array, Field, Structure, Axis
+0.17-beta1   8/31/01  2nd Beta.
+                      - Added BaseObjectWithXMLElements class. Array, Field, Structure, Axis
                         classes may now hold new XMLElements.
                       - Added ability to add an arbitary XML attribute (e.g. previously undeclared 
                         attribute that isnt a part of the class in the DTD) to any class that 
                         inherits from BaseObject.
-                      - Re-added writeAxisOrder stuff to XMLDataIOStyle classes. Fixed write
-                        bug. 
-                      - Added many Interface classes for those classes which seem most likely to
-                        be customized in new (derived) XDF dataformats.
+                      - Re-added writeAxisOrder stuff to XMLDataIOStyle classes. Fixed write bug. 
                       - Added XDF base object structure class. This class represents the top
                         level structure in an XDF object and (hopefully) clarifies some 
                         confusion over the nature of structure objects in general.
@@ -69,6 +67,7 @@
                       - added compression/decompression support for GZIP, Zip (bzip2, UNIX "compress" 
                         and Xmill still missing)
                       - bug fix to valueGroup printing in toXMLOutputStream.
+                      - re-wrote toXMLOutputStream. Now using buffered writing. Faster.
                       - added convience methods for populating axis, fieldAxis at construction time.
                       - further cleanup of deprecated classes from old xml-tr2 package. It should NOT
                         be needed at all now. Note that we are not making full use of namespaces (yet).
@@ -77,3 +76,8 @@
                       - added toXMLString method to BaseObject. All inheriting classes may now write
                         their XML representation string when called.
                       - added class XML attribute to FieldGroup.
+                      - bug fix to allow integer data starting with "+" sign.
+                      - added ValueListAlgorithm, ValueListDelimitedList and ValueList(internal reader class)
+                        to treat <valueList> nodes.
+                      - added XDF::DOM functionality. Any XML document may be read into this DOM which 
+                        contains convience methods for accessing/manipulation of the XDF element nodes.

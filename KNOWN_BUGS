@@ -7,6 +7,11 @@
 
         - Log configuration doesnt appear to allow writing to System.err.
 
+        - XDF::DOM is not yet internet ready. Specifically the newLine entitys are converted
+          to spaces by the internal double-parsing of the document. This means that delimited
+          data will not be correctly read in (or written out) by the XDF::DOM at this time.
+          Look to the XDF-018 version for a fix for this.
+
         - This may work, but it hasnt been specifically checked:
           When axisValues havent been specifically assigned, written data should
           show empty ones, rather than dropping them. For example, take a 1D array that
@@ -25,11 +30,6 @@
           a machine generated one on an earlier node. We need a final pass thru the Id 
           stacks to enforce uniqueness in objects (or better yet internal checking of ids to
           enforce unique id's between like nodes).
-
-        - In part because there is no such animal as a ValueList object, the Reader cant
-          resolve local attributes in id/idRef situations with ValueList as per other 
-          objects w/ id's. This means that only whole drop-in replacement of ValueList is 
-          possible via id/idRef. Need to Fix? or remove Id/idref from valueList.
 
         - Treatment of XML comments (the stuff in an XML file that occurs between 
           the "<--" "-->").

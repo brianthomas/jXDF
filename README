@@ -10,7 +10,7 @@
         benefits of using XML to handle this type of data is the possibility of 
         using a single format from data source (instrument) to the scientist, to 
         the journal publication, to data centers, and to the public. The aim of 
-        XDF is to provides all of the needed constucts within XML to accomplish 
+        XDF is to provides all of the needed constructs within XML to accomplish 
         this goal. See the XDF homepage for more information about XDF:
 
            http://xml.gsfc.nasa.gov/XDF/XDF_home.html
@@ -23,7 +23,7 @@
         read/write XDF objects to disk. XDF objects themselves contain all the 
         hooks needed to access/manipulate information within the XDF model.  
 
-	This package is a beta release. This means that all forseen functionality 
+	This package is a beta release. This means that all foreseen functionality 
         has been implemented, but many bugs may remain. Note that we reserve the 
         right to significantly revise the API as need suits us.
 
@@ -31,11 +31,11 @@
         freeware.  Please refer to the GPL.TXT file included in this distribution 
         for more information on the terms of this license.
 
-        To use the XDF package you will need to acquire the Java API for XML 
-        Processing (JAXP) Package (version 1.1) which provides the functionality
-        for 
-        reading, manipulating, and generating XML documents that are the basis of 
-        XDF.  The JAXP package is available from SUN: 
+        To use the XDF package you will need to acquire a version of Java equal or
+        greater to 1.3.0 (we have heard that it works for 1.2 but cannot verify) and
+        the Java API for XML Processing (JAXP) Package (version 1.1) which provides 
+	the functionality for reading, manipulating, and generating XML documents that 
+        are the basis of XDF.  The JAXP package is available from SUN: 
 
             http://developer.java.sun.com 
 
@@ -44,21 +44,29 @@
             http://developer.java.sun.com/developer/earlyAccess/xml/ 
 
         Use the later URL if you can login already as Java Sun developer. JAXP 
-        includes the crimson parser which is the default XML parser for XDF but 
-        note that XDF allows you to use any other SAX2 compliant XML parser (such 
-        as Xerces from the Apache project: 
+        includes the crimson parser which is the default XML parser for XDF.
+      	You will also need to acquire the Xerces-J (version 1.4.3, not the upcoming 2) 
+        package from 
 
-            http://xml.apache.org/xerces-j/index.html
+            http://xml.apache.org/dist/xerces-j/
 
-	As you might guess from its name this package is currently somewhat stable, 
-        with only infreqent modification to the interface of available classes. 
-        Nevertheless, this package is NOT mature (yet), and we are still chasing 
-        down bugs. Please keep this in mind if you are considering the adoption of 
-        this software for production enviroments.
+        in order to use the classes in the sub-package: gov.nasa.gsfc.adc.xdf.DOM package.
 
-	This package supports SAX1 parsering (e.g. no namespaces). SAX2 and schema 
+        Furthermore, we *only* support Xerces-1.4.3, so please download that version,
+	and YOU WILL NEED TO APPLY A PATCH: ElementState.java.patch (included in this
+        distribution) to the relevant Xerces class ElementState AND REBUILD the Xerces 
+        distribution (not difficult). Having to patch the Xerces distribution is unfortunate, 
+        however, the patch has been submitted to the Xerces-J mailing list, and hopefully it will
+	find its way into the next version of Xerces-J.
+
+        The XDF package is currently somewhat stable, with only infrequent modification 
+        to the interface of available classes.  Nevertheless, this package is NOT 
+        mature (yet), and we are still chasing down bugs. Please keep this in mind 
+        if you are considering the adoption of this software for production environments.
+
+	This package supports SAX1 parsing (e.g. no namespaces). SAX2 and schema 
         will be supported as soon as these become comfortably mature W3C 
-        recogmendations. 
+        recommendations. 
 
 	For more details on missing features/problems that remain in the package 
         please refer to the TODO file.
@@ -75,7 +83,7 @@
 
 	Read only access to the nightly snapshot is allowed for people who have 
         downloaded this code once from the main site. The CVS account is "guest" 
-        which has a password "gu3stacc3ss". The XDF java package directory is 
+        which has a password "gu3stacc3ss". The XDF Java package directory is 
         "xml/XDF/Java_Package" and the CVSROOT directory is "/home/cvsadmin/src". 
         Here is an example of how you can use this information to obtain a nightly 
         CVS snapshot (UNIX tcsh):
@@ -120,7 +128,7 @@
 
        Brian Thomas (Project design and lead programmer)
        Kelly Zeng   (Porting of Perl to Java, additional classes)  
-       Ping Huang   (additional convience methods)
+       Ping Huang   (additional convenience methods)
        Lynne Case   (Code review and critical comments)
        Ed Shaya     (XDF DTD development)
 
