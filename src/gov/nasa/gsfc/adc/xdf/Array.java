@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Vector;
 
 
  /** DESCRIPTION
@@ -107,8 +108,9 @@ import java.util.Iterator;
    * to which this array object belongs
   */
   protected Set paramGroupOwnedHash = Collections.synchronizedSet(new HashSet());
- // protected locatorOrder;   //doudle check init value
 
+  //the list of locators whose parentArray is this Array object
+  protected List locators = new Vector();
   protected boolean hasFieldAxis = false;
 
   //
@@ -232,7 +234,7 @@ import java.util.Iterator;
   }
 
   /** getNotesObject
-     @return: the current *Notes* attribute object 
+     @return: the current *Notes* attribute object
    */
   public Notes getNotesObject()
   {
@@ -260,15 +262,15 @@ import java.util.Iterator;
   public void setXMLDataIOStyle(XMLDataIOStyle xmlDataIOStyle)
   {
 
-     if (xmlDataIOStyle == null) 
+     if (xmlDataIOStyle == null)
      {
         Log.error("in Array.setXMLDataIOStyle(), param passed in is null, ");
         Log.errorln("xmlDataIOStyle attribute not updated");
-        return; // bail 
+        return; // bail
      }
 
      //set the parent array to this object
-     xmlDataIOStyle.setParentArray(this);  
+     xmlDataIOStyle.setParentArray(this);
 
      // set the xmlattribute
      ((XMLAttribute) attribHash.get("xmlDataIOStyle")).setAttribValue(xmlDataIOStyle);
@@ -287,23 +289,23 @@ import java.util.Iterator;
    * @return: the current *dataCube* attribute
    * double check, we should not allow user to set the datacube
    */
-// 
+//
 // Hurm.. This is a dangerous method. All sorts of array meta-data arent updated
 // properly when this is used. Commenting it out for now. -b.t.
 //
-/*
-  public void setDataCube(DataCube dataCube)
+
+  protected void setDataCube(DataCube dataCube)
   {
      ((XMLAttribute) attribHash.get("dataCube")).setAttribValue(dataCube);
   }
-*/
+
 
   /** getDataCube
       @return: the current *DataCube* attribute
    */
   public DataCube getDataCube()
   {
-    return (DataCube) ((XMLAttribute) attribHash.get("dataCube")).getAttribValue();
+     return (DataCube) ((XMLAttribute) attribHash.get("dataCube")).getAttribValue();
   }
 
    /** Set the *noteList* attribute
@@ -335,6 +337,9 @@ import java.util.Iterator;
     */
    public Locator createLocator() {
       Locator locatorObj = new Locator(this);
+
+      //add this locator to the list of locators this Array object monitors
+      locators.add(locatorObj);
       return locatorObj;
    }
 
@@ -366,16 +371,11 @@ import java.util.Iterator;
     return paramGroupOwnedHash.remove(group);
   }
 
-   /** addAxis: insert an Axis object into the list of axes held by this object. 
+   /** addAxis: insert an Axis object into the list of axes held by this object.
        @param: Axis to be added
        @return: an Axis object on success, null on failure
    */
    public Axis addAxis(Axis axis) {
-
-      if (axis == null) {
-         Log.warn("in Array.addAxis(), the Axis passed in is null");
-         return null;
-      }
 
      if (!canAddAxisObjToArray(axis)) //check if the axis can be added
         return null;
@@ -384,8 +384,13 @@ import java.util.Iterator;
 
      getAxisList().add(axis);
 
+     //update the locators that is related to this Array object
+     int stop = locators.size();
+     for (int i = 0; i < stop; i++) {
+       ((Locator) locators.get(i)).addAxis(axis);
+     }
+
      updateNotesLocationOrder(); // reset to the current order of the axes
-     
      return axis;
   }
 
@@ -617,17 +622,10 @@ import java.util.Iterator;
    * (NOT CURRENTLY IMPLEMENTED).
    */
 
-   public double  removeData (Locator locator, double numValue) {
-    return getDataCube().removeData(locator, numValue);
+   public boolean  removeData (Locator locator) {
+    return getDataCube().removeData(locator);
   }
 
- /** removeData : Remove the requested data from the indicated datacell
-   * (via DataCube LOCATOR REF) in the XDF::DataCube held in this Array.
-   * (NOT CURRENTLY IMPLEMENTED).
-   */
-  public String  removeData (Locator locator, String strValue) {
-    return getDataCube().removeData(locator, strValue);
-  }
 
   /**getDataFormatList: Get the dataFormatList for this array.
    *
@@ -647,7 +645,7 @@ import java.util.Iterator;
    * @return: reference to fieldAxis if successful, null if not.
    */
   public FieldAxis addFieldAxis(FieldAxis fieldAxis) {
-    if (!canAddFieldAxisObjToArray(fieldAxis))
+    if (!canAddAxisObjToArray(fieldAxis))
       return null;
 
     if (getFieldAxis() !=null) {
@@ -661,6 +659,12 @@ import java.util.Iterator;
     }
     hasFieldAxis = true;
 
+    //update the locators that are related to this Array object
+    int stop = locators.size();
+     for (int i = 0; i < stop; i++) {
+       ((Locator) locators.get(i)).addAxis(fieldAxis);
+     }
+
     //array doenst hold a dataformat anymore
     //each field along the fieldAxis should have dataformat
     setDataFormat(null);
@@ -671,8 +675,11 @@ import java.util.Iterator;
     if (axisList.size() == 0){  //empty axisList
       return null;
     }
-    if ((axisList.get(0).getClass().getName()).indexOf("FieldAxis")!=-1)
-      return (FieldAxis) (getAxisList().get(0));
+
+    Object axisObj = axisList.get(0);
+
+    if (axisObj instanceof FieldAxis)
+      return (FieldAxis) axisObj;
     else
       return null;
   }
@@ -726,17 +733,13 @@ import java.util.Iterator;
     attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
 
   };
- 
-  /**canAddAxisObjToArray: check if we can add this Axis Object to the array
+
+  /**canAddAxisObjToArray: check if we can add this Axis or FieldAxis Object
+   * to the array
    * 1- check to see that it has an id
    * 2- we SHOULD also check that the id is unique but DONT currently.
   */
-  private boolean canAddAxisObjToArray(Axis axisToAdd) {
-    if (axisToAdd == null) {
-      Log.error("can't add axis, the axis to add is null");
-      return false;
-
-    }
+  private boolean canAddAxisObjToArray(AxisInterface axisToAdd) {
     if (axisToAdd.getAxisId() == null) {
       Log.error("Can't add Axis Object without axisId attribute defined");
       return false;
@@ -744,27 +747,11 @@ import java.util.Iterator;
     return true;
   }
 
-  /**canAddFieldAxisObjToArray: check if we can add this FieldAxis Object to the array
-   * 1- check to see that it has an id
-   * 2- we SHOULD also check that the id is unique but DONT currently.
-  */
-  private boolean canAddFieldAxisObjToArray(FieldAxis fieldAxisToAdd) {
-    if (fieldAxisToAdd == null) {
-      Log.error("can't add fieldAxis, the fieldAxis to add is null");
-      return false;
-
-    }
-    if (fieldAxisToAdd.getAxisId() == null) {
-      Log.error("Can't add FieldAxis Object without axisId attribute defined");
-      return false;
-    }
-    return true;
-  }
 
    // Need to do this operation after every axis add
    // reset to the current order of the axes.
    // Note: IF there where lots of axes in an object
-   // then this could become a real processing bottleneck 
+   // then this could become a real processing bottleneck
    private void updateNotesLocationOrder () {
 
       // ArrayList axisList = (ArrayList) getAxisList();
@@ -778,15 +765,44 @@ import java.util.Iterator;
          String axisIdRef = axisObj.getAxisId();
          ((ArrayList) axisIdList).add(axisIdRef);
       }
-      
+
       Notes notesObj = getNotesObject();
-      notesObj.setLocationOrderList(axisIdList); 
+      notesObj.setLocationOrderList(axisIdList);
    }
-}
+
+   public Object clone() throws CloneNotSupportedException {
+    Array cloneObj = (Array) super.clone();
+    //deep clone for DataCube
+    cloneObj.setDataCube((DataCube) this.getDataCube().clone());
+
+    //there are no locators that are related to the cloned Array object
+    cloneObj.locators = new Vector();
+
+    //set the parentArray correctly for child object
+    cloneObj.getDataCube().setParentArray(cloneObj);
+    cloneObj.getXMLDataIOStyle().setParentArray(cloneObj);
+
+    synchronized (this.paramGroupOwnedHash) {
+      synchronized(cloneObj.paramGroupOwnedHash) {
+        cloneObj.paramGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.paramGroupOwnedHash.size()));
+        Iterator iter = this.paramGroupOwnedHash.iterator();
+        while (iter.hasNext()) {
+          cloneObj.paramGroupOwnedHash.add(iter.next());
+        }
+      }
+    }
+
+    return cloneObj;
+
+   }  //end of clone
+}  //end of Array class
 
 /**
   * Modification History:
   * $Log$
+  * Revision 1.13  2000/11/06 21:11:52  kelly
+  * added deep cloning  --k.z.
+  *
   * Revision 1.12  2000/11/02 19:44:29  thomas
   * Added Notes object , removed old noteList XML attribute.
   * Updated all add/remove/etc Notes methods. -b.t.
