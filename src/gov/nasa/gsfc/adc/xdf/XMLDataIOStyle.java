@@ -162,7 +162,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
      String endian = (String) ((Attribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).getAttribValue();
      // a safety just in case someone asks a stupid question
-     // if (endian == null) endian = DEFAULT_ENDIAN;
+     if (endian == null) endian = DEFAULT_ENDIAN;
 
      return endian;
   }
@@ -210,7 +210,12 @@ public abstract class XMLDataIOStyle extends BaseObject {
          outputWriter.write( "\"");
       }
 
-      if ( (attrib=getEndian()) !=null)
+      // we have to do it this way to avoid printing it out
+      // when we dont want to
+      // (the method will return non-null value always)
+      // if ( (attrib=getEndian()) !=null)  
+      attrib = (String) ((Attribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).getAttribValue();
+      if ( attrib != null)
       { 
          outputWriter.write( " "+ENDIAN_XML_ATTRIBUTE_NAME+"=\"");
          outputWriter.write( attrib);
@@ -353,6 +358,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.30  2001/09/19 14:14:26  thomas
+ * bug fix for endian attrib
+ *
  * Revision 1.29  2001/09/18 19:35:15  thomas
  * Opps. bug in setIOAxesOrder fixed
  *
