@@ -73,20 +73,16 @@
     </antcall>
 
     <!-- create delimited data, internal -->
-<!--
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
          <param name="dataiostyle" value="delimited"/>
     </antcall>
--->
 
     <!-- create delimited data, external -->
-<!--
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
          <param name="dataiostyle" value="delimited"/>
     </antcall>
--->
 
     <!-- create formatted data, internal -->
     <antcall target="creationTest">
@@ -106,20 +102,14 @@
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample2.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample3.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample4.xml"/></antcall>
-    <!-- file 5 currently has problem with skip/recordTerminator rep --> 
-    <!--
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample5.xml"/></antcall>
-      -->
+
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample6.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample7.xml"/></antcall>
 
-    <!-- file 8 is very problematic: wont validate versus the DTD --> 
-    <!-- 
-         <antcall target="loadingTests"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
-      -->
     <antcall target="loadXDFTest"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
-
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample9.xml"/></antcall>
+
     <!-- no bzip in Java (yet) -->
     <!-- <antcall target="loadingTests"><param name="file" value="samples/XDF_sample10.xml"/></antcall> -->
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample11.xml"/></antcall>
