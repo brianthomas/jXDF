@@ -29,6 +29,7 @@ import java.util.Hashtable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
+import java.io.OutputStream;
 
 /**
  * Notes.java:
@@ -140,6 +141,26 @@ public class Notes extends BaseObject {
       return removeFromList(index, getNoteList(), "noteList");
    }
 
+   // quick little change to prevent this node from printing out
+   // IF there are no note objects in its notelist
+   public void toXDFOutputStream ( OutputStream outputstream,
+                                   Hashtable XMLDeclAttribs,
+                                   String indent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
+                                 ) 
+   {
+     
+      if( getNoteList().size() > 0 ) { 
+          super.toXDFOutputStream ( outputstream, XMLDeclAttribs,
+                                    indent, dontCloseNode,
+                                    newNodeNameString, noChildObjectNodeName
+                                   );
+      }
+
+   }
+
    //
    // Private Methods
    //
@@ -167,6 +188,11 @@ public class Notes extends BaseObject {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.4  2000/11/03 20:26:57  thomas
+  * Updated toXDFOutputStream so that the node wont
+  * print out IF there are no note objects held within it.
+  * -b.t.
+  *
   * Revision 1.3  2000/11/02 19:44:45  thomas
   * Initial Version. -b.t.
   *
