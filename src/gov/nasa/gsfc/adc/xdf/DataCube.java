@@ -1430,12 +1430,12 @@ protected boolean  removeData (Locator locator) {
          int formatsize = thisDataFormat.numOfBytes();
 
          // format the number for output
-         if ( thisDataFormat instanceof FixedDataFormat ||
-              thisDataFormat instanceof IntegerDataFormat )
+         if (thisDataFormat instanceof IntegerDataFormat )
          {
 
+
             DecimalFormat formatter = new DecimalFormat(pattern);
-            Double thisDatum = new Double(getDoubleData(locator));
+            Integer thisDatum = new Integer (getIntData(locator));
             output = formatter.format(thisDatum);
 
          } else if (thisDataFormat instanceof StringDataFormat)
@@ -1447,7 +1447,7 @@ protected boolean  removeData (Locator locator) {
             if(output.length() > formatsize)
                output = output.substring(0,formatsize);
 
-         } else if ( thisDataFormat instanceof ExponentialDataFormat)
+         } else if ( thisDataFormat instanceof FloatDataFormat)
          {
 
             // Exponentials need special treatment. Why? because as of Java
@@ -1461,8 +1461,9 @@ protected boolean  removeData (Locator locator) {
 
             // Our quick 'fix': trim down the size of the output if its exceeded.
             if (output.length() > formatsize) { 
+               Log.warn("Warning: formatted floating point number width exceeds spec, trimming ["+output+"] to ");
                output = output.substring(0,formatsize);
-               Log.warnln("Warning: formatted exponential width too large, trimming trailing digits.\n");
+               Log.warnln("["+output+"]");
             }
 
 /*
@@ -1583,6 +1584,10 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.22  2001/01/29 19:29:34  thomas
+  * Changes related to combining ExponentialDataFormat
+  * and FloatDataFormat classes. -b.t.
+  *
   * Revision 1.21  2001/01/29 05:03:37  thomas
   * Half-hearted code for binary writing. Disabled
   * for the time being. -b.t.

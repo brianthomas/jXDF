@@ -44,16 +44,15 @@ import java.lang.Character;
 import org.xml.sax.AttributeList;
 import org.xml.sax.HandlerBase;
 import org.xml.sax.SAXException;
-
 import org.xml.sax.InputSource;
 
+// Java IO stuff
 import java.io.Reader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader; // this can problably be dropped
 import java.io.InputStream;
 
-// these can problably be dropped
-import java.io.FileReader;
 
 /** 
  */
@@ -753,23 +752,21 @@ Log.errorln("Adding "+bytes_to_add+" bytes of data to current array");
 
                if ( currentDataFormat instanceof IntegerDataFormat) {
 
-               } else if (currentDataFormat instanceof FixedDataFormat) {
+               } else if (currentDataFormat instanceof FloatDataFormat) {
 
-               } else if (currentDataFormat instanceof ExponentialDataFormat) {
-
-Log.errorln("Got Href Data Exponential:["+new String(data,bytes_added,bytes_added+bytes_to_add)+ "]["+bytes_added+"]["+bytes_to_add+"]");
+Log.errorln("Got Href Data Float:["+new String(data,bytes_added,bytes_added+bytes_to_add)+ "]["+bytes_added+"]["+bytes_to_add+"]");
 
                } else if (currentDataFormat instanceof BinaryFloatDataFormat) {
 
                   if (bytes_to_add == 4) { 
   
                      Float myValue = convert4bytesToFloat(endian, data, bytes_added);
-Log.errorln("Got Href Data Float:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+Log.errorln("Got Href Data BFloatSingle:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
 
                   } else if (bytes_to_add == 8) { 
 
                     Double myValue = convert8bytesToDouble(endian, data, bytes_added);
-Log.errorln("Got Href Data Float:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+Log.errorln("Got Href Data BFloatDouble:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
 
                   } else {
                      Log.errorln("Error: got floating point with bit size != (32|64). Ignoring data.");
@@ -993,11 +990,10 @@ Log.errorln("");
        startElementHandlerHashtable.put(XDFNodeName.BINARYINTEGER, new binaryIntegerFieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.DATA, new dataStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.DATAFORMAT, new dataFormatStartElementHandlerFunc());
-       startElementHandlerHashtable.put(XDFNodeName.EXPONENT, new exponentFieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELD, new fieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELDAXIS, new fieldAxisStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELDRELATIONSHIP, new fieldRelationshipStartElementHandlerFunc());
-       startElementHandlerHashtable.put(XDFNodeName.FIXED, new fixedFieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.FLOAT, new floatFieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FORNODE, new forStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELDGROUP, new fieldGroupStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.INDEX, new noteIndexStartElementHandlerFunc());
@@ -1091,26 +1087,26 @@ Log.errorln("");
        try {
 
            if ( CurrentDataFormat instanceof StringDataFormat) {
+
 // Log.errorln(" StringDataFormat");
               CurrentArray.setData(dataLocator, thisString);
-           } else if ( CurrentDataFormat instanceof FixedDataFormat
+
+           } else if ( CurrentDataFormat instanceof FloatDataFormat
                        || CurrentDataFormat instanceof BinaryFloatDataFormat) 
            {
-// Log.errorln(" FixedDataFormat");
+
+// Log.errorln(" FloatDataFormat");
               Double number = new Double (thisString);
               CurrentArray.setData(dataLocator, number.doubleValue());
+
            } else if ( CurrentDataFormat instanceof IntegerDataFormat
                        || CurrentDataFormat instanceof BinaryIntegerDataFormat) 
            {
+
 // Log.errorln(" IntegerDataFormat");
               Integer number = new Integer (thisString);
               CurrentArray.setData(dataLocator, number.intValue());
-           } else if ( CurrentDataFormat instanceof ExponentialDataFormat) {
-// Log.errorln(" ExponentDataFormat");
-              // hurm.. this is a stop-gap. Exponential format needs to be
-              // preserved better than this, perhaps??. -b.t. 
-              Double number = new Double (thisString);
-              CurrentArray.setData(dataLocator, number.doubleValue());
+
            } else {
               Log.warnln("Unknown data format, unable to setData:["+thisString+"], ignoring request");
            }
@@ -1503,11 +1499,10 @@ Log.errorln(" TValue:"+valueString);
        public static final String BINARYINTEGER = "binaryInteger";
        public static final String DATA = "data";
        public static final String DATAFORMAT = "dataFormat";
-       public static final String EXPONENT = "exponential";
        public static final String FIELD = "field";
        public static final String FIELDAXIS = "fieldAxis";
        public static final String FIELDRELATIONSHIP = "relation";
-       public static final String FIXED = "fixed";
+       public static final String FLOAT = "float";
        public static final String FORNODE = "for";
        public static final String FIELDGROUP = "fieldGroup";
        public static final String INDEX = "index";
@@ -2029,29 +2024,6 @@ Log.errorln(" TValue:"+valueString);
     }
 
 
-    // EXPONENTFIELD
-    //
-
-    class exponentFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
-
-         // create the object
-          ExponentialDataFormat exponentFormat = new ExponentialDataFormat();
-          exponentFormat.setXMLAttributes(attrs);
-          exponentFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
-
-          if (CurrentDatatypeObject instanceof Field) {
-              ((Field) CurrentDatatypeObject).setDataFormat(exponentFormat);
-          } else if (CurrentDatatypeObject instanceof Array) { 
-              ((Array) CurrentDatatypeObject).setDataFormat(exponentFormat);
-          } else {
-              Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
-          }
-
-          return exponentFormat;
-       }
-    }
-
     // FIELD
     //
 
@@ -2281,14 +2253,14 @@ Log.errorln(" TValue:"+valueString);
        }
     }
 
-    // FIXEDFIELD
+    // FLOATFIELD
     //
 
-    class fixedFieldStartElementHandlerFunc implements StartElementHandlerAction {
+    class floatFieldStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // create the object
-          FixedDataFormat fixedFormat = new FixedDataFormat();
+          FloatDataFormat fixedFormat = new FloatDataFormat();
           fixedFormat.setXMLAttributes(attrs);
           fixedFormat.setXMLAttributes(DataFormatAttribs);
 
@@ -2297,7 +2269,7 @@ Log.errorln(" TValue:"+valueString);
           } else if (CurrentDatatypeObject instanceof Array) { 
               ((Array) CurrentDatatypeObject).setDataFormat(fixedFormat);
           } else {
-              Log.warnln("Unknown parent object, cant set string data type/format in $dataTypeObj, ignoring.");
+              Log.warnln("Unknown parent object, cant set string data type/format in dataTypeObj, ignoring.");
           }
 
           return fixedFormat;
@@ -3638,6 +3610,10 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.28  2001/01/29 19:29:35  thomas
+ * Changes related to combining ExponentialDataFormat
+ * and FloatDataFormat classes. -b.t.
+ *
  * Revision 1.27  2001/01/29 05:05:42  thomas
  * Code for reading binary values. The implemented code
  * is a travesty, it converts bytes to Strings, then decides

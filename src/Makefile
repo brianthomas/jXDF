@@ -40,10 +40,9 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/DataFormat.java \
 	$(XDF_SOURCE_PATH)/DataCube.java \
 	$(XDF_SOURCE_PATH)/DelimitedXMLDataIOStyle.java \
-	$(XDF_SOURCE_PATH)/ExponentialDataFormat.java \
 	$(XDF_SOURCE_PATH)/Field.java \
 	$(XDF_SOURCE_PATH)/FieldAxis.java \
-	$(XDF_SOURCE_PATH)/FixedDataFormat.java \
+	$(XDF_SOURCE_PATH)/FloatDataFormat.java \
 	$(XDF_SOURCE_PATH)/Group.java \
 	$(XDF_SOURCE_PATH)/IntegerDataFormat.java \
 	$(XDF_SOURCE_PATH)/Locator.java \
@@ -66,6 +65,7 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/ValueGroup.java \
 	$(XDF_SOURCE_PATH)/XMLDataIOStyle.java
 
+#	$(XDF_SOURCE_PATH)/ExponentialDataFormat.java \
 #	$(XDF_SOURCE_PATH)/ErroredValue.java \
 #	$(XDF_SOURCE_PATH)/FieldGroup.java \
 #	$(XDF_SOURCE_PATH)/FieldRelation.java \

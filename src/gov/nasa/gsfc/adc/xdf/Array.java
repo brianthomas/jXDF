@@ -206,8 +206,7 @@ import java.util.Vector;
    * is held in the attribute $obj->dataFormat, its type is accessible
    * Takes a SCALAR object reference as its argument. Allowed objects to pass
    * to this method include BinaryIntegerDataFormat, BinaryFloatDataFormat,
-   * ExponentDataFormat, FixedDataFormat, IntegerDataFormat,
-   * or StringDataFormat.
+   * FloatDataFormat, IntegerDataFormat, or StringDataFormat.
   */
   public void setDataFormat(DataFormat dataFormat)
   {
@@ -794,6 +793,10 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.21  2001/01/29 19:29:34  thomas
+  * Changes related to combining ExponentialDataFormat
+  * and FloatDataFormat classes. -b.t.
+  *
   * Revision 1.20  2001/01/22 22:09:25  thomas
   * Added updateChildLocators method. Fixed missing
   * fctnality of removingAxis then updating locators. -b.t.
