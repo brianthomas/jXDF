@@ -112,7 +112,7 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
   // Protected Methods
   //
 
-   protected void basicXMLWriter (
+   protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -152,6 +152,7 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
     }
 
     //if(niceOutput) outputWriter.write(Constants.NEW_LINE);
+    return classXDFNodeName;
 
   }
 
@@ -178,6 +179,9 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/09/06 15:56:41  thomas
+ * changed basicXMLWriter to return String (nodeName)
+ *
  * Revision 1.12  2001/09/05 22:00:58  thomas
  * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter
  *

@@ -122,7 +122,7 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
    // Protected Methods
    //
 
-   protected void basicXMLWriter (
+   protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -330,6 +330,8 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
 //         if (Specification.getInstance().isPrettyXDFOutput() && nodeNameString != null ) 
 //	     outputWriter.write( Constants.NEW_LINE);
 
+         return nodeNameString;
+
       } //end synchronize
 
    }
@@ -350,6 +352,9 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
 /** Modification Log 
   *
   * $Log$
+  * Revision 1.6  2001/09/06 15:56:41  thomas
+  * changed basicXMLWriter to return String (nodeName)
+  *
   * Revision 1.5  2001/09/05 22:05:38  thomas
   * yanked toXMLWriter/toXMLOutputStream methods in favor of basicXMLWriter implementation
   *

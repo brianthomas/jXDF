@@ -173,7 +173,7 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
    }
 
 
-   protected void basicXMLWriter (
+   protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -229,6 +229,7 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
      // if (Specification.getInstance().isPrettyXDFOutput())
      //     outputWriter.write(Constants.NEW_LINE);
 
+      return "valueList";
    }
 
    public Object clone() throws CloneNotSupportedException {
@@ -263,6 +264,9 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/09/06 15:56:41  thomas
+ * changed basicXMLWriter to return String (nodeName)
+ *
  * Revision 1.4  2001/09/05 22:04:08  thomas
  * added toXMLOutputString, basicXMLWriter, methods and assoc. changes
  *

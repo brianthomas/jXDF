@@ -172,7 +172,7 @@ import java.util.Hashtable;
    // Other Public Methods
    //
  
-   protected void basicXMLWriter (   Writer outputWriter,
+   protected String basicXMLWriter (   Writer outputWriter,
                                    String indent,
                                    boolean dontCloseNode,
                                    String newNodeNameString,
@@ -217,6 +217,8 @@ import java.util.Hashtable;
      //if (Specification.getInstance().isPrettyXDFOutput())
      // outputWriter.write( Constants.NEW_LINE);
  
+     return nodeNameString;
+
    }
  
     //
@@ -264,6 +266,9 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/09/06 15:56:41  thomas
+ * changed basicXMLWriter to return String (nodeName)
+ *
  * Revision 1.19  2001/09/05 22:00:58  thomas
  * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter
  *

@@ -45,6 +45,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    //
    //Fields
    //
+   private static final String READ_NODE_NAME = "read";
 
    /* XML attribute names */
    private static final String ENDIAN_XML_ATTRIBUTE_NAME = new String("endian");
@@ -168,7 +169,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   // Other Public Methods
   //
 
-  protected void basicXMLWriter (
+  protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -191,7 +192,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
       outputWriter.write( myIndent);
 
     //open the read block
-    outputWriter.write( "<read");
+    outputWriter.write( "<"+READ_NODE_NAME);
 
     //write out attributes of read, ie.
 
@@ -238,10 +239,11 @@ public abstract class XMLDataIOStyle extends BaseObject {
       outputWriter.write( indent);
     }
 
-     outputWriter.write( "</read>");
+     outputWriter.write( "</"+READ_NODE_NAME+">");
 
 //    if (niceOutput) { outputWriter.write(Constants.NEW_LINE); }
 
+     return READ_NODE_NAME;
   }
 
    // Kelly, is this needed?
@@ -331,6 +333,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.26  2001/09/06 15:56:41  thomas
+ * changed basicXMLWriter to return String (nodeName)
+ *
  * Revision 1.25  2001/09/05 22:00:58  thomas
  * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter
  *

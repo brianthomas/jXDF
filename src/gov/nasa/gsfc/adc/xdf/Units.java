@@ -233,7 +233,7 @@ import java.io.IOException;
   }
 
 
-  protected void basicXMLWriter (
+  protected String basicXMLWriter (
                                    Writer outputWriter,
                                    String indent,
                                    boolean dontCloseNode,
@@ -242,7 +242,7 @@ import java.io.IOException;
                                 )
   throws java.io.IOException
   {
-     super.basicXMLWriter( outputWriter, indent, false, XDFNodeName, noUnitChildNodeName);
+     return super.basicXMLWriter( outputWriter, indent, false, XDFNodeName, noUnitChildNodeName);
   }
 
   //
@@ -277,6 +277,9 @@ import java.io.IOException;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2001/09/06 15:56:41  thomas
+ * changed basicXMLWriter to return String (nodeName)
+ *
  * Revision 1.20  2001/09/05 22:00:58  thomas
  * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter
  *

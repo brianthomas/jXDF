@@ -135,7 +135,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
    // Protected Methods 
    //
 
-   protected void basicXMLWriter (
+   protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -333,6 +333,8 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
       }
 
+      return nodeNameString;
+
     } //synchronize
 
    }
@@ -353,6 +355,9 @@ public abstract class BaseObjectWithValueList extends BaseObject
 /** Modification Log 
   *
   * $Log$
+  * Revision 1.7  2001/09/06 15:56:41  thomas
+  * changed basicXMLWriter to return String (nodeName)
+  *
   * Revision 1.6  2001/09/05 22:05:38  thomas
   * yanked toXMLWriter/toXMLOutputStream methods in favor of basicXMLWriter implementation
   *

@@ -125,7 +125,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
    // Protected Methods
    //
 
-   protected void basicXMLWriter (
+   protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -280,6 +280,8 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
    
          // if (Specification.getInstance().isPrettyXDFOutput() && nodeNameString != null ) 
 	 //    outputWriter.write( Constants.NEW_LINE);
+
+         return nodeNameString;
 
       } //end synchronize
 
