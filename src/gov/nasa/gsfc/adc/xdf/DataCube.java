@@ -47,7 +47,7 @@ public class DataCube extends BaseObject {
 
   protected int dimension = 0;;
   protected Array parentArray;
-
+  protected boolean hasMoreData;
   //to store the n-dimensional data, it is an ArrayList of ArrayList, whose
   //innermost layer contains two kinds of arrays:
   //--an array of bytes to indicate if its corresponding cell contains valid data
@@ -1232,9 +1232,13 @@ protected void writeTaggedData(OutputStream outputstream,
   {
      writeOut(outputstream, "<![CDATA[");
      List commands = readObj.getCommands();
-     while (locator.next())
-      recursiveWriteFormattedData(outputstream, locator, commands, fastestAxis, noDataValues);
+
+     synchronized (data) { //double check on sync
+      hasMoreData = locator.hasNext();
+      while (hasMoreData)
+       recursiveWriteFormattedData(outputstream, locator, commands, fastestAxis, noDataValues);
      writeOut(outputstream, "]]>");
+    }
   }
 
   private void recursiveWriteFormattedData(OutputStream outputstream,
@@ -1256,12 +1260,17 @@ protected void writeTaggedData(OutputStream outputstream,
       else {
         if (command instanceof SkipCharFormattedIOCmd) {
           try {
-            writeOut(outputstream, getStringData(locator));
+            if (hasMoreData)   {
+              writeOut(outputstream, getStringData(locator));
+            }
+            else
+              return;
           }
           catch (NoDataException e) {
             String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
-            if (noData != null) 
-               writeOut(outputstream, noData);
+            if (noData != null) {
+              writeOut(outputstream, noData);
+            }
           }
           String output=((SkipCharFormattedIOCmd) command).getOutput();
           if (output == null) {
@@ -1270,14 +1279,15 @@ protected void writeTaggedData(OutputStream outputstream,
           else {
             writeOut(outputstream, output);
           }
-          if (!locator.next())      //no more data, we are done
+          if (!locator.next())  {    //no more data, we are done
+            hasMoreData = false;
             return;
-        }
-      }    //done dealing with SkipCharFormattedIOCmd
-      
+          }
+        } //done dealing with SkipCharFormattedIOCmd
+      }
 
     } //end of outer for loop
-  }
+ }
 
 
 
@@ -1353,10 +1363,12 @@ protected void writeTaggedData(OutputStream outputstream,
   }
 
 }
-
  /**
   * Modification History:
   * $Log$
+  * Revision 1.14  2000/11/10 15:35:08  kelly
+  * minor fix related to cvs check in.
+  *
   * Revision 1.13  2000/11/10 04:32:44  thomas
   * Updated to fix compile problems. -b.t.
   *
