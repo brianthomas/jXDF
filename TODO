@@ -17,6 +17,8 @@
         - Are Utility, Constants classes truely independant? Shunt methods to
           places they are used.
 
+        - fix the repeatable attribute on string parsing
+
         - check that notesEndElementHandlerFunc is finished (?)
 
 	- Use singleton for PrettyOutput, etc.

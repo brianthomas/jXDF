@@ -376,6 +376,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
+     XMLDeclAttribs.put("rootName", sXDFRootNodeName);
+     XMLDeclAttribs.put("dtdName", sXDFDTDName);
 
      toXMLFile(filename, XMLDeclAttribs);
 
@@ -590,6 +592,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
+     XMLDeclAttribs.put("dtdName", sXDFDTDName);
+     XMLDeclAttribs.put("rootName", sXDFRootNodeName);
      toXMLOutputStream(outputstream, XMLDeclAttribs, indent);
   }
 
@@ -603,6 +607,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
+     XMLDeclAttribs.put("dtdName", sXDFDTDName);
+     XMLDeclAttribs.put("rootName", sXDFRootNodeName);
 
      toXMLOutputStream(outputstream, XMLDeclAttribs);
 
@@ -898,19 +904,28 @@ public abstract class BaseObject implements Serializable, Cloneable {
     while ( keys.hasMoreElements() )
     {
       String attribName = (String) keys.nextElement();
-      if (attribName.equals("version") ) 
+      if (attribName.equals("version") ) { 
          Log.errorln("XMLDeclAttrib hash has version attribute, not allowed and ignoring.");
-      else 
+      } else if ( attribName.equals("dtdName") || attribName.equals("rootName") ) { 
+         // skip over it
+      } else 
          writeOut(outputstream, " " + attribName + "=\"" + XMLDeclAttribs.get(attribName) + "\"");
     }
     writeOut(outputstream, " ?>");
     if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
 
-    // print the DOCTYPE DECL IF its a structure node
-    if(classXDFNodeName != null && classXDFNodeName.equals(sXDFStructureNodeName) ) {
-      writeOut(outputstream, "<!DOCTYPE " + sXDFRootNodeName + " SYSTEM \"" + sXDFDTDName + "\">");
+    // Print the DOCTYPE DECL only if right info exists
+    if (XMLDeclAttribs.containsKey("rootName")
+        && XMLDeclAttribs.containsKey("dtdName"))
+    {
+        // print the DOCTYPE DECL IF its a structure node
+        if(classXDFNodeName != null && classXDFNodeName.equals(sXDFStructureNodeName) ) {
+            writeOut(outputstream, "<!DOCTYPE " + XMLDeclAttribs.get("rootName") + " SYSTEM \"" 
+                                   + XMLDeclAttribs.get("dtdName") + "\">");
+        }
       if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
-    }
+    } else 
+      Log.errorln("Passed XMLDeclAttributes table lacks either dtdName, rootName entries, ignoring DOCTYPE line printout"); 
 
   }
 
@@ -919,6 +934,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.30  2000/11/09 23:04:56  thomas
+ * Updated version, made changes to allow extension
+ * to other dataformats (e.g. FITSML). -b.t.
+ *
  * Revision 1.29  2000/11/09 05:32:35  thomas
  * Print out of XML declaration attributes isnt ordered
  * (as you might expect since they are stored in a hash)

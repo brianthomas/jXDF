@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
 
 /** 
  */
-class SaxDocumentHandler implements DocumentHandler {
+public class SaxDocumentHandler implements DocumentHandler {
 
     // 
     // Fields
@@ -78,6 +78,10 @@ class SaxDocumentHandler implements DocumentHandler {
     private ArrayList CurrentFieldGroupList = new ArrayList();
     private ArrayList CurrentValueGroupList = new ArrayList();
 
+    // the last object created by a startElementNodeActionHandler
+    private Object ParentObject; 
+    private Object CurrentObject; 
+    private boolean UpdateCurrentObject = false; 
 
     // GLOBALs for saving these between dataFormat/read node and later when we 
     // know what kind of DataFormat/DataIOStyle object we really have
@@ -208,6 +212,56 @@ class SaxDocumentHandler implements DocumentHandler {
     }
 
     //
+    // Methods that describe the current parsing
+    //
+
+    public Object getCurrentObject() {
+       return CurrentObject;
+    }
+
+    // return the element before last 
+    public Object getParentObject () {
+       return ParentObject;
+    }
+
+    public String getCurrentNodeName () {
+       int pathSize = CurrentNodePath.size();
+       return (String) CurrentNodePath.get((pathSize-1));
+    }
+
+    // return the element before last 
+    public String getParentNodeName () {
+
+       String parentNodeName = null;
+       int pathSize = CurrentNodePath.size();
+
+       if (pathSize > 1) {
+          parentNodeName = (String) CurrentNodePath.get((pathSize-2));
+       }
+
+       return parentNodeName;
+
+    }
+
+    // return 2 elements before last 
+    public String getGrandParentNodeName () {
+
+       String gParentNodeName = null;
+       int pathSize = CurrentNodePath.size();
+
+       if (pathSize > 2) {
+          gParentNodeName = (String) CurrentNodePath.get((pathSize-3));
+       }
+
+       return gParentNodeName;
+
+    }
+
+    public Structure getCurrentStructure () {
+       return CurrentStructure;
+    }
+
+    //
     // SAX methods
     //
 
@@ -226,10 +280,18 @@ class SaxDocumentHandler implements DocumentHandler {
         // if a handler exists, run it, else give a warning
         if ( startElementHandlerHashtable.containsKey(element) ) {
 
+           UpdateCurrentObject = false;
+
            // run the appropriate start handler
            StartElementHandlerAction event = 
               (StartElementHandlerAction) startElementHandlerHashtable.get(element); 
-           event.action(attrs);
+           Object thisObject = event.action(this,attrs);
+
+           if(thisObject != null) { 
+              ParentObject = CurrentObject;
+              CurrentObject = thisObject;
+              UpdateCurrentObject = true; 
+           }
 
         } else {
            Log.warnln("Warning: UNKNOWN NODE ["+element+"] encountered.");
@@ -251,7 +313,11 @@ class SaxDocumentHandler implements DocumentHandler {
            // run the appropriate end handler
            EndElementHandlerAction event = (EndElementHandlerAction) 
                    endElementHandlerHashtable.get(element);
-           event.action();
+           event.action(this);
+
+           if (UpdateCurrentObject) { 
+              CurrentObject = ParentObject;
+           }
 
         } else {
 
@@ -285,7 +351,7 @@ class SaxDocumentHandler implements DocumentHandler {
           // run the appropriate character data handler
            CharDataHandlerAction event = (CharDataHandlerAction)
                    charDataHandlerHashtable.get(currentNodeName);
-           event.action(buf,offset,len);
+           event.action(this,buf,offset,len);
 
         } else {
 
@@ -294,7 +360,7 @@ class SaxDocumentHandler implements DocumentHandler {
            if (DataNodeLevel > 0) {
 
               CharDataHandlerAction event = new dataCharDataHandlerFunc();
-              event.action(buf,offset,len);
+              event.action(this,buf,offset,len);
 
            } else {
 
@@ -472,35 +538,6 @@ class SaxDocumentHandler implements DocumentHandler {
        endElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListEndElementHandlerFunc());
 
     }
-
-    // return the element before last 
-    private String getParentNodeName () {
-     
-       String parentNodeName = null;
-       int pathSize = CurrentNodePath.size(); 
-
-       if (pathSize > 1) {
-          parentNodeName = (String) CurrentNodePath.get((pathSize-2));
-       }
-
-       return parentNodeName;
-
-    }
-
-    // return 2 elements before last 
-    private String getGrandParentNodeName () {
-
-       String gParentNodeName = null;
-       int pathSize = CurrentNodePath.size();
-
-       if (pathSize > 2) {
-          gParentNodeName = (String) CurrentNodePath.get((pathSize-3));
-       }
-
-       return gParentNodeName;
-
-    }
- 
 
    // To read in data appropriately to dataCube
    // we have to type it appropriately as determined from
@@ -701,55 +738,55 @@ class SaxDocumentHandler implements DocumentHandler {
        Now, Some defines based on XDF DTD.
        Change these as needed to reflect new namings of same nodes as they occur.
     */
-    static class XDFNodeName 
+    public static class XDFNodeName 
     {
        // *sigh* cant decide if making this hashtable is better or not.
-       protected static final String ARRAY = "array";
-       protected static final String AXIS = "axis";
-       protected static final String AXISUNITS= "axisUnits";
-       protected static final String BINARYFLOAT = "binaryFloat";
-       protected static final String BINARYINTEGER = "binaryInteger";
-       protected static final String DATA = "data";
-       protected static final String DATAFORMAT = "dataFormat";
-       protected static final String EXPONENT = "exponent";
-       protected static final String FIELD = "field";
-       protected static final String FIELDAXIS = "fieldAxis";
-       protected static final String FIELDRELATIONSHIP = "relation";
-       protected static final String FIXED = "fixed";
-       protected static final String FORNODE = "for";
-       protected static final String FIELDGROUP = "fieldGroup";
-       protected static final String INDEX = "index";
-       protected static final String INTEGER = "integer";
-       protected static final String LOCATIONORDER = "locationOrder";
-       protected static final String NOTE = "note";
-       protected static final String NOTES = "notes";
-       protected static final String PARAMETER = "parameter";
-       protected static final String PARAMETERGROUP = "parameterGroup";
-       protected static final String ROOT = "XDF"; // beware setting this to the same name as structure 
-       protected static final String READ = "read";
-       protected static final String READCELL = "readCell";
-       protected static final String REPEAT = "repeat";
-       protected static final String SKIPCHAR = "skipChars";
-       protected static final String STRUCTURE = "structure";
-       protected static final String STRING = "string";
-       protected static final String TAGTOAXIS = "tagToAxis";
-       protected static final String TD0 = "d0";
-       protected static final String TD1 = "d1";
-       protected static final String TD2 = "d2";
-       protected static final String TD3 = "d3";
-       protected static final String TD4 = "d4";
-       protected static final String TD5 = "d5";
-       protected static final String TD6 = "d6";
-       protected static final String TD7 = "d7";
-       protected static final String TD8 = "d8";
-       protected static final String TEXTDELIMITER = "textDelimiter";
-       protected static final String UNIT = "unit";
-       protected static final String UNITS = "units";
-       protected static final String UNITLESS = "unitless";
-       protected static final String VALUELIST = "valueList";
-       protected static final String VALUE = "value";
-       protected static final String VALUEGROUP = "valueGroup";
-       protected static final String VECTOR = "unitDirection";
+       public static final String ARRAY = "array";
+       public static final String AXIS = "axis";
+       public static final String AXISUNITS= "axisUnits";
+       public static final String BINARYFLOAT = "binaryFloat";
+       public static final String BINARYINTEGER = "binaryInteger";
+       public static final String DATA = "data";
+       public static final String DATAFORMAT = "dataFormat";
+       public static final String EXPONENT = "exponent";
+       public static final String FIELD = "field";
+       public static final String FIELDAXIS = "fieldAxis";
+       public static final String FIELDRELATIONSHIP = "relation";
+       public static final String FIXED = "fixed";
+       public static final String FORNODE = "for";
+       public static final String FIELDGROUP = "fieldGroup";
+       public static final String INDEX = "index";
+       public static final String INTEGER = "integer";
+       public static final String LOCATIONORDER = "locationOrder";
+       public static final String NOTE = "note";
+       public static final String NOTES = "notes";
+       public static final String PARAMETER = "parameter";
+       public static final String PARAMETERGROUP = "parameterGroup";
+       public static final String ROOT = "XDF"; // beware setting this to the same name as structure 
+       public static final String READ = "read";
+       public static final String READCELL = "readCell";
+       public static final String REPEAT = "repeat";
+       public static final String SKIPCHAR = "skipChars";
+       public static final String STRUCTURE = "structure";
+       public static final String STRING = "string";
+       public static final String TAGTOAXIS = "tagToAxis";
+       public static final String TD0 = "d0";
+       public static final String TD1 = "d1";
+       public static final String TD2 = "d2";
+       public static final String TD3 = "d3";
+       public static final String TD4 = "d4";
+       public static final String TD5 = "d5";
+       public static final String TD6 = "d6";
+       public static final String TD7 = "d7";
+       public static final String TD8 = "d8";
+       public static final String TEXTDELIMITER = "textDelimiter";
+       public static final String UNIT = "unit";
+       public static final String UNITS = "units";
+       public static final String UNITLESS = "unitless";
+       public static final String VALUELIST = "valueList";
+       public static final String VALUE = "value";
+       public static final String VALUEGROUP = "valueGroup";
+       public static final String VECTOR = "unitDirection";
 
     } // End of XDFNodeName class 
 
@@ -765,7 +802,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
     // asciiDelimiter node start
     class asciiDelimiterStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
            DelimitedXMLDataIOStyle readObj = new DelimitedXMLDataIOStyle(CurrentArray);
            readObj.setXMLAttributes(attrs);
@@ -773,12 +810,14 @@ class SaxDocumentHandler implements DocumentHandler {
 
            CurrentFormatObjectList.add(readObj);
 
+           return readObj;
+
        }
     }
 
     // asciiDelimiter node end
     class asciiDelimiterEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () { 
+       public void action (SaxDocumentHandler handler) { 
            // pop off last value
            CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
        }
@@ -790,7 +829,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
     // Array node start 
     class arrayStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
 
           // create new object appropriately 
           Array newarray = new Array();
@@ -801,6 +840,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
           CurrentDatatypeObject = CurrentArray;
 
+          return newarray;
        }
     } 
 
@@ -808,7 +848,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class axisStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
 
           // create new object appropriately 
           Axis newaxis = new Axis();
@@ -855,7 +895,7 @@ class SaxDocumentHandler implements DocumentHandler {
            
                  } else {
                     Log.warnln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
-                    return;
+                    return (Object) null;
                  }
              }
 
@@ -869,14 +909,17 @@ class SaxDocumentHandler implements DocumentHandler {
              Log.errorln("Axis object:"+newaxis+" lacks either axisId or axisIdRef, ignoring!");
           }
 
+          return newaxis;
+
        }
+
     }
 
     // BinaryFloatField 
     //
 
     class binaryFloatFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
 
         // create the object
           BinaryFloatDataFormat bfFormat = new BinaryFloatDataFormat();
@@ -891,6 +934,7 @@ class SaxDocumentHandler implements DocumentHandler {
               Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
           }
 
+          return bfFormat;
 
        }
     }
@@ -900,7 +944,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class binaryIntegerFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
 
          // create the object
           BinaryIntegerDataFormat biFormat = new BinaryIntegerDataFormat();
@@ -915,6 +959,7 @@ class SaxDocumentHandler implements DocumentHandler {
               Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
           }
 
+          return biFormat;
 
        }
     }
@@ -926,13 +971,14 @@ class SaxDocumentHandler implements DocumentHandler {
     // REMINDER: these functions only get called when tagged data is being read..
 
     class dataTagStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
           CurrentDataTagLevel++;
+          return (Object) null;
        }
     }
 
     class dataTagEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () { 
+       public void action (SaxDocumentHandler handler) { 
 
           if (CurrentDataTagLevel == DataTagLevel)
              TaggedLocatorObj.next();
@@ -959,7 +1005,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class dataCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (char buf [], int offset, int len) {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
 
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
 
@@ -999,7 +1045,7 @@ class SaxDocumentHandler implements DocumentHandler {
     }
 
     class dataEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () { 
+       public void action (SaxDocumentHandler handler) { 
 
           // we stopped reading datanode, lower count by one
           DataNodeLevel--;
@@ -1106,7 +1152,7 @@ class SaxDocumentHandler implements DocumentHandler {
     }
 
     class dataStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
 
           // we only need to do these things for the first time we enter
           // a data node
@@ -1149,6 +1195,7 @@ class SaxDocumentHandler implements DocumentHandler {
           // this (partially helps) declare we are now reading data, 
           DataNodeLevel++; 
 
+          return readObj;
        }
     }
 
@@ -1156,11 +1203,12 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class dataFormatStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
 
            // save attribs for latter
            DataFormatAttribs = attrs;
 
+           return (Object) null;
        }
     }
 
@@ -1169,7 +1217,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class exponentFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
          // create the object
           ExponentialDataFormat exponentFormat = new ExponentialDataFormat();
@@ -1184,6 +1232,7 @@ class SaxDocumentHandler implements DocumentHandler {
               Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
           }
 
+          return exponentFormat;
        }
     }
 
@@ -1191,7 +1240,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class fieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // create new object appropriately 
           Field newfield = new Field();
@@ -1237,7 +1286,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
              } else {
                 Log.warnln("Error: Reader got an field with FieldIdRef=\""+fieldIdRef+"\" but no previous field has that id! Ignoring add field request.");
-                    return;
+                    return (Object) null;
              }
           }
 
@@ -1253,6 +1302,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
           LastFieldObject = newfield;
 
+          return newfield;
        }
     }
 
@@ -1260,7 +1310,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class fieldAxisStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // create new object appropriately 
           FieldAxis newfieldaxis = new FieldAxis();
@@ -1306,7 +1356,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
                  } else {
                     Log.warnln("Error: Reader got an fieldaxis with AxisIdRef=\""+axisIdRef+"\" but no previous field axis has that id! Ignoring add fieldAxis request.");
-                    return;
+                    return (Object) null;
                  }
              }
 
@@ -1317,6 +1367,7 @@ class SaxDocumentHandler implements DocumentHandler {
              Log.errorln("FieldAxis object:"+newfieldaxis+" lacks either axisId or axisIdRef, ignoring!");
           }
 
+          return newfieldaxis;
        }
     }
 
@@ -1325,16 +1376,16 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class fieldGroupEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () {
+       public void action (SaxDocumentHandler handler) {
           // peel off the last object in the field group list
           CurrentFieldGroupList.remove(CurrentFieldGroupList.size()-1);
        }
     }
 
     class fieldGroupStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
-         // grab parent node name
+          // grab parent node name
           String parentNodeName = getParentNodeName();
 
           // create new object appropriately 
@@ -1373,6 +1424,7 @@ class SaxDocumentHandler implements DocumentHandler {
           // now add it to the list
           CurrentFieldGroupList.add(newfieldGroup);
 
+          return newfieldGroup;
        }
     }
 
@@ -1380,7 +1432,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class fieldRelationshipStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // create the object
           FieldRelationship newfieldrelation = new FieldRelationship();
@@ -1395,6 +1447,7 @@ class SaxDocumentHandler implements DocumentHandler {
           // add this relationship in the field object
           LastFieldObject.setRelationship(newfieldrelation);
 
+          return newfieldrelation;
        }
     }
 
@@ -1402,7 +1455,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class fixedFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // create the object
           FixedDataFormat fixedFormat = new FixedDataFormat();
@@ -1416,6 +1469,8 @@ class SaxDocumentHandler implements DocumentHandler {
           } else {
               Log.warnln("Unknown parent object, cant set string data type/format in $dataTypeObj, ignoring.");
           }
+
+          return fixedFormat;
        }
     }
 
@@ -1423,7 +1478,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class forStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // for node sets the iteration order for how we will setData
           // in the datacube (important for delimited and formatted reads).
@@ -1437,6 +1492,8 @@ class SaxDocumentHandler implements DocumentHandler {
              } else 
                  Log.warnln("Warning: got weird attribute:"+name+" on for node");
           } 
+
+          return (Object) null;
        }
     }
 
@@ -1444,7 +1501,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class integerFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
          // create the object
           IntegerDataFormat integerFormat = new IntegerDataFormat();
@@ -1459,7 +1516,7 @@ class SaxDocumentHandler implements DocumentHandler {
               Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
           }
 
-
+          return integerFormat;
        }
     }
 
@@ -1467,7 +1524,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class noteCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (char buf [], int offset, int len) {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
 
           // add cdata as text to the last note object 
           String newText = new String(buf,offset,len);
@@ -1477,7 +1534,7 @@ class SaxDocumentHandler implements DocumentHandler {
     }
 
     class noteStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
            String parentNodeName = getParentNodeName(); 
 
@@ -1522,7 +1579,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
               } else {
                  Log.warnln("Error: Reader got a note with NoteIdRef=\""+noteIdRef+"\" but no previous note has that id! Ignoring add note request.");
-                 return;
+                 return (Object) null;
               }
            }
 
@@ -1545,6 +1602,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
            LastNoteObject = newnote;
 
+           return newnote;
 
        }
     }
@@ -1554,7 +1612,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
     
     class noteIndexStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           String axisIdRef = (String) null;
           int size = attrs.getLength(); 
@@ -1569,6 +1627,7 @@ class SaxDocumentHandler implements DocumentHandler {
              NoteLocatorOrder.add(axisIdRef);
           }
 
+          return (Object) null;
        }
     }
 
@@ -1577,7 +1636,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
     
     class notesEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () {
+       public void action (SaxDocumentHandler handler) {
 
        // set the locatorOrder in the Notes object
 /*
@@ -1595,10 +1654,11 @@ class SaxDocumentHandler implements DocumentHandler {
     }
 
     class notesStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // do nothing .. this node doenst have any attributes
           // only child nodes. 
+          return (Object) null;
 
        }
     }
@@ -1608,8 +1668,9 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class nullStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
-           // null means do nothing!!
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+          // null means do nothing!!
+          return (Object) null;
        }
     }
 
@@ -1618,7 +1679,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
     
     class parameterStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // grab parent node name
           String parentNodeName = getParentNodeName();
@@ -1651,7 +1712,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
           } else {
             Log.warnln("Error: weird parent node "+parentNodeName+" for parameter, ignoring");
-            return;
+            return (Object) null;
           }
 
           // add this object to all open groups
@@ -1663,6 +1724,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
           LastParameterObject = newparameter;
 
+          return newparameter;
        }
     }
 
@@ -1670,14 +1732,14 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class parameterGroupEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () {
+       public void action (SaxDocumentHandler handler) {
           // peel off the last object in the parametergroup list
           CurrentParameterGroupList.remove(CurrentParameterGroupList.size()-1);
        }
     }
 
     class parameterGroupStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
          // grab parent node name
           String parentNodeName = getParentNodeName();
@@ -1725,6 +1787,8 @@ class SaxDocumentHandler implements DocumentHandler {
           // now add it to the list
           CurrentParameterGroupList.add(newparamGroup);
 
+          return newparamGroup; 
+
        }
     }
 
@@ -1732,7 +1796,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class readEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () {
+       public void action (SaxDocumentHandler handler) {
 
           // obtain the current XMLDataIOStyle Object
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
@@ -1763,7 +1827,7 @@ class SaxDocumentHandler implements DocumentHandler {
     }
 
     class readStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // save these for later, when we know what kind of dataIOstyle we got
           DataIOStyleAttribs = attrs;
@@ -1777,6 +1841,8 @@ class SaxDocumentHandler implements DocumentHandler {
           // set the iteration order of the locator that will populate
           // the datacube 
           AxisReadOrder = new ArrayList();
+
+          return (Object) null;
        }
     }
 
@@ -1784,8 +1850,9 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class readCellStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
           Log.errorln("READCELL Start handler not implemented yet.");
+          return (Object) null;
        }
     }
 
@@ -1793,15 +1860,16 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class repeatEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () {
+       public void action (SaxDocumentHandler handler) {
           // pop off last value
           CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
        }
     }
 
     class repeatStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
           Log.errorln("REPEAT Start handler not implemented yet.");
+          return (Object) null;
        }
     }
 
@@ -1810,7 +1878,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
     // Root node start 
     class rootStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
           // The root node is just a "structure" node,
           // but is always the first one.
           XDF.setXMLAttributes(attrs); // set XML attributes from passed list 
@@ -1822,6 +1890,8 @@ class SaxDocumentHandler implements DocumentHandler {
              int value = ((Integer) Options.get("DefaultDataDimensionSize")).intValue();
              XDF.setDefaultDataArraySize(value);
           }
+
+          return CurrentStructure;
        }
     }
 
@@ -1829,8 +1899,9 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class skipCharStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
           Log.errorln("SKIPCHAR Start handler not implemented yet.");
+          return (Object) null;
        }
     }
 
@@ -1838,7 +1909,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class stringFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
 
          // create the object
           StringDataFormat stringFormat = new StringDataFormat();
@@ -1853,6 +1924,8 @@ class SaxDocumentHandler implements DocumentHandler {
               Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring");
           }
 
+          return stringFormat;
+
        }
     }
 
@@ -1861,8 +1934,9 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class structureStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
           Log.errorln("STRUCTURE Start handler not implemented yet.");
+          return (Object) null;
        }
     }
 
@@ -1871,7 +1945,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
     // Our purpose here: configure the TaggedXMLDataIOStyle with axis/tag associations.
     class tagToAxisStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
 
           // well, if we see tagToAxis nodes, must have tagged data, the 
           // default style. No need for initing further. 
@@ -1901,6 +1975,8 @@ class SaxDocumentHandler implements DocumentHandler {
           // works?
           ((TaggedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).setAxisTag(tagname, axisIdRefname);
 
+          return (Object) null;
+
        }
     }
 
@@ -1908,7 +1984,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class unitCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (char buf [], int offset, int len) {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
 
           LastUnitObject.setValue(new String(buf,offset,len));
 
@@ -1916,7 +1992,7 @@ class SaxDocumentHandler implements DocumentHandler {
     }
 
     class unitStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
 
           //  grab parent node name
           String gParentNodeName = getGrandParentNodeName();
@@ -1954,6 +2030,9 @@ class SaxDocumentHandler implements DocumentHandler {
           }
 
           LastUnitObject = newunit;
+
+          return newunit;
+
        }
     }
 
@@ -1961,7 +2040,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class valueCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (char buf [], int offset, int len) {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
 
           //  grab parent node name
           String parentNodeName = getParentNodeName();
@@ -2010,13 +2089,13 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class valueGroupEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () {
+       public void action (SaxDocumentHandler handler) {
           CurrentValueGroupList.remove(CurrentValueGroupList.size()-1);
        }
     }
 
     class valueGroupStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // 1. grab parent node name
           String parentNodeName = getParentNodeName();
@@ -2065,6 +2144,8 @@ class SaxDocumentHandler implements DocumentHandler {
           // now add it to the list
           CurrentValueGroupList.add(newvalueGroup);
 
+          return newvalueGroup;
+
        }
     }
 
@@ -2072,7 +2153,7 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class valueListCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (char buf [], int offset, int len) {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
 
           // IF we get here, we have the delmited case for populating
           // a value list.
@@ -2125,7 +2206,7 @@ class SaxDocumentHandler implements DocumentHandler {
     // there is undoubtably some code-reuse spots missed in this function.
     // get it later when Im not being lazy. -b.t.
     class valueListStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
  
            // 1. re-init
            CurrentValueListParameter = new Hashtable(); 
@@ -2147,11 +2228,13 @@ class SaxDocumentHandler implements DocumentHandler {
            // yet determined for this :)
            CurrentValueListParameter.put("isDelimitedCase", "false"); 
 
+           return (Object) null;
+
        }
     }
 
     class valueListEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () {
+       public void action (SaxDocumentHandler handler) {
 
           // generate valuelist values from algoritm IF we need to
           // (e.g. values where'nt in a delimited cdata list)
@@ -2253,8 +2336,9 @@ class SaxDocumentHandler implements DocumentHandler {
     //
 
     class vectorStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
           Log.errorln("VECTOR Start handler not implemented yet.");
+          return (Object) null;
        }
     }
 
@@ -2264,6 +2348,10 @@ class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2000/11/09 23:04:56  thomas
+ * Updated version, made changes to allow extension
+ * to other dataformats (e.g. FITSML). -b.t.
+ *
  * Revision 1.11  2000/11/09 04:24:12  thomas
  * Implimented small efficiency improvements to traversal
  * loops. -b.t.

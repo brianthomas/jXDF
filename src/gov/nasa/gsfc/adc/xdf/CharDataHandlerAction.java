@@ -30,13 +30,17 @@ package gov.nasa.gsfc.adc.xdf;
 /** Interface for all start element actions in the Reader start
     element dispatch table. 
 */
-interface CharDataHandlerAction {
-  public void action (char buf [], int offset, int len);
+public interface CharDataHandlerAction {
+  public void action (SaxDocumentHandler handler, char buf [], int offset, int len);
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/11/09 23:04:56  thomas
+ * Updated version, made changes to allow extension
+ * to other dataformats (e.g. FITSML). -b.t.
+ *
  * Revision 1.1  2000/10/25 17:57:00  thomas
  * Initial Version. -b.t.
  *

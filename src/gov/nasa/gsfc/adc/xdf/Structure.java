@@ -94,10 +94,10 @@ public class Structure extends BaseObject {
 
   }
 
-  /** init -- special private method used by constructor methods to
+  /** Special method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
 
     classXDFNodeName = "structure";
@@ -128,7 +128,6 @@ public class Structure extends BaseObject {
   //
 
   /**set the *name* attribute
-   * @return: the current *name* attribute
    */
   public void setName (String strName)
   {
@@ -144,7 +143,6 @@ public class Structure extends BaseObject {
   }
 
    /**set the *description* attribute
-   * @return: the current *description* attribute
    */
   public void setDescription (String strDesc)
   {
@@ -159,7 +157,6 @@ public class Structure extends BaseObject {
   }
 
   /**set the *paramList* attribute
-   * @return: the current *paramList* attribute
    */
   public void setParamList(List param) {
      ((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
@@ -173,7 +170,6 @@ public class Structure extends BaseObject {
   }
 
   /**set the *structList* attribute
-   * @return: the current *structList* attribute
    */
   public void setStructList(List struct) {
     ((XMLAttribute) attribHash.get("structList")).setAttribValue(struct);
@@ -187,7 +183,6 @@ public class Structure extends BaseObject {
   }
 
   /**set the *arrayList* attribute
-   * @return: the current *arrayList* attribute
    */
   public void setArrayList(List array) {
      ((XMLAttribute) attribHash.get("arrayList")).setAttribValue(array);
@@ -201,7 +196,6 @@ public class Structure extends BaseObject {
   }
 
   /**set the *noteList* attribute
-   * @return: the current *noteList* attribute
    */
   public void setNoteList(List note) {
     ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
@@ -227,6 +221,26 @@ public class Structure extends BaseObject {
   {
     return paramGroupOwnedHash;
   }
+
+  //
+  // Protected Get/set
+  //
+
+  /**set the type attribute
+   */
+  // This should only be set by inheriting Structures (ala FITSML and
+  // so on (hmm. reader may also need to set it.., more thought on this..) 
+  protected void setType(String strType ) {
+    ((XMLAttribute) attribHash.get("type")).setAttribValue(strType);
+  }
+
+  /**getNoteList
+   * @return: the current *type* attribute
+   */
+  public List getType() {
+    return (List) ((XMLAttribute) attribHash.get("type")).getAttribValue();
+  }
+
 
   //
   //Other PUBLIC Methods
@@ -428,6 +442,10 @@ public class Structure extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2000/11/09 23:04:56  thomas
+ * Updated version, made changes to allow extension
+ * to other dataformats (e.g. FITSML). -b.t.
+ *
  * Revision 1.13  2000/11/09 04:32:05  thomas
  * Minor 'hack' to add the 'type' attribute. Strictly
  * speaking, this attribute only occurs on the XDF
