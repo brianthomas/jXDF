@@ -393,4 +393,20 @@ public class Parameter extends BaseObject {
     return getUnits().removeUnit(index);
   }
 
+  public Object clone() throws CloneNotSupportedException {
+    Parameter cloneObj = (Parameter) super.clone();
+
+    //deep copy of the valueGroupOwnedHash
+     synchronized (this.valueGroupOwnedHash) {
+      synchronized(cloneObj.valueGroupOwnedHash) {
+        cloneObj.valueGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.valueGroupOwnedHash.size()));
+        Iterator iter = this.valueGroupOwnedHash.iterator();
+        while (iter.hasNext()) {
+          cloneObj.valueGroupOwnedHash.add(iter.next());
+        }
+      }
+    }
+    return cloneObj;
+  }
+
  }
