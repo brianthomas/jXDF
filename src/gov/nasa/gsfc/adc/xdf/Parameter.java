@@ -117,7 +117,7 @@ public class Parameter extends BaseObject {
      //set up the attribute hashtable key with the default initial value
     attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("units", new XMLAttribute(null, Constants.OBJECT_TYPE));
+    attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
     attribHash.put("datatype", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("paramIdRef", new XMLAttribute(null, Constants.STRING_TYPE));  //double check k.z.
     attribHash.put("paramId", new XMLAttribute(null, Constants.STRING_TYPE));
@@ -215,17 +215,20 @@ public class Parameter extends BaseObject {
   /**setDatatype: set the *datatype* attribute
    * @return: the current *datatype* attribute
    */
-  public DataFormat setDatatype(DataFormat datatype)
+  public String setDatatype(String strDatatype)
   {
-    return (DataFormat) ((XMLAttribute) attribHash.get("datatype")).setAttribValue(datatype);
+    if (Utility.isValidDatatype(strDatatype))
+      return (String) ((XMLAttribute) attribHash.get("datatype")).setAttribValue(strDatatype);
+    else
+      return null;
   }
 
   /**getDatatype
    * @return: the current *datatype* attribute
    */
-  public DataFormat getDatatype()
+  public String getDatatype()
   {
-    return (DataFormat) ((XMLAttribute) attribHash.get("datatype")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get("datatype")).getAttribValue();
   }
 
   /**setValueList: set the *valueList* attribute

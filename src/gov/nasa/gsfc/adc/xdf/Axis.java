@@ -92,7 +92,7 @@ public class Axis extends BaseObject implements Cloneable {
     attribHash.put("axisUnits", new XMLAttribute(unitsObj, Constants.OBJECT_TYPE));
     unitsObj.setXDFNodeName("axisUnits");
 
-    attribHash.put("axisDatatype",new XMLAttribute(new StringDataFormat(), Constants.STRING_TYPE));
+    attribHash.put("axisDatatype",new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
 
@@ -141,17 +141,20 @@ public class Axis extends BaseObject implements Cloneable {
   /**setAxisDataType: set the *axisDatatype* attribute
    * @return: the current *axisDatatype* attribute
    */
-  public DataFormat setDatatype(DataFormat datatype)
+  public String setDatatype(String strDatatype)
   {
-    return (DataFormat) ((XMLAttribute) attribHash.get("axisDatatype")).setAttribValue(datatype);
+    if (Utility.isValidDatatype(strDatatype))
+      return (String) ((XMLAttribute) attribHash.get("axisDatatype")).setAttribValue(strDatatype);
+    else
+      return null;
   }
 
   /**getAxisDatatype
    * @return: the current *axisDatatype* attribute
    */
-  public DataFormat getDatatype()
+  public String getDatatype()
   {
-    return (DataFormat) ((XMLAttribute) attribHash.get("axisDatatype")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get("axisDatatype")).getAttribValue();
   }
 
   /**setAxisUnits: set the *axisUnits* attribute
@@ -485,6 +488,9 @@ public class Axis extends BaseObject implements Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/10/26 20:09:20  kelly
+ * dataType as String, fixed its get/set methods -k.z.
+ *
  * Revision 1.5  2000/10/25 21:20:29  thomas
  * Bug fix. AxisDataType is really string. -b.t.
  *
