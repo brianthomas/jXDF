@@ -846,28 +846,36 @@ public class SaxDocumentHandler extends DefaultHandler {
 
        if (hrefObj.getSystemId() != null) {
 
-          // we assume here that this is a file. hurm.
-          String fileName = hrefObj.getSystemId();
-
-
           try {
                InputSource input = resolveEntity(hrefObj.getPublicId(), hrefObj.getSystemId()); 
                in = input.getByteStream();
           } catch (SAXException e) {
                 Log.printStackTrace(e);
           } catch (NullPointerException e) {
-                Log.info("Trying to open href file resource:"+hrefObj.getSystemId());
+
                 // in this case the InputSource object is null to request that 
                 // the parser open a regular URI connection to the system identifier.
-                // In our case, the systemId IS the filename.
-                File f = new File(hrefObj.getSystemId());
-//                size = (int) f.length();
+                // In our case, the systemId IS the filename and we assume here that 
+                // this is a file. hurm.
+                String fileResource = hrefObj.getSystemId();
+
+                // Some parsers return systemId with the 'file:' prefix. Java
+                // doenst currently understand this so we need to peal it off.
+                int index = fileResource.indexOf("file:");
+                if (index == 0)
+                    fileResource = fileResource.substring(5);
+
+                Log.info("Trying to open file resource:"+fileResource);
+
+                // now open it
+                File f = new File(fileResource);
                 try {
                    in = (java.io.InputStream) new FileInputStream(f);
+                   Log.infoln("...success");
                 } catch (java.io.FileNotFoundException fileNotFound) {
+                   Log.infoln("...failure");
                    fileNotFound.printStackTrace();
                 }
-                Log.infoln("...success");
 
           }
 
@@ -2783,6 +2791,15 @@ Log.errorln(" TValue:"+valueString);
 
                 Hashtable hrefInfo = (Hashtable) UnParsedEntity.get(hrefValue);
 
+/*
+Log.errorln("Href Entity has following keys:");
+java.util.Set keys = hrefInfo.keySet();
+Iterator iter = keys.iterator();
+while (iter.hasNext()) {
+  Log.errorln("   Key:"+iter.next().toString());
+}
+*/
+
                 if (UnParsedEntity.containsKey(hrefValue)) 
                 {
                    hrefObj.setName((String) hrefInfo.get("name"));
@@ -2796,6 +2813,7 @@ Log.errorln(" TValue:"+valueString);
                       hrefObj.setPublicId((String) hrefInfo.get("publicId"));
                    if (hrefInfo.containsKey("ndata")) 
                       hrefObj.setNdata((String) hrefInfo.get("ndata"));
+
                 } else {
                    // bizarre. It usually means that the unparsed entity handler
                    // isnt working like it should
@@ -4504,6 +4522,9 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.54  2001/09/19 16:40:10  thomas
+ * implemented better handling of file hrefs in different directories
+ *
  * Revision 1.53  2001/09/18 19:36:29  thomas
  * intermediate code, may fail for delmited/formatted data
  *
