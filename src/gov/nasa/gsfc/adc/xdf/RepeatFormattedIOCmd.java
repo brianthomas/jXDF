@@ -41,6 +41,8 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   //Fields
   //
 
+  int DefaultCountValue = 1;
+
   //list to store the formatted IO commands
   private List formatCommandList = Collections.synchronizedList(new ArrayList());
 
@@ -88,7 +90,7 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   /** Get the *count* attribute. 
    */
   public Integer getCount() {
-    return new Integer((String) ((XMLAttribute) attribHash.get("count")).getAttribValue());
+     return (Integer) ((XMLAttribute) attribHash.get("count")).getAttribValue();
   }
 
   /** Set the formatCommandList. 
@@ -194,7 +196,7 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   {
     classXDFNodeName = "repeat";
     attribOrder.add(0, "count");
-    attribHash.put("count", new XMLAttribute(new Integer(1), Constants.NUMBER_TYPE));
+    attribHash.put("count", new XMLAttribute(new Integer(DefaultCountValue), Constants.INTEGER_TYPE));
   }
 
 }
@@ -203,6 +205,12 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/20 22:07:58  thomas
+ * Implimented some changes needed by SaxDocHandler
+ * to allow formatted reads (e.g. these classes were not
+ * working!!). Implemented new XMLAttribute INTEGER_TYPE
+ * in count attributes for repeat/skipChar classes. -b.t.
+ *
  * Revision 1.3  2000/11/20 18:31:35  thomas
  * fixed getCommands method to return expaneded
  * command list. Fixed setCount to prevent <1 value

@@ -71,16 +71,19 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
   //Get/Set methods
   //
 
-  /**setCount: set the *count* attribute
+  /** Set the *count* attribute. May not set numCount to less than 1. 
    */
   public void setCount(Integer numCount) {
-    ((XMLAttribute) attribHash.get("count")).setAttribValue(numCount);
+    if(numCount.intValue() < 1) 
+      Log.warnln("Cant set skipChar count value to less than 1, ignoring request.");
+    else  
+      ((XMLAttribute) attribHash.get("count")).setAttribValue(numCount);
   }
 
-  /**getCount: get the *count* attribute
+  /** Get the *count* attribute. 
    */
   public Integer getCount() {
-    return (Integer)  ((XMLAttribute) attribHash.get("count")).getAttribValue();
+     return ((Integer) ((XMLAttribute) attribHash.get("count")).getAttribValue());
   }
 
   /**setOutput: set the *output* attribute
@@ -130,7 +133,7 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
     attribOrder.add(0,"output");
     attribOrder.add(0, "count");
 
-    attribHash.put("count", new XMLAttribute(new Integer(DefaultCount), Constants.NUMBER_TYPE));
+    attribHash.put("count", new XMLAttribute(new Integer(DefaultCount), Constants.INTEGER_TYPE));
     attribHash.put("output", new XMLAttribute(DefaultOutput, Constants.STRING_TYPE));
   }
 
@@ -140,6 +143,12 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/20 22:07:58  thomas
+ * Implimented some changes needed by SaxDocHandler
+ * to allow formatted reads (e.g. these classes were not
+ * working!!). Implemented new XMLAttribute INTEGER_TYPE
+ * in count attributes for repeat/skipChar classes. -b.t.
+ *
  * Revision 1.4  2000/11/16 20:08:27  kelly
  * fixed documentation.  -k.z.
  *

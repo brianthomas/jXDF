@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 /**
    @version $Revision$
@@ -91,10 +92,28 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   public List getFormatCommandList() {
    return formatCommandList;
   }
-  /** convenience methods that return the command list
+
+  /** Convenience method that returns the command list. Repeat
+      commands are expanded into their component parts. 
    */
   public List getCommands() {
-     return formatCommandList;
+     
+     ArrayList commandList = new ArrayList();
+
+     Iterator iter = formatCommandList.iterator();  
+     while (iter.hasNext()) {
+        FormattedIOCmd thisCommand = (FormattedIOCmd) iter.next();
+        if (thisCommand instanceof RepeatFormattedIOCmd) {
+           int count = ((RepeatFormattedIOCmd) thisCommand).getCount().intValue();
+           while (count-- > 0) {
+              commandList.addAll(((RepeatFormattedIOCmd) thisCommand).getCommands());
+           }
+        } else {
+           commandList.add(thisCommand);
+        }
+     }
+
+     return (List) commandList;
   }
 
   //
@@ -201,6 +220,12 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/20 22:07:58  thomas
+ * Implimented some changes needed by SaxDocHandler
+ * to allow formatted reads (e.g. these classes were not
+ * working!!). Implemented new XMLAttribute INTEGER_TYPE
+ * in count attributes for repeat/skipChar classes. -b.t.
+ *
  * Revision 1.7  2000/11/17 22:29:55  thomas
  * Some minor changes to code layout. -b.t.
  *
