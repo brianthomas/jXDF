@@ -85,7 +85,11 @@ public class ValueGroup extends Group {
     //
 
     protected void init () {
+
+       super.init();
+
        classXDFNodeName = "valueGroup";
+
     }
 
 
@@ -94,6 +98,9 @@ public class ValueGroup extends Group {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2001/05/04 20:26:41  thomas
+ * added super.init() to init().
+ *
  * Revision 1.5  2000/11/27 16:57:45  thomas
  * Made init method protected so that extending
  * Dataformats may make use of them. -b.t.

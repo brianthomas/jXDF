@@ -84,6 +84,8 @@ import java.util.Hashtable;
 
     protected void init () {
 
+       super.init();
+
        classXDFNodeName = "fieldGroup";
 
     }
@@ -93,6 +95,9 @@ import java.util.Hashtable;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/05/04 20:25:37  thomas
+ * added super.init() to init().
+ *
  * Revision 1.3  2000/11/27 16:57:45  thomas
  * Made init method protected so that extending
  * Dataformats may make use of them. -b.t.
