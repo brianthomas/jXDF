@@ -146,8 +146,9 @@ public class Log {
 
     if(outputFormat != null) {
       if ( outputFormat.equalsIgnoreCase("System.out")) {  //output is System.out
-        //System.out.println("yes, config read in is System.out");
         output = System.out;
+      } else if ( outputFormat.equalsIgnoreCase("System.err")) {  //output is System.err
+        output = System.err;
       }
       else {  //output is a file
         try {
