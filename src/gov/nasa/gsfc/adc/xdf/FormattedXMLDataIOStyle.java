@@ -27,6 +27,7 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.Hashtable;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.ArrayList;
@@ -142,6 +143,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
    */
 
   protected void specificIOStyleToXDF( OutputStream outputstream, String indent)
+  throws java.io.IOException
   {
 
      //List axisList = parentArray.getAxes();
@@ -200,7 +202,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   //
 
 /*
-  private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) {
+  private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) 
+  throws java.io.IOException
+  {
     //base condition
     if (which > stop) {
       if (Specification.getInstance().isPrettyXDFOutput()) {
@@ -244,6 +248,10 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/07/06 19:05:01  thomas
+ * toXMLOutputStream and related methods now throw
+ * java.io.IOException
+ *
  * Revision 1.17  2001/06/28 16:50:54  thomas
  * changed add method(s) to return boolean.
  *
