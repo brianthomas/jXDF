@@ -40,7 +40,6 @@ public class NaturalLogarithm extends BaseObject implements ConversionComponentI
    //
 
    /* XML attribute names */
-   private static final String VALUE_XML_ATTRIBUTE_NAME = new String("value");
 
    //
    // Constructors
@@ -56,6 +55,17 @@ public class NaturalLogarithm extends BaseObject implements ConversionComponentI
    //
    // Set Methods
    //
+
+   /** Set the *value* attribute.
+       In actuallity, this class doesnt have a value attribute, this method is
+       simply here to provide compiliance with the ConversionComponentInterface.
+       IF you attempt to use it, it will print an error, so don't do it.
+    */
+   public void setValue (Double number)
+   {
+	Log.error("Not allowed to set a value for NaturalLogarithm");
+   }
+
 
    //
    // Other PUBLIC Methods
@@ -93,14 +103,6 @@ public class NaturalLogarithm extends BaseObject implements ConversionComponentI
      super.init();
 
      classXDFNodeName = "naturalLogarithm";
-
-     // order matters! these are in *reverse* order of their
-     // occurence in the XDF DTD
-     attribOrder.add(0, VALUE_XML_ATTRIBUTE_NAME);
-
-     //set up the attribute hashtable key with the default initial value
-     attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.DOUBLE_TYPE));
-
 
    }
 
