@@ -110,7 +110,6 @@ public class Log {
       return;
     }
     // If we reach here, then the config file is alright.
-    System.out.println("Reading configuration.");
     configure(props);
   }
 
