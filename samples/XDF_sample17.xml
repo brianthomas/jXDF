@@ -1,0 +1,44 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE XDF SYSTEM "XDF_018.dtd">
+<!-- a simple table example where data are held in columns -->
+<XDF name="XDF" description="The simple XDF table format using columns">
+  <parameter name="obsdate">
+    <unitless/>
+    <value>01-12-99</value>
+  </parameter>
+  <array name="Raw Frame Data">
+     <parameter name="integration time">
+         <units><unit>sec</unit></units>
+         <value>900</value>
+     </parameter>
+     <units>
+        <unit>counts</unit>
+        <unit power="-1">seconds</unit>
+     </units>
+     <dataFormat>
+        <float width="5" precision="2"/>
+     </dataFormat>
+     <colAxis name="X axis" size="6"/>
+     <rowAxis name="Y axis" size="6"/>
+ <!-- this array is transposed from that in sample 16 -->
+     <data>
+                <column>1.00 2.00 3.00 4.00 5.00  </column>
+                <column>   8.00  9.00  10.00 11.00  12.00 </column>
+<!--
+             </data>
+             <data>
+-->
+                <!-- note that first the last columns are short in this example, thats ok, those cells will become a "null" -->
+                <column>13.00 14.00 15.00 16.00 17.00 </column>
+                <column>19.00 20.00 21.00 22.00 23.00 24.00  </column>
+                <column>25.00 26.00 27.00 28.00 29.00 30.00
+</column>
+                <column>31.00 32.00  33.00 34.00 35.00</column>
+     </data>
+     <notes>
+        <note>Improper cooling of the camera may have resulted in significant dark current.</note>
+        <note noteId="note2" location="6 2">No data because of a cosmic ray hit</note>
+        <note noteIdRef="note2" location="8 3"/>
+     </notes>
+  </array>
+</XDF>

@@ -1,0 +1,57 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE XDF SYSTEM "XDF_018.dtd"> 
+<!-- test of whitespace handling in delimited read of PCDATA section -->
+<XDF name="A sample XDF document" description="This shows how to put any data into XDF format">
+      <parameter name="obsdate"><unitless/><value>01-12-99</value></parameter>
+      <array name="Raw Data">
+          <parameter name="integration time"><units><unit>sec</unit></units>
+              <value>900</value>
+          </parameter>
+          <units><unit>counts</unit><unit power="-1">seconds</unit></units>
+          <dataFormat><float width="5" precision="2"/></dataFormat>
+          <axis name="x" axisId="x-axis" size="5">
+             <units><unit>pixel</unit></units>
+             <dataFormat><integer width="1"/></dataFormat>
+             <valueListAlgorithm><polynomial size="5">0 1</polynomial></valueListAlgorithm>
+          </axis>
+          <axis name="y" axisId="y-axis" size="4">
+             <units><unit>pixel</unit></units>
+             <dataFormat><integer width="1"/></dataFormat>
+             <valueList delimiter=" " repeatable="yes">1  2 4 5 </valueList>
+          </axis>
+          <dataStyle encoding="ISO-8859-1">
+             <delimited>
+               <delimitedInstruction>
+<!-- next line sez: use *one* space character as the delimiter -->
+                 <delimiter repeatable="no"><chars value=" "/></delimiter>
+<!-- next line sez: use *one* space character as the recordterminator -->
+                 <recordTerminator><chars value=" "/></recordTerminator>
+               </delimitedInstruction>
+               <for axisIdRef="x-axis">
+                 <for axisIdRef="y-axis">
+                   <doInstruction/>
+                 </for>
+               </for>
+             </delimited>
+           </dataStyle>
+<!-- This data should read in OK, even without the recordTerminator set. This is because
+      1) NO CDATA section wraps this data, so it should be all converted to SINGLE-space
+         delimited
+      2) the array isnt "ragged" which is to say all records are complete.
+-->
+           <data>1.00  2.00 3.00 4.00 5.00
+6.00 7.00 8.00 9.00
+10.00
+11.00 12.00 13.00 14.00 15.00
+16.00 17.00 18.00 19.00 20.00</data> <!-- ending of block is strickly INCORRECT (no recordterminator) but should work --> 
+          <notes>
+             <locationOrder>
+                <index axisIdRef="x-axis"/>
+                <index axisIdRef="y-axis"/>
+             </locationOrder>
+             <note>Improper cooling of the camera may have resulted in significant dark current.</note>
+             <note noteId="note2" location="2 6">No data because of a cosmic ray hit</note>
+             <note noteIdRef="note2" location="3 8"/>
+          </notes>
+      </array>
+</XDF>

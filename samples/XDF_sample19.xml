@@ -1,0 +1,54 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE XDF SYSTEM "XDF_018.dtd" [
+  <!ENTITY table1 SYSTEM "XDF_sample19.dat" NDATA xdf>
+  <!NOTATION xdf PUBLIC "application/xdf">
+]>
+<!-- a simple table example using external delimited ASCII data storage, the "default" style,
+     where the delimiter between datum (cells) is understood to be any number of "whitespaces" 
+     (e.g. in UNIX parlance thats " " or "\n" or "\r") 
+  -->
+<XDF name="A sample XDF document" description="This shows how to put any data into XDF format">
+  <parameter name="obsdate">
+    <unitless/>
+    <value>01-12-99</value>
+  </parameter>
+  <array name="Raw Data">
+    <parameter name="integration time">
+      <units>
+        <unit>sec</unit>
+      </units>
+      <value>900</value>
+    </parameter>
+    <units>
+      <unit>counts</unit>
+      <unit power="-1">seconds</unit>
+    </units>
+    <dataFormat>
+      <float width="5" precision="2"/>
+    </dataFormat>
+    <rowAxis name="y" size="10">
+      <units>
+        <unit>pixel</unit>
+      </units>
+      <dataFormat><integer width="2"/></dataFormat> <!-- not required, but we wish to be "formal" --> 
+      <valueList delimiter=" " repeatable="yes">10  9 8 7 6 5 4 3 2 1</valueList>
+    </rowAxis>
+    <colAxis name="x" size="10">
+      <units>
+        <unit>pixel</unit>
+      </units>
+      <dataFormat><integer width="2"/></dataFormat> <!-- not required, but we wish to be "formal" --> 
+      <valueListAlgorithm><polynomial size="10">0 1</polynomial></valueListAlgorithm>
+    </colAxis>
+    <data href="table1" startByte="4"/>
+    <notes>
+      <!-- in a simple table, a locationOrder section SHOULD throw a validation error because there
+            are NO row/col axis Id's. Its not needed anyways, because the implicit ordering
+            of note location indices is "col", "row". Upshot: DONT define the locationOrder. -->
+      <note>Improper cooling of the camera may have resulted in significant dark current.</note>
+      <!-- because we have no axisId's the implicit order of the notes location is col,row -->
+      <note noteId="note1" location="2 6">Not real data because of a cosmic ray hit</note>
+      <note noteIdRef="note1" location="3 8"/>
+    </notes>
+  </array>
+</XDF>

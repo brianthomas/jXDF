@@ -1,11 +1,12 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE XDF SYSTEM "XDF_018.dtd" [
-  <!ENTITY table1 SYSTEM "XDF_sample11.dat.zip" NDATA xdf>
   <!ENTITY newLine "&#10;">
+  <!ENTITY table1 SYSTEM "XDF_sample18_A.dat" NDATA xdf>
+  <!ENTITY table2 SYSTEM "XDF_sample18_B.dat" NDATA xdf>
   <!NOTATION xdf PUBLIC "application/xdf">
 ]>
 <XDF name="A sample XDF document" description="This shows how to put any data into XDF using formatted data IO Style.">
-<!-- A little table about 3 nearby galaxies -->
+<!-- test of reading separate  data nodes from external files -->
   <parameterGroup name="Structure Properties">
     <parameter name="date">
       <unitless/>
@@ -82,7 +83,7 @@
     </fieldAxis>
     <axis axisId="rows" size="3">
       <unitless/>
-      <dataFormat><integer width="1"/></dataFormat>
+      <!-- no dataFormat listed.. this means should be considered unbounded "string" -->
       <valueGroup name="rows">
         <valueList delimiter=" ">0 1 2</valueList>
       </valueGroup>
@@ -104,13 +105,17 @@
         </fixedWidthInstruction>
         <for axisIdRef="rows">
           <for axisIdRef="fields">
-<!-- the "fast" axis -->
             <doInstruction/>
           </for>
         </for>
       </fixedWidth>
     </dataStyle>
-    <data href="table1" compression="zip"/>
+<!-- here we have the data split into more than one file, specifying 
+     things this way results in combining the data together in this array. -->
+    <data>
+      <data href="table1" startByte="13"/>
+      <data href="table2" startByte="5"/> <!-- start byte calculated from start of 'table2' -->
+    </data>
     <notes>
       <locationOrder>
         <index axisIdRef="fields"/>
