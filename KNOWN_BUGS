@@ -12,6 +12,18 @@
 
         - Log configuration doesnt appear to allow writing to System.err.
 
+        - This may work, but it hasnt been specifically checked:
+          When axisValues havent been specifically assigned, written data should
+          show empty ones, rather than dropping them. For example, take a 1D array that
+          is of size 3. The axis only has values assigned to dataCube indices 0, 2, therefore
+          the output XML should look like:
+          <axis>
+             ...
+             <value>one</value>
+             <value></value>
+             <value>three</value>
+          </axis>
+ 
         - The Java DecimalFormat code for exponential fields has unfortunate behavior.
           There can be no maximum exponent size specified, this means that the width of
           the exponential after being formated may exceed the specified dataFormat width.
