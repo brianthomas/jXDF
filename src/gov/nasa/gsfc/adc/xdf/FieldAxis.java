@@ -37,7 +37,7 @@ import java.util.Iterator;
 /**describe an Axis that consists of Fields
  */
 
-public class FieldAxis extends BaseObject implements AxisInterface{
+public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterface {
 
    //
    // Fields
@@ -319,6 +319,8 @@ public class FieldAxis extends BaseObject implements AxisInterface{
   protected void init ()
   {
 
+    super.init();
+
     classXDFNodeName = "fieldAxis";
 
     // order matters! these are in *reverse* order of their
@@ -349,6 +351,10 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.15  2001/05/04 20:32:15  thomas
+  * changed baseObject superclass to BaseObjectWithXMLElements.
+  * added super.init() to init().
+  *
   * Revision 1.14  2001/02/07 18:44:04  thomas
   * Converted XML attribute decl
   * to use constants (final static fields within the object). These
