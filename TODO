@@ -4,6 +4,8 @@
 	this package "ALPHA"
         ------------------------------------------------------------
 
+	- Implement Formatted reads.
+
         - readId/readIdRef not implimented in SaxDocHandler (?)
 
         - XMLDataIOStyle has clone method in it, correct? (I did this, not kelly?)
@@ -12,12 +14,17 @@
           (now fixed? review code again)
 
         - Dataformat classes have regex, templateNotation, sprintFNotation methods.
-          Are these needed? Closely evaluate these classes.
+          Are these needed? Closely evaluate these classes (in conjuction w/ Formatted
+          IO code).
        
         - Are Utility, Constants classes truely independant? Shunt methods to
           places they are used.
 
         - fix the repeatable attribute on string parsing
+
+        - dropping relationship after output fed thru parser a second time.
+        - notes w/ refId getting 2x the amount of text should have after output fed
+          thru a second time.
 
         - check that notesEndElementHandlerFunc is finished (?)
 
@@ -35,8 +42,6 @@
 	  these to Vector (resolved?).
 
 	- Check synchronization issues on all code (develop threaded tests). 
-
-	- Implement Formatted reads.
 
 	- Update all derived locators when axis is add/removed from an array.
 
