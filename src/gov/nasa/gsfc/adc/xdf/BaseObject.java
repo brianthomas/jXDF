@@ -297,7 +297,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
         int size = attribs.size();
         for (int i = 0; i < size; i++) {
           Hashtable item = (Hashtable) attribs.get(i);
-          writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
+          writeOut(outputstream, " " + item.get("name") + "=\"");
+          writeOut(outputstream, (String) item.get("value"));
+          writeOut(outputstream, "\"" );
         }
       }
 
@@ -639,6 +641,16 @@ public abstract class BaseObject implements Serializable, Cloneable {
     }
   }
 
+  /** write message, correcting characters in the text to match UTF-16
+      encoding as needed.
+   */
+  protected void writeOutUTF16 ( OutputStream outputstream, String text) {
+
+      Log.errorln("ERROR: writeOutUTF16 method NOT yet implemented.");
+      System.exit(-1); // die hard :P.
+
+  }
+
   /** Set the XMLattributes of this object using the passed AttributeList.
    */
   // NOTE: this is essentially the Perl update method
@@ -787,6 +799,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.34  2000/11/27 20:48:37  thomas
+ * *** empty log message ***
+ *
  * Revision 1.33  2000/11/20 22:04:41  thomas
  * Implimented new INTEGER_TYPE/DOUBLE_TYPE for
  * XMLAttribute printout in toXMLOutputStream. -b.t.
