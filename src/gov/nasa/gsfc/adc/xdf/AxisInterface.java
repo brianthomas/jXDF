@@ -24,6 +24,9 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
+import java.io.OutputStream;
+import java.io.Writer;
+
 /**  AxisInterface aggregates the common signature of Axis
  *   and FieldAxis
  */
@@ -36,12 +39,17 @@ public interface AxisInterface {
    /* ugh. shouldnt be public method */
    public void setParentArray(Array parent);
    public boolean addXMLElementNode (XMLElementNode element);
+   public void toXMLWriter (Writer outputWriter, String indent) throws java.io.IOException;
+   public void toXMLOutputStream (OutputStream o, String indent) throws java.io.IOException;
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/09/04 21:16:48  thomas
+ * added toXMLOutputStream, toXMLWriter methods
+ *
  * Revision 1.9  2001/07/26 15:54:31  thomas
  * addXMLElementNode method name change.
  *
