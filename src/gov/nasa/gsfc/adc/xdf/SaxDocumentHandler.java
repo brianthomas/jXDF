@@ -97,17 +97,16 @@ class SaxDocumentHandler implements DocumentHandler {
     private Unit      LastUnitObject;
     private Units     LastUnitsObject;
 
+    // store some of the parent objects for various nodes
     private Object LastParameterGroupParentObject;
     private Object LastFieldGroupParentObject;
     private Object LastValueGroupParentObject;
 
-    private String LastNotesParentObjectName;
-
+    // Notes stuff
     private ArrayList NoteLocatorOrder = new ArrayList();
 
-    // keeping track of valueList settings
+    // Keeping track of working valueList node (attributes) settings
     private Hashtable CurrentValueListParameter;
-
 
     // Data writing stuff
     private int CurrentDataTagLevel = 0; // how nested we are within d0/d1/d2 data tags
@@ -1100,7 +1099,20 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class fieldRelationshipStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("FIELDRELATIONSHIP Start handler not implemented yet.");
+
+          // create the object
+          FieldRelationship newfieldrelation = new FieldRelationship();
+          newfieldrelation.setXMLAttributes(attrs);
+
+          // add in reference object if it exists
+          String fieldIdRefs = newfieldrelation.getFieldIdRefs();
+          if (fieldIdRefs != null) {
+             // not clear what to do here. Leave blank for now
+          }
+           
+          // add this relationship in the field object
+          LastFieldObject.setRelationship(newfieldrelation);
+
        }
     }
 
@@ -1173,9 +1185,7 @@ class SaxDocumentHandler implements DocumentHandler {
     class noteStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
 
-           // Note: note nodes sometimes appear within notes node,
-           // use LastNotesParentObjectName to determine if this is the case
-           String parentNodeName = (LastNotesParentObjectName != null) ? XDFNodeName.ARRAY : getParentNodeName(); 
+           String parentNodeName = getParentNodeName(); 
 
            // create new object appropriately 
            Note newnote = new Note();
@@ -1198,8 +1208,10 @@ class SaxDocumentHandler implements DocumentHandler {
 
            // add this object to parent object
 
-           if( parentNodeName.equals(XDFNodeName.ARRAY) )
+           if( parentNodeName.equals(XDFNodeName.NOTES) )
            {
+              // only NOTES objects appear in arrays, so we can 
+              // just add to the current array
               CurrentArray.addNote(newnote);
            } else if ( parentNodeName.equals(XDFNodeName.FIELD) )
            {
@@ -1272,6 +1284,7 @@ class SaxDocumentHandler implements DocumentHandler {
     class notesEndElementHandlerFunc implements EndElementHandlerAction {
        public void action () {
 
+       // set the locatorOrder in the Notes object
 /*
    my $notesObj = $LAST_NOTES_OBJECT;
 
@@ -1284,17 +1297,14 @@ class SaxDocumentHandler implements DocumentHandler {
           // reset the location order
           NoteLocatorOrder = new ArrayList ();
 
-          // clear notes parent object
-          LastNotesParentObjectName = (String) null;
-
        }
     }
 
     class notesStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
 
-          // grab and record the parent node name
-          LastNotesParentObjectName = getParentNodeName();
+          // do nothing .. this node doenst have any attributes
+          // only child nodes. 
 
        }
     }
@@ -1346,8 +1356,8 @@ class SaxDocumentHandler implements DocumentHandler {
             }
 
           } else {
-            Log.errorln("Error: weird parent node "+parentNodeName+" for parameter");
-            System.exit(-1); // fatal error, shut down 
+            Log.warnln("Error: weird parent node "+parentNodeName+" for parameter, ignoring");
+            return;
           }
 
           // add this object to all open groups
@@ -1974,6 +1984,9 @@ class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/02 19:45:13  thomas
+ * Updated to read in Notes objects. -b.t.
+ *
  * Revision 1.5  2000/11/01 22:14:03  thomas
  * Updated for new cloning scheme. -b.t.
  *
