@@ -75,6 +75,10 @@
 	- Check synchronization issues on all code (develop threaded tests) 
           (or, as mentioned above, lunk threaded code and remove sync blocks)
 
+        - IO Speed is still fairly slow (although about factor of ~ 10 faster than Perl).
+          Reading in is faster than output, Java XDF is able to load ~ 13,000 records/sec 
+          and write ~3000 records/sec on 400 MHz machine.
+
         - Need Code review, issues:
 	    1. Remove unnecessary methods like setDimension, etc.
 
@@ -96,7 +100,7 @@
 
         - placement of parameter objects under more classes (e.x. axis, field)
 
-	- XDF functions.
+	- XDF functions (append, merge, and sort and sub-select arrays in particular).
 
 	- Face up to the setData/dataFormat issue. What happens when a user
           sets the first data? Check that it conforms to the declared dataFormat
