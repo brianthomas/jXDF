@@ -418,11 +418,9 @@ public abstract class BaseObject implements Serializable {
 
       // check is class Strucuture & XMLDeclAttribs populated?
       if ( nodeNameString.equals(sXDFStructureNodeName) && !XMLDeclAttribs.isEmpty() )
-      {
-        writeOut(outputstream,"<" + sXDFRootNodeName); // print opening root node statement
-      } else {
-        writeOut(outputstream,"<" + nodeNameString);   // print opening statement
-      }
+        nodeNameString = sXDFRootNodeName;
+
+      writeOut(outputstream,"<" + nodeNameString);   // print opening statement
 
     }
 
@@ -446,22 +444,14 @@ public abstract class BaseObject implements Serializable {
     ArrayList childObjs = (ArrayList) xmlInfo.get("childObjList");
     String pcdata = (String) xmlInfo.get("PCDATA");
 
-    //it is the simplest node, with opening/closing node, no child, no PCDATA
-    if ( childObjs.size() == 0 && pcdata == null && noChildObjectNodeName == null){
-      writeOut(outputstream, "></" + nodeNameString + ">");
-      if (sPrettyXDFOutput)
-        writeOut(outputstream, Constants.NEW_LINE);
-      return ;
-    }
-
     if ( childObjs.size() > 0 || pcdata != null || noChildObjectNodeName != null)
     {
 
       // close the opening tag
       if (nodeNameString != null) {
         writeOut(outputstream, ">");
-        if ((sPrettyXDFOutput) && (pcdata == null)  && (childObjs.size() !=0))
-          writeOut(outputstream, Constants.NEW_LINE);
+        if ((sPrettyXDFOutput) && (pcdata == null)) 
+           writeOut(outputstream, Constants.NEW_LINE);
       }
 
       // deal with object/list XML attributes, if any in our list
@@ -481,9 +471,9 @@ public abstract class BaseObject implements Serializable {
             while (iter.hasNext()) {
               BaseObject containedObj = (BaseObject) iter.next();
               if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
+                indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
+                indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
                 String newindent = indent + sPrettyXDFOutputIndentation;
-                dealWithOpeningGroupNodes(containedObj, outputstream, indent);
-                dealWithClosingGroupNodes(containedObj, outputstream, indent);
                 containedObj.toXDFOutputStream(outputstream, new Hashtable(), newindent);
               }
             }
@@ -495,9 +485,9 @@ public abstract class BaseObject implements Serializable {
           if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
             // shouldnt this be synchronized too??
             synchronized(containedObj) {
+              indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
+              indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
               String newindent = indent + sPrettyXDFOutputIndentation;
-              dealWithOpeningGroupNodes(containedObj, outputstream, indent);
-              dealWithClosingGroupNodes(containedObj, outputstream, indent);
               containedObj.toXDFOutputStream(outputstream, new Hashtable(), newindent);
             }
           }
@@ -512,55 +502,42 @@ public abstract class BaseObject implements Serializable {
       // print out PCDATA, if any
       if(pcdata != null)  {
         writeOut(outputstream, pcdata);
-        //write out closing node after PCDATA, leaving no space between them.
-        //k.z. 10/18/2000
-        if (!dontCloseNode)
-          if ( nodeNameString.equals(sXDFStructureNodeName) && !XMLDeclAttribs.isEmpty() )
-          {
-            writeOut(outputstream, "</"+sXDFRootNodeName+">");
-          } else {
-            writeOut(outputstream, "</"+nodeNameString+">");
-          }
-        if (sPrettyXDFOutput)
-          writeOut(outputstream, Constants.NEW_LINE);
-        return ; //now we are done, return!
-        //k.z. 10/18/2000
       };
 
       // if there are no PCDATA or child objects/nodes then
       // we print out noChildObjectNodeName and close the node
       if ( childObjs.size() == 0 && pcdata == null && noChildObjectNodeName != null)
       {
+
+        if (sPrettyXDFOutput)
+                writeOut(outputstream, indent + sPrettyXDFOutputIndentation);
+
         writeOut(outputstream, "<" + noChildObjectNodeName + "/>");
-        writeOut(outputstream, "</"+nodeNameString + ">");
+
         if (sPrettyXDFOutput)
           writeOut(outputstream, Constants.NEW_LINE);
-        return ;
+
       }
 
       // ok, now deal with closing the node
       if (nodeNameString != null) {
-        // Needed??
-        //dealWithClosingGroupNodes(containedObj, outputstream, indent);
 
-        //Brian: we have to fix this, no whitespace should be allowed between
-        //PCDATA and closing node
-        if (sPrettyXDFOutput) writeOut(outputstream, indent);
-        if (!dontCloseNode)
-          if ( nodeNameString.equals(sXDFStructureNodeName) && !XMLDeclAttribs.isEmpty() )
-          {
-            writeOut(outputstream, "</"+sXDFRootNodeName+">");
-          } else {
+         indent = dealWithClosingGroupNodes((BaseObject) this, outputstream, indent);
+
+         if (sPrettyXDFOutput && pcdata == null) 
+                writeOut(outputstream, indent);
+
+         if (!dontCloseNode) 
             writeOut(outputstream, "</"+nodeNameString+">");
-          }
 
       }
 
     } else {
 
-      if(dontCloseNode) {
+      if (dontCloseNode) {
          // it may not have sub-objects, but we dont want to close it
          // (happens for group objects)
+         writeOut(outputstream, ">");
       } else {
         // no sub-objects, just close this node
         writeOut(outputstream, "/>");
@@ -830,6 +807,7 @@ public abstract class BaseObject implements Serializable {
      }
   }
 
+
   //
   // PRIVATE Methods
   //
@@ -839,26 +817,28 @@ public abstract class BaseObject implements Serializable {
   */
   private String dealWithOpeningGroupNodes (BaseObject obj, OutputStream outputstream, String indent) {
 
+    StringBuffer newIndent = new StringBuffer(indent);
+
     // Should *both* groupMemberHash and openGroupNodeHash be synchronized??
     synchronized(obj.groupMemberHash) {
-      synchronized(obj.openGroupNodeHash) {
+      synchronized(this.openGroupNodeHash) {
         Iterator iter = obj.groupMemberHash.iterator(); // Must be in synchronized block
         while (iter.hasNext()) {
           Group memberGroup = (Group) iter.next();
           // determine if this group that we belong to is already
           // open or not.
-          if(!obj.openGroupNodeHash.contains(memberGroup)) {
+          if(!this.openGroupNodeHash.contains(memberGroup)) {
             // its *not* already open, so we bump up the indentation,
             // open it and add it to the open group node list.
-            indent.concat(sPrettyXDFOutputIndentation);
-            memberGroup.toXDFOutputStream(outputstream, indent);
-            obj.openGroupNodeHash.add(memberGroup);
+            newIndent.append(sPrettyXDFOutputIndentation);
+            memberGroup.toXDFOutputStream(outputstream, new Hashtable(), newIndent.toString(), true, null, null);
+            this.openGroupNodeHash.add(memberGroup);
           }
         }
       }
     }
 
-    return indent;
+    return newIndent.toString();
   }
 
   /** Method determines if any of the currently open group objects
@@ -868,13 +848,14 @@ public abstract class BaseObject implements Serializable {
 
     // Should *both* groupMemberHash and openGroupNodeHash be synchronized??
     synchronized(obj.groupMemberHash) {
-      synchronized(obj.openGroupNodeHash) {
+      synchronized(this.openGroupNodeHash) {
 
-        Iterator iter = obj.openGroupNodeHash.iterator(); // Must be in synchronized block
+        Iterator iter = this.openGroupNodeHash.iterator(); // Must be in synchronized block
         while (iter.hasNext()) {
           Group openGroup = (Group) iter.next();
           // determine if this group that we belong to is already
           // open or not.
+
           if(!obj.groupMemberHash.contains(openGroup)) {
             // its *not* a member of this group and its still open,
             // so we need to close it.
@@ -882,7 +863,7 @@ public abstract class BaseObject implements Serializable {
             if (sPrettyXDFOutput) writeOut(outputstream, indent);
             writeOut(outputstream, "</" + openGroup.classXDFNodeName + ">");
             if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
-            obj.openGroupNodeHash.remove(openGroup);
+            this.openGroupNodeHash.remove(openGroup);
             // peel off some indent
             indent = indent.substring(0,indent.length() - sPrettyXDFOutputIndentation.length());
           }
@@ -927,6 +908,10 @@ public abstract class BaseObject implements Serializable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2000/11/01 22:14:41  thomas
+ * Reversed changes to toXDFOutputStream. Fixed grouping
+ * code (mostly in dealWith*nodes mthods). -b.t.
+ *
  * Revision 1.20  2000/11/01 21:58:08  kelly
  * moved XMLAttribute out of BaseObject -k.z
  *
