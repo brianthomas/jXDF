@@ -109,7 +109,7 @@ import java.util.*;
     attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("units", new XMLAttribute(null, Constants.OBJECT_TYPE));
-    attribHash.put("datatype", new XMLAttribute(null, Constants.OBJECT_TYPE));
+    attribHash.put("datatype", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("paramIdRef", new XMLAttribute(null, Constants.STRING_TYPE));  //double check k.z.
     attribHash.put("paramId", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
