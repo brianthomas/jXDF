@@ -1,21 +1,53 @@
 
 
-        The Java XDF Package was developed by programmers at 
+   About this package.
+   ------------------
 
-        the Astronomical Data Center, Code 631, NASA/GSFC;
+	This is an alpha release. This means that not all forseen
+	functionality has yet been implemented and that we reserve
+	the right to significantly revise the API.
 
-        Raytheon Technical Services Company, Lanham Md
+	As you might guess, this package is currently under heavy 
+	construction. That said, a subset of the final forseen 
+	functionality of the package is fairly well implemented. 
 
-        and
+	The stability and features of the java objects is good, the 
+	main lack remains in the IO portion of the package. At this 
+	time it is possible to create java XDF structure objects from
+	both delimited and tagged ASCII data (of any dimensionality).
+	Binary data is not currently implemented, nor are formatted
+       	read/write functionality. Delimited writes work unless newline
+	returns are used as either a delimiter or recordTerminator
+	character.
 
-        Century Computing, a Division of AppNet, Inc.
+	Please report bugs, comments to xdf-dev@xdf.gsfc.nasa.gov.
 
-        For information concerning this code:
+	See the samples directory for sample code, a DTD and xml files.
 
-        Email contact:
-        adc@adc.gsfc.nasa.gov 
-        (mention the "XDF Java Package" in the subject line)
+	See the XDF homepage for more information about XDF:
 
-        Mailing lists available at:
-        http://xdf.gsfc.nasa.gov/
+	http://tarantella.gsfc.nasa.gov/xml/XDFhome.html
+
+   The Java XDF Package was developed by programmers at: 
+   -----------------------------------------------------
+
+           the Astronomical Data Center, Code 631, NASA/GSFC;
+
+           Raytheon Technical Services Company, Lanham Md
+
+           and
+
+           Century Computing, a Division of AppNet, Inc.
+
+
+   For information concerning this code:
+   ------------------------------------
+
+   Email contact:
+
+      Brian Thomas <thomas@adc.gsfc.nasa.gov> 
+
+   Mailing lists (and list archives) available at:
+      http://xdf.gsfc.nasa.gov/
+
 

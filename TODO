@@ -4,6 +4,8 @@
 	this package "ALPHA"
         ------------------------------------------------------------
 
+        - readId/readIdRef not implimented in SaxDocHandler (?)
+
         - XMLDataIOStyle has clone method in it, correct? (I did this, not kelly?)
 
 	- Efficiency issues. Don't use sth. like attrib.size() in the for loop
@@ -66,6 +68,11 @@
 
 	- Make methods/classes as consistent as possible with Perl package.
 
+        - the XML declaration hash doesnt allow user to declare the XML version;
+          (partly because XMLDecl Hashtable is not an orderd object, and we cant
+           insure that "version" will be the first attribute (and why this needs
+	   to be is difficult for me to understand, but thats another matter..).
+	   ) so we need to review if current implementation is correct.
 
         Things for the next big version upgrade to XDF version 0.19
         ============================================================

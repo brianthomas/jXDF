@@ -1,5 +1,9 @@
 
 Package Version History
 
-0.01  9/15/00   Initial Code/Directory Structure Laid Down. 
+0.01   9/15/00  Initial code/directory structure laid down and
+                Java project started. 
+
+0.17a 11/09/00  First alpha version. Delimited and Tagged ASCII
+                IO implemented. 
 
