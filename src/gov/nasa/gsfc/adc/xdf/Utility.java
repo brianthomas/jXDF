@@ -105,6 +105,26 @@ import java.util.*;
       return false;
     }
 
+    public static boolean isValidValueSpecial(String strValueSpecial) {
+      String[] valueSpecialList = Constants.VALUE_SPECIAL_LIST;
+      int stop = valueSpecialList.length;
+      for (int i = 0; i < stop; i++) {
+        if (valueSpecialList.equals(valueSpecialList[i]))
+          return true;
+      }
+      return false;
+    }
+
+    public static boolean isValidValueInequality(String strValueInequality) {
+      String[] valueInequalityList = Constants.VALUE_INEQUALITY_LIST;
+      int stop = valueInequalityList.length;
+      for (int i = 0; i < stop; i++) {
+        if (valueInequalityList.equals(valueInequalityList[i]))
+          return true;
+      }
+      return false;
+    }
+
 
 
   }  //end of Utility class
@@ -112,6 +132,9 @@ import java.util.*;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/02 20:35:26  kelly
+ * minor fix
+ *
  * Revision 1.4  2000/10/27 21:24:02  kelly
  * changes made in correspondence with Constants.java  -k.z.
  *
