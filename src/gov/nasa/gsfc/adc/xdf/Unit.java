@@ -1,7 +1,6 @@
+
 // XDF Unit Class
 // CVS $Id$
-package gov.nasa.gsfc.adc.xdf;
-import java.util.*;
 
 // Unit.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -22,6 +21,10 @@ import java.util.*;
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
+
+package gov.nasa.gsfc.adc.xdf;
+
+import java.util.Hashtable;
 
 /**
  * Unit.java: describes a unit within a given units object

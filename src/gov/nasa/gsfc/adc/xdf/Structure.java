@@ -2,10 +2,6 @@
 // XDF Structure Class
 // CVS $Id$
 
-package gov.nasa.gsfc.adc.xdf;
-
-import java.util.*;
-
 // Structure.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
@@ -26,13 +22,22 @@ import java.util.*;
 
 */
 
+package gov.nasa.gsfc.adc.xdf;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Structure.java: XDF::Structure is a means of grouping/associating L<XDF::Parameter> objects, which hold
- * scientific content of the data, and L<XDF::Array> objects which hold the mathematical content
- * of the data. If an XDF::Structure holds a parameter with several XDF::Array objects then the
+ * Structure is a means of grouping/associating Parameter objects, which hold
+ * scientific content of the data, and Array objects which hold the mathematical content
+ * of the data. If a Structure holds a parameter with several Array objects then the
  * parameter is assumed to be applicable to all of the array child nodes. Sub-structure (e.g. other
- * XDF::Structure objects) may be held within a structure to create more fine-grained associations
+ * Structure objects) may be held within a structure to create more fine-grained associations
  * between parameters and arrays.
  * @version $Revision$
  */
@@ -40,15 +45,15 @@ import java.util.*;
  /**
   * Description of class attributes:
   * name--
-  * string containing the name of this XDF::Structure.
+  * string containing the name of this Structure.
   * description
-  * scalar string containing the description (long name) of this XDF::Structure.
+  * scalar string containing the description (long name) of this Structure.
   * paramList--
-  * list reference to the XDF::Parameter objects held by this XDF::Structure.
+  * list reference to the Parameter objects held by this Structure.
   * structList
-  * list reference to the XDF::Structure objects held by this XDF::Structure.
+  * list reference to the Structure objects held by this Structure.
   * arrayList
-  * list reference to the XDF::Array objects held by this XDF::Structure.
+  * list reference to the Array objects held by this Structure.
  */
 
 public class Structure extends BaseObject {
@@ -227,9 +232,9 @@ public class Structure extends BaseObject {
   //Other PUBLIC Methods
   //
 
-  /** addNote: insert an XDF::Note object into the noteList
-   * @param: XDF::Note
-   * @return: an XDF::Note object on success, null on failure
+  /** addNote: insert an Note object into the noteList
+   * @param: Note
+   * @return: an Note object on success, null on failure
    */
   public Note addNote(Note n) {
     if (n == null) {
@@ -240,7 +245,7 @@ public class Structure extends BaseObject {
     return n;
   }
 
-  /**removeNote: removes an XDF::Note object from noteList
+  /**removeNote: removes an Note object from noteList
    * @param: Note to be removed
    * @return: true on success, false on failure
    */
@@ -250,7 +255,7 @@ public class Structure extends BaseObject {
 
 
 
-  /**removeNote: removes an XDF::Note object from noteList
+  /**removeNote: removes an Note object from noteList
    * @param: list index number
    * @return: true on success, false on failure
    */
@@ -265,9 +270,9 @@ public class Structure extends BaseObject {
     return getNoteList();
   }
 
- /** addParameter: insert an XDF::Parameter object into the paramList
-   * @param: XDF::Parameter
-   * @return: an XDF::Parameter object on success, null on failure
+ /** addParameter: insert an Parameter object into the paramList
+   * @param: Parameter
+   * @return: an Parameter object on success, null on failure
    */
   public Parameter addParameter(Parameter p) {
     if (p == null) {
@@ -277,7 +282,7 @@ public class Structure extends BaseObject {
     getParamList().add(p);
     return p;
   }
-  /**removeParameter: removes an XDF::Parameter object from paramList
+  /**removeParameter: removes an Parameter object from paramList
    * @param: Parameter to be removed
    * @return: true on success, false on failure
    */
@@ -285,7 +290,7 @@ public class Structure extends BaseObject {
     return  removeFromList(what, getParamList(), "paramList");
   }
 
-  /**removeParameter: removes an XDF::Parameter object from paramList
+  /**removeParameter: removes an Parameter object from paramList
    * @param: list index number
    * @return: true on success, false on failure
    */
@@ -293,9 +298,9 @@ public class Structure extends BaseObject {
     return removeFromList(index, getParamList(), "paramList");
   }
 
-  /** addStructure: insert an XDF::Structure object into the structList
-   * @param: XDF::Structure
-   * @return: an XDF::Structure object on success, null on failure
+  /** addStructure: insert an Structure object into the structList
+   * @param: Structure
+   * @return: an Structure object on success, null on failure
    */
   public Structure addStructure(Structure s) {
     if (s == null) {
@@ -306,7 +311,7 @@ public class Structure extends BaseObject {
     return s;
   }
 
-  /**removeStructure: removes an XDF::Structure object from structList
+  /**removeStructure: removes an Structure object from structList
    * @param: Structure to be removed
    * @return: true on success, false on failure
    */
@@ -314,7 +319,7 @@ public class Structure extends BaseObject {
     return  removeFromList(what, getStructList(), "structList");
   }
 
-  /**removeStructure: removes an XDF::Structure object from structList
+  /**removeStructure: removes an Structure object from structList
    * @param: list index number
    * @return: true on success, false on failure
    */
@@ -322,9 +327,9 @@ public class Structure extends BaseObject {
     return removeFromList(index, getStructList(), "structList");
   }
 
-  /**addArray: insert an XDF::Array object into the arrayList
-   * @param: XDF::Array
-   * @return: an XDF::Array object on success, null on failure
+  /**addArray: insert an Array object into the arrayList
+   * @param: Array
+   * @return: an Array object on success, null on failure
    */
   public Array addArray(Array array) {
     if (array == null) {
@@ -335,7 +340,7 @@ public class Structure extends BaseObject {
     return array;
   }
 
-  /**removeArray: removes an XDF::Array object from arrayList
+  /**removeArray: removes an Array object from arrayList
    * @param: Array to be removed
    * @return: true on success, false on failure
    */
@@ -343,7 +348,7 @@ public class Structure extends BaseObject {
     return removeFromList(what, getArrayList(), "arrayList");
   }
 
-  /**removeArray: removes an XDF::Array object from arrayList
+  /**removeArray: removes an Array object from arrayList
    * @param: list index number
    * @return: true on success, false on failure
    */
@@ -351,9 +356,9 @@ public class Structure extends BaseObject {
     return removeFromList(index, getArrayList(), "arrayList");
   }
 
-  /**addParamGroup: Insert an XDF::ParameterGroup object into this object.
+  /**addParamGroup: Insert an ParameterGroup object into this object.
    * @param: ParameterGroup to be added
-   * @return:an XDF::ParameterGroup object reference on success, null on failure.
+   * @return:an ParameterGroup object reference on success, null on failure.
    */
   public ParameterGroup addParamGroup (ParameterGroup group) {
     if (group !=null) {
@@ -367,7 +372,7 @@ public class Structure extends BaseObject {
     }
   }
 
-  /**removeParamGroup: Remove an XDF::ParameterGroup object from the hashset--paramGroupOwnedHash
+  /**removeParamGroup: Remove an ParameterGroup object from the hashset--paramGroupOwnedHash
    * @param: ParameterGroup to be removed
    * @return: true on success, false on failure
    */
@@ -379,11 +384,10 @@ public class Structure extends BaseObject {
     return paramGroupOwnedHash.remove(group);
   }
 
-  /** Read in an XML file using XDF::Reader.
+  /** Read in an XML file using Reader.
    * @return: the structure read in on success, null on failure.
    */
 
-   // This will make a call to the XDF::Reader class one day.
    public void loadFromXDFFile (String filename)
    {
 
@@ -424,6 +428,9 @@ public class Structure extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2000/11/08 20:10:04  thomas
+ * Trimmed down import path to just needed classes -b.t
+ *
  * Revision 1.10  2000/11/06 21:17:10  kelly
  * added clone()  -k.z.
  *

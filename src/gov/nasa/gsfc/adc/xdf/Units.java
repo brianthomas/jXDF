@@ -1,6 +1,6 @@
+
 // XDF Units Class
 // CVS $Id$
-
 
 // Units.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -24,8 +24,13 @@
 
 
 package gov.nasa.gsfc.adc.xdf;
-import java.util.*;
-import java.io.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+
+import java.io.OutputStream;
 
 /**
  * Units.java:
@@ -251,6 +256,9 @@ import java.io.*;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/08 20:17:09  thomas
+ * Trimmed down import path to just needed classes -b.t
+ *
  * Revision 1.5  2000/11/08 19:18:07  thomas
  * Changed the name of toXDF* methods to toXML* to
  * better reflect the nature of the output (its not XDF

@@ -1,10 +1,6 @@
 // XDF Utility Class
 // CVS $Id$
 
-package gov.nasa.gsfc.adc.xdf;
-
-import java.util.*;
-
 // Utility.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
@@ -25,10 +21,11 @@ import java.util.*;
 
 */
 
+package gov.nasa.gsfc.adc.xdf;
 
 
 /**
- * Utility.java:constains util routines.
+ * Shared (utility) routines.
  * @version $Revision$
  */
 
@@ -132,6 +129,9 @@ import java.util.*;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/08 20:20:55  thomas
+ * Trimmed down import path to just needed classes -b.t
+ *
  * Revision 1.5  2000/11/02 20:35:26  kelly
  * minor fix
  *
