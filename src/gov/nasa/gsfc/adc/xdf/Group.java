@@ -162,7 +162,7 @@ public class Group extends BaseObject {
   /** Special protected method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
 
     // order matters! these are in *reverse* order of their
