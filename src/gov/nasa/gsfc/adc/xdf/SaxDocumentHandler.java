@@ -2083,7 +2083,6 @@ Log.errorln(" TValue:"+valueString);
                 // set up the origLocator
                 List locatorAxisList = addLocator.getIterationOrder();
                 Iterator iter5 = locatorAxisList.iterator();
-                Log.debug("Appending data to array(");
                 while (iter5.hasNext()) {
                    Axis addAxis = (Axis) iter5.next();
                    Value thisAxisValue = addLocator.getAxisValue(addAxis); 
@@ -2111,14 +2110,15 @@ Log.errorln(" TValue:"+valueString);
                    else if (data instanceof String ) 
                        arrayToAppendTo.setData(origLocator, (String) data);
                    else
-                       Log.errorln("Cant understand class of data !(Double|Integer|String). ignoring append");
+                       Log.errorln("Cant understand class of data !(Double|Integer|String). Ignoring append.");
 
                 } catch (SetDataException e) {
-                   Log.errorln("Cant setData. Ignoring append");
+                   Log.errorln(e.getMessage()+". Ignoring append");
                 }
 
              } catch (NoDataException e) {
                 // do nothing for NoDataValues??
+                Log.errorln(e.getMessage());
              }
 
              addLocator.next(); // go to next location
@@ -2512,7 +2512,7 @@ Log.errorln(" TValue:"+valueString);
                     // override attrs with those in passed list
                     newaxis.setAttributes(attrs);
                     // give the clone a unique Id and remove IdRef 
-                    newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId(), AxisAliasId)); 
+                    newaxis.setAxisId(findUniqueIdName(AxisObj, newaxis.getAxisId(), AxisAliasId)); 
                     newaxis.setAxisIdRef(null);
 
                     // add this into the list of axis objects
@@ -3770,6 +3770,10 @@ while (iter.hasNext()) {
                 while (iter.hasNext()) {
                    AxisInterface arrayAxisObj = (AxisInterface) iter.next();
                    String refAxisId = (String) AxisAliasId.get(arrayAxisObj.getAxisId());
+                   // argh. The way things are now, we can have axes with
+                   // the same axisId !?!?
+                   if (refAxisId == null) // use the orig Id then
+                       refAxisId = arrayAxisObj.getAxisId();
                    Iterator iter2 = readObj.getIOAxesOrder().iterator();
                    while (iter2.hasNext()) {
                       AxisInterface readAxisObj = (AxisInterface) iter2.next();
@@ -4697,6 +4701,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.60  2001/09/21 16:50:59  thomas
+ * changes to make array appending work again. *sigh* the whole thing breaks the DTD however
+ *
  * Revision 1.59  2001/09/21 14:08:58  thomas
  * *** empty log message ***
  *
