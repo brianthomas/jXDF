@@ -66,6 +66,13 @@ public class  ErroredValue extends Value {
       setLowerErrorValue(errorValue);
    }
 
+   /** This returns the *lowerErrorValue*. 
+    */
+   public String getErrorValue() 
+   {
+      return getLowerErrorValue();
+   }
+
    /** A convenience method which returns a String array holding 
        the value of the lowerErrorValue and upperErrorValue attributes. 
     */
@@ -102,19 +109,6 @@ public class  ErroredValue extends Value {
       ((XMLAttribute) attribHash.get(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(lowerErrorValue);
    }
 
-   /** This returns the *lowerErrorValue*. 
-   */
-   public String getErrorValue() {
-      return getLowerErrorValue();
-   }
-
-   /** This method sets the *lowerErrorValue*. 
-    */
-   public void setErrorValue (Number ErrorValue)
-   {
-      setLowerErrorValue(ErrorValue);
-   }
-
    //
    // Protected Methods
    //
@@ -138,6 +132,9 @@ public class  ErroredValue extends Value {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2001/02/07 18:08:55  thomas
+ * removed duplicitous setErrorValue method.
+ *
  * Revision 1.5  2001/02/07 18:44:03  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These
