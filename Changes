@@ -24,3 +24,10 @@ Package Version History
                - valueList now may be used under parameter node.
                - Array now directs child Locators to properly remove an axis 
                  when it itself removes an axis.
+
+0.17e  1/29/01  revision to 4th alpha version. 
+               - Binary reading enabled
+               - Finally fess'd up to the fact that nobody uses Java-X package.
+                 Code is now compliant with org.xml.sax.* classes. Download
+                 jaxp (or other package) to get this functionality. 
+
