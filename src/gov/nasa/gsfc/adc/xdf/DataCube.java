@@ -388,6 +388,27 @@ public class DataCube extends BaseObject {
 
    }
 
+   /**Get the double value of the requested datacell.
+    */
+   public float getFloatData (Locator locator)
+   throws NoDataException
+   {
+
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
+
+      try { 
+         if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
+            throw new NoDataException();  //the location we try to access contains noDataValue
+
+         return java.lang.reflect.Array.getFloat(longDataArray.get(longIndex+1), shortIndex);
+      }
+      catch (Exception e) {  //the location we try to access is not allocated,
+         //i.e., no data in the cell
+         throw new NoDataException();
+      }
+
+   }
 
   /**  Append the String value onto the requested datacell. 
        Care should be taken when using this method to insure that
@@ -421,6 +442,16 @@ public class DataCube extends BaseObject {
    {
       setData(locator, value.doubleValue());
    }
+
+  /** Set the value of the requested datacell. 
+   *  Overwrites existing datacell value if already populated with a value.
+   */
+   public void setData (Locator locator, Float value)
+   throws SetDataException
+   {
+      setData(locator, value.floatValue());
+   }
+
 
   /** Set the value of the requested datacell. 
    *  Overwrites existing datacell value if already populated with a value.
@@ -473,6 +504,38 @@ public class DataCube extends BaseObject {
 
          //put data into the requested datacell
          java.lang.reflect.Array.setDouble(longDataArray.get(longIndex+1), shortIndex, numValue);
+         return;
+      }
+      catch (Exception e) {
+         throw new SetDataException();
+      }
+
+   }
+
+   /** Set the value of the requested datacell. 
+    *  Overwrites existing datacell value if already populated with a value.
+    */
+   public void setData (Locator locator, float numValue)
+   throws SetDataException
+   {
+
+      // data are stored in a huge 2D array. The long array axis
+      // mirrors all dimensions but the 2nd axis. The 2nd axis gives
+      // the index on the 'short' internal array.
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
+
+      // Bounds checking
+      checkDataArrayBounds(longIndex, shortIndex, DOUBLE_DATA_TYPE);
+
+      // Set the Data
+      try {
+         byte realValue = 1;
+         //indicate its corresponding datacell holds valid data
+         java.lang.reflect.Array.setByte(longDataArray.get(longIndex), shortIndex, realValue);
+
+         //put data into the requested datacell
+         java.lang.reflect.Array.setFloat(longDataArray.get(longIndex+1), shortIndex, numValue);
          return;
       }
       catch (Exception e) {
@@ -1937,6 +2000,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.49  2001/09/20 15:07:48  thomas
+  * added some float handling
+  *
   * Revision 1.48  2001/09/19 16:39:25  thomas
   * clean up of write data code; better implementation of file href writing
   *
