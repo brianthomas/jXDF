@@ -108,6 +108,7 @@ public class Structure extends BaseObject {
     attribOrder.add(0,"arrayList");
     attribOrder.add(0,"structList");
     attribOrder.add(0,"paramList");
+    attribOrder.add(0,"type");
     attribOrder.add(0,"description");
     attribOrder.add(0,"name");
 
@@ -116,6 +117,7 @@ public class Structure extends BaseObject {
     attribHash.put("arrayList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("structList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("paramList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put("type", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
 
@@ -426,6 +428,13 @@ public class Structure extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2000/11/09 04:32:05  thomas
+ * Minor 'hack' to add the 'type' attribute. Strictly
+ * speaking, this attribute only occurs on the XDF
+ * root node and not all structures. In the future
+ * we either need to spawn a new class for the Root
+ * node or figure another workaround. -b.t.
+ *
  * Revision 1.12  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *
