@@ -143,7 +143,9 @@ public class DataCube extends BaseObject {
      return (String) ((Attribute) attribHash.get(CHECKSUM_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-   /** set the *encoding* attribute
+   /** Set the *encoding* attribute. Note that this attribute is different in nature
+       from the encoding attribute on the XMLDataIOStyle objects. Currently reading of
+       data encoded data is not supported. 
    */
    public void setEncoding (String strEncoding)
    {
@@ -153,9 +155,9 @@ public class DataCube extends BaseObject {
       else
          ((Attribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).setAttribValue(strEncoding);
 
-  }
+   }
 
-  /**
+  /*
    * @return the current *encoding* attribute
    */
   public String getEncoding()
@@ -681,10 +683,21 @@ public class DataCube extends BaseObject {
   
       XMLDataIOStyle readObj = parentArray.getXMLDataIOStyle();
   
-      if (hrefObj != null) {  //write out to another file,
+      // Well here decide if we need to write out to another file,
+      // In practice the systemId may correspond to an internet URI,
+      // and we cant always write to that (!). Its not clear under which
+      // situations we do want to do so. :P For the time being we just
+      // take the following 'dumb' approach.
+      if (hrefObj != null) {  
         String fileName = hrefObj.getSystemId();
         String hrefName = hrefObj.getName();
   
+        // Some parsers return systemId with the 'file:' prefix. Java
+        // doenst currently understand this so we need to peal it off.
+        int index = fileName.indexOf("file:");
+        if (index == 0)
+           fileName = fileName.substring(5);
+
         if(hrefName == null) 
         {
           Log.errorln("Error: href object in dataCube lacks name. Data being written into metadata instead.\n");
@@ -692,9 +705,10 @@ public class DataCube extends BaseObject {
         else if (fileName != null)
         {
            writeHrefAttribute = true;
+
            try {
 
-              dataOutputStream = new FileOutputStream(hrefObj.getSystemId());
+              dataOutputStream = new FileOutputStream(fileName);
 
            }
            catch (IOException e) {
@@ -725,13 +739,14 @@ public class DataCube extends BaseObject {
          outputWriter.write( "\"");
       }
   
-  
+/*
       String encoding = getEncoding();
-      if (encoding!= null) {  
+      if (encoding != null) {  
          outputWriter.write( " "+ENCODING_XML_ATTRIBUTE_NAME+"=\"");
          writeOutAttribute(outputWriter, encoding.toString());
          outputWriter.write( "\"");
       }
+*/
   
   
       String compress = getCompression();
@@ -788,33 +803,93 @@ public class DataCube extends BaseObject {
          // writing Data to either the XML file or an Href
          //
 
-         // this should be the FIELD Axis :P
-         AxisInterface fastestAxis = (AxisInterface) axisList.get(0);
+         // Init important dataFormat information into arrays, this 
+         // will help speed up long writes. Each entry corresponds to 
+         // cached information about a particular dataFormat object. In
+         // the case where no FieldAxis (e.g. Fields) exist within the array,
+         // then we only have 1 entry in each of these arrays. 
 
-         //stores the NoDataValues for the parentArray,
-         //used in writing out when NoDataException is caught
-         String[] NoDataValues;
-  
+         String[] noDataValues; //stores the NoDataValues for the parentArray,
+                                //used in writing out when NoDataException is caught
+
+         String[] formatPattern;      // cache of Java Formatter patterns for correct 
+                                // formatting of output values.
+
+         String[] negExponentialPattern; // Stupid Java DecimalFormatter cant work properly
+                                         // on exponential data, so we compensate with this.
+
+         String[] intFlag;      // Integer format flag 
+
+
+         int[] numOfBytes;      // number of bytes each data format has. 
+
+         DataFormat dataFormat[] = parentArray.getDataFormatList();
+
          if (parentArray.hasFieldAxis()) {
+
+            // If we have field axis then prepare to init multiple size arrays
+
             List fields = parentArray.getFieldAxis().getFields();
-            NoDataValues = new String[parentArray.getFieldAxis().getLength()];
-            Iterator iter = fields.iterator();
-           int i = 0;
-           while (iter.hasNext()) {
-               Field field = (Field) iter.next();
+            int nrofDataFormats = fields.size();
+
+            noDataValues  = new String[nrofDataFormats];
+            formatPattern = new String[nrofDataFormats];
+            intFlag       = new String[nrofDataFormats];
+            negExponentialPattern = new String[nrofDataFormats];
+            numOfBytes = new int[nrofDataFormats];
+
+            // now assign values 
+            for (int i = 0; i < nrofDataFormats; i++) {
+
+               formatPattern[i] = dataFormat[i].getFormatPattern();
+               numOfBytes[i]    = dataFormat[i].numOfBytes();
+
+               Field field = (Field) fields.get(i);
                if (field != null && field.getNoDataValue() != null) 
-                   NoDataValues[i]=field.getNoDataValue().toString();
-               i++;
-           } 
-         }
-         else {
-               // no field axis? then only one noDataValue, get it from the Array
-               NoDataValues = new String[1];
-               String value = (String) null;
-               if (parentArray.getNoDataValue() != null) {
-                   value = parentArray.getNoDataValue().toString(); // this is a HACK 
-               }
-               NoDataValues[0] = value;
+                   noDataValues[i] = field.getNoDataValue().toString();
+
+               if (dataFormat[i] instanceof FloatDataFormat)
+                  negExponentialPattern[i] = ((FloatDataFormat) dataFormat[i]).getNegativeExponentFormatPattern();
+               else
+                  negExponentialPattern[i] = null;
+
+               if (dataFormat[i] instanceof IntegerDataFormat)
+                  intFlag[i] = ((IntegerDataFormat) dataFormat[i]).getType();
+               else
+                  intFlag[i] = null;
+            }
+
+
+         } else {
+
+            // no field axis? then only one dataFormat and we get it from the Array
+            // init single size arrays
+            noDataValues  = new String[1];
+            formatPattern = new String[1];
+            negExponentialPattern = new String[1];
+            intFlag       = new String[1];
+            numOfBytes = new int[1];
+
+            // assign values 
+            formatPattern[0] = dataFormat[0].getFormatPattern();
+            numOfBytes[0]    = dataFormat[0].numOfBytes();
+
+            String value = (String) null;
+            if (parentArray.getNoDataValue() != null) {
+               value = parentArray.getNoDataValue().toString(); // this is a HACK 
+            }
+            noDataValues[0] = value;
+
+            if (dataFormat[0] instanceof FloatDataFormat)
+               negExponentialPattern[0] = ((FloatDataFormat) dataFormat[0]).getNegativeExponentFormatPattern();
+            else
+               negExponentialPattern[0] = null;
+
+            if (dataFormat[0] instanceof IntegerDataFormat)
+               intFlag[0] = ((IntegerDataFormat) dataFormat[0]).getType();
+            else
+               intFlag[0] = null;
+
          }
      
          // init the dataOutputWriter properly. To a file or to the same writer as the
@@ -828,28 +903,8 @@ public class DataCube extends BaseObject {
             dataOutputWriter = outputWriter;
          }
 
-         // Init important dataFormat information into arrays, this 
-         // will help speed up long writes.
+         // some info about the format Object
          String endian = readObj.getEndian();
-
-         DataFormat dataFormat[] = parentArray.getDataFormatList();
-         int nrofDataFormats = dataFormat.length;
-         String[] pattern = new String[nrofDataFormats];
-         String[] negExponentialPattern = new String[nrofDataFormats];
-         String[] intFlag = new String[nrofDataFormats];
-         int[] numOfBytes = new int[nrofDataFormats];
-         for (int i=0; i< nrofDataFormats; i++) {
-            pattern[i] = dataFormat[i].getFormatPattern();
-            if (dataFormat[i] instanceof FloatDataFormat)
-               negExponentialPattern[i] = ((FloatDataFormat) dataFormat[i]).getNegativeExponentFormatPattern();
-            else
-               negExponentialPattern[i] = null;
-            numOfBytes[i] = dataFormat[i].numOfBytes();
-            if (dataFormat[i] instanceof IntegerDataFormat)
-               intFlag[i] = ((IntegerDataFormat) dataFormat[i]).getType();
-            else
-               intFlag[i] = null;
-         }
 
          // now, based on outputstyle, write out the data
          if (readObj instanceof TaggedXMLDataIOStyle) 
@@ -877,6 +932,8 @@ public class DataCube extends BaseObject {
             }
 
             Locator taggedLocator = parentArray.createLocator();
+            AxisInterface fastestAxis = (AxisInterface) axisList.get(0);
+            int nrofDataFormats = dataFormat.length;
 
             writeTaggedData( dataOutputWriter,
                              taggedLocator,
@@ -886,11 +943,11 @@ public class DataCube extends BaseObject {
                              0,
                              0,
                              fastestAxis,
-                             NoDataValues,
+                             noDataValues,
                              nrofDataFormats,
                              dataFormat,
                              numOfBytes,
-                             pattern,
+                             formatPattern,
                              negExponentialPattern,
                              endian,
                              intFlag, 
@@ -908,31 +965,32 @@ public class DataCube extends BaseObject {
          {
    
             if (readObj instanceof DelimitedXMLDataIOStyle) {
-                writeDelimitedData( dataOutputWriter,
-                                    (DelimitedXMLDataIOStyle) readObj,
-                                    fastestAxis, NoDataValues,
-                                    dataFormat,
-                                    numOfBytes,
-                                    pattern,
-                                    negExponentialPattern,
-                                    endian,
-                                    intFlag,
-                                    writeHrefAttribute ? false : true
-                                   );
+
+               AxisInterface fastestAxis = (AxisInterface) axisList.get(0);
+               writeDelimitedData( dataOutputWriter,
+                                   (DelimitedXMLDataIOStyle) readObj,
+                                   fastestAxis, noDataValues,
+                                   dataFormat,
+                                   numOfBytes,
+                                   formatPattern,
+                                   negExponentialPattern,
+                                   endian,
+                                   intFlag,
+                                   writeHrefAttribute ? false : true
+                                 );
      
-            }
-            else {
-             writeFormattedData(  dataOutputWriter,
-                                  (FormattedXMLDataIOStyle) readObj,
-                                  NoDataValues,
-                                  dataFormat,
-                                  numOfBytes,
-                                  pattern,
-                                  negExponentialPattern,
-                                  endian,
-                                  intFlag, 
-                                  writeHrefAttribute ? false : true
-                                );
+            } else {
+               writeFormattedData( dataOutputWriter,
+                                   (FormattedXMLDataIOStyle) readObj,
+                                   noDataValues,
+                                   dataFormat,
+                                   numOfBytes,
+                                   formatPattern,
+                                   negExponentialPattern,
+                                   endian,
+                                   intFlag, 
+                                   writeHrefAttribute ? false : true
+                                 );
             }
    
             if (writeHrefAttribute) {
@@ -1345,7 +1403,6 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
   throws java.io.IOException
   {
 
-    // int nrofNoDataValues = noDataValues.length;
     Locator locator = parentArray.createLocator();
 
     int lastFieldIndex = 0;
@@ -1880,6 +1937,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.48  2001/09/19 16:39:25  thomas
+  * clean up of write data code; better implementation of file href writing
+  *
   * Revision 1.47  2001/09/18 21:40:45  thomas
   * I saw the light and yanked the 'fastestAxis' code in writeFormatted/Delimited data as per earlier stuff in tagged data writes. We should be thinking only in terms of the field axis when we need to determine if a new dataformat is needed for the next datacell we are writing. These changes should make it much more likely that the higher dimensional data will write out correctly (but it still needs to be tested!)
   *
