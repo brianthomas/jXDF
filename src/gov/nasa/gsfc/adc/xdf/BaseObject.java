@@ -165,21 +165,27 @@ public abstract class BaseObject implements Serializable, Cloneable {
      return obj;
   }
 
-  /** Get the value of a specific Attribute. Only returns non-null
-      if the Attribute exists and is of STRING_TYPE.
+  /** Get the value of a specific Attribute. 
+   *  if not string type, get the object's String value
    */
   public String getAttributeStringValue(String attribName) 
   {
       String value = null;
       Attribute attrib = getAttribute(attribName); 
+
+      /*
       if (attrib != null && attrib.getAttribType() == Constants.STRING_TYPE) {
         value = (String) attrib.getAttribValue();
       }
+      */
+      if (attrib != null) {
+	  value = attrib.getAttribValue().toString();
+      }
+
       return value;
   }
 
-  /** Get the value of a specific Attribute. Only returns non-null
-      if the Attribute exists and is of STRING_TYPE.
+  /** Get the value of a specific Attribute. 
       @deprecated Use the getAttributeStringValue method instead.
    */
   public String getXMLAttributeStringValue(String attribName) 
