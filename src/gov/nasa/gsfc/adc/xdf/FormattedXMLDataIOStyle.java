@@ -137,17 +137,52 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 
   protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
   {
+
+     ArrayList axisIds = new ArrayList ();
+     int numberOfAxes = 0;
+
+     synchronized (parentArray) {
+
+        List axisList = parentArray.getAxisList();
+        Iterator iter = axisList.iterator(); 
+        while(iter.hasNext()) {
+           AxisInterface axis = (AxisInterface) iter.next();
+           if (Specification.getInstance().isPrettyXDFOutput()) {
+              writeOut(outputstream, Constants.NEW_LINE);
+              writeOut(outputstream, indent);
+              indent = indent + Specification.getInstance().getPrettyXDFOutputIndentation(); 
+           }
+           writeOut(outputstream, "<for axisIdRef=\""+axis.getAxisId()+"\">");
+           numberOfAxes++;
+        }
+     }
+
      //write out nodes in formatCommandList
      synchronized (formatCommandList) {
-      int stop = formatCommandList.size();
-      for (int i = 0; i <stop; i++) {
-         if (Specification.getInstance().isPrettyXDFOutput()) {
-          writeOut(outputstream, Constants.NEW_LINE);
-          writeOut(outputstream, indent);
+        int stop = formatCommandList.size();
+        for (int i = 0; i <stop; i++) {
+           if (Specification.getInstance().isPrettyXDFOutput()) {
+              writeOut(outputstream, Constants.NEW_LINE);
+              writeOut(outputstream, indent);
+           }
+           ((XMLDataIOStyle) formatCommandList.get(i)).specificIOStyleToXDF(outputstream, indent);
         }
-        ((XMLDataIOStyle) formatCommandList.get(i)).specificIOStyleToXDF(outputstream, indent);
-      }
+     } // end formatCommandList sync 
+
+     // print out remaining for statements
+     while(numberOfAxes-- > 0) 
+     {
+        if (Specification.getInstance().isPrettyXDFOutput()) {
+           writeOut(outputstream, Constants.NEW_LINE);
+           // peel off some indent
+           indent = indent.substring(0,indent.length() - 
+                          Specification.getInstance().getPrettyXDFOutputIndentation().length());
+           writeOut(outputstream, indent);
+        }
+        writeOut(outputstream, "</for>");
      }
+
+
   }
 
 
@@ -220,6 +255,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/22 21:56:03  thomas
+ * Fix to print out for nodes in toXML* methods. -b.t.
+ *
  * Revision 1.8  2000/11/20 22:07:58  thomas
  * Implimented some changes needed by SaxDocHandler
  * to allow formatted reads (e.g. these classes were not
