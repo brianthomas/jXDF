@@ -33,12 +33,10 @@ import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException;
 
-/*
 // crimson DOM
-import org.apache.crimson.tree.ElementNode;
-import org.apache.crimson.tree.TextNode;
-import org.apache.crimson.tree.CDataNode;
-*/
+import org.apache.crimson.tree.ElementNode2;
+import org.apache.crimson.tree.XmlDocument;
+
 /*
 // dom4j DOM 
 import org.dom4j.dom.DOMElement;
@@ -49,18 +47,22 @@ import org.dom4j.QName;
 */
 
 // Xerces DOM 
-import org.apache.xerces.dom.CoreDocumentImpl;
-import org.apache.xerces.dom.ElementNSImpl;
-import org.apache.xerces.dom.TextImpl;
-import org.apache.xerces.dom.CDATASectionImpl;
+//import org.apache.xerces.dom.CoreDocumentImpl;
+//import org.apache.xerces.dom.ElementNSImpl;
+//import org.apache.xerces.dom.TextImpl;
+//import org.apache.xerces.dom.CDATASectionImpl;
 
 import org.xml.sax.Attributes;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.DOMException;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.Document;
+// import org.w3c.dom.DOMException;
+// import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 /** 
      This class is used to hold XML element node information *inside* XDF (and child) objects.
@@ -68,7 +70,9 @@ import org.w3c.dom.Node;
      the node name, node attributes AND PCData as well as child Elements.
  */
 
-public class ElementNode extends ElementNSImpl implements Cloneable {
+public class ElementNode extends org.apache.crimson.tree.ElementNode2
+implements Cloneable 
+{
 
    // 
    // Fields
@@ -77,7 +81,36 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
    //
    // Constructors
    //
+ 
+   /**
+     * Construct an element.
+     */
+   public ElementNode (String namespaceURI, String qualifiedName)
+   {
+      super(namespaceURI, qualifiedName);
+   }
 
+   /**
+     * Construct an element with a particular XML REC "Name".
+     */
+   public ElementNode (String name)
+   {
+      super(null, name);
+   }
+
+  /**
+     * Construct an element with a particular XML REC "Name"
+     * and belonging to document "owner".
+     */
+   public ElementNode (Document owner, String namespaceURI, String qualifiedName)
+   {
+      super(namespaceURI, qualifiedName);
+      // Oh badness. I wish this was simply 'Document'. Oh well, out of my hands. :P
+      this.setOwnerDocument((XmlDocument) owner);
+   }
+
+
+/* //Xerces constructors
    public ElementNode (CoreDocumentImpl ownerDocument,
                           String namespaceURI,
                           String qualifiedName)
@@ -96,6 +129,7 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
    {
       super(ownerDocument, name);
    }
+*/
 
 /*
   // next 4 constructors are for DOM4J
@@ -122,22 +156,26 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
    //
 
    /** Set the value of the PCDATA held by this ElementNode.
+       This method will choose to create a CDATASection for this text
+       so as to insure special characters like the lessthan sign are 
+       preserved without resorting to entities.
     */
    public void setPCData (String text) {
       removeAllTextChildNodes();
-      CoreDocumentImpl owner = (CoreDocumentImpl) this.getOwnerDocument();
-      TextImpl newTextNode = new TextImpl(owner, text); // CDataNode is a special Text node 
+      CDATASection newTextNode = (CDATASection) this.getOwnerDocument().createTextNode(text);
       appendChild(newTextNode);
    }
 
    /** Set the value of the PCDATA held by this ElementNode.
-       By using CDataNode here, the user may insure special characters like the
-       lessthan sign are preserved without resorting to entities.
-   */
-  public void setPCData (CDATASectionImpl textNode) {
+       Passed node totally replaces all other text nodes.
+       By using CDATASection node here (sub-class of Text), the 
+       user may insure special characters like the lessthan sign are 
+       preserved without resorting to entities.
+    */
+   public void setPCData (Text newTextNode) {
       removeAllTextChildNodes();
-      appendChild(textNode);
-  }
+      appendChild(newTextNode);
+   }
 
   private void removeAllTextChildNodes() {
 
@@ -145,7 +183,7 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
       int size = childNodes.getLength();
       for (int i = 0; i < size; i++) {
           Node thisNode = childNodes.item(i);
-          if (thisNode instanceof TextImpl) {
+          if (thisNode instanceof Text) {
              removeChild(thisNode);
           }
       }
@@ -165,7 +203,7 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
       int size = childNodes.getLength();
       for (int i = 0; i < size; i++) {
           Node thisNode = childNodes.item(i);
-          if (thisNode instanceof TextImpl) {
+          if (thisNode instanceof Text) {
              myCDATA.append(thisNode.getNodeValue());
              gotSomeTextData = true;
           }
@@ -197,17 +235,20 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
    // Other Public Methods
    //
 
-   /** appends more PCDATA into this ElementNode. 
+   /** Appends more PCDATA into this ElementNode. 
+       This method will choose to create a CDATASection for this text
+       so as to insure special characters like the lessthan sign are 
+       preserved without resorting to entities.
     */
-   public void appendPCData (String text) {
-      CoreDocumentImpl owner = (CoreDocumentImpl) this.getOwnerDocument();
-      TextImpl newTextNode = new TextImpl(owner, text);
+   public void appendPCData (String text) 
+   {
+      CDATASection newTextNode = (CDATASection) this.getOwnerDocument().createTextNode(text);
       appendChild(newTextNode);
    }
 
-   /** appends more PCDATA into this ElementNode. 
+   /** Appends more PCDATA into this ElementNode. 
     */
-   public void appendPCData (CDATASectionImpl textNode) {
+   public void appendPCData (Text textNode) {
       appendChild(textNode);
    }
 
@@ -235,13 +276,11 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
 */
 
    public boolean addElementNode (ElementNode obj) {
-
       appendChild(obj);
       return false;
    }
 
    public boolean removeElementNode (ElementNode obj) {
-
       removeChild(obj);
       return false;
    }
@@ -322,6 +361,25 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
 
    }
  
+   /**
+    */
+   public void toXMLOutputStream (
+                                   OutputStream outputstream,
+                                   String indent
+                                )
+   throws java.io.IOException
+   {
+      toXMLOutputStream(outputstream, indent, false, null, null);
+   }
+
+   /**
+    */
+   public void toXMLOutputStream ( OutputStream outputstream)
+   throws java.io.IOException
+   {
+      toXMLOutputStream(outputstream, "", false, null, null);
+   }
+
    public void toXMLWriter ( 
                                 Writer outputWriter
                            )
@@ -339,14 +397,40 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
        toXMLWriter(outputWriter, indent, false, null, null);
    }
 
+   /**
+    */
+   public Object clone() throws CloneNotSupportedException {
+     return super.clone();
+   }
 
-   public void toXMLWriter ( 
+
+   public void toXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
                                 String newNodeNameString,
                                 String noChildObjectNodeName
                              )
+   throws java.io.IOException
+   {
+
+      String nodeNameString =
+         basicXMLWriter(outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+      if (Specification.getInstance().isPrettyXDFOutput() && nodeNameString != null)
+           outputWriter.write(Constants.NEW_LINE);
+   }
+
+   //
+   // Protected Methods
+   //
+
+   protected String basicXMLWriter ( Writer outputWriter,
+                                     String indent,
+                                     boolean dontCloseNode,
+                                     String newNodeNameString,
+                                     String noChildObjectNodeName
+                                   )
    throws java.io.IOException
    {
 
@@ -418,39 +502,11 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
 
       }
 
-      if (isPrettyOutput) 
-          outputWriter.write(Constants.NEW_LINE);
+//      if (isPrettyOutput) outputWriter.write(Constants.NEW_LINE);
+
+      return nodeNameString;
 
    }
-
-   /**
-    */
-   public void toXMLOutputStream (
-                                   OutputStream outputstream,
-                                   String indent
-                                )
-   throws java.io.IOException
-   {
-      toXMLOutputStream(outputstream, indent, false, null, null);
-   }
-
-   /**
-    */
-   public void toXMLOutputStream ( OutputStream outputstream)
-   throws java.io.IOException
-   {
-      toXMLOutputStream(outputstream, "", false, null, null);
-   }
-
-   /**
-    */
-   public Object clone() throws CloneNotSupportedException {
-     return super.clone(); 
-   }
-
-   //
-   // Protected Methods
-   //
 
    //
    // Private Methods
