@@ -569,9 +569,15 @@ public class SaxDocumentHandler extends DefaultHandler {
     public void endDocument()
     throws SAXException
     {
-        // do nothing
-        //set the notation hash for the XDF structure
-        XDF.setXMLNotationHash(Notation);
+
+        // Now that it exists, lets
+        // set the notation hash for the XDF structure
+        Iterator iter = Notation.iterator();
+        while (iter.hasNext()) {
+           Hashtable initValues = (Hashtable) iter.next(); 
+           XDF.getDocumentType().addNotation(new XMLNotation(initValues));
+        }
+
     }
 
     public void ignorableWhitespace(char buf [], int offset, int len)
@@ -620,8 +626,8 @@ public class SaxDocumentHandler extends DefaultHandler {
         Hashtable information = new Hashtable ();
         information.put("name", name);
         // if (base != null) information.put("base", base);
-        if (publicId != null) information.put("pubId", publicId);
-        if (systemId != null) information.put("sysId", systemId);
+        if (publicId != null) information.put("publicId", publicId);
+        if (systemId != null) information.put("systemId", systemId);
         if (notationName != null) information.put("ndata", notationName);
 
         // add this to the UnparsedEntity hash
@@ -756,7 +762,7 @@ public class SaxDocumentHandler extends DefaultHandler {
     // trying to do here.. At this time, it will read a file, 
     // I seriously doubt if this will really work for other URI's 
     // without serious change.
-    private String getHrefData (Href hrefObj, String compressionType) {
+    private String getHrefData (XDFEntity hrefObj, String compressionType) {
 
        StringBuffer buffer = new StringBuffer();
 
@@ -764,10 +770,10 @@ public class SaxDocumentHandler extends DefaultHandler {
        // but arent because it isnt captured by this API. feh.
        // $file = $href->getBase() if $href->getBase();
 
-       if (hrefObj.getSysId() != null) {
+       if (hrefObj.getSystemId() != null) {
 
           // we assume here that this is a file. hurm.
-          String fileName = hrefObj.getSysId();
+          String fileName = hrefObj.getSystemId();
  //         int size = 0;
 
           try {
@@ -775,16 +781,16 @@ public class SaxDocumentHandler extends DefaultHandler {
              java.io.InputStream in = null;
 
              try {
-               InputSource input = resolveEntity(hrefObj.getPubId(), hrefObj.getSysId()); 
+               InputSource input = resolveEntity(hrefObj.getPublicId(), hrefObj.getSystemId()); 
                in = input.getByteStream();
              } catch (SAXException e) {
                 Log.printStackTrace(e);
              } catch (NullPointerException e) {
-                Log.infoln("Trying to open href file resource:"+hrefObj.getSysId());
+                Log.infoln("Trying to open href file resource:"+hrefObj.getSystemId());
                 // in this case the InputSource object is null to request that 
                 // the parser open a regular URI connection to the system identifier.
-                // In our case, the sysId IS the filename.
-                File f = new File(hrefObj.getSysId());
+                // In our case, the systemId IS the filename.
+                File f = new File(hrefObj.getSystemId());
 //                size = (int) f.length();
                 try {
                    in = (java.io.InputStream) new FileInputStream(f);
@@ -836,7 +842,7 @@ public class SaxDocumentHandler extends DefaultHandler {
           }
 
        } else {
-          Log.warnln("Can't read Href data, sysId is not defined! Ignoring read request.");
+          Log.warnln("Can't read XDFEntity data, systemId is not defined! Ignoring read request.");
        }
 
        return buffer.toString();
@@ -846,29 +852,29 @@ public class SaxDocumentHandler extends DefaultHandler {
     // This and its sub-routines are Not currently used
     private void loadHrefDataIntoCurrentArray () {
  
-       Href hrefObj = CurrentArray.getDataCube().getHref();
+       XDFEntity hrefObj = CurrentArray.getDataCube().getHref();
 
        // well, we should be doing something with base here, 
        // but arent because it isnt captured by this API. feh.
        // $file = $href->getBase() if $href->getBase();
 
-       if (hrefObj.getSysId() != null) {
+       if (hrefObj.getSystemId() != null) {
 
           try {
 
              InputStream in = null;
 
              try {
-               InputSource inputSource = resolveEntity(hrefObj.getPubId(), hrefObj.getSysId());
+               InputSource inputSource = resolveEntity(hrefObj.getPublicId(), hrefObj.getSystemId());
                in = inputSource.getByteStream();
              } catch (SAXException e) {
                 Log.printStackTrace(e);
              } catch (NullPointerException e) {
                 // in this case the InputSource object is null to request that 
                 // the parser open a regular URI connection to the system identifier.
-                // In our case, the sysId IS the filename.
-                File f = new File(hrefObj.getSysId());
-                in = (InputStream) new FileInputStream(new File(hrefObj.getSysId()));
+                // In our case, the systemId IS the filename.
+                File f = new File(hrefObj.getSystemId());
+                in = (InputStream) new FileInputStream(new File(hrefObj.getSystemId()));
              }
 
              // ok, got a bytestream, now read the info
@@ -916,7 +922,7 @@ public class SaxDocumentHandler extends DefaultHandler {
           }
 
        } else {
-          Log.warnln("Can't read Href data, undefined sysId!");
+          Log.warnln("Can't read XDFEntity data, undefined systemId!");
        }
 
     }
@@ -2639,26 +2645,28 @@ while(thisIter.hasNext()) {
 
              // A little 'pre-handling' as href is a specialattribute
              // that will hold an (Href) object rather than string value 
-             Href hrefObj = null;
+             XDFEntity hrefObj = null;
              String hrefValue = getAttributesValueByName(attrs,"href");
              if (hrefValue != null ) 
              {
 
                 // now we look up the href from the entity list gathered by
                 // the parser and transfer relevant info to our Href object 
-                hrefObj = new Href();
+                hrefObj = new XDFEntity();
 
                 Hashtable hrefInfo = (Hashtable) UnParsedEntity.get(hrefValue);
 
                 if (UnParsedEntity.containsKey(hrefValue)) 
                 {
                    hrefObj.setName((String) hrefInfo.get("name"));
+/*
                    if (hrefInfo.containsKey("base")) 
                       hrefObj.setBase((String) hrefInfo.get("base"));
-                   if (hrefInfo.containsKey("sysId")) 
-                      hrefObj.setSysId((String) hrefInfo.get("sysId"));
-                   if (hrefInfo.containsKey("pubId")) 
-                      hrefObj.setPubId((String) hrefInfo.get("pubId"));
+*/
+                   if (hrefInfo.containsKey("systemId")) 
+                      hrefObj.setSystemId((String) hrefInfo.get("systemId"));
+                   if (hrefInfo.containsKey("publicId")) 
+                      hrefObj.setPublicId((String) hrefInfo.get("publicId"));
                    if (hrefInfo.containsKey("ndata")) 
                       hrefObj.setNdata((String) hrefInfo.get("ndata"));
                 } else {
@@ -4342,6 +4350,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.49  2001/09/05 22:02:09  thomas
+ * Added in new XMLNotation class. Made Href->XDFEntity change
+ *
  * Revision 1.48  2001/09/04 21:50:53  thomas
  * added 8, 24 bit integer handling
  *
