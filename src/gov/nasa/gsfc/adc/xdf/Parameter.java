@@ -73,7 +73,7 @@ public class Parameter extends BaseObjectWithValueList {
    private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
    private static final String ID_XML_ATTRIBUTE_NAME = new String("paramId");
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("paramIdRef");
-   private static final String DATATYPE_XML_ATTRIBUTE_NAME = new String("datatype");
+   private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = new String("dataFormat");
    private static final String UNITS_XML_ATTRIBUTE_NAME = new String("units");
    private static final String NOTELIST_XML_ATTRIBUTE_NAME = new String("notes");
    private static final String VALUELIST_XML_ATTRIBUTE_NAME = new String("valueList");
@@ -203,23 +203,22 @@ public class Parameter extends BaseObjectWithValueList {
     return (Units) ((Attribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /**set the *datatype* attribute
-   */
-  public void setDatatype(String strDatatype)
-  {
-    if (Utility.isValidDatatype(strDatatype))
-       ((Attribute) attribHash.get(DATATYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strDatatype);
-    else
-       Log.warnln("Datatype not valid, ignoring request to set.");
-  }
+   /**  set the *dataFormat* attribute
+       @return the current *dataFormat* attribute
+    */
+   public void setDataFormat (DataFormat dataFormat)
+   {
+       ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).setAttribValue(dataFormat);
+   }
 
-  /**
-   * @return the current *datatype* attribute
+   /**
+   * @return the current *dataFormat* attribute
    */
-  public String getDatatype()
-  {
-    return (String) ((Attribute) attribHash.get(DATATYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
-  }
+   public DataFormat getDataFormat()
+   {
+      return (DataFormat) ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
 
   /** Set the list of values held by this Parameter from the passed list.
       @deprecated You should use the add/remove methods to manipulate this list.
@@ -486,8 +485,8 @@ public class Parameter extends BaseObjectWithValueList {
     // occurence in the XDF DTD
     attribOrder.add(0, NOTELIST_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, VALUELIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, DATATYPE_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
@@ -497,7 +496,7 @@ public class Parameter extends BaseObjectWithValueList {
     attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put(VALUELIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new Attribute(new Units(), Constants.OBJECT_TYPE));
-    attribHash.put(DATATYPE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
     attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));  //double check k.z.
     attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
@@ -506,6 +505,8 @@ public class Parameter extends BaseObjectWithValueList {
 
      // set the valueList field for BaseObjectWithValueList
      valueListXMLItemName = VALUELIST_XML_ATTRIBUTE_NAME;
+
+//     this.setUnits(new Unitless());
 
   };
 
