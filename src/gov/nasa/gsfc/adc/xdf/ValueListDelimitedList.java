@@ -26,6 +26,7 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import java.io.Writer;
+import java.io.StringWriter;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.OutputStream;
@@ -138,7 +139,41 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
       toXMLWriter (outputWriter, indent, false, null, null);
    }
 
+   public String toXMLString ()
+   {
+
+     // hurm. Cant figure out how to use BufferedWriter here. fooey.
+     Writer outputWriter = (Writer) new StringWriter();
+     try {
+        // we use this so that newline *isnt* appended onto the last element node
+        basicXMLWriter(outputWriter, "", false, null, null);
+     } catch (java.io.IOException e) {
+        // weird. Out of memorY?
+        Log.errorln("Cant got IOException for toXMLWriter() method within toXMLString().");
+        Log.printStackTrace(e);
+     }
+
+     return outputWriter.toString();
+
+   }
+
    public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+   throws java.io.IOException
+   {
+
+      basicXMLWriter(outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+      if (Specification.getInstance().isPrettyXDFOutput()) //  && nodeNameString != null)
+          outputWriter.write(Constants.NEW_LINE);
+   }
+
+
+   protected void basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -191,8 +226,8 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
             outputWriter.write(valueListDelimiter);
       }
       outputWriter.write("</valueList>");
-      if (Specification.getInstance().isPrettyXDFOutput())
-          outputWriter.write(Constants.NEW_LINE);
+     // if (Specification.getInstance().isPrettyXDFOutput())
+     //     outputWriter.write(Constants.NEW_LINE);
 
    }
 
@@ -228,6 +263,9 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/09/05 22:04:08  thomas
+ * added toXMLOutputString, basicXMLWriter, methods and assoc. changes
+ *
  * Revision 1.3  2001/07/26 15:55:42  thomas
  * added flush()/close() statement to outputWriter object as
  * needed to get toXMLOutputStream to work properly.
