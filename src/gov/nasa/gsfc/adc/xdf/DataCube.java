@@ -101,9 +101,9 @@ private void init()
     attribOrder.add(0,"href");
 
     //set up the attribute hashtable key with the default initial value
-    attribHash.put("compression", new XMLAttribute(null, Constants.STRING_TYPE));  //double check init value
+    attribHash.put("compression", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("encoding", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("checksum", new XMLAttribute(null, Constants.NUMBER_TYPE));  //double check
+    attribHash.put("checksum", new XMLAttribute(null, Constants.NUMBER_TYPE));
     attribHash.put("href", new XMLAttribute(null, Constants.STRING_TYPE));
 
   };
@@ -1081,6 +1081,13 @@ protected boolean  removeData (Locator locator) {
                                fastestAxis, NoDataValues );
 
        }
+       else {
+        writeFormattedData(dataOutputStream,
+                           currentLocator,
+                           (FormattedXMLDataIOStyle) readObj,
+                           fastestAxis,
+                           NoDataValues);
+       }
     }
 
     //close the data section appropriately
@@ -1196,7 +1203,6 @@ protected void writeTaggedData(OutputStream outputstream,
       dataNum ++;
       try {
         writeOut(outputstream, getStringData(locator));
-        writeOut(outputstream, delimiter);
       }
       catch (NoDataException e) {  //double check, a bug here, "yes" is already printed
         String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
@@ -1206,8 +1212,9 @@ protected void writeTaggedData(OutputStream outputstream,
         else {
           writeOut(outputstream, noData);
         }
-        writeOut(outputstream, delimiter);
       }
+      //write out delimiter anyway
+      writeOut(outputstream, delimiter);
       if (dataNum == fastestAxisLength) {
         writeOut(outputstream, recordTerminator);
         dataNum = 0;
@@ -1217,8 +1224,69 @@ protected void writeTaggedData(OutputStream outputstream,
     writeOut(outputstream, "]]>");
   }
 
-  /**clone for DataCube should not be invoked externally.  it has to be invoken
-   * by its parentArray.  left to work
+  protected void writeFormattedData(OutputStream outputstream ,
+                                 Locator locator,
+                                 FormattedXMLDataIOStyle readObj,
+                                 AxisInterface fastestAxis,
+                                 String[] noDataValues)
+  {
+     writeOut(outputstream, "<![CDATA[");
+     List commands = readObj.getCommands();
+     while (locator.next())
+      recursiveWriteFormattedData(outputstream, locator, commands, fastestAxis, noDataValues);
+     writeOut(outputstream, "]]>");
+  }
+
+  private void recursiveWriteFormattedData(OutputStream outputstream,
+                                           Locator locator,
+                                           List commands,
+                                           AxisInterface fastestAxis,
+                                           String[] noDataValues)
+  {
+    int stop = commands.size();
+    for (int i = 0; i<stop; i++) {
+      FormattedIOCmd command = (FormattedIOCmd) commands.get(i);
+      if (command instanceof RepeatFormattedIOCmd) {
+        int end = ((RepeatFormattedIOCmd) command).getCount().intValue();
+        List repeatCommandList = ((RepeatFormattedIOCmd)command).getCommands();
+        for (int j = 0; j < end; j ++) {
+          recursiveWriteFormattedData(outputstream, locator, repeatCommandList, fastestAxis, noDataValues);
+        }
+      }
+      else {
+        if (command instanceof SkipCharFormattedIOCmd) {
+          try {
+            writeOut(outputstream, getStringData(locator));
+          }
+          catch (NoDataException e) {
+            String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
+            if (noData != null) {
+            writeOut(outputstream, noData);
+          }
+          String output=((SkipCharFormattedIOCmd) command).getOutput();
+          if (output == null) {
+            writeOut(outputstream, SkipCharFormattedIOCmd.DefaultOutput) ;
+          }
+          else {
+            writeOut(outputstream, output);
+          }
+          if (!locator.next())      //no more data, we are done
+            return;
+        }
+      }    //done dealing with SkipCharFormattedIOCmd
+      
+
+    } //end of outer for loop
+  }
+
+
+
+  //
+  //PROTECTED methods
+  //
+
+  /**clone for DataCube should not be invoked externally.  it has to be invoked
+   * by its parentArray.
    */
   protected Object clone() throws CloneNotSupportedException {
     DataCube cloneObj = (DataCube) super.clone();
@@ -1230,6 +1298,14 @@ protected void writeTaggedData(OutputStream outputstream,
     return cloneObj;
   }
 
+  //
+  //PRIVATE methods
+  //
+  /**deepCopy: deep copy data
+   * @param: data--the data that needs to be copied
+   *         currentLayer--which dimension we are copying
+   * @return: an exact copy of passed in data
+   */
   private List deepCopy(List data, int currentLayer) {
     List tempData = new ArrayList();
     if (data == null)
@@ -1281,6 +1357,9 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.12  2000/11/09 23:22:59  kelly
+  * handles formatted read now.  -k.z.
+  *
   * Revision 1.11  2000/11/09 04:52:00  thomas
   * In toXML* method, CDATA miss-spelled CDDATA (!)
   * Fixed. -b.t.
