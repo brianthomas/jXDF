@@ -766,10 +766,7 @@ public class SaxDocumentHandler extends DefaultHandler {
     }
 
     // creates object & adds to appropriate lists, etc. 
-    private XMLDataIOStyle createFormattedReadObj (Hashtable attribs) {
-
-       // create new object appropriately 
-       XMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, attribs);
+    private XMLDataIOStyle checkReadObjectIsOk (XMLDataIOStyle readObj) {
 
        String readId = readObj.getReadId();
        // add this object to the lookup table, if it has an ID
@@ -788,6 +785,7 @@ public class SaxDocumentHandler extends DefaultHandler {
        return readObj;
 
     }
+
 
     private Value createValueListValueObj (ValueList thisValueList, String valueString) {
 
@@ -1514,8 +1512,11 @@ Log.errorln("");
        startElementHandlerHashtable.put(XDFNodeName.AXISUNITS, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.BINARYFLOAT, new binaryFloatFieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.BINARYINTEGER, new binaryIntegerFieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.CHARS, new charsStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.DATA, new dataStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.DATAFORMAT, new dataFormatStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.DELIMITER, new delimiterStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.DO_READ_INSTRUCTIONS, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELD, new fieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELDAXIS, new fieldAxisStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELDRELATIONSHIP, new fieldRelationshipStartElementHandlerFunc());
@@ -1525,12 +1526,19 @@ Log.errorln("");
        startElementHandlerHashtable.put(XDFNodeName.INDEX, new noteIndexStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.INTEGER, new integerFieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.LOCATIONORDER, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.NEWLINE, new newLineStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.NOTE, new noteStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.NOTES, new notesStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.PARAMETER, new parameterStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.PARAMETERGROUP, new parameterGroupStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.READ, new readStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.READ_DELIMITED_STYLE, new delimitedStyleStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.READ_FIXEDWIDTH_STYLE, new fixedStyleStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.READ_INSTRUCTIONS_FIXED, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.READ_INSTRUCTIONS_DELIMITED, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.READ_TAGGED_STYLE, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.READCELL, new readCellStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.RECORDTERMINATOR, new recordTerminatorStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.REPEAT, new repeatStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.ROOT, new rootStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.SKIPCHAR, new skipCharStartElementHandlerFunc());
@@ -1546,7 +1554,6 @@ Log.errorln("");
        startElementHandlerHashtable.put(XDFNodeName.TD6, new dataTagStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.TD7, new dataTagStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.TD8, new dataTagStartElementHandlerFunc());
-       startElementHandlerHashtable.put(XDFNodeName.TEXTDELIMITER, new asciiDelimiterStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.UNIT, new unitStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.UNITS, new unitsStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.UNITLESS, new nullStartElementHandlerFunc());
@@ -1554,6 +1561,7 @@ Log.errorln("");
        startElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VECTOR, new vectorStartElementHandlerFunc());
+
 
     }
 
@@ -1586,6 +1594,8 @@ Log.errorln("");
        endElementHandlerHashtable.put(XDFNodeName.NOTES, new notesEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.PARAMETERGROUP, new parameterGroupEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.READ, new readEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.READ_FIXEDWIDTH_STYLE, new fixedStyleEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.READ_DELIMITED_STYLE, new delimitedStyleEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.REPEAT, new repeatEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.STRUCTURE, new structureEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.TD0, new dataTagEndElementHandlerFunc());
@@ -2292,8 +2302,11 @@ Log.errorln(" TValue:"+valueString);
        public static final String AXISUNITS= "axisUnits";
        public static final String BINARYFLOAT = "binaryFloat";
        public static final String BINARYINTEGER = "binaryInteger";
+       public static final String CHARS= "chars";
        public static final String DATA = "data";
        public static final String DATAFORMAT = "dataFormat";
+       public static final String DELIMITER = "delimiter";
+       public static final String DO_READ_INSTRUCTIONS = "doReadInstructions";
        public static final String FIELD = "field";
        public static final String FIELDAXIS = "fieldAxis";
        public static final String FIELDRELATIONSHIP = "relation";
@@ -2303,15 +2316,22 @@ Log.errorln(" TValue:"+valueString);
        public static final String INDEX = "index";
        public static final String INTEGER = "integer";
        public static final String LOCATIONORDER = "locationOrder";
+       public static final String NEWLINE = "newLine";
        public static final String NOTE = "note";
        public static final String NOTES = "notes";
        public static final String PARAMETER = "parameter";
        public static final String PARAMETERGROUP = "parameterGroup";
        public static final String ROOT = "XDF"; // beware setting this to the same name as structure 
        public static final String READ = "read";
+       public static final String RECORDTERMINATOR = "recordTerminator";
+       public static final String READ_DELIMITED_STYLE = "delimitedStyle";
+       public static final String READ_FIXEDWIDTH_STYLE = "fixedWidthStyle";
+       public static final String READ_TAGGED_STYLE = "taggedStyle";
+       public static final String READ_INSTRUCTIONS_FIXED = "fixedWidthReadInstructions";
+       public static final String READ_INSTRUCTIONS_DELIMITED = "delimitedReadInstructions";
        public static final String READCELL = "readCell";
        public static final String REPEAT = "repeat";
-       public static final String SKIPCHAR = "skipChars";
+       public static final String SKIPCHAR = "skip";
        public static final String STRUCTURE = "structure";
        public static final String STRING = "string";
        public static final String TAGTOAXIS = "tagToAxis";
@@ -2324,7 +2344,6 @@ Log.errorln(" TValue:"+valueString);
        public static final String TD6 = "d6";
        public static final String TD7 = "d7";
        public static final String TD8 = "d8";
-       public static final String TEXTDELIMITER = "textDelimiter";
        public static final String UNIT = "unit";
        public static final String UNITS = "units";
        public static final String UNITLESS = "unitless";
@@ -2443,40 +2462,6 @@ Log.errorln(" TValue:"+valueString);
 
        }
     }
-
-    // ASCII DELIMITER NODE HANDLERS
-    //
-
-    // asciiDelimiter node start
-    class asciiDelimiterStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) 
-       throws SAXException
-       {
-
-           DelimitedXMLDataIOStyle readObj = new DelimitedXMLDataIOStyle(CurrentArray);
-           readObj.setAttributes(attrs);
-           CurrentArray.setXMLDataIOStyle(readObj);
-
-         // is this needed??
-         //  CurrentFormatObjectList.add(readObj);
-
-           return readObj;
-
-       }
-    }
-
-    // asciiDelimiter node end
-    class asciiDelimiterEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) 
-       throws SAXException
-       {
-
-           // pop off last value
-           // CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
-
-       }
-    }
-
 
     // ARRAY NODE
     //
@@ -2665,6 +2650,37 @@ Log.errorln(" TValue:"+valueString);
        }
     }
 
+
+    // CHARS
+    //
+
+    class charsStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+          Chars charDataObj = new Chars();
+          charDataObj.setAttributes(attrs);
+
+          Object lastObject = getLastObject();
+
+          if (lastObject instanceof SkipCharFormattedIOCmd) {
+             ((SkipCharFormattedIOCmd) lastObject).setOutput(charDataObj);
+             return charDataObj;
+          } else if (lastObject instanceof Delimiter) {
+             ((Delimiter) lastObject).setValue(charDataObj);
+             return charDataObj;
+          } else if (lastObject instanceof RecordTerminator) {
+             ((RecordTerminator) lastObject).setValue(charDataObj);
+             return charDataObj;
+          } else {
+             Log.warnln("Warning: cant add Chars object to parent:"+lastObject.getClass().toString()+"), not a valid object. Ignoring request ");
+          }
+
+          return null;
+
+       }
+    }
 
     // DATATAG
     //
@@ -2856,11 +2872,13 @@ Log.errorln(" TValue:"+valueString);
               } else {
 
                  // Delimited Case here
+
                  // snag the string representation of the values
+                 // and use them to split the string appropriately
                  strValueList = splitStringIntoStringObjects( DATABLOCK.toString(), 
-                                                ((DelimitedXMLDataIOStyle) formatObj).getDelimiter(), 
-                                                ((DelimitedXMLDataIOStyle) formatObj).getRepeatable(), 
-                                                ((DelimitedXMLDataIOStyle) formatObj).getRecordTerminator()
+                                                ((DelimitedXMLDataIOStyle) formatObj).getDelimiter().getStringValue(), 
+                                                ((DelimitedXMLDataIOStyle) formatObj).getDelimiter().getRepeatable(), 
+                                                ((DelimitedXMLDataIOStyle) formatObj).getRecordTerminator().getStringValue() 
                                               );
               }
 
@@ -3111,6 +3129,73 @@ while (iter.hasNext()) {
     }
 
 
+    // DELIMITED STYLE 
+    //
+
+    class delimitedStyleStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+//           DelimitedXMLDataIOStyle readObj = new DelimitedXMLDataIOStyle(CurrentArray);
+//           readObj.setAttributes(attrs);
+
+           // create new object appropriately 
+           DelimitedXMLDataIOStyle readObj = new DelimitedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
+
+           readObj = (DelimitedXMLDataIOStyle) checkReadObjectIsOk(readObj);
+
+           CurrentArray.setXMLDataIOStyle(readObj);
+
+           // this is needed
+           CurrentFormatObjectList.add(readObj);
+
+           return readObj;
+
+       }
+    }
+
+    class delimitedStyleEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action (SaxDocumentHandler handler)
+       throws SAXException
+       {
+
+           // pop off last value
+           CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
+
+       }
+    }
+
+
+    // DELIMITER
+    //
+
+    class delimiterStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+
+          Delimiter delimitObj = new Delimiter();
+          delimitObj.setAttributes(attrs);
+
+          // okey, now that that is taken care off, we will go
+          // get the current format (read) object, and add the readCell
+          // command to it.
+          Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
+ 
+          if (formatObj instanceof DelimitedXMLDataIOStyle) {
+             ((DelimitedXMLDataIOStyle) formatObj).setDelimiter(delimitObj);
+             return delimitObj;
+          } else {
+             Log.warnln("Warning: cant add Delimiter object to parent..its not a DelimitedXMLDataIOStyle Object. Ignoring request ");
+          }
+
+          return null;
+       }
+    }
+
+
     // FIELD
     //
 
@@ -3352,6 +3437,40 @@ while (iter.hasNext()) {
        }
     }
 
+    // FIXED STYLE 
+    //
+
+    class fixedStyleStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+           // create new object appropriately 
+           FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
+    
+           readObj = (FormattedXMLDataIOStyle) checkReadObjectIsOk(readObj);
+ 
+           // add read object to Current Array
+           CurrentArray.setXMLDataIOStyle(readObj);
+
+           CurrentFormatObjectList.add(readObj);
+
+           return readObj;
+
+       }
+    }
+
+    class fixedStyleEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action (SaxDocumentHandler handler)
+       throws SAXException
+       {
+
+           // pop off last value
+           CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
+
+       }
+    }
+
     // FLOATFIELD
     //
 
@@ -3429,6 +3548,37 @@ while (iter.hasNext()) {
           }
 
           return integerFormat;
+       }
+    }
+
+    // NEWLINE
+    //
+
+    class newLineStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+          NewLine newLineObj = new NewLine();
+          newLineObj.setAttributes(attrs);
+
+          Object lastObject = getLastObject();
+
+          if (lastObject instanceof SkipCharFormattedIOCmd) {
+             ((SkipCharFormattedIOCmd) lastObject).setOutput(newLineObj);
+             return newLineObj;
+          } else if (lastObject instanceof Delimiter) {
+             ((Delimiter) lastObject).setValue(newLineObj);
+             return newLineObj;
+          } else if (lastObject instanceof RecordTerminator) {
+             ((RecordTerminator) lastObject).setValue(newLineObj);
+             return newLineObj;
+          } else {
+             Log.warnln("Warning: cant add NewLine object to parent, not a valid object. Ignoring request ");
+          }
+
+          return null;
+
        }
     }
 
@@ -3908,6 +4058,7 @@ while (iter.hasNext()) {
        throws SAXException
        {
 
+/*
           // if this is set to Tagged style, then we really havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
           if ( CurrentArray.getXMLDataIOStyle() instanceof TaggedXMLDataIOStyle ) {
@@ -3921,8 +4072,9 @@ while (iter.hasNext()) {
              CurrentFormatObjectList.add(readObj);
 
           }
-
           // okey, now that that is taken care off, we will go
+*/
+
           // get the current format (read) object, and add the readCell
           // command to it.
           Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
@@ -3944,6 +4096,35 @@ while (iter.hasNext()) {
        }
     }
 
+    // RECORDTERMINATOR
+    //
+
+    class recordTerminatorStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+    
+          RecordTerminator recTermObj = new RecordTerminator();
+          recTermObj.setAttributes(attrs);
+
+          // okey, now that that is taken care off, we will go
+          // get the current format (read) object, and add the readCell
+          // command to it.
+          Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
+
+          if (formatObj instanceof DelimitedXMLDataIOStyle) {
+             ((DelimitedXMLDataIOStyle) formatObj).setRecordTerminator(recTermObj);
+             return recTermObj;
+          } else {
+             Log.warnln("Warning: cant add RecordTerminator object to parent..its not a DelimitedFormatObject. Ignoring request ");
+          }
+
+          return null;
+
+       }
+    }
+
+
     // REPEAT
     //
 
@@ -3961,6 +4142,7 @@ while (iter.hasNext()) {
        throws SAXException
        {
 
+/*
           // if this is set to Tagged style, then we really havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
           if ( CurrentArray.getXMLDataIOStyle() instanceof TaggedXMLDataIOStyle ) {
@@ -3976,6 +4158,8 @@ while (iter.hasNext()) {
           }
 
           // okey, now that that is taken care off, we will go
+*/
+
           // get the current format (read) object, and add the readCell
           // command to it.
           Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
@@ -4032,6 +4216,7 @@ while (iter.hasNext()) {
        throws SAXException
        {
 
+/*
           // if this is set to Tagged style, then we really havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
           if ( CurrentArray.getXMLDataIOStyle() instanceof TaggedXMLDataIOStyle ) {
@@ -4047,6 +4232,8 @@ while (iter.hasNext()) {
           }
 
           // okey, now that that is taken care off, we will go
+*/
+
           // get the current format (read) object, and add the readCell
           // command to it.
           Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
@@ -4142,13 +4329,6 @@ while (iter.hasNext()) {
           // well, if we see tagToAxis nodes, must have tagged data, the 
           // default style. No need for initing further. 
 
-//          if ( defined $DataIOStyle_Attrib_Ref) {
-//              $CURRENT_ARRAY->XmlDataIOStyle(new XDF::TaggedXMLDataIOStyle($DataIOStyle_Attrib_Ref))
-//          }
-
-         // I cant imagine any need for this in Java. In Perl even?
-//          $DataIOStyle_Attrib_Ref = undef;
-
           String tagname = new String ();
           String axisIdRefname = new String();
 
@@ -4164,7 +4344,6 @@ while (iter.hasNext()) {
               }
           }
 
-          // works?
           ((TaggedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).setAxisTag(tagname, axisIdRefname);
 
           return (Object) null;
