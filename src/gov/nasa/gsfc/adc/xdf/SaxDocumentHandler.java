@@ -701,13 +701,18 @@ class SaxDocumentHandler implements DocumentHandler {
                  if (AxisObj.containsKey(axisIdRef)) {
 
                     BaseObject refAxisObj = (BaseObject) AxisObj.get(axisIdRef);
-                    newaxis = (Axis) refAxisObj.clone();
+                    try {
+                       newaxis = (Axis) refAxisObj.clone();
+                    } catch (java.lang.CloneNotSupportedException e) {
+                       Log.errorln("Weird error, cannot clone axis object. Aborting read.");
+                       System.exit(-1);
+                    }
 
                     // override attrs with those in passed list
                     newaxis.setXMLAttributes(attrs);
            
                  } else {
-                    Log.errorln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
+                    Log.warnln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
                     return;
                  }
              }
@@ -1008,13 +1013,18 @@ class SaxDocumentHandler implements DocumentHandler {
                  if (AxisObj.containsKey(axisIdRef)) {
 
                     BaseObject refAxisObj = (BaseObject) AxisObj.get(axisIdRef);
-                    newfieldaxis = (FieldAxis) refAxisObj.clone();
+                    try {
+                      newfieldaxis = (FieldAxis) refAxisObj.clone();
+                    } catch (java.lang.CloneNotSupportedException e) {
+                      Log.errorln("Weird error, cannot clone field object. Aborting read.");
+                      System.exit(-1);
+                    }
 
                     // override attrs with those in passed list
                     newfieldaxis.setXMLAttributes(attrs);
 
                  } else {
-                    Log.errorln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
+                    Log.warnln("Error: Reader got an fieldaxis with AxisIdRef=\""+axisIdRef+"\" but no previous field axis has that id! Ignoring add fieldAxis request.");
                     return;
                  }
              }
@@ -1209,13 +1219,20 @@ class SaxDocumentHandler implements DocumentHandler {
               if (NoteObj.containsKey(noteIdRef)) {
 
                  BaseObject refNoteObj = (BaseObject) NoteObj.get(noteIdRef);
-                 newnote = (Note) refNoteObj.clone();
+                 try {
+                    newnote = (Note) refNoteObj.clone();
+                 } catch (java.lang.CloneNotSupportedException e) {
+                    Log.errorln("Weird error, cannot clone note object. Aborting read.");
+                    System.exit(-1);
+                 }
+
+
 
                  // override attrs with those in passed list
                  newnote.setXMLAttributes(attrs);
 
               } else {
-                 Log.errorln("Error: Reader got a note with NoteIdRef=\""+noteIdRef+"\" but no previous note has that id! Ignoring add note request.");
+                 Log.warnln("Error: Reader got a note with NoteIdRef=\""+noteIdRef+"\" but no previous note has that id! Ignoring add note request.");
                  return;
               }
            }
@@ -1957,6 +1974,9 @@ class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/01 22:14:03  thomas
+ * Updated for new cloning scheme. -b.t.
+ *
  * Revision 1.4  2000/11/01 21:59:31  thomas
  * Implimented ValueGroup, FieldGroup fully. -b.t.
  *
