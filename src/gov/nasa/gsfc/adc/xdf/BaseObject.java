@@ -516,6 +516,9 @@ public abstract class BaseObject implements Serializable {
       if (nodeNameString != null) {
         // Needed??
         //dealWithClosingGroupNodes(containedObj, outputstream, indent);
+
+        //Brian: we have to fix this, no whitespace should be allowed between
+        //PCDATA and closing node
         if (sPrettyXDFOutput) writeOut(outputstream, indent);
         if (!dontCloseNode)
           if ( nodeNameString.equals(sXDFStructureNodeName) && !XMLDeclAttribs.isEmpty() )
@@ -559,8 +562,9 @@ public abstract class BaseObject implements Serializable {
   */
   public void toXDFOutputStream (OutputStream outputstream, Hashtable XMLDeclAttribs)
   {
-     toXDFOutputStream(outputstream, XMLDeclAttribs, sPrettyXDFOutputIndentation,
-                       false, null, null);
+     //not reseanable to set the indent to sPrettyXDFOutputIndentation --k.z. 10/17
+     //toXDFOutputStream(outputstream, XMLDeclAttribs, sPrettyXDFOutputIndentation, false, null, null);
+     toXDFOutputStream(outputstream, XMLDeclAttribs,"", false, null, null);
   }
 
   /** A different invokation style. It has defaults for the XML Declaration
@@ -568,7 +572,10 @@ public abstract class BaseObject implements Serializable {
   */
   public void toXDFOutputStream (OutputStream outputstream, String indent)
   {
+     // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
+     XMLDeclAttribs.put("standalone", new String("no"));
+     XMLDeclAttribs.put("version", (String) sXMLSpecVersion);
      toXDFOutputStream(outputstream, XMLDeclAttribs, indent);
   }
 
@@ -579,8 +586,15 @@ public abstract class BaseObject implements Serializable {
   public void toXDFOutputStream (OutputStream outputstream)
   {
 
+     // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
+     XMLDeclAttribs.put("standalone", new String("no"));
+     XMLDeclAttribs.put("version", (String) sXMLSpecVersion);
+
      toXDFOutputStream(outputstream, XMLDeclAttribs);
+
+
+
   }
 
   //
@@ -665,6 +679,78 @@ public abstract class BaseObject implements Serializable {
     }
   }
 
+  /** Basically this rearranges XMLAttribute information into a more convient
+      order for the toXDFOutputstream method.
+      @return: Hashtable with 3 entries: attribList--attributes(strings, numbers)
+                                         objRefList--the object this class owns
+                                         PCDATA--the PCDATA of this element
+  */
+
+  /**added another if clause to put attibutes of Number type in the attribList
+   * declare as protected, sub-class might use
+   * fixed the documentation--k.z. 10/17
+   */
+  protected Hashtable getXMLInfo () {
+
+    Hashtable xmlInfo = new Hashtable();
+    ArrayList attribList = new ArrayList();
+    ArrayList objRefList = new ArrayList();
+
+    for (int i = 0; i < attribHash.size(); i++) {
+      String attribName = (String) attribOrder.get(i);
+      XMLAttribute obj = (XMLAttribute) attribHash.get(attribName);
+      if (obj != null && obj.attribValue != null) {
+        if ( obj.attribType == Constants.STRING_TYPE)
+        {
+
+          if (attribName.equals(sPCDATAAttribute)) {
+            xmlInfo.put("PCDATA", obj.attribValue);
+          } else {
+            Hashtable item = new Hashtable();
+            item.put("name", attribName);
+            item.put("value", obj.attribValue);
+            attribList.add(item);
+          }
+        }
+        else {
+          if(obj.attribType == Constants.NUMBER_TYPE) {  //it's an attribute of Number type
+            Hashtable item = new Hashtable();
+            item.put("name", attribName);
+            item.put("value", obj.attribValue.toString());
+            attribList.add(item);
+          }
+          else {// it's an obj ref, add to list
+            Hashtable item = new Hashtable();
+            item.put("name", attribName);
+            item.put("value", obj.attribValue);
+            item.put("type", obj.attribType);
+            objRefList.add(item);
+          }
+        }
+      }
+    }
+
+    xmlInfo.put("attribList", attribList);
+    xmlInfo.put("childObjList", objRefList);
+    return xmlInfo;
+  }
+
+  /** Write message out to specified OutputStream Object.
+  */
+  /**declare as proteced, sub-classes may use --k.z. 10/17/2000
+   *
+   */
+  protected void writeOut ( OutputStream outputstream, String msg ) {
+
+    try {
+      outputstream.write(msg.getBytes());
+    } catch (IOException e) {
+      Log.error("Error: couldnt open OutputStream for writing");
+    }
+  }
+
+
+
   //
   // PRIVATE Methods
   //
@@ -728,47 +814,7 @@ public abstract class BaseObject implements Serializable {
     return indent;
   }
 
-  /** Basically this rearranges XMLAttribute information into a more convient
-      order for the toXDFOutputstream method.
-      @return: Hashtable with 3 entries: "PCDATA", "name" and "value".
-  */
-  private Hashtable getXMLInfo () {
 
-    Hashtable xmlInfo = new Hashtable();
-    ArrayList attribList = new ArrayList();
-    ArrayList objRefList = new ArrayList();
-
-    for (int i = 0; i < attribHash.size(); i++) {
-      String attribName = (String) attribOrder.get(i);
-      XMLAttribute obj = (XMLAttribute) attribHash.get(attribName);
-      if (obj != null && obj.attribValue != null) {
-
-        if ( obj.attribType == Constants.STRING_TYPE)
-        {
-
-          if (attribName.equals(sPCDATAAttribute)) {
-            xmlInfo.put("PCDATA", obj.attribValue);
-          } else {
-            Hashtable item = new Hashtable();
-            item.put("name", attribName);
-            item.put("value", obj.attribValue);
-            attribList.add(item);
-          }
-        } else { // its an obj ref, add to list
-          Hashtable item = new Hashtable();
-          item.put("name", attribName);
-          item.put("value", obj.attribValue);
-          item.put("type", obj.attribType);
-          objRefList.add(item);
-        }
-      }
-    }
-
-    xmlInfo.put("attribList", attribList);
-    xmlInfo.put("childObjList", objRefList);
-
-    return xmlInfo;
-  }
 
  /** Write the XML Declaration to the indicated OutputStream.
   */
@@ -798,17 +844,8 @@ public abstract class BaseObject implements Serializable {
 
   }
 
-  /** Write message out to specified OutputStream Object.
-  */
-  private void writeOut ( OutputStream outputstream, String msg ) {
 
-    try {
-      outputstream.write(msg.getBytes());
-    } catch (IOException e) {
-      Log.error("Error: couldnt open OutputStream for writing");
-    }
 
-  }
 
   //
   // Internal Classes
@@ -872,6 +909,11 @@ public abstract class BaseObject implements Serializable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2000/10/17 22:07:55  kelly
+ * --enabled Number attribute in getXMLInfo() (added an if clause)
+ * --declared writeOut() and getXMLInfo as protected
+ * --constructed default XMLDelAttrib in several *toXDF* routines
+ *
  * Revision 1.10  2000/10/16 14:47:24  kelly
  * use enum list to  check valid XMLAttribute type. --k.z.
  *
