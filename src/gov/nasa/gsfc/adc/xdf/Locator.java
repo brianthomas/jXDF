@@ -28,7 +28,13 @@ import java.util.*;
    DataModel, which determines the range of the valid axis indexes and
    the range of valid datum indexes.
  */
+
 public class Locator {
+  protected Array parentArray;
+  public Locator(Array array) {
+    Log.debug("in Locator(Array)");
+    parentArray = array;
+  }
     private org.log4j.Category    log;      //error and debug logging facility
     private DataModel dm_;
     private ArrayList datumIndexes_;  //List of idexes, one for each Axis
@@ -92,6 +98,9 @@ public class Locator {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/10 19:55:09  cvs
+ * merged  in Kellys stuff.
+ *
  * Revision 1.2  2000/10/10 17:59:10  cvs
  * Updated documentation. Removed Tickmark variable
  * from setCoordinate method (not a valid class anymore!)
