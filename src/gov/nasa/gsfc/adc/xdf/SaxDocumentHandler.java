@@ -69,7 +69,7 @@ public class SaxDocumentHandler extends HandlerBase {
     // is written for, it should match up with the BaseObject sXDFDTDName
     // Not clear that checking between other than baseobject DTDName and
     // the declared document version is needed (so eliminate this field..)
-    private static final String sHandlerXDFDTDName = "XDF_0.17.dtd";
+//    private static final String sHandlerXDFDTDName = "XDF_017.dtd";
 
     // The XDF structure that is populated by the XDF DocumentHandler
     private XDFInterface XDF; 
@@ -4072,6 +4072,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.34  2001/06/19 15:06:56  thomas
+ * removed DTD handler info, as its duplicated in Specification class
+ *
  * Revision 1.33  2001/06/18 21:40:15  thomas
  * now uses set/getIOAxesOrder from dataIOStyle obj. and
  * for nodes.
