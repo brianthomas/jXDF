@@ -71,10 +71,7 @@ import java.util.*;
  * @version $Revision$
  */
 
-
-
-
-public class Field extends BaseObject{
+public class Field extends BaseObject {
 
   //
   //Fields
@@ -134,7 +131,7 @@ public class Field extends BaseObject{
     attribHash.put("dataFormat", new XMLAttribute(null, Constants.OBJECT_TYPE));
     attribHash.put("class", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("fieldIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("paramId", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("fieldId", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
 
@@ -351,6 +348,10 @@ public class Field extends BaseObject{
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/10/30 18:55:53  thomas
+ * Attrib order in init had entry for "paramId" instead
+ * of "fieldId". Corrected. -b.t.
+ *
  * Revision 1.5  2000/10/27 21:16:48  kelly
  * units are initialized as null now.  changed add/remove units methods.  -k.z.
  *
