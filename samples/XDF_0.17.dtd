@@ -26,6 +26,7 @@ Rather create a subfieldML.dtd that overrides this and XDF_TYPE and
 calls XDF.dtd by a parameter entity.
 -->
 <!ENTITY % XDF_KEYWORD_ADDITION " ">
+<!ENTITY % XDF_AXIS_ADDITION " ">
 <!ENTITY % XDF_TYPE "basic">
 <!ELEMENT XDF (%XDF_KEYWORD_ADDITION;(structure | parameter | parameterGroup | array | note*)+)>
 <!ATTLIST XDF
@@ -98,7 +99,6 @@ calls XDF.dtd by a parameter entity.
 	inequality (lessThan | lessThanOrEqual | greaterThan | greaterThanOrEqual) #IMPLIED
 	upperErrorValue NMTOKEN #IMPLIED
 	lowerErrorValue NMTOKEN #IMPLIED
-	errorValue NMTOKEN #IMPLIED
 >
 <!--
 	One can fill valueList with value elements or a 
@@ -111,8 +111,8 @@ calls XDF.dtd by a parameter entity.
 	size NMTOKEN #REQUIRED
 	delimiter CDATA "&space;"
 	repeatable (yes | no) "no"
-	start CDATA "0"
-	step CDATA "1"
+	start CDATA  #IMPLIED
+	step CDATA  #IMPLIED
 	valueListId ID #IMPLIED
 	valueListIdRef IDREF #IMPLIED
 	infiniteValue NMTOKEN #IMPLIED
@@ -186,7 +186,7 @@ calls XDF.dtd by a parameter entity.
         to accomplish an array/@apppendTo.
 
 -->
-<!ELEMENT axis (((axisUnits, (value | valueList | valueGroup)+) | unitDirection)*%XDF_AXIS_ADDITION;)>
+<!ELEMENT axis (((axisUnits, (value | valueList | valueGroup)+) | unitDirection)* %XDF_AXIS_ADDITION;)>
 <!ATTLIST axis
 	name CDATA #IMPLIED
 	description CDATA #IMPLIED
@@ -293,7 +293,7 @@ grouped together with name="position".
 	Or, if there are no terminators, the set of formats are 
 	repeated until the end of the data. 
 -->
-<!ELEMENT dataFormat (fixed | integer | string | exponent | binaryInteger | binaryFloat)>
+<!ELEMENT dataFormat (fixed | integer | string | exponential | binaryInteger | binaryFloat)>
 <!ELEMENT read (for | tagToAxis+)>
 <!ATTLIST read
 	encoding (ANSI | ISO-8859-1 | UTF-8 | UTF-16) "ISO-8859-1"
@@ -333,10 +333,16 @@ grouped together with name="position".
 	width NMTOKEN #REQUIRED
 	precision NMTOKEN #REQUIRED
 >
-<!ELEMENT exponent EMPTY>
-<!ATTLIST exponent
+<!-- For exponential notation, width is total length, precision is
+again the number of digits past the decimal point and exponent is
+the number of characters past the E or e.  For example, 7.345E-12 has
+width="9", precision="3", and exponent="3".  The mantissa width
+is equal to width - exponent - 1. -->
+<!ELEMENT exponential EMPTY>
+<!ATTLIST exponential
 	width NMTOKEN #REQUIRED
 	precision NMTOKEN #REQUIRED
+	exponent  NMTOKEN #REQUIRED
 >
 <!ELEMENT integer EMPTY>
 <!ATTLIST integer
