@@ -190,13 +190,13 @@ public abstract class XMLDataIOStyle extends BaseObject {
     synchronized(attribHash) {  //sync, prevent the attribHash' structure be changed
       String attrib;
       if ( (attrib=getEncoding()) !=null)
-        writeOut(outputstream, " encoding=" + attrib);
+        writeOut(outputstream, " encoding=\"" + attrib+"\"");
       if ( (attrib=getEndian()) !=null)
-        writeOut(outputstream, " endian=" + attrib);
+        writeOut(outputstream, " endian=\"" + attrib + "\"");
       if ( (attrib=getReadId()) !=null)
-        writeOut(outputstream, " readId=" + attrib);
+        writeOut(outputstream, " readId=\"" + attrib + "\"");
       if ( (attrib=getReadIdRef()) !=null)
-        writeOut(outputstream, " readIdRef=" + attrib);
+        writeOut(outputstream, " readIdRef=\"" + attrib + "\"");
 
     }
     writeOut(outputstream, ">");
@@ -261,6 +261,10 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2000/11/09 04:50:59  thomas
+ * Error in output attribute for node in toXML* method
+ * (missing double quotes). Fixed. -b.t.
+ *
  * Revision 1.10  2000/11/09 04:24:12  thomas
  * Implimented small efficiency improvements to traversal
  * loops. -b.t.
