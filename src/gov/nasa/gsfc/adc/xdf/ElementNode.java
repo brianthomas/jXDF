@@ -250,7 +250,6 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
 
       resetAttributes();
 
-Log.errorln("Attribs reset, now setting them one by one.");
       // must we do it this way? argh.
       if (attrs != null) {
           // whip thru the list setting each
@@ -258,7 +257,6 @@ Log.errorln("Attribs reset, now setting them one by one.");
           for (int i = 0; i < size; i++) {
              String attribName = attrs.getQName(i);
              String attribValue = attrs.getValue(i);
-Log.errorln("   setting attrib:"+attribName+" to "+attribValue);
              this.setAttribute(attribName, attribValue);
           }
       }
@@ -277,7 +275,7 @@ Log.errorln("   setting attrib:"+attribName+" to "+attribValue);
    /**
       @deprecated use setAttributes instead
     */
-   public void setAttributes (List attributeList) { }
+   public void setXMLAttributes (List attributeList) { this.setAttributes(attributeList); }
 
    /** just a convenience method for setAttribute
     */
@@ -463,6 +461,9 @@ Log.errorln("   setting attrib:"+attribName+" to "+attribValue);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/09/18 20:52:45  thomas
+ * re-added deprecated method setXMLAttributes
+ *
  * Revision 1.2  2001/09/18 20:32:20  thomas
  * added back in setXMLAttribute(s) convience method, w/ deprecated statement
  *
