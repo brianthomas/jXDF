@@ -57,7 +57,10 @@ public class Structure extends BaseObject {
   //Fields
   //
 
-  protected Set paramGroupOwnedHash = Collections.synchronizedSet(new HashSet());  //double check, init size?
+  /** This field stores object references to those parameter group objects
+   * to which this parameter object belongs
+  */
+  protected Set paramGroupOwnedHash = Collections.synchronizedSet(new HashSet());
 
   //
   // Constructor and related methods
@@ -375,5 +378,16 @@ public class Structure extends BaseObject {
     }
     return paramGroupOwnedHash.remove(group);
   }
+
+  /** read
+   * Read in an XML file using XDF::Reader.
+   * @return: the structure read in on success, null on failure.
+   */
+
+   //Brian, we need to fill in
+   public void read() {
+     Log.error("Structure.read() is called, but the function is empty.");
+   }
+
 
 }

@@ -4,7 +4,7 @@
 
 // BaseObject.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
- 
+
 /*
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,14 +28,14 @@ import java.util.*;
 import java.io.*;
 
 /** The base class for most XDF objects.
-    XDF is the eXtensible Data Structure, which is an XML format designed 
+    XDF is the eXtensible Data Structure, which is an XML format designed
     to contain n-dimensional scientific/mathematical data.
     A diagram of the XDF object structure is included in the package.
 
     The BaseObject class provides a generalized means of storing, retrieving
     and writing out the XML-based properties of the XDF objects. It also
     provides fields/methods to allow all inheriting XDF objects be
-    members of Group objects. Key parts to the BaseObject class include the 
+    members of Group objects. Key parts to the BaseObject class include the
     XMLAttributes and the toXDF* methods it provides.
  */
 public abstract class BaseObject implements Serializable {
@@ -45,15 +45,15 @@ public abstract class BaseObject implements Serializable {
   //
 
   /** Stores whether nicely formatted XDF should be output from any toXDF*
-      method. Nice formatting includes nested indentation and return characters 
+      method. Nice formatting includes nested indentation and return characters
       to improve human readability of output XDF (but blows up the size of
       the XDF file!).
   */
   public static boolean sPrettyXDFOutput = false;
 
   /** The indentation string that will be used for every nesting level within an
-      output XDF. For example, if the sPrettyXDFOutputIndentation string consists 
-      of 3 spaces, then a doubly nested node will be indented 6 spaces, its parent 
+      output XDF. For example, if the sPrettyXDFOutputIndentation string consists
+      of 3 spaces, then a doubly nested node will be indented 6 spaces, its parent
       node will be indented 3 spaces and the root node will not be indented at all.
       You can be creative with the indentation: any sequence of characters is valid
       (no need to just use spaces!).
@@ -61,19 +61,19 @@ public abstract class BaseObject implements Serializable {
   public static String sPrettyXDFOutputIndentation = "  ";
 
   /** The default allocation size for each dimension within all XDF arrays.
-      The practical meaning of this field is that it indicates the initial 
-      size of each XDF Axis/FieldAxis (the number of axis values/fields along 
-      the axis) and the number of data cells within a dimension of the XDF 
-      DataCube object. If more axis values/fields/datacells are placed on a 
-      given Axis/FieldAxis or data in a unallocated spot within the dataCube 
-      then the package allocates the needed memory and enlarges the 
-      DataCube/Axis/FieldAxis objects as it is needed. 
+      The practical meaning of this field is that it indicates the initial
+      size of each XDF Axis/FieldAxis (the number of axis values/fields along
+      the axis) and the number of data cells within a dimension of the XDF
+      DataCube object. If more axis values/fields/datacells are placed on a
+      given Axis/FieldAxis or data in a unallocated spot within the dataCube
+      then the package allocates the needed memory and enlarges the
+      DataCube/Axis/FieldAxis objects as it is needed.
 
-      This automated allocation is slow however, so it is desirable, IF you 
-      know how big your arrays will be, to pre-set this value to encompass your 
-      data set. Doing so will to improve efficency in some cases. Note that if 
-      you are having keeping all of your data in memory (a multi-dimensional 
-      dataset) it may be desirable to DECREASE the value. 
+      This automated allocation is slow however, so it is desirable, IF you
+      know how big your arrays will be, to pre-set this value to encompass your
+      data set. Doing so will to improve efficency in some cases. Note that if
+      you are having keeping all of your data in memory (a multi-dimensional
+      dataset) it may be desirable to DECREASE the value.
   */
   public static int sDefaultDataArraySize = 1000;
 
@@ -81,23 +81,23 @@ public abstract class BaseObject implements Serializable {
       have a defined node name (ie map to the XDF DTD). The BaseObject class
       is an example of this case.
   */
-  protected String classXDFNodeName; 
+  protected String classXDFNodeName;
 
-  /** The version of XML that will be output from a toXDF* method call. 
+  /** The version of XML that will be output from a toXDF* method call.
   */
   private static String sXMLSpecVersion = "1.0";
 
-  /** The root node name for any XDF document. The root node is a structure 
+  /** The root node name for any XDF document. The root node is a structure
       node with a different name as specified here.
   */
   private static String sXDFRootNodeName = "XDF";
 
   /** The XDF node name for the structure class.
   */
-  private static String sXDFStructureNodeName = "structure"; // bad. we should call the 
-                                                             // class to find this out. -b.t. 
+  private static String sXDFStructureNodeName = "structure"; // bad. we should call the
+                                                             // class to find this out. -b.t.
 
-  /** The name of the relevant version of XDF DTD file for this package. 
+  /** The name of the relevant version of XDF DTD file for this package.
   */
   private static String sXDFDTDName = "XDF_0.17.dtd";
 
@@ -109,22 +109,21 @@ public abstract class BaseObject implements Serializable {
   */
   private static String sPCDATAAttribute = "value";
 
-  // need clarification on the get/set methods
   /** openGroupNodeHash is an internal field used by the toXDF* methods to track
       which group nodes are still open. Probably should go away.
   */
   protected Set openGroupNodeHash = Collections.synchronizedSet(new HashSet());
 
-  /** This field stores object references to those group objects to which a given  
+  /** This field stores object references to those group objects to which a given
       object belongs.
   */
   protected Set groupMemberHash = Collections.synchronizedSet(new HashSet());
 
-  /** A Hashtable to hold the XML attributes. 
+  /** A Hashtable to hold the XML attributes.
   */
   protected Hashtable attribHash;
 
-  /** A List to store the order of the XML attributes. 
+  /** A List to store the order of the XML attributes.
   */
   protected List attribOrder;
 
@@ -140,10 +139,10 @@ public abstract class BaseObject implements Serializable {
     // The heart of the baseObject is that it manages the storage, retrieval
     // and writing out the XMLAttributes for the XDF objects.
     // There are 2 parts to making the XMLAttributes of the base Object
-    // work properly: a lookup table of key/value pairs in attribHash and a 
+    // work properly: a lookup table of key/value pairs in attribHash and a
     // list containing the  proper order of the attributes.
 
-    // initialize 
+    // initialize
     attribHash  = new Hashtable(Constants.INIT_ATTRIBUTE_HASH_SIZE);
     attribOrder = Collections.synchronizedList(new ArrayList());
 
@@ -161,8 +160,8 @@ public abstract class BaseObject implements Serializable {
   }
 
   /** Return the hashtable of XMLAttribute names and their values. An empty
-      hashtable is passed back if their are no XMLAttributes within a given 
-      XDF object class. 
+      hashtable is passed back if their are no XMLAttributes within a given
+      XDF object class.
   */
   public Hashtable getAttribHash() {
     return attribHash;
@@ -176,7 +175,7 @@ public abstract class BaseObject implements Serializable {
     return attribOrder;
   }
 
-  /** Returns true if nicely formatted XML is to be outputted from any call to 
+  /** Returns true if nicely formatted XML is to be outputted from any call to
       a toXDF* method.
   */
   public static boolean getPrettyXDFOutput() {
@@ -222,7 +221,7 @@ public abstract class BaseObject implements Serializable {
     return sDefaultDataArraySize;
   }
 
-  /** Get the XML version of this package. 
+  /** Get the XML version of this package.
       This cooresponds to the XML spec version that this package
       uses to write out XDF.
   */
@@ -230,25 +229,25 @@ public abstract class BaseObject implements Serializable {
     return sXMLSpecVersion;
   }
 
-  /** Get the root node name for XDF. 
-  */ 
+  /** Get the root node name for XDF.
+  */
   public static String getXDFRootNodeName() {
     return sXDFRootNodeName;
   }
 
-  /** Get the name of the XDF DTD to which this package corresponds. 
-  */ 
+  /** Get the name of the XDF DTD to which this package corresponds.
+  */
   public static String getXDFDTDName() {
     return sXDFDTDName;
   }
 
-  /** Get the name of the XMLAttribute which will be written out as PCDATA. 
+  /** Get the name of the XMLAttribute which will be written out as PCDATA.
   */
   public static String getPCDATAAttribute() {
     return sPCDATAAttribute;
   }
 
-  /** Get the Hashtable containing the XMLAttributes for this object. 
+  /** Get the Hashtable containing the XMLAttributes for this object.
   */
   public Hashtable getXMLAttributes() {
     return attribHash;
@@ -258,44 +257,45 @@ public abstract class BaseObject implements Serializable {
   // Other Public Methods
   //
 
-  /** Add this object to the indicated Group object. 
+  /** Add this object to the indicated Group object.
   */
   public Group addToGroup(Group groupObject) {
 
     if (groupObject != null) {
-      if (groupMemberHash.add(groupObject)) {
+      if (groupMemberHash.add(groupObject)) {  //add in successful
         groupObject.addMemberObject(this);
         return groupObject; // bad, should return based on success of adding
       } else {
-        System.err.println("Can't add to group.  already a member of the group" + 
+        Log.error("Can't add to group.  already a member of the group" +
                            groupObject.getName());
         return null;
       }
     } else {
-      System.err.println("Error: the group object to add to is null");
+      Log.error("Error: the group object to add to is null");
       return null;
     }
 
   }
 
-  /** Remove this object from the indicated Group object. 
+  /** Remove this object from the indicated Group object.
   */
   public Group removeFromGroup (Group groupObject) {
     if (groupObject != null)  {
       if (groupMemberHash.contains(groupObject))  {
+        //this object does belong to the indicated Group object
         groupObject.removeMemberObj(this);
         groupMemberHash.remove(groupObject);
         return groupObject;
       }
       else {
-        System.err.println("Can't delete from group.  not a member of the group" + 
+        Log.error("Can't delete from group.  not a member of the group" +
                             groupObject.getName());
         return null;
       }
 
     }
     else {
-      System.err.println("Error: The group to add to is null");
+      Log.error("Error: The group to add to is null");
       return null;
     }
   }
@@ -313,7 +313,7 @@ public abstract class BaseObject implements Serializable {
       by the output, so it is advisable to check for the existence of the file
       *before* using this method if you are worried about losing prior information.
       Uses toXDFOutputStream. The passed hashtable will be used to initialize the
-      attributes of the XML declaration in the output XDF file. 
+      attributes of the XML declaration in the output XDF file.
   */
   public void toXDFFile (String filename, Hashtable XMLDeclAttribs) {
 
@@ -323,7 +323,7 @@ public abstract class BaseObject implements Serializable {
       toXDFOutputStream(fileout, XMLDeclAttribs);
       fileout.close();
     } catch (IOException e) {
-      System.err.println("Error: toXDFFile method hash trouble writing to "+ filename + " for writing.");
+      Log.error("Error: toXDFFile method hash trouble writing to "+ filename + " for writing.");
     }
 
   }
@@ -343,10 +343,10 @@ public abstract class BaseObject implements Serializable {
   }
 
   /** Write this object and all the objects it owns to the supplied
-      OutputStream object as XDF. Supplying a populated XMLDeclAttributes 
+      OutputStream object as XDF. Supplying a populated XMLDeclAttributes
       Hashtable will result in the xml declaration being written at the
-      begining of the outputstream (so when you do this, you will 
-      get well-formmed XML output for ANY object). For obvious reasons, only 
+      begining of the outputstream (so when you do this, you will
+      get well-formmed XML output for ANY object). For obvious reasons, only
       Structure objects will create *valid XDF* output.
   */
   public void toXDFOutputStream (
@@ -372,8 +372,8 @@ public abstract class BaseObject implements Serializable {
         indent = "";
         writeXMLDeclToOutputStream(outputstream, XMLDeclAttribs);
     } else {
-       System.err.println("Warning: XMLDeclAttribs NOT currently supported.");
-    } 
+       Log.warn("Warning: XMLDeclAttribs NOT currently supported.");
+    }
 
     // 1. open this node, print its simple XML attributes
     if (nodeNameString != null) {
@@ -467,7 +467,7 @@ public abstract class BaseObject implements Serializable {
           }
         } else {
           // error: weird type, actually shouldnt occur. Is this needed??
-          System.err.println("Weird error: unknown XML attribute type for item:"+item);
+          Log.error("Weird error: unknown XML attribute type for item:"+item);
         }
 
       }
@@ -514,23 +514,23 @@ public abstract class BaseObject implements Serializable {
 
   }
 
-  /** A different invokation style for writing this object out to 
-      the indicated OutputStream. 
+  /** A different invokation style for writing this object out to
+      the indicated OutputStream.
   */
-  public void toXDFOutputStream ( OutputStream outputstream, 
-                                  Hashtable XMLDeclAttribs, 
+  public void toXDFOutputStream ( OutputStream outputstream,
+                                  Hashtable XMLDeclAttribs,
                                   String indent
                                 )
   {
      toXDFOutputStream(outputstream, XMLDeclAttribs, indent, false, null, null);
   }
 
-  /** A different invokation style for writing this object out to 
-      the indicated OutputStream. 
+  /** A different invokation style for writing this object out to
+      the indicated OutputStream.
   */
   public void toXDFOutputStream (OutputStream outputstream, Hashtable XMLDeclAttribs)
   {
-     toXDFOutputStream(outputstream, XMLDeclAttribs, sPrettyXDFOutputIndentation, 
+     toXDFOutputStream(outputstream, XMLDeclAttribs, sPrettyXDFOutputIndentation,
                        false, null, null);
   }
 
@@ -548,8 +548,8 @@ public abstract class BaseObject implements Serializable {
   // PROTECTED Methods
   //
 
-  /** A little convience method to save coding time elsewhere. 
-      This method initializes the XDF attributes of an object from a 
+  /** A little convience method to save coding time elsewhere.
+      This method initializes the XDF attributes of an object from a
       passed Hashtable.
       Hashtable key/value pairs coorespond to the class XDF attribute
       names and their desired values.
@@ -575,52 +575,53 @@ public abstract class BaseObject implements Serializable {
 
   }
 
-  /** A little convience method to save coding time elsewhere. 
-     Pass in an object to be removed from the indicated list. 
+  /** A little convience method to save coding time elsewhere.
+     Pass in an object to be removed from the indicated list.
+     @return: true on success, false on failure
   */
   protected boolean removeFromList ( Object what, List fromList, String listName ) {
     if (fromList !=null) {
       if ( what !=null) {
         int index = fromList.indexOf(what);
-        if (index !=-1) {
+        if (index !=-1) {  //object to be removed is found in the list
           fromList.remove(index);
           return true;
         }
-        else {
-          System.err.println("Error: can't find object in" + listName + 
+        else {  //cant find the object in the list
+          Log.warn("warn: can't find object in" + listName +
                              ", ignoring remove");
           return false;
-
         }
       }
-      else {
-        System.err.println("Error: object to remove is null");
+      else {  //object to remove is null
+        Log.error("Error: object to remove is null");
         return false;
       }
     }
-    else {
-      System.err.println("Error: Passed list to remove from is null, no object to remove");
+    else {  //the list to remove from is null
+      Log.error("Error: Passed list to remove from is null, no object to remove");
       return false;
     }
   }
 
-  /** A little convience method to save coding time elsewhere. 
-      Another way to remove an object from a list. Pass in index of 
-      the object to be removed. 
+  /** A little convience method to save coding time elsewhere.
+      Another way to remove an object from a list. Pass in index of
+      the object to be removed.
+      @return: true on success, false on failure
   */
   protected boolean removeFromList(int listIndex, List fromList, String listName ) {
     if (fromList !=null) {
-      if ( (listIndex >=0) && (listIndex < fromList.size())) {
+      if ( (listIndex >=0) && (listIndex < fromList.size())) { //valid index number
         fromList.remove(listIndex);
         return true;
       }
-      else {
-        System.err.println("Error: passed index out of range.");
+      else { //invalid index number
+        Log.error("Error: passed index out of range.");
         return false;
       }
     }
-    else {
-      System.err.println("Passed list to remove from is null, no object to remove.");
+    else {  //list to remove from is null
+      Log.error("Passed list to remove from is null, no object to remove.");
       return false;
     }
   }
@@ -629,22 +630,22 @@ public abstract class BaseObject implements Serializable {
   // PRIVATE Methods
   //
 
-  /** FILL IN 
+  /** FILL IN
   */
   private void dealWithOpeningGroupNodes (BaseObject obj, OutputStream o, String indent) {
 
     // fill in later
-    System.err.println("ERROR: dealWithOpeningGroupNodes called but method is empty!");
+    Log.error("ERROR: dealWithOpeningGroupNodes called but method is empty!");
   }
 
-  /** FILL IN 
+  /** FILL IN
   */
   private void dealWithClosingGroupNodes (BaseObject obj, OutputStream o, String indent) {
     // fill in later
-    System.err.println("ERROR: dealWithClosingGroupNodes called but method is empty!");
+    Log.error("ERROR: dealWithClosingGroupNodes called but method is empty!");
   }
 
-  /** Basically this rearranges XMLAttribute information into a more convient 
+  /** Basically this rearranges XMLAttribute information into a more convient
       order for the toXDFOutputstream method.
   */
   private Hashtable getXMLInfo () {
@@ -685,9 +686,9 @@ public abstract class BaseObject implements Serializable {
     return xmlInfo;
   }
 
- /** Write the XML Declaration to the indicated OutputStream. 
+ /** Write the XML Declaration to the indicated OutputStream.
   */
-  private void writeXMLDeclToOutputStream ( OutputStream outputstream, 
+  private void writeXMLDeclToOutputStream ( OutputStream outputstream,
                                             Hashtable XMLDeclAttribs
                                           )
   {
@@ -703,10 +704,10 @@ public abstract class BaseObject implements Serializable {
       writeOut(outputstream, " " + (String) key + "=\"" + XMLDeclAttribs.get((String) key) + "\"");
     }
     writeOut(outputstream, " ?>");
-    if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE); 
+    if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
 
-    // print the DOCTYPE DECL IF its a structure node 
-    if(classXDFNodeName != null && classXDFNodeName.equals(sXDFStructureNodeName) ) { 
+    // print the DOCTYPE DECL IF its a structure node
+    if(classXDFNodeName != null && classXDFNodeName.equals(sXDFStructureNodeName) ) {
       writeOut(outputstream, "<!DOCTYPE " + sXDFRootNodeName + " " + sXDFDTDName + ">");
       if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
     }
@@ -720,12 +721,12 @@ public abstract class BaseObject implements Serializable {
     try {
       outputstream.write(msg.getBytes());
     } catch (IOException e) {
-      System.err.println("Error: couldnt open OutputStream for writing");
+      Log.error("Error: couldnt open OutputStream for writing");
     }
 
   }
 
-  // 
+  //
   // Internal Classes
   //
 
@@ -747,33 +748,33 @@ public abstract class BaseObject implements Serializable {
       attribType = strType;
     }
 
-    /** Set the value of this XMLAttribute.  
+    /** Set the value of this XMLAttribute.
     */
     public Object setAttribValue(Object objValue) {
       attribValue = objValue;
       return attribValue;
     }
 
-    /** Set the type of value held by this XMLAttribute.  
+    /** Set the type of value held by this XMLAttribute.
     */
     public String setAttribType(String strType) {
       attribType = strType;
       return attribType;
     }
 
-    /** Get the value of this XMLAttribute. 
+    /** Get the value of this XMLAttribute.
     */
     public Object getAttribValue() {
       return attribValue;
     }
 
-    /** Get the XMLAttribute value type. 
+    /** Get the XMLAttribute value type.
     */
     public String getAttribType() {
       return attribType;
     }
 
-  } // end of internal Class XMLAttribute 
+  } // end of internal Class XMLAttribute
 
 } // end of BaseObject Class
 

@@ -4,10 +4,57 @@ package gov.nasa.gsfc.adc.xdf;
 
 import java.util.*;
 
+// Parameter.java Copyright (C) 2000 Brian Thomas,
+// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+
+/*
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*/
+
+
+
 /**
- * Parameter.java:
+ * Parameter.java: An XDF::Parameter describes a scientific parameter assocated
+ * with the L<XDF::Structure> or L<XDF::Array> that it is contained in.
+ * Parameter is a flexible container for holding what is essentially information
+ * about data but is not needed to read/write/manipulate the data in a
+ *  mathematical sense.
  * @version $Revision$
  */
+
+ /**  Description of class attributes:
+  * name--
+  * The string description (short name) of this object.
+  * description--
+  * the string description (long name) of this object.
+  * paramId--
+  * a string holding the param Id of this object.
+  * paramIdRef--
+  * a  string holding the parameter id reference to another parameter.
+  * datatype--
+  * holds object reference to a single datatype (L<XDF::DataFormat>) object for this axis.
+  * units--
+  * reference of the L<XDF::Units> object of this parameter. The XDF::Units object
+  * is used to hold the XDF::Unit objects.
+  * noteList--
+  * list reference to the L<XDF::Note> objects held within this parameter.
+  * valueList--
+  * list reference to the L<XDF::Value> objects held within in this parameter.
+  */
+
 
  public class Parameter extends BaseObject{
 
@@ -45,7 +92,7 @@ import java.util.*;
   private void init()
   {
 
-    classXMLName = "parameter";
+    classXDFNodeName = "parameter";
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
@@ -58,7 +105,7 @@ import java.util.*;
     attribOrder.add(0,"description");
     attribOrder.add(0,"name");
 
-
+     //set up the attribute hashtable key with the default initial value
     attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("units", new XMLAttribute(null, Constants.OBJECT_TYPE));
@@ -74,83 +121,128 @@ import java.util.*;
   //Get/Set Methods
   //
 
+  /**setName: set the *name* attribute
+   * @return: the current *name* attribute
+   */
   public String setName (String strName)
   {
     return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
 
   }
 
+   /**getName
+   * @return: the current *name* attribute
+   */
   public String getName()
   {
     return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
   }
 
+   /**setDescription: set the *description* attribute
+   * @return: the current *description* attribute
+   */
   public String setDescription (String strDesc)
   {
     return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
 
   }
 
+  /**getDescription
+   * @return: the current *description* attribute
+   */
   public String getDescription() {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
   }
 
-
+  /**setParamId: set the *paramId* attribute
+   * @return: the current *paramId* attribute
+   */
   public String setParamId (String strParam)
   {
     return (String) ((XMLAttribute) attribHash.get("paramId")).setAttribValue(strParam);
 
   }
-
+  /**getParamId
+   * @return: the current *paramId* attribute
+   */
   public String getParamId()
   {
     return (String) ((XMLAttribute) attribHash.get("paramId")).getAttribValue();
   }
 
+  /**setParamIdRef: set the *paramIdRef* attribute
+   * @return: the current *paramIdRef* attribute
+   */
   public String setParamIdRef (String strParam)
   {
     return (String) ((XMLAttribute) attribHash.get("paramIdRef")).setAttribValue(strParam);
 
   }
 
+  /**getParamIdRef
+   * @return: the current *paramIdRef* attribute
+   */
   public String getParamIdRef()
   {
     return (String) ((XMLAttribute) attribHash.get("paramIdRef")).getAttribValue();
   }
 
+  /**setUnits: set the *units* attribute
+   * @return: the current *units* attribute
+   */
   public Units setUnits (Units units)
   {
     return (Units) ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
-
   }
 
+  /**getUnits
+   * @return: the current *units* attribute
+   */
   public Units getUnits()
   {
     return (Units) ((XMLAttribute) attribHash.get("units")).getAttribValue();
   }
 
+  /**setDatatype: set the *datatype* attribute
+   * @return: the current *datatype* attribute
+   */
   public DataFormat setDatatype(DataFormat datatype)
   {
     return (DataFormat) ((XMLAttribute) attribHash.get("datatype")).setAttribValue(datatype);
   }
 
+  /**getDatatype
+   * @return: the current *datatype* attribute
+   */
   public DataFormat getDatatype()
   {
     return (DataFormat) ((XMLAttribute) attribHash.get("datatype")).getAttribValue();
   }
 
+  /**setValueList: set the *valueList* attribute
+   * @return: the current *valueList* attribute
+   */
   public List setValueList(List value) {
     return (List)((XMLAttribute) attribHash.get("valueList")).setAttribValue(value);
   }
 
+  /**getValueList
+   * @return: the current *valueList* attribute
+   */
   public List getValueList() {
     return (List) ((XMLAttribute) attribHash.get("valueList")).getAttribValue();
   }
 
+  /**setNoteList: set the *noteList* attribute
+   * @return: the current *noteList* attribute
+   */
   public List setNoteList(List note) {
     return (List)((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
   }
 
+  /**getNoteList
+   * @return: the current *noteList* attribute
+   */
   public List getNoteList() {
     return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
   }
@@ -159,15 +251,22 @@ import java.util.*;
   //Other PUBLIC Methods
   //
 
-    /** addValue: add a value to this object
-    */
+  /** addValue: insert an XDF::Value object into the valueList
+   * @param: XDF::Value
+   * @return: an XDF::Value object on success, null on failure
+   */
   public Value addValue(Value v) {
+    if (v == null) {
+      Log.warn("in Parameter.addValue(), the Value passed in is null");
+      return null;
+    }
     getValueList().add(v);
     return v;
   }
 
-  /**removeValue
-   * pass in Value
+  /**removeValue: removes an XDF::Value from the list of values in this Parameter object
+   * @param: Value to be removed
+   * @return: true on success, false on failure
    */
    public boolean removeValue(Value what) {
      return removeFromList(what, getValueList(), "valueList");
@@ -175,12 +274,12 @@ import java.util.*;
 
 
 
-  /**removeValue
-   * pass in index
-   * function overload
+  /**removeValue: removes an XDF::Value from the list of values in this Parameter object
+   * @param: list index number
+   * @return: true on success, false on failure
    */
-  public boolean removeValue(int what) {
-     return removeFromList(what, getValueList(), "valueList");
+  public boolean removeValue(int index) {
+     return removeFromList(index, getValueList(), "valueList");
   }
 
   /**getValues: A convinience methods.  returns a list of values in this parameter
@@ -189,15 +288,22 @@ import java.util.*;
     return getValueList();
   }
 
-  /** addNote
+ /** addNote: insert an XDF::Note object into the list of notes in this Parameter object
+   * @param: XDF::Note
+   * @return: an XDF::Note object on success, null on failure
    */
   public Note addNote(Note n) {
+    if (n == null) {
+      Log.warn("in Parameter.addNote(), the Note passed in is null");
+      return null;
+    }
     getNoteList().add(n);
     return n;
   }
 
-  /**removeNote
-   * pass in Note
+  /**removeNote: removes an XDF::Note object from the list of notes in this Parameter object
+   * @param: Note to be removed
+   * @return: true on success, false on failure
    */
    public boolean removeNote(Note what) {
      return removeFromList(what, getNoteList(), "noteList");
@@ -205,38 +311,46 @@ import java.util.*;
 
 
 
-  /**removeNote
-   * pass in index
-   * function overload
+   /**removeNote: removes an XDF::Note object from the list of notes in this Parameter object
+   * @param: list index number
+   * @return: true on success, false on failure
    */
-  public boolean removeNote(int what) {
-     return removeFromList(what, getNoteList(), "noteList");
+  public boolean removeNote(int index) {
+     return removeFromList(index, getNoteList(), "noteList");
   }
 
-  /**getNotes
+  /**getNotes: Convenience method which returns a list of the notes held by
+   * this object.
    */
   public List getNotes() {
     return getNoteList();
   }
 
-  /**addUnit
+  /**addUnit: Insert an XDF::Unit object into the L<XDF::Units> object
+   * held in this object.
+   * @param: Unit to be added
+   * @return: an XDF::Unit object if successfull, null if not.
    */
   public Unit addUnit(Unit unit) {
     return  getUnits().addUnit(unit);
   }
 
-  /**removeUnit
-   * pass in Unit
+  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
+   * this object
+   * @param: Unit to be removed
+   * @return: true if successful, false if not
    */
   public boolean removeUnit(Unit what) {
     return getUnits().removeUnit(what);
   }
 
-  /**removeUnit
-   * pass in index
+  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
+   * this object
+   * @param: list index number
+   * @return: true if successful, false if not
    */
-  public boolean removeUnit(int what) {
-    return getUnits().removeUnit(what);
+  public boolean removeUnit(int index) {
+    return getUnits().removeUnit(index);
   }
 
  }
