@@ -106,26 +106,42 @@ mathematically handled followining to MathML methods.
      that familiar to old HP users: RPN ("Reverse Polish Notation").
      For example the algorithm " 10 ^ (50 * ln (45 x + 89)) " would be written 
      <conversion>
-       <multiply>45</multiply>
-       <add>89</add>
+       <multiply value="45"/>
+       <add value="89"/>
        <naturalLogarithm/>
-       <multiply>50</multiply>
-       <exponentOn>10</exponentOn>
+       <multiply value="50"/>
+       <exponentOn value="10"/>
+       <exponent value="3.0"/>
      </conversion>
   -->
-<!ELEMENT conversion (multiply | add | naturalLogarithm | logarithmBase | exponent | exponentOn)+>
+<!ELEMENT conversion (multiply | add | naturalLogarithm | logarithm | exponent | exponentOn)+>
 <!--number to multiply the data value  (cx).-->
-<!ELEMENT multiply (#PCDATA)>
+<!ELEMENT multiply EMPTY>
+<!ATTLIST multiply
+	value NMTOKEN #REQUIRED
+>
 <!--number to add to data (a constant offset: x + c).-->
-<!ELEMENT add (#PCDATA)>
+<!ELEMENT add EMPTY>
+<!ATTLIST add
+	value NMTOKEN #REQUIRED
+>
 <!--take the natural log by value here ln(x).-->
 <!ELEMENT naturalLogarithm EMPTY>
 <!--take the log with base set by value here (e.g. "2" means log2(x)).-->
-<!ELEMENT logarithmBase (#PCDATA)>
+<!ELEMENT logarithm EMPTY>
+<!ATTLIST logarithm
+	base NMTOKEN #REQUIRED
+>
 <!--take prior value to power with exponent set by value here (x^y).-->
-<!ELEMENT exponent (#PCDATA)>
+<!ELEMENT exponent EMPTY>
+<!ATTLIST exponent
+	value NMTOKEN #REQUIRED
+>
 <!-- take prior value as exponent on provided constant y (y^x)-->
-<!ELEMENT exponentOn (#PCDATA)>
+<!ELEMENT exponentOn EMPTY>
+<!ATTLIST exponentOn 
+	value NMTOKEN #REQUIRED
+>
 
 <!ELEMENT units (unit+)>
 <!ATTLIST units
