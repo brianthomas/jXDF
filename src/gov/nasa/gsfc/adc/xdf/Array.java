@@ -111,7 +111,7 @@ import java.util.Vector;
 
   /**the list of locators whose parentArray is this Array object
    */
-  protected List locators = new Vector();
+  protected List locatorList = new Vector();
   protected boolean hasFieldAxis = false;
 
   //
@@ -322,7 +322,7 @@ import java.util.Vector;
       Locator locatorObj = new Locator(this);
 
       //add this locator to the list of locators this Array object monitors
-      locators.add(locatorObj);
+      locatorList.add(locatorObj);
       return locatorObj;
    }
 
@@ -357,27 +357,24 @@ import java.util.Vector;
 
      getAxisList().add(axis);
 
-
-     //update the locators that is related to this Array object
-     int stop = locators.size();
-     for (int i = 0; i < stop; i++) {
-       ((Locator) locators.get(i)).addAxis(axis);
-     }
-
      updateNotesLocationOrder(); // reset to the current order of the axes
+     updateChildLocators(axis, "add");
+
      return axis;
   }
 
    /**removes a Axis object from axisList
-   * @param what - Axis to be removed
+   * @param axisObj - Axis to be removed
    * @return true on success and decrement the dimension,
    *          false on failure and keep the dimension unchanged
    * double check the implication on datacube
    */
-  public boolean removeAxis(Axis what) {
-    boolean isRemoveSuccess = removeFromList(what, getAxisList(), "axisList");
-    if (isRemoveSuccess)   //remove successful
+  public boolean removeAxis(Axis axisObj) {
+    boolean isRemoveSuccess = removeFromList(axisObj, getAxisList(), "axisList");
+    if (isRemoveSuccess) {   //remove successful
        getDataCube().decrementDimension();   //decrease the dimension by 1
+       updateChildLocators(axisObj, "remove");
+    }
     return isRemoveSuccess;
   }
 
@@ -388,8 +385,10 @@ import java.util.Vector;
    */
   public boolean removeAxis(int index) {
     boolean isRemoveSuccess = removeFromList(index, getAxisList(), "axisList");
-    if (isRemoveSuccess)   //remove successful
+    if (isRemoveSuccess) {  //remove successful
        getDataCube().decrementDimension();   //decrease the dimension by 1
+       updateChildLocators(index, "remove");
+    }
     return isRemoveSuccess;
   }
 
@@ -507,7 +506,7 @@ import java.util.Vector;
   /** Append the string value onto the requested datacell
    * (via DataCube LOCATOR REF).
    */
-  public void appendData (Locator locator, String strValue) throws SetDataException{
+  public void appendData (Locator locator, String strValue) throws SetDataException {
      getDataCube().appendData(locator, strValue);
   }
 
@@ -630,11 +629,7 @@ import java.util.Vector;
     }
     hasFieldAxis = true;
 
-    //update the locators that are related to this Array object
-    int stop = locators.size();
-     for (int i = 0; i < stop; i++) {
-       ((Locator) locators.get(i)).addAxis(fieldAxis);
-     }
+    updateChildLocators(fieldAxis, "add");
 
     //array doenst hold a dataformat anymore
     //each field along the fieldAxis should have dataformat
@@ -711,7 +706,7 @@ import java.util.Vector;
    * 1- check to see that it has an id
    * 2- we SHOULD also check that the id is unique but DONT currently.
   */
-  private boolean canAddAxisObjToArray(AxisInterface axisToAdd) {
+  private boolean canAddAxisObjToArray (AxisInterface axisToAdd) {
     if (axisToAdd.getAxisId() == null) {
       Log.warnln("Warning: Can't add Axis Object without axisId attribute defined");
       return false;
@@ -719,6 +714,33 @@ import java.util.Vector;
     return true;
   }
 
+   // force an update of all child locator objects. We do this to 
+   // insure that when an axis is removed/added the locators reflect
+   // the new geometry of the array.
+   // 
+   private void updateChildLocators (AxisInterface axis, String action) {
+
+      Iterator iter = locatorList.iterator();
+      while (iter.hasNext() ) {
+          Locator childLocator = (Locator) iter.next();
+          if (action.equals("add"))
+             childLocator.addAxis(axis);
+          else
+             childLocator.removeAxis(axis);
+      }
+
+   }
+
+   private void updateChildLocators (int index, String action) {
+      Iterator iter = locatorList.iterator();
+      while (iter.hasNext() ) {
+          Locator childLocator = (Locator) iter.next();
+          if (action.equals("add"))
+             Log.errorln("This method cant add an axis!");
+          else
+             childLocator.removeAxis(index);
+      }
+   }
 
    // Need to do this operation after every axis add
    // reset to the current order of the axes.
@@ -748,7 +770,7 @@ import java.util.Vector;
     cloneObj.setDataCube((DataCube) this.getDataCube().clone());
 
     //there are no locators that are related to the cloned Array object
-    cloneObj.locators = new Vector();
+    cloneObj.locatorList = new Vector();
 
     //set the parentArray correctly for child object
     cloneObj.getDataCube().setParentArray(cloneObj);
@@ -772,6 +794,10 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.20  2001/01/22 22:09:25  thomas
+  * Added updateChildLocators method. Fixed missing
+  * fctnality of removingAxis then updating locators. -b.t.
+  *
   * Revision 1.19  2000/11/27 16:57:44  thomas
   * Made init method protected so that extending
   * Dataformats may make use of them. -b.t.
