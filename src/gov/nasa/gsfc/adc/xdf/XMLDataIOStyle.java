@@ -42,42 +42,44 @@
   
   public abstract class XMLDataIOStyle extends BaseObject {
   
-     //
-     //Fields
-     //
-     private static final String READ_NODE_NAME = "dataStyle";
+    //
+    //Fields
+    //
+    private static final String READ_NODE_NAME = "dataStyle";
   
-     /* XML attribute names */
-     private static final String ENDIAN_XML_ATTRIBUTE_NAME = new String("endian");
-     private static final String ENCODING_XML_ATTRIBUTE_NAME = new String("encoding");
-     private static final String ID_XML_ATTRIBUTE_NAME = new String("dataStyleId");
-     private static final String IDREF_XML_ATTRIBUTE_NAME = new String("dataStyleIdRef");
+    /* XML attribute names */
+    private static final String ENDIAN_XML_ATTRIBUTE_NAME = new String("endian");
+    private static final String ENCODING_XML_ATTRIBUTE_NAME = new String("encoding");
+    private static final String ID_XML_ATTRIBUTE_NAME = new String("dataStyleId");
+    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("dataStyleIdRef");
   
-     protected List axesIOList = Collections.synchronizedList(new ArrayList());
+    protected List axesIOList = Collections.synchronizedList(new ArrayList());
   
      /* attribute defaults */
-     public final static String DEFAULT_ENCODING = Constants.IO_ENCODING_ISO_8859_1;
-     public final static String DEFAULT_ENDIAN = Constants.BIG_ENDIAN;
+    public final static String DEFAULT_ENCODING = Constants.IO_ENCODING_ISO_8859_1;
+    public final static String DEFAULT_ENDIAN = Constants.BIG_ENDIAN;
   
-     /* other */
-     protected String UntaggedInstructionNodeName = "for";
-     protected String UntaggedInstructionAxisIdRefName = "axisIdRef";
-     protected Array parentArray;
+    /* other */
+    protected String UntaggedInstructionNodeName = "for";
+    protected String UntaggedInstructionAxisIdRefName = "axisIdRef";
+    protected Array parentArray;
   
+    //
+    // Constructors
+    //
+
     //no-arg constructor
     public XMLDataIOStyle (Array parentArray)
     {
-       this.parentArray = parentArray;
-       init();
+         init(parentArray);
     }
   
+    // construct with initial attribute hash table
     public XMLDataIOStyle (Array parentArray, Hashtable InitXDFAttributeTable)
     {
   
-        this.parentArray = parentArray;
-  
         // init the XML attributes (to defaults)
-        init();
+        init(parentArray);
   
         // init the value of selected XML attributes to HashTable values
         hashtableInitXDFAttributes(InitXDFAttributeTable);
@@ -296,12 +298,14 @@
      /** init -- special method used by constructor methods to
       *  convienently build the XML attribute list for a given class.
       */
-     protected void init()
+     protected void init(Array owner)
      {
   
         super.init();
   
         classXDFNodeName = "read";
+
+        parentArray = owner;
        
         // order matters! these are in *reverse* order of their
         // occurence in the XDF DTD

@@ -60,11 +60,13 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   public TaggedXMLDataIOStyle(Array parentArray) 
   {
      super(parentArray);
+     init();
   }
 
   public TaggedXMLDataIOStyle(Array parentArray, Hashtable InitXDFAttributeTable) 
   {
      super(parentArray,InitXDFAttributeTable);
+     init();
   }
   
   //
@@ -291,6 +293,14 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
       needToCheckAxisOrder = true;
 
       return tagName;
+   }
+
+   protected void init()
+   {
+
+//      super.init(owner);// no
+
+      classXDFNodeName = "tagged";
    }
 
    //

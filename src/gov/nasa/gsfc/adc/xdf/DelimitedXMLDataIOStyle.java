@@ -57,6 +57,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    public DelimitedXMLDataIOStyle (Array parentArray)
    {
       super(parentArray);
+      init();
    }
 
    /**  This constructor takes a Java Hashtable as an initializer of
@@ -66,7 +67,14 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
     */
    public DelimitedXMLDataIOStyle ( Array parentArray, Hashtable InitXDFAttributeTable )
    {
-      super(parentArray, InitXDFAttributeTable);
+
+        super(parentArray);
+
+        // init the XML attributes (to defaults)
+        init();
+
+        // init the value of selected XML attributes to HashTable values
+        hashtableInitXDFAttributes(InitXDFAttributeTable);
    }
 
   //
@@ -227,7 +235,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    protected void init()
    {
 
-      super.init(); 
+//      super.init(owner);// no
 
       classXDFNodeName = "delimited";
 

@@ -48,7 +48,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   protected List formatCommandList = Collections.synchronizedList(new ArrayList());
 
   //
-  //constructor and related methods
+  //Constructor and related methods
   //
 
   /** constructor
@@ -56,6 +56,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   public FormattedXMLDataIOStyle (Array parentArray)
   {
      super(parentArray);
+     init();
   }
 
   /**  This constructor takes a Java Hashtable as an initializer of
@@ -66,6 +67,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   public FormattedXMLDataIOStyle ( Array parentArray, Hashtable InitXDFAttributeTable )
   {
      super(parentArray,InitXDFAttributeTable);
+     init();
   }
 
   //
@@ -141,6 +143,14 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   //
   /**specific tailoring when writing out
    */
+
+   protected void init()
+   {
+
+//      super.init(owner);// no
+
+      classXDFNodeName = "fixed";
+   }
 
 /*
   read SECTION for formatted data now looks like:
