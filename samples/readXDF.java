@@ -1,5 +1,5 @@
 
-import gov.nasa.gsfc.adc.xdf.Structure;
+import gov.nasa.gsfc.adc.xdf.XDF;
 import gov.nasa.gsfc.adc.xdf.Specification;
 import gov.nasa.gsfc.adc.xdf.Reader;
 import gov.nasa.gsfc.adc.xdf.AxisInterface;
@@ -18,10 +18,10 @@ public class readXDF {
   public static void main(String[] argv) {
 
     // declare the structure
-    Structure s = new Structure();
+    XDF s = new XDF();
     Reader r = new Reader();
 
-    r.setReaderStructureObj(s);
+    r.setReaderXDFStructureObj(s);
 
     // set a few attributes
     s.setName("First structure");
@@ -53,8 +53,8 @@ public class readXDF {
 
     Locator locator = arrayObj.createLocator();
     try {
-      locator.setAxisIndex((AxisInterface) arrayObj.getAxisList().get(0), 1);
-      locator.setAxisIndex((AxisInterface) arrayObj.getAxisList().get(1), 2);
+      locator.setAxisIndex((AxisInterface) arrayObj.getAxes().get(0), 1);
+      locator.setAxisIndex((AxisInterface) arrayObj.getAxes().get(1), 2);
     } catch (AxisLocationOutOfBoundsException e) {
     }
  
@@ -65,7 +65,10 @@ public class readXDF {
       value = new String("");
     }
 
-    s.toXMLOutputStream(System.out);
+    try {
+       s.toXMLOutputStream(System.out);
+    } catch (java.io.IOException e ) { }
+
     System.out.println("Array 0 data cell (1,2):"+value);
 
   }
