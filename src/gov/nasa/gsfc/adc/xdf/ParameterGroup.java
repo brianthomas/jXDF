@@ -86,7 +86,17 @@ import java.util.HashSet;
     //
 
     private void init () {
+
        classXDFNodeName = "parameterGroup";
+
+       // order matters! these are in *reverse* order of their
+       // occurence in the XDF DTD
+       attribOrder.add(0,"description");
+       attribOrder.add(0,"name");
+
+       attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+
     }
 
  }
