@@ -894,9 +894,7 @@ Log.errorln(" TValue:"+valueString);
              if (thisCommand instanceof ReadCellFormattedIOCmd) // ReadCell ==> read some data
              {
 
-Log.error("currentDataFormat: "+currentDataFormat + " ");
                  DataFormat formatObj = dataFormat[currentDataFormat];
-Log.errorln("FormatObject: "+formatObj.getClass());
                  int endDataPosition = dataPosition + formatObj.numOfBytes();
 
                  // add in our object
@@ -2787,6 +2785,9 @@ Log.errorln("FormatObject: "+formatObj.getClass());
 /* Modification History:
  *
  * $Log$
+ * Revision 1.23  2001/01/17 18:28:46  thomas
+ * removed unneeded debug comments. -b.t.
+ *
  * Revision 1.22  2001/01/17 18:08:25  thomas
  * Minor bug, changed exponential node name
  * from "exponent" to "exponential". -b.t.
