@@ -156,7 +156,7 @@ import java.io.*;
   }
 
   /** getClassNoUnitChildNodeName
-   * return: Name of the child node to print in the toXMLFileHandle method when
+   * return: Name of the child node to print in the toXDFOutputStream method when
    * an  XDF::Units object contains NO XDF::Unit child objects.
    */
   public String getClassNoUnitChildName() {
@@ -232,15 +232,14 @@ import java.io.*;
   public void toXDFOutputStream  (
                                    OutputStream outputstream,
                                    Hashtable XMLDeclAttribs,
-                                   String indent,
-                                   boolean dontCloseNode
+                                   String indent
                                  )
 
   {
     super.toXDFOutputStream( outputstream,
                              XMLDeclAttribs,
                              indent,
-                             dontCloseNode,
+                             false,
                              XDFNodeName,
                              classNoUnitChildNodeName
                            );
@@ -252,6 +251,9 @@ import java.io.*;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/10/27 21:22:48  kelly
+ * fixed bug in *toXDF*  -k.z.
+ *
  * Revision 1.3  2000/10/11 14:37:17  kelly
  * complete value(), toXDFOutputStream(), added more documentation.
  * this file is considered done  -k.z.
