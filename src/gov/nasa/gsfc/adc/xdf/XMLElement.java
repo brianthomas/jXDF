@@ -25,6 +25,16 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+import java.io.OutputStream;
+
+//import org.apache.crimson.tree.ElementNode;
+import org.xml.sax.AttributeList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /** 
  */
 
@@ -33,26 +43,84 @@ public class XMLElement extends BaseObjectWithXMLElements {
    // 
    // Fields
    //
-   private String myCDATA;
+   private Hashtable attribHash = new Hashtable();
+   private String myTagName;
+   private StringBuffer myCDATA;
+
+   private List childNodeList = (List) new Vector ();
 
    //
    // Constructors
    //
 
-   //
-   //no-arg constructor
-   //
-    public XMLElement () {
+   //public XMLElement (String tagName, Document ownerDoc) { }
+
+   public XMLElement (String tagName) {
       init();
+      setTagName(tagName);
    }
+
    //
-   // Public Methods
+   // Get/Set Methods 
    //
+
+   public void setCData(String text) {
+      myCDATA.delete(0,myCDATA.length());
+      myCDATA.append(text);
+   }
 
    /** get the *value* (PCDATA) attribute.
    */
    public String getCData() {
-      return myCDATA;
+      return myCDATA.toString();
+   }
+
+   /**
+    */
+   public String getTagName( ) {
+      return myTagName;
+   }
+
+   //
+   // Other Public Methods
+   //
+
+   /**
+    */
+   public void appendCData (String text) {
+      myCDATA.append(text);
+   }
+
+   public void addAttribute (String name, String value) {
+      attribHash.put(name, value);
+   }
+
+   public void removeAttribute ( String name ) {
+      attribHash.remove(name);
+   }
+
+   public void setXMLAttributes (AttributeList attribs) { 
+
+   }
+
+   /**
+    */
+   public void toXMLOutputStream (
+                                   OutputStream outputstream,
+                                   Hashtable XMLDeclAttribs,
+                                   String indent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
+                                )
+   {
+
+
+      String nodeNameString = this.getTagName();
+      if (newNodeNameString != null) nodeNameString = newNodeNameString;
+
+      super.toXMLOutputStream ( outputstream, new Hashtable(), indent,
+                                dontCloseNode, nodeNameString, noChildObjectNodeName);
    }
 
    //
@@ -62,19 +130,34 @@ public class XMLElement extends BaseObjectWithXMLElements {
    /** A special method used by constructor methods to
        convienently build the XML attribute list for a given class.
     */
-   protected void init()
+   protected void init( )
    {
 
-       super.init();
+       resetXMLAttributes();
        classXDFNodeName = "";
 
    }
 
 
+   //
+   // Private Methods
+   //
+
+   private void setTagName (String name) {
+      myTagName = name;
+   }
+
+
 }
+
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/05/10 21:46:20  thomas
+ * more code, but this class still unfinished.
+ * It looks like it will be a pain to get this
+ * to conform to XML::DOM::Element.
+ *
  * Revision 1.1  2001/05/04 20:05:53  thomas
  * Initial version
  *
