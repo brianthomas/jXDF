@@ -152,7 +152,8 @@ implements LexicalHandler
     private ArrayList NoteLocatorOrder = new ArrayList();
 
     // Keeping track of working valueList node (attributes) settings
-    private ValueList CurrentValueList; // = new Hashtable();
+    private ValueList CurrentValueList;
+    private String valueListString;
 
     // Data writing stuff
     private int CurrentDataTagLevel = 0; // how nested we are within d0/d1/d2 data tags
@@ -4901,135 +4902,12 @@ while (iter.hasNext()) {
        public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
        throws SAXException
        {
-
-          // IF we get here, we have the delmited case for populating
-          // a value list.
-
-          // 1. set up information we need
-          // our string that we will parse
-          String valueListString = new String (buf, offset, len);
-          ValueList thisValueList = CurrentValueList;
-
-          // safety checks 
-          if ( !thisValueList.getIsDelimitedCase() )
-          {
-             String noWhiteSpaceList = valueListString.trim();
-             if (noWhiteSpaceList.length() > 0) { 
-                Log.errorln("Got non-whitespace character data for valueList with size attribute! Ignoring.");
-                return;
-             } else {
-                Log.warnln("Got size attribute set on delimited valueList. Ignoring attribute.");
-             }
-          }
-
-          // 2. reconsitute information we need
-          String parentNodeName = thisValueList.getParentNodeName();
-
-          // 3. add these values to the lookup table, if the original valueList had an ID
-          String valueListId = thisValueList.getValueListId();
-          if (valueListId != null) {
-
-              // a warning check, just in case 
-              if (ValueListObj.containsKey(valueListId))
-                 Log.warnln("More than one valueList node with valueListId=\""+valueListId+"\", using latest node." );
-
-              // add the valueList array into the list of valueList objects
-              ValueListObj.put(valueListId, thisValueList);
-
-          }
-
-          //  4. If there is a reference object, clone it to get
-          //     the new valueList
-          String valueListIdRef = thisValueList.getValueListIdRef();
-          if (valueListIdRef != null) {
-
-             if (ValueListObj.containsKey(valueListIdRef)) {
-
-                 // Just a simple clone since we have stored the ArrayList rather than the
-                 // ValueList object (which actually doesnt exist. :P
-                 ValueList refValueListObj = (ValueList) ValueListObj.get(valueListIdRef);
-                 try {
-                    thisValueList = (ValueList) refValueListObj.clone();
-                 } catch (java.lang.CloneNotSupportedException e) {
-                    Log.errorln("Weird error, cannot clone valueList object. Aborting read.");
-                    System.exit(-1);
-                 }
-
-// This is missing. Should allow override. 
-// later note to self: Huh??  
-/*
-                 // override attrs with those in passed list
-              //   strValueList.setAttributes(attrs);
-                 // give the clone a unique Id and remove IdRef 
-              //   strValueList.setValueListId(findUniqueIdName(ValueListObj,strValueList.getValueListId()));
-              //   strValueList.setValueListIdRef(null);
-
-                 // add this into the list of valueList objects
-              //   ValueListObj.put(strValueList.getValueListId(), strValueList);
-*/
-
-              } else {
-                 Log.warnln("Error: Reader got an valueList with ValueListIdRef=\""+valueListIdRef+"\" but no previous valueList has that id! Ignoring add valueList request.");
-                 return;
-              }
-          }
-
-          // 5. split up string into Value Objects based on declared delimiter
-          ArrayList myValueList = splitStringIntoValueObjects( valueListString, thisValueList);
-
-          // 6. determine where these values go and then insert them
-          ValueListDelimitedList newValueListObj = new ValueListDelimitedList (myValueList,
-                                                    thisValueList.getDelimiter(),
-                                                    thisValueList.getNoData(),
-                                                    thisValueList.getInfinite(),
-                                                    thisValueList.getInfiniteNegative(),
-                                                    thisValueList.getNotANumber(),
-                                                    thisValueList.getOverflow(),
-                                                    thisValueList.getUnderflow()
-                                                                              );
-
-          if( parentNodeName.equals(XDFNodeName.AXIS) )
-          {
-
-             // get the last axis
-             List axisList = (List) CurrentArray.getAxes();
-             Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-
-             lastAxisObject.addAxisValueList(newValueListObj);
-
-          } 
-           else if( parentNodeName.equals(XDFNodeName.PARAMETER) )
-          {
-
-             LastParameterObject.addValueList( newValueListObj);
-
-          } 
-          else 
-          {
-
-             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST+", Ignoring.");
-          } 
-
-          // now add valueObjects to groups 
-          Iterator iter = myValueList.iterator();
-          while (iter.hasNext())
-          {
-
-             Value newvalue = (Value) iter.next();
-             // add this object to all open value groups
-             Iterator groupIter = CurrentValueGroupList.iterator();
-             while (groupIter.hasNext())
-             {
-                ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
-                newvalue.addToGroup(nextValueGroupObj);
-             }
-          }
-
-          CurrentValueList.setIsDelimitedCase(true); // notify that we did the list 
-
+	   if (valueListString != null)
+	       valueListString += new String (buf, offset, len);
+	   else
+	       valueListString = new String (buf, offset, len);
        }
     }
-
 
     // there is undoubtably some code-reuse spots missed in this function.
     // get it later when Im not being lazy. -b.t.
@@ -5071,8 +4949,94 @@ while (iter.hasNext()) {
           // generate valuelist values from algoritm IF we need to
           // (e.g. values where'nt in a delimited cdata list)
           // check to see if we didnt alrealy parse from a delmited string.
-          if ( thisValueList.getIsDelimitedCase() )
-             return; // we already did the list, leave here 
+          if ( thisValueList.getIsDelimitedCase() ) {
+	      String parentNodeName = thisValueList.getParentNodeName();
+
+	      // add these values to the lookup table, if the original valueList had an ID
+	      String valueListId = thisValueList.getValueListId();
+	      if (valueListId != null) {
+
+		  // a warning check, just in case 
+		  if (ValueListObj.containsKey(valueListId))
+		      Log.warnln("More than one valueList node with valueListId=\""+valueListId+"\", using latest node." );
+
+		  // add the valueList array into the list of valueList objects
+		  ValueListObj.put(valueListId, thisValueList);
+		  
+	      }
+
+	      // If there is a reference object, clone it to get the new valueList
+	      String valueListIdRef = thisValueList.getValueListIdRef();
+	      if (valueListIdRef != null) {
+
+		  if (ValueListObj.containsKey(valueListIdRef)) {
+
+		      // Just a simple clone since we have stored the ArrayList rather than the
+		      // ValueList object (which actually doesnt exist. :P
+		      ValueList refValueListObj = (ValueList) ValueListObj.get(valueListIdRef);
+		      try {
+			  thisValueList = (ValueList) refValueListObj.clone();
+		      } catch (java.lang.CloneNotSupportedException e) {
+			  Log.errorln("Weird error, cannot clone valueList object. Aborting read.");
+			  System.exit(-1);
+		      }
+		      
+		  } else {
+		      Log.warnln("Error: Reader got an valueList with ValueListIdRef=\""+valueListIdRef+"\" but no previous valueList has that id! Ignoring add valueList request.");
+		      return;
+		  }
+	      }
+	      
+	      // split up string into Value Objects based on declared delimiter
+	      ArrayList myValueList = splitStringIntoValueObjects(valueListString, thisValueList);
+
+
+	      // determine where these values go and then insert them
+	      ValueListDelimitedList newValueListObj = new ValueListDelimitedList (myValueList,
+										   thisValueList.getDelimiter(),
+										   thisValueList.getNoData(),
+										   thisValueList.getInfinite(),
+										   thisValueList.getInfiniteNegative(),
+										   thisValueList.getNotANumber(),
+										   thisValueList.getOverflow(),
+										   thisValueList.getUnderflow()
+										   );
+
+	      if( parentNodeName.equals(XDFNodeName.AXIS) )  {
+
+		  // get the last axis
+		  List axisList = (List) CurrentArray.getAxes();
+		  Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+		  
+		  lastAxisObject.addAxisValueList(newValueListObj);
+		  
+	      } else if( parentNodeName.equals(XDFNodeName.PARAMETER) ) {
+
+		  LastParameterObject.addValueList( newValueListObj);
+		  
+	      } else {
+		  Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST+", Ignoring.");
+	      } 
+
+	      // now add valueObjects to groups 
+	      Iterator iter = myValueList.iterator();
+	      while (iter.hasNext()) {
+
+		  Value newvalue = (Value) iter.next();
+		  // add this object to all open value groups
+		  Iterator groupIter = CurrentValueGroupList.iterator();
+		  while (groupIter.hasNext()) {
+		      ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
+		      newvalue.addToGroup(nextValueGroupObj);
+		  }
+	      }
+
+	      //CurrentValueList.setIsDelimitedCase(true); // notify that we did the list 
+	      CurrentValueList = null;
+	      valueListString = null;
+	      return; // done with it
+
+	  }
 
           // 1. grab parent node name
           String parentNodeName = thisValueList.getParentNodeName();
