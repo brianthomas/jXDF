@@ -778,6 +778,7 @@ public class DataCube extends BaseObject {
   
       // List axisList = parentArray.getAxes();
       List axisList = readObj.getIOAxesOrder();
+
       if (axisList == null || axisList.size() == 0) {
 
           // we dont have axes to direct the write?!?. Well, then, we 
@@ -789,6 +790,7 @@ public class DataCube extends BaseObject {
          // writing Data to either the XML file or an Href
          //
 
+         // this should be the FIELD Axis :P
          AxisInterface fastestAxis = (AxisInterface) axisList.get(0);
 
          //stores the NoDataValues for the parentArray,
@@ -1253,14 +1255,8 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
              // outputWriter.write(  ">" + getStringData(locator) + "</" + tag1 + ">");
           }
           catch (NoDataException e) {
-             String noDataString = noDataValues[currentDataFormat];
-             // opps! no data in that location. Print out accordingly
-             // sloppy algorithm as a result of clean up after Kelly 
-             // if (nrofNoDataValues > 1)
-                // noDataString = noDataValues[locator.getAxisIndex(fastestAxis)];
-             // else
-             //   noDataString = noDataValues[0];
 
+             String noDataString = noDataValues[currentDataFormat];
              if (noDataString != null)
              {
                 outputWriter.write(">" + noDataString + "</" + tag1 + ">");
@@ -1852,6 +1848,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.46  2001/09/18 19:35:54  thomas
+  * subtracted unused code
+  *
   * Revision 1.45  2001/09/18 17:42:57  thomas
   * fixes to writing out tagged data, small code clean up
   *
