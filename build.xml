@@ -145,7 +145,11 @@ CVS $Id$
   </target>
 
   <target name="clean">
+    <delete>
+       <fileset dir="test" includes="*.class"/>
+    </delete>
     <delete dir="gov"/>
+    <delete file="xdf-*.jar"/>
     <delete dir="${docApi}"/>
   </target>
 
