@@ -1,0 +1,15 @@
+ # this is a sample of the XDF log configuration file
+ # Output could be either a file for the log messages to write to or
+ # standard System.out, for example
+ # Output=C:/Data/XDF/gov/nasa/gsfc/adc/xdf/XDFLog or
+ # Output=System.out
+
+ Output=System.err
+
+ # four levels of priority, error>warn>debug>info
+ # 0: all levels are printed
+ # 1: priority >=debug are printed
+ # 2: priority >=warn are printed
+ # 3: priority >=error are printed
+
+ Priority=2
