@@ -72,6 +72,7 @@ public class DataCube extends BaseObject {
    private int SHORT_DATA_TYPE = 2;
    private int LONG_DATA_TYPE = 3;
    private int STRING_DATA_TYPE = 4;
+   private int BYTE_DATA_TYPE = 5;
 
    //  to store the n-dimensional data, it is an ArrayList of ArrayList, whose
    //  innermost layer contains two kinds of arrays:
@@ -316,6 +317,29 @@ public class DataCube extends BaseObject {
       }
    
    }
+
+   /** Get byte (1-bit) integer data from a requested datacell. 
+    */
+   public byte getByteData (Locator locator)
+   throws NoDataException
+   {
+
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
+
+      try { 
+         if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
+            throw new NoDataException();  //the location we try to access contains noDataValue
+
+         return java.lang.reflect.Array.getByte(longDataArray.get(longIndex+1), shortIndex);
+      }
+      catch (Exception e) {  //the location we try to access is not allocated,
+        //i.e., no data in the cell
+         throw new NoDataException();
+      }
+
+   }
+
    
    /** Get long (64-bit) integer data from a requested datacell. 
     */
@@ -551,6 +575,38 @@ public class DataCube extends BaseObject {
 
    }
 
+   /** Set the value of the requested datacell. 
+    *  Overwrites existing datacell value if already populated with a value.
+    */
+   public void setData(Locator locator, byte numValue)
+   throws SetDataException
+   {
+
+      // data are stored in a huge 2D array. The long array axis
+      // mirrors all dimensions but the 2nd axis. The 2nd axis gives
+      // the index on the 'short' internal array.
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
+
+      // Bounds checking
+      checkDataArrayBounds(longIndex, shortIndex, BYTE_DATA_TYPE);
+
+      // Set the Data
+      try {
+         byte realValue = 1;
+         //indicate its corresponding datacell holds valid data
+         java.lang.reflect.Array.setByte(longDataArray.get(longIndex), shortIndex, realValue);
+
+         //put data into the requested datacell
+         java.lang.reflect.Array.setByte(longDataArray.get(longIndex+1), shortIndex, numValue);
+         return;
+      }
+      catch (Exception e) {
+         throw new SetDataException();
+      }
+
+   }
+
 
    /** Set the value of the requested datacell. 
     *  Overwrites existing datacell value if already populated with a value.
@@ -584,7 +640,12 @@ public class DataCube extends BaseObject {
 
    }
 
-   protected void basicXMLWriter (
+   //
+   // PROTECTED methods
+   //
+
+
+   protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String strIndent,
                                 boolean dontCloseNode,
@@ -681,7 +742,7 @@ public class DataCube extends BaseObject {
  
           if (hrefObj == null) {
              Log.errorln("Cant write compressed data within the XML file (use href instead for an external file). Aborting write.");
-             return;
+             return nodeName;
           }
 
           // change the data outputWriter to match
@@ -691,7 +752,7 @@ public class DataCube extends BaseObject {
 
              } catch (java.io.IOException e) {
                 Log.errorln("Cant open compressed (GZIP) outputstream to write to an href. Aborting.");
-                return;
+                return nodeName;
              }
           } else if (compress.equals(Constants.DATA_COMPRESSION_ZIP)) {
              dataOutputStream = new ZipOutputStream(dataOutputStream);
@@ -699,11 +760,11 @@ public class DataCube extends BaseObject {
                 ((ZipOutputStream) dataOutputStream).putNextEntry(new ZipEntry(hrefObj.getSystemId())); // write only to the first entry for now 
              } catch (java.io.IOException e) {
                 Log.errorln("Cant open compressed (ZIP) outputstream to write to an href. Aborting.");
-                return;
+                return nodeName;
              }
           } else {
              Log.errorln("Error: cant write data with compression type:"+compress+". Ignoring request.");
-             return;
+             return nodeName;
           }
       }
   
@@ -822,7 +883,7 @@ public class DataCube extends BaseObject {
                   dataOutputWriter.close();
                } catch (java.io.IOException e) {
                   Log.errorln("Cant close dataOuputStream! Aborting.");
-                  return;
+                  return nodeName;
                }
             }
    
@@ -843,12 +904,9 @@ public class DataCube extends BaseObject {
   
  //     if (niceOutput)
  //       outputWriter.write( Constants.NEW_LINE);
+      return nodeName;
 
    }
-
-   //
-   // PROTECTED methods
-   //
 
    protected void setParentArray(Array parentArray) {
       this.parentArray = parentArray;
@@ -890,6 +948,8 @@ public class DataCube extends BaseObject {
          size = ((double[]) longDataArray.get(longIndex+1)).length;
       } else if (type == INT_DATA_TYPE) {
          size = ((int []) longDataArray.get(longIndex+1)).length;
+      } else if (type == BYTE_DATA_TYPE) {
+         size = ((byte []) longDataArray.get(longIndex+1)).length;
       } else if (type == SHORT_DATA_TYPE) {
          size = ((short []) longDataArray.get(longIndex+1)).length;
       } else if (type == LONG_DATA_TYPE) {
@@ -929,6 +989,8 @@ public class DataCube extends BaseObject {
             longDataArray.set(longIndex+1, new double [shortAxisSize]);
          } else if (type == INT_DATA_TYPE) {
             longDataArray.set(longIndex+1, new int [shortAxisSize]);
+         } else if (type == BYTE_DATA_TYPE) {
+            longDataArray.set(longIndex+1, new byte [shortAxisSize]);
          } else if (type == SHORT_DATA_TYPE) {
             longDataArray.set(longIndex+1, new short [shortAxisSize]);
          } else if (type == LONG_DATA_TYPE) {
@@ -958,6 +1020,8 @@ public class DataCube extends BaseObject {
                    longDataArray.set(longIndex+1, expandArray((double[]) longDataArray.get(longIndex+1), newsize));
                 } else if (type == INT_DATA_TYPE) {
                    longDataArray.set(longIndex+1, expandArray((int[]) longDataArray.get(longIndex+1), newsize));
+                } else if (type == BYTE_DATA_TYPE) {
+                   longDataArray.set(longIndex+1, expandArray((byte[]) longDataArray.get(longIndex+1), newsize));
                 } else if (type == SHORT_DATA_TYPE) {
                    longDataArray.set(longIndex+1, expandArray((short[]) longDataArray.get(longIndex+1), newsize));
                 } else if (type == LONG_DATA_TYPE) {
@@ -1691,6 +1755,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.43  2001/09/06 15:55:16  thomas
+  * added byte set/getData stuff; changed basicXMLWriter to return String (nodeName)
+  *
   * Revision 1.42  2001/09/05 22:01:36  thomas
   * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter. Made Href->XDFEntity change
   *
