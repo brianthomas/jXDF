@@ -262,6 +262,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
       begining of the outputstream (so when you do this, you will
       get well-formmed XML output for ANY object). For obvious reasons, only
       XDF objects will create *valid XDF* output.
+      @deprecated Use the toXMLWriter method instead.
   */
   public void toXMLOutputStream (
                                    OutputStream outputstream,
@@ -469,6 +470,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   /** A different invokation style for writing this object out to
       the indicated OutputStream.
+      @deprecated Use the toXMLWriter method instead.
   */
   public void toXMLOutputStream ( OutputStream outputstream,
                                   String indent
@@ -481,6 +483,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** A different invokation style. It has defaults for the XML Declaration
       setting standalone to "no" and version to the value of sXMLSpecVersion.
       Indentation starts as "".
+      @deprecated Use the toXMLWriter method instead.
   */
   public void toXMLOutputStream (OutputStream outputstream)
   throws java.io.IOException
@@ -959,6 +962,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.55  2001/09/04 21:17:16  thomas
+ * added deprecated tag to toXMLOutputStream docs
+ *
  * Revision 1.54  2001/08/31 19:58:52  thomas
  * fix to toXMLString, wont append newline
  *

@@ -113,6 +113,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
        OutputStream object as XDF. This method overrides the BaseObject
        version, allowing the XMLElementNode children to be written out, should
        they exist in the object.
+       @deprecated Use the toXMLWriter method instead.
     */
    public void toXMLOutputStream (
                                    OutputStream outputstream,

@@ -123,6 +123,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
        OutputStream object as XDF. This method overrides the BaseObject
        version, allowing the XMLElement children to be written out, should
        they exist in the object.
+       @deprecated Use the toXMLWriter method instead.
     */
 
    public void toXMLOutputStream (
@@ -383,6 +384,9 @@ public abstract class BaseObjectWithValueList extends BaseObject
 /** Modification Log 
   *
   * $Log$
+  * Revision 1.5  2001/09/04 21:17:16  thomas
+  * added deprecated tag to toXMLOutputStream docs
+  *
   * Revision 1.4  2001/07/26 15:55:42  thomas
   * added flush()/close() statement to outputWriter object as
   * needed to get toXMLOutputStream to work properly.
