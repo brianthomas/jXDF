@@ -416,15 +416,20 @@ import java.util.Vector;
      }
 
      /* set the *axisList* attribute
-      *  @deprecated This method is dangerous, not all of the internal linkage that needs to happen
-      *   will occur if this is used.
       */
-      // this looks dangerous, lets remove from package for now
-/*
-     public void setAxisList(List axis) {
-        ((XMLAttribute) attribHash.get(AXISLIST_XML_ATTRIBUTE_NAME)).setAttribValue(axis);
+     public void setAxisList(List axisList) {
+	 // remove the existing axes
+	 List oldAxisList = getAxes();
+	 for (int i=0;i<oldAxisList.size();i++)
+	     removeAxis(i++);
+
+	 //add new axes
+	 if (axisList != null && axisList.size() > 0) {
+	     Iterator iter = axisList.iterator();
+	     while (iter.hasNext())
+		 addAxis((Axis) iter.next());
+	 }
      }
-*/
    
      /**
       * @return the current a list of FieldAxis and Axis Objects in this array. 
@@ -1139,6 +1144,9 @@ System.out.println ("DEBUG: String []: " + numValue.length);
 /**
   * Modification History:
   * $Log$
+  * Revision 1.27  2001/05/24 17:23:54  huang
+  * revived setAxisList() and other minor changes
+  *
   * Revision 1.26  2001/05/16 22:47:30  huang
   * added/modified several conveniencemethods
   *
