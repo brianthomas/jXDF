@@ -99,7 +99,8 @@ public class SaxDocumentHandler extends HandlerBase {
 
     // GLOBALs for saving these between dataFormat/read node and later when we 
     // know what kind of DataFormat/DataIOStyle object we really have
-    private Hashtable DataIOStyleAttribs;
+    private Hashtable ValueAttribs = new Hashtable();
+    private Hashtable DataIOStyleAttribs = new Hashtable();
     private AttributeList DataFormatAttribs;
 
     // for tagged reads only. Keeps track of which data tags are open
@@ -124,7 +125,7 @@ public class SaxDocumentHandler extends HandlerBase {
     private ArrayList NoteLocatorOrder = new ArrayList();
 
     // Keeping track of working valueList node (attributes) settings
-    private Hashtable CurrentValueListParameter;
+    private Hashtable CurrentValueListParameter = new Hashtable();
 
     // Data writing stuff
     private int CurrentDataTagLevel = 0; // how nested we are within d0/d1/d2 data tags
@@ -142,6 +143,8 @@ public class SaxDocumentHandler extends HandlerBase {
 
     // lookup tables holding objects that have id/idref stuff
     private Hashtable FieldObj = new Hashtable();
+    private Hashtable ValueObj = new Hashtable();
+    private Hashtable ParamObj = new Hashtable();
     private Hashtable AxisObj = new Hashtable();
     private Hashtable ReadObj = new Hashtable();
     private Hashtable NoteObj = new Hashtable();
@@ -669,7 +672,7 @@ public class SaxDocumentHandler extends HandlerBase {
        startElementHandlerHashtable.put(XDFNodeName.UNIT, new unitStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.UNITS, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.UNITLESS, new nullStartElementHandlerFunc());
-       startElementHandlerHashtable.put(XDFNodeName.VALUE, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.VALUE, new valueStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VECTOR, new vectorStartElementHandlerFunc());
@@ -1078,6 +1081,20 @@ Log.errorln(" TValue:"+valueString);
            return false;
        return true;
     } 
+
+    private Hashtable attribListToHashtable ( AttributeList attrs ) {
+
+       Hashtable hash = new Hashtable();
+       int size = attrs.getLength();
+       for (int i = 0; i < size; i++) {
+          String name = attrs.getName(i);
+          String value; 
+          if ((value = attrs.getValue(i)) != null) 
+             hash.put(name, value);
+       }
+         
+       return hash;
+    }
 
     // For the case where valueList is storing values in 
     // algorithmic fashion
@@ -2127,6 +2144,49 @@ Log.errorln(" TValue:"+valueString);
           Parameter newparameter = new Parameter();
           newparameter.setXMLAttributes(attrs); // set XML attributes from passed list 
 
+          // add this object to the lookup table, if it has an ID
+          String paramId = newparameter.getParamId();
+          if (paramId != null) {
+
+              // a warning check, just in case 
+              if (ParamObj.containsKey(paramId))
+                 Log.warnln("More than one param node with paramId=\""+paramId+"\", using latest node." );
+
+              // add this into the list of param objects
+              ParamObj.put(paramId, newparameter);
+
+          }
+
+          //  If there is a reference object, clone it to get
+          //  the new param
+          String paramIdRef = newparameter.getParamIdRef();
+          if (paramIdRef != null) {
+
+             if (ParamObj.containsKey(paramIdRef)) {
+
+                 Parameter refParamObj = (Parameter) ParamObj.get(paramIdRef);
+                 try {
+                    newparameter = (Parameter) refParamObj.clone();
+                 } catch (java.lang.CloneNotSupportedException e) {
+                    Log.errorln("Weird error, cannot clone param object. Aborting read.");
+                    System.exit(-1);
+                 }
+
+                 // override attrs with those in passed list
+                 newparameter.setXMLAttributes(attrs);
+                 // give the clone a unique Id and remove IdRef 
+                 newparameter.setParamId(findUniqueIdName(ParamObj,newparameter.getParamId()));
+                 newparameter.setParamIdRef(null);
+
+                 // add this into the list of param objects
+                 ParamObj.put(newparameter.getParamId(), newparameter);
+
+              } else {
+                Log.warnln("Error: Reader got an param with ParamIdRef=\""+paramIdRef+"\" but no previous param has that id! Ignoring add param request.");
+                 return (Object) null;
+              }
+          }
+
           // determine where this goes and then insert it 
           if( parentNodeName.equals(XDFNodeName.ARRAY) ) 
           {
@@ -2270,14 +2330,8 @@ Log.errorln(" TValue:"+valueString);
 
           // save these for later, when we know what kind of dataIOstyle we got
           // Argh we really need a clone on AttributeList. Just dumb copy for now.
-          DataIOStyleAttribs = new Hashtable();
-          int size = attrs.getLength(); 
-          for (int i = 0; i < size; i++) { 
-             String name = attrs.getName(i); 
-             String value = attrs.getValue(i);
-             if (value != null) 
-                DataIOStyleAttribs.put(name, value);
-          }
+          DataIOStyleAttribs.clear(); // all old values cleared
+          DataIOStyleAttribs = attribListToHashtable(attrs);
 
           // clear out the format command object array
           // (its used by Formatted reads only, but this is reasonable 
@@ -2288,6 +2342,49 @@ Log.errorln(" TValue:"+valueString);
           // set the iteration order of the locator that will populate
           // the datacube 
           AxisReadOrder = new ArrayList();
+
+          //  If there is a reference object, clone it to get
+          //  the new readObj
+          String readIdRef = (String) DataIOStyleAttribs.get("readIdRef");
+          if (readIdRef != null) {
+
+             XMLDataIOStyle readObj = null;
+
+             if (ReadObj.containsKey(readIdRef)) {
+
+                XMLDataIOStyle refReadObj = (XMLDataIOStyle) ReadObj.get(readIdRef);
+                try {
+                   readObj = (XMLDataIOStyle) refReadObj.clone();
+                } catch (java.lang.CloneNotSupportedException e) {
+                   Log.errorln("Weird error, cannot clone XMLDataIOStyle (read node) object. Aborting read.");
+                   System.exit(-1);
+                }
+
+                // override attrs with those in passed list
+                readObj.hashtableInitXDFAttributes(DataIOStyleAttribs);
+
+                // give the clone a unique Id and remove IdRef 
+                readObj.setReadId(findUniqueIdName(ReadObj, readObj.getReadId()));
+                readObj.setReadIdRef(null);
+
+                // add this into the list of Read objects
+                ReadObj.put(readObj.getReadId(), readObj);
+
+             } else {
+                Log.warnln("Error: Reader got a read node with ReadIdRef=\""+readIdRef+"\"");
+                Log.warnln("but no previous read node has that id! Ignoring add request.");
+                return (Object) null;
+             }
+
+             // add read object to Current Array
+             CurrentArray.setXMLDataIOStyle(readObj); 
+
+             // clear attrib table since we cloned to get values 
+             DataIOStyleAttribs.clear();
+
+             CurrentFormatObjectList.add(readObj);
+
+          }
 
           return (Object) null;
        }
@@ -2306,9 +2403,9 @@ Log.errorln(" TValue:"+valueString);
              // create new object appropriately 
              FormattedXMLDataIOStyle readObj = 
                  new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
+             CurrentArray.setXMLDataIOStyle(readObj); 
 
              String readId = readObj.getReadId();
-             String readIdRef = readObj.getReadIdRef();
 
              // add this object to the lookup table, if it has an ID
              if (readId != null) {
@@ -2317,45 +2414,16 @@ Log.errorln(" TValue:"+valueString);
                 if (ReadObj.containsKey(readId))
                    Log.warnln("More than one read node with readId=\""+readId+"\", using latest node." );
 
-                // add this into the list of note objects
+                // add this into the list of read objects
                 ReadObj.put(readId, readObj);
 
              }
 
-             //  If there is a reference object, clone it to get
-             //  the new readObj
-             if (readIdRef != null) {
+            // Note that we DONT need to check for IdRef here, it should be  
+            // impossible to have readIdRef on DataAttributes AND then hit a readCell
+            // command.
 
-                if (ReadObj.containsKey(readIdRef)) {
-
-                   BaseObject refReadObj = (BaseObject) ReadObj.get(readIdRef);
-                   try {
-                      readObj = (FormattedXMLDataIOStyle) refReadObj.clone();
-                   } catch (java.lang.CloneNotSupportedException e) {
-                      Log.errorln("Weird error, cannot clone FormattedXMLDataIOStyle (read node) object. Aborting read.");
-                      System.exit(-1);
-                   }
-
-                   // override attrs with those in passed list
-                   readObj.hashtableInitXDFAttributes(DataIOStyleAttribs);
-
-                   // give the clone a unique Id and remove IdRef 
-                   readObj.setReadId(findUniqueIdName(ReadObj, readObj.getReadId()));
-                   readObj.setReadIdRef(null);
-
-                   // add this into the list of note objects
-                   ReadObj.put(readObj.getReadId(), readObj);
-
-                } else {
-                   Log.warnln("Error: Reader got a read node with ReadIdRef=\""+readIdRef+"\" but no previous read node has that id! Ignoring add request.");
-                   return (Object) null;
-                }
-             }
-
-
-             CurrentArray.setXMLDataIOStyle(readObj); 
-
-             DataIOStyleAttribs = new Hashtable();  // clear table 
+             DataIOStyleAttribs.clear(); // clear table 
              CurrentFormatObjectList.add(readObj);
 
           }
@@ -2397,12 +2465,29 @@ Log.errorln(" TValue:"+valueString);
           //  XMLDataIOStyle object for this array yet, do it now. 
           if ( !DataIOStyleAttribs.isEmpty()) {
 
-             // FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle(CurrentArray);
+             // must be formatted style, thats the only style that has 
+             // repeat formatted commands
              FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
-             // readObj.setXMLAttributes(DataIOStyleAttribs);
              CurrentArray.setXMLDataIOStyle(readObj);
+ 
+             String readId = readObj.getReadId();
+            // add this object to the lookup table, if it has an ID
+             if (readId != null) {
 
-             DataIOStyleAttribs = new Hashtable ();
+                // a warning check, just in case 
+                if (ReadObj.containsKey(readId))
+                   Log.warnln("More than one read node with readId=\""+readId+"\", using latest node." );
+
+                // add this into the list of read objects
+                ReadObj.put(readId, readObj);
+
+             }
+
+             // Note that we DONT need to check for IdRef here, it should be  
+             // impossible to have readIdRef on DataAttributes AND then hit a repeat
+             // command.
+
+             DataIOStyleAttribs.clear(); // clear table 
              CurrentFormatObjectList.add(readObj);
 
           }
@@ -2462,12 +2547,28 @@ Log.errorln(" TValue:"+valueString);
           //  XMLDataIOStyle object for this array yet, do it now. 
           if ( !DataIOStyleAttribs.isEmpty()) {
 
-             // FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle(CurrentArray);
+             // If we see a skipChar command, then we must have Formatted data IO style
              FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
-             // readObj.setXMLAttributes(DataIOStyleAttribs);
              CurrentArray.setXMLDataIOStyle(readObj);
 
-             DataIOStyleAttribs = new Hashtable(); // clear out table 
+             String readId = readObj.getReadId();
+             // add this object to the lookup table, if it has an ID
+             if (readId != null) {
+
+                // a warning check, just in case 
+                if (ReadObj.containsKey(readId))
+                   Log.warnln("More than one read node with readId=\""+readId+"\", using latest node." );
+
+                // add this into the list of read objects
+                ReadObj.put(readId, readObj);
+
+             }
+
+            // Note that we DONT need to check for IdRef here, it should be  
+            // impossible to have readIdRef on DataAttributes AND then hit a skipChar
+            // command.
+
+             DataIOStyleAttribs.clear(); // clear out table 
              CurrentFormatObjectList.add(readObj);
 
           }
@@ -2627,8 +2728,94 @@ Log.errorln(" TValue:"+valueString);
     // VALUE 
     //
 
-    class valueCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
+   class valueStartElementHandlerFunc implements StartElementHandlerAction {
+      public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+
+          ValueAttribs.clear(); // clear out old values, if any
+          // save these for later, when we know what kind of dataIOstyle we got
+          // Argh we really need a clone on AttributeList. Just dumb copy for now.
+          ValueAttribs = attribListToHashtable(attrs);
+
+          //  If there is a reference object, clone it to get
+          //  the new value
+          String valueIdRef = (String) ValueAttribs.get("valueIdRef");
+          if (valueIdRef != null) {
+
+             Value newvalue = null;
+
+             if (ValueObj.containsKey(valueIdRef)) {
+
+                 Value refValueObj = (Value) ValueObj.get(valueIdRef);
+                 try {
+                    newvalue = (Value) refValueObj.clone();
+                 } catch (java.lang.CloneNotSupportedException e) {
+                    Log.errorln("Weird error, cannot clone value object. Aborting read.");
+                    System.exit(-1);
+                 }
+
+                 // override attrs with those in passed list
+                 newvalue.setXMLAttributes(attrs);
+                 // give the clone a unique Id and remove IdRef 
+                 newvalue.setValueId(findUniqueIdName(ValueObj,newvalue.getValueId()));
+                 newvalue.setValueIdRef(null);
+
+                 // add this into the list of value objects
+                 ValueObj.put(newvalue.getValueId(), newvalue);
+
+              } else {
+                Log.warnln("Error: Reader got an value with ValueIdRef=\""+valueIdRef+"\" but no previous value has that id! Ignoring add value request.");
+                 return (Object) null;
+              }
+
+              if (newvalue != null) {
+                 // well, we got a value. That means we have to add it in. 
+                 // sigh. Yes, some repeat code from valueCharDataHandler. Too lazy 
+                 // to properly turn it into a sub-routine. -b.t.
+
+                 //  grab parent node name
+                 // this special call will find the first parent node name 
+                 // that doesnt match XDFNodeName.VALUEGROUP
+                 String parentNodeName = getParentNodeName(XDFNodeName.VALUEGROUP);
+
+                 // determine where this goes and then insert it 
+                 if( parentNodeName.equals(XDFNodeName.PARAMETER) )
+                 {
+
+                    newvalue = LastParameterObject.addValue(newvalue);
+
+                 } else if ( parentNodeName.equals(XDFNodeName.AXIS) )
+                 {
+
+                    List axisList = (List) CurrentArray.getAxisList();
+                    Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+                    newvalue = lastAxisObject.addAxisValue(newvalue);
+
+//          } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
+//          {
+//
+                 } else {
+                    Log.errorln("Error: weird parent node "+parentNodeName+" for value.");
+                    System.exit(-1); // fatal error, shut down 
+                 }
+
+                 // Now add this object to all open groups
+                 Iterator iter = CurrentValueGroupList.iterator();
+                 while (iter.hasNext()) {
+                    ValueGroup nextValueGroupObj = (ValueGroup) iter.next();
+                    newvalue.addToGroup(nextValueGroupObj);
+                 }
+
+                 // since we added object here, clear the attributes now.
+                 ValueAttribs.clear();
+              }
+          }
+
+          return (Object) null; 
+      }
+   }
+
+   class valueCharDataHandlerFunc implements CharDataHandlerAction {
+      public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
 
           //  grab parent node name
           // this special call will find the first parent node name 
@@ -2638,9 +2825,54 @@ Log.errorln(" TValue:"+valueString);
           
           // create new object appropriately 
           Value newvalue = new Value();
+          newvalue.hashtableInitXDFAttributes(ValueAttribs);
           // reconsitute the value node PCdata from passed information.
           // and add value to object
           newvalue.setValue( new String (buf, offset, len) );
+
+         // add this object to the lookup table, if it has an ID
+          String valueId = newvalue.getValueId();
+          if (valueId != null) {
+
+              // a warning check, just in case 
+              if (ValueObj.containsKey(valueId))
+                 Log.warnln("More than one value node with valueId=\""+valueId+"\", using latest node." );
+
+              // add this into the list of value objects
+              ValueObj.put(valueId, newvalue);
+
+          }
+
+          //  If there is a reference object, clone it to get
+          //  the new value
+          String valueIdRef = newvalue.getValueIdRef();
+          if (valueIdRef != null) {
+
+             if (ValueObj.containsKey(valueIdRef)) {
+
+                 Value refValueObj = (Value) ValueObj.get(valueIdRef);
+                 try {
+                    newvalue = (Value) refValueObj.clone();
+                 } catch (java.lang.CloneNotSupportedException e) {
+                    Log.errorln("Weird error, cannot clone value object. Aborting read.");
+                    System.exit(-1);
+                 }
+
+                 // override attrs with those in passed list
+                 newvalue.hashtableInitXDFAttributes(ValueAttribs);
+
+                 // give the clone a unique Id and remove IdRef 
+                 newvalue.setValueId(findUniqueIdName(ValueObj,newvalue.getValueId()));
+                 newvalue.setValueIdRef(null);
+
+                 // add this into the list of value objects
+                 ValueObj.put(newvalue.getValueId(), newvalue);
+
+              } else {
+                 Log.warnln("Error: Reader got an value with ValueIdRef=\""+valueIdRef+"\" but no previous value has that id! Ignoring add value request.");
+                 return;
+              }
+          }
 
           // determine where this goes and then insert it 
           if( parentNodeName.equals(XDFNodeName.PARAMETER) )
@@ -2672,6 +2904,7 @@ Log.errorln(" TValue:"+valueString);
              newvalue.addToGroup(nextValueGroupObj);
           }
 
+          ValueAttribs.clear();
        }
     }
 
@@ -2799,20 +3032,14 @@ Log.errorln(" TValue:"+valueString);
        public Object action (SaxDocumentHandler handler, AttributeList attrs) {
  
            // 1. re-init
-           CurrentValueListParameter = new Hashtable(); 
+           CurrentValueListParameter.clear();
 
-           // 2. populate ValueListparameters w/ parent name 
+           // 2. populate ValueListparameters from attribute list 
+           CurrentValueListParameter = attribListToHashtable(attrs);
+
+           // 3. populate ValueListparameters w/ parent name 
            String parentNodeName = getParentNodeName();
            CurrentValueListParameter.put("parentNodeName", parentNodeName);
-
-           // 3. populate ValueListparameters from attribute list 
-           int size = attrs.getLength(); 
-           for (int i = 0; i < size; i++)
-           {
-               String value; 
-               if ((value = attrs.getValue(i)) != null) 
-                  CurrentValueListParameter.put(attrs.getName(i), value);
-           }
 
            // 4. set this parameter to false to indicate the future is not
            // yet determined for this :)
@@ -2916,7 +3143,7 @@ Log.errorln(" TValue:"+valueString);
              }
           }
 
-// Need to do something wi/ ValueObjList HERE
+// Need to do something wi/ ValueObjList HERE?? 
 
 
        }
@@ -2938,6 +3165,10 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.25  2001/01/19 22:34:28  thomas
+ * Fixed handling of readId/IdRef stuff. Added Id/IdRef stuff
+ * for value, parameter. valuelist is not done yet. -b.t.
+ *
  * Revision 1.24  2001/01/19 17:23:03  thomas
  * Fixed Href stuff to DTD standard. Now using
  * notation and entities at the beginning of the
