@@ -1,0 +1,61 @@
+
+<project name="XDF" default="all" basedir=".">
+
+  <!-- set global properties for this build -->
+  <property name="path" value="gov/nasa/gsfc/adc/xdf"/>
+  <property name="src" value="src/${path}"/>
+  <property name="build" value="."/>
+  <property name="docApi"  value="docs/api"/>
+  <property name="build.compiler" value="modern"/>
+  <property name="adc_xml_homepage" value="http://xml.gsfc.nasa.gov"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    <mkdir dir="${docApi}"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac debug="on" srcdir="${src}" destdir="${build}"/> 
+  </target>
+
+  <target name="jar" depends="compile">
+    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+    <jar jarfile="xdf-${DSTAMP}.jar" basedir="${path}"/>
+  </target>
+
+  <target name="doc" depends="init">
+    <!-- <javadoc srcdir="${src}" destdir="${doc}"/> -->
+
+    <javadoc packagenames="gov.nasa.gsfc.adc.xdf.*"
+             sourcepath="src"
+             defaultexcludes="yes"
+             destdir="${docApi}"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="eXtensible Data Format API">
+        <header><![CDATA[<h2><a href="${adc_xml_homepage}">ADC XML Group</a></h2><A HREF="http://www.nasa.gov/"><IMG SRC="http://adc.gsfc.nasa.gov/adc/images/nasalogo.gif" BORDER=0 ALT=\"NASA insignia\"></A><br>
+<h2><A HREF="mailto:xdf@xml.gsfc.nasa.gov">Contact the ADC XDF Group</a></h2>]]></header>
+        <doctitle><![CDATA[<h2>DOC TITLE</h2>]]></doctitle>
+        <footer>FOOTER</footer>
+        <bottom><![CDATA[<i>Copyright &#169; 2001 Brian Thomas. All Rights Reserved.  This is free software, and you are welcome to redistribute it under certain conditions.  This software comes with ABSOLUTELY NO WARRANTY. For details on terms and conditions of use refer to the README and LICENCE files included in the software distribution.</i>]]></bottom>
+        <group title="Group 1 Packages" packages="gov.nasa.gsfc.adc.xdf.*"/>
+        <group title="Group 2 Packages" packages="gov.nasa.gsfc.adc.xdf.DOM.*"/>
+        <link offline="true" href="http://java.sun.com/products/jdk/1.2/docs/api/" packagelistLoc="C:\tmp"/>
+        <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
+    </javadoc>
+
+  </target>
+
+  <target name="all" depends="compile,doc"/>
+
+  <target name="clean">
+    <delete dir="gov"/>
+    <delete dir="${docApi}"/>
+  </target>
+
+</project>
