@@ -32,7 +32,9 @@ import java.util.*;
   //double check, should not inherit from BaseObject as is implemented
  public class Locator {
   protected Array parentArray;
-  protected List locationList = Collections.synchronizedList(new ArrayList());
+  protected List axisOrderList = Collections.synchronizedList(new ArrayList());
+  //hashtable to store the (axis, index) pair
+  protected Hashtable locations;
   public Locator(Array array) {
     Log.debug("in Locator(Array)");
     parentArray = array;
@@ -45,35 +47,29 @@ import java.util.*;
      * We choose the parent Array axisList ordering for our
      * default location ordering.
      */
+
+    locations = new Hashtable(axisList.size());
     for (int i = 0; i < axisList.size(); i++) {
-      Location location = new Location((Axis) axisList.get(i),0);
-      locationList.add(location);
+      Axis axis = (Axis) axisList.get(i);
+      axisOrderList.add(axis);
+      locations.put(axis, new Integer(0));
     }
   }
 
   /**setAxisLocation: set the index of an axis
    * @param: Axis, index
-   * @return: index if successful, -1 if not
+   * @return: index if successful
    */
-  public int setAxisLocation (Axis axisObj, int index) {
+  public int setAxisLocation (Axis axisObj, int index) throws AxisLocationOutOfBoundsException {
     if ((!parentArray.getAxisList().contains(axisObj)) ||
         (index < 0) ||
         (index > axisObj.getLength()-1) ) {
-
-        Log.error("either index outof range, or axisObj is not an Axis ref in Locator's parentArray");
-        Log.error("ignore request");
-        return -1;
-      }
-      int result= -1;
-      for (int i = 0; i < locationList.size(); i++) {
-        Location location = (Location) locationList.get(i);
-        if (location.axis.equals(axisObj) ) {
-          location.index = index;
-          result = location.index;
-          break;
-        }
-      }
-      return result;
+        throw new AxisLocationOutOfBoundsException();
+    }
+    //now update the axis and index pair in the hashtable
+    //locations.remove(axisObj);
+    locations.put(axisObj, new Integer(index));
+    return index;
   }
 
   /**getAxisLocation: get the index of an Axis in the Locator object
@@ -86,45 +82,35 @@ import java.util.*;
         Log.error("regnore request");
         return -1;
      }
-     int result= -1;
-     for (int i = 0; i<locationList.size(); i++) {
-      Location location = (Location)locationList.get(i);
-      if (location.axis.equals(axisObj)) {
-        result = location.index;
-        break;
-      }
-     }
-     return result;
-  }
-
-  /**getAxisLocation: get the index list.
-   *  note that the ordering is *still* that of the axisList in Array
-   * @return: an array of indices
-   */
-  public int[] getAxisLocation() {
-    int[] indices = new int[locationList.size()];
-    Location location;
-    for (int i = 0; i <locationList.size(); i++) {
-      location = (Location) locationList.get(i);
-      indices[i] = location.index;
+     Integer loc = (Integer) locations.get(axisObj);
+     if (loc !=null)
+      return loc.intValue();
+     else {
+      Log.error("error, parentArray constains the axisObj, but Location doens't");
+      return -1;
     }
-    return indices;
+
   }
 
-  /**setAxisLocationAxisValue: set the index of an axis to the index of a value
+
+
+  /**setAxisLocationByAxisValue: set the index of an axis to the index of a value
    * along that axis
    * @return: index if successful, -1 if not
    */
-  public int setAxisLocationByAxisValue(Axis axisObj, Value valueObj) {
+  public int setAxisLocationByAxisValue(Axis axisObj, Value valueObj) throws AxisLocationOutOfBoundsException{
     if ((!parentArray.getAxisList().contains(axisObj)) ||
         valueObj == null ) {
         Log.error("either axisObj is not an Axis ref contained in Locator's parentArray or Value is null");
         Log.error("regnore request");
         return -1;
      }
-
+    try {
      return setAxisLocation(axisObj, axisObj.getIndexFromAxisValue(valueObj));
-
+    }
+    catch (AxisLocationOutOfBoundsException e) {
+      throw e;
+    }
   }
 
   /**next: Change the locator coordinates to the next datacell as
@@ -134,15 +120,17 @@ import java.util.*;
    */
   public boolean next() {
     boolean outofDataCells = true;
-    Location location;
-    for (int i = locationList.size()-1; i >=0; i--) {
-      location = (Location) locationList.get(i);
-      if (location.index < location.axis.getLength()) {
+
+    for (int i = axisOrderList.size()-1; i >=0 ; i--) {
+      Axis axis = (Axis) axisOrderList.get(i);
+      int index = ((Integer) locations.get(axis)).intValue();
+      if (index < axis.getLength()-1) {
         outofDataCells = false;
-        location.index++;
-        break;
+        index++;
+        locations.put(axis, new Integer(index));
+        break;  //get out of the for loop
       }
-      location.index = 0;
+      locations.put(axis, new Integer(0));
     }
     return !outofDataCells;
   }
@@ -153,16 +141,18 @@ import java.util.*;
    */
   public boolean prev() {
     boolean outofDataCell = true;
-    Location location;
-    for (int i = locationList.size()-1; i >=0; i--) {
-      location = (Location) locationList.get(i);
-      location.index--;
-      if (location.index < 0) {
-        location.index = location.axis.getLength();
+
+    for (int i = axisOrderList.size()-1; i >=0; i--) {
+      Axis axis = (Axis) axisOrderList.get(i);
+      int index = ((Integer) locations.get(axis)).intValue();
+      index--;
+      if (index < 0) {
+        locations.put(axis, new Integer(axis.getLength()-1));
       }
       else {
+        locations.put(axis, new Integer(index));
         outofDataCell = false;
-        break;
+        break;  //get out of the for loop
       }
     }
 
@@ -170,29 +160,23 @@ import java.util.*;
   }
 
   public void setIterationOrder(List axisOrderListRef) {
-    //have to check the list elements are of type Location, double check
+    //have to check the list elements are of type Axis, double check
     if (axisOrderListRef == null) {
       Log.error("Locator can't setIterationOrder, axisOrderList arg is null");
       return;
     }
-    List oldList = locationList;
-    locationList = Collections.synchronizedList(new ArrayList());
-    Location location;
-    Location oldLocation;
+    List oldList = axisOrderList;
+    axisOrderList = Collections.synchronizedList(new ArrayList());
     int index = 0;
     for (int i = 0; i < axisOrderListRef.size(); i++) {
-      location = null;  //force garbage collection
-      location = (Location) axisOrderListRef.get(i);
+      Axis axis = (Axis) axisOrderListRef.get(i);
       for (int j = 0; j < oldList.size(); j++) {
-        oldLocation = null;  //force garbage collection
-        oldLocation = (Location) oldList.get(j);
-        if (oldLocation.axis.equals(location.axis)) {
-          index = oldLocation.index;
+        Axis oldAxis = (Axis) oldList.get(j);
+        if (oldAxis.equals(axis)) {
+          axisOrderList.add(axis);
           break;
         }
       }  //end of inner for loop
-      //add Location in order of the axisOrderListRef
-      locationList.add(new Location(location.axis, index));
     } //end of outer for loop
 
     oldList = null;  //force garbage collection
@@ -204,12 +188,8 @@ import java.util.*;
    * @return: an array of Axises, whose order in the array correspondes to
    * the iteration order
    */
-  public Axis[] getIterationOrder() {
-    Axis[] axisList = new Axis[locationList.size()];  //array of Axises
-    for (int i = 0; i < locationList.size(); i++) {
-      axisList[i]= ((Location)locationList.get(i)).axis;
-    }
-    return axisList;
+  public List getIterationOrder() {
+    return axisOrderList;
 
   }
 
@@ -218,31 +198,26 @@ import java.util.*;
    *
    */
     public void reset() {
-      for (int i = 0; i < locationList.size(); i++) {
-        ((Location) locationList.get(i)).index = 0;
+      synchronized(locations) {
+        Integer origin = new Integer(0);
+        Enumeration enum = locations.keys(); // Must be in synchronized block
+            while (enum.hasMoreElements()) {
+              Axis axis = (Axis) enum.nextElement();
+              locations.put(axis, origin);
+            }
       }
     }
 
 
 }  //end of Locator class
 
-  /**Location: class/structure to store the location info in Locator class
-   *
-   */
-  class Location  {
-    //Fields
-    public Axis axis;
-    public int index;
 
-    public Location (Axis axis, int index) {
-      this.axis = axis;
-      this.index = index;
-    }
-
-  }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/10/22 21:11:10  kelly
+ * major rework of the class.
+ *
  * Revision 1.4  2000/10/18 15:52:30  kelly
  * pretty much completed the class.  -k.z.
  *
