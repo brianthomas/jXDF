@@ -39,3 +39,12 @@ package gov.nasa.gsfc.adc.xdf;
     super(errorMsg);
   }
  }
+
+/** Modification History.  
+  * 
+  * $Log$
+  * Revision 1.3  2001/02/07 18:42:43  thomas
+  * Not sure what changed. -b.t.
+  *
+  *
+  */
