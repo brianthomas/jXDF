@@ -809,10 +809,21 @@ import java.util.Vector;
     *  set data for a general object
     *  which can be an array of primitive object; or wrapped data
     */
-   public void setData (Locator locator, Object dataObj) throws SetDataException 
+   public void setData (Locator locator, Object dataObj) 
+       throws SetDataException 
    {
-       if (dataObj.getClass().isArray()) {
-	   if (dataObj instanceof int[] )
+       String classType = dataObj.getClass().getName().trim();
+       if (classType.startsWith("[[")) {
+	   Object [] dataArray = (Object[])dataObj;
+	   for (int i=0; i<dataArray.length; i++) {
+	       setData(locator, dataArray[i]);
+	   }
+       } else if (classType.startsWith("[")) {
+	   if (dataObj instanceof byte[] )
+	       this.setData (locator, (byte[])dataObj);
+	   else if (dataObj instanceof short[] )
+	       this.setData (locator, (short[])dataObj);
+	   else if (dataObj instanceof int[] )
 	       this.setData (locator, (int[])dataObj);
 	   else if (dataObj instanceof long[])
 	       this.setData (locator, (long[])dataObj);
@@ -823,7 +834,7 @@ import java.util.Vector;
 	   else if (dataObj instanceof String[])
 	       this.setData (locator, (String[])dataObj);	
 	   else {
-	       String msg = "Data array: " + dataObj.getClass().getName() + " is not implemented";
+	       String msg = "Array: setData(): " + dataObj.getClass().getName() + " is not implemented";
 	       Log.errorln(msg);
 	       throw new SetDataException (msg);
 	   }
@@ -832,8 +843,10 @@ import java.util.Vector;
 	       this.setData (locator, (Double) dataObj);
 	   else if (dataObj instanceof Integer )
 	       this.setData (locator, (Integer) dataObj);
+	   else if (dataObj instanceof Short )
+	       this.setData (locator, (Short) dataObj);
 	   else {
-	       String msg = "Primiary data wrapper type: " + dataObj.getClass().getName() + " is not implemented";
+	       String msg = "Array: setData(): " + dataObj.getClass().getName() + " is not implemented";
 	       Log.errorln(msg);
 	       throw new SetDataException (msg);
 	   }
@@ -864,6 +877,20 @@ import java.util.Vector;
 	   locator.next();
        }
    }
+
+
+   /** 
+    *  set Data from an integer data array 
+    */
+   public void setData (Locator locator, short [] numValue) 
+       throws SetDataException {
+
+       for (int i = 0; i < numValue.length; i++) {
+	   this.setData(locator, numValue[i]);
+	   locator.next();
+       }
+   }
+
 
   /** 
     *  set Data from an integer data array 
@@ -921,6 +948,27 @@ import java.util.Vector;
       getDataCube().setData(locator, numValue);
    }
 
+
+   /** Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, short numValue) 
+   throws SetDataException 
+   {
+      getDataCube().setData(locator, numValue);
+   }
+
+
+   /** Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, Short numValue) 
+   throws SetDataException 
+   {
+      getDataCube().setData(locator, numValue);
+   }
+
+
    /** Set the value of the requested datacell. 
     * Overwrites existing datacell value if any.
     */
@@ -929,6 +977,7 @@ import java.util.Vector;
    {
       getDataCube().setData(locator, numValue);
    }
+
 
    /** Set the value of the requested datacell. 
     * Overwrites existing datacell value if any.
@@ -1368,6 +1417,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.35  2001/08/01 18:00:48  huang
+  * allow setData () for object to have recursive ability for multi-dim array and added more convenience methods for setData() for other types
+  *
   * Revision 1.34  2001/07/11 22:35:21  thomas
   * Changes related to adding valueList or removeal of unneeded interface files.
   *
