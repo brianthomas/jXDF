@@ -34,9 +34,10 @@ import java.util.*;
 
   public class Utility {
     public static boolean isValidEndian(String strEndian) {
-      List endianList = Constants.ENDIANS_LIST;
-      for (int i = 0; i < endianList.size(); i++) {
-        if (strEndian.equals(endianList.get(i)))
+      String[] endianList = Constants.ENDIANS_LIST;
+      int stop = endianList.length;
+      for (int i = 0; i < stop; i++) {
+        if (strEndian.equals(endianList[i]))
           return true;
       }
 
@@ -44,9 +45,10 @@ import java.util.*;
     }
 
     public static boolean isValidIntegerType(String strIntegerType) {
-      List integerTypeList = Constants.INTEGER_TYPE_LIST;
-      for (int i = 0; i < integerTypeList.size(); i++) {
-        if (strIntegerType.equals(integerTypeList.get(i)))
+      String[] integerTypeList = Constants.INTEGER_TYPE_LIST;
+      int stop = integerTypeList.length;
+      for (int i = 0; i < stop; i++) {
+        if (strIntegerType.equals(integerTypeList[i]))
           return true;
       }
 
@@ -54,18 +56,30 @@ import java.util.*;
     }
 
     public static boolean isValidXMLAttributeType(String strAttributeType) {
-      List attributeTypeList = Constants.XMLATTRIBUTE_TYPE_LIST;
-      for (int i = 0; i< attributeTypeList.size(); i++) {
-        if (strAttributeType.equals(attributeTypeList.get(i)))
+      String[] attributeTypeList = Constants.XMLATTRIBUTE_TYPE_LIST;
+      int stop = attributeTypeList.length;
+      for (int i = 0; i< stop; i++) {
+        if (strAttributeType.equals(attributeTypeList[i]))
           return true;
       }
       return false;
     }
 
      public static boolean isValidEncoding(String strEncoding) {
-      List encodingList = Constants.ENCODINGS_LIST;
-      for (int i = 0; i< encodingList.size(); i++) {
-        if (strEncoding.equals(encodingList.get(i)))
+      String[] encodingList = Constants.ENCODINGS_LIST;
+      int stop = encodingList.length;
+      for (int i = 0; i< stop; i++) {
+        if (strEncoding.equals(encodingList[i]))
+          return true;
+      }
+      return false;
+    }
+
+    public static boolean isValidDatatype(String strDatatype) {
+      String[] dataTypeList = Constants.DATATYPE_LIST;
+      int stop = dataTypeList.length;
+      for (int i = 0; i < stop; i++) {
+        if (strDatatype.equals(dataTypeList[i]))
           return true;
       }
       return false;
@@ -77,6 +91,9 @@ import java.util.*;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/26 20:11:27  kelly
+ * changes related to Constants are made
+ *
  * Revision 1.2  2000/10/18 18:48:34  kelly
  * added isValidEncoding method.  -k.z.
  *
