@@ -11,7 +11,7 @@
 
 	- Impliment ASCII octal/hex data read/write in SaxDocHandler.
 
-	- Impliment binary data read/write in SaxDocHandler/Binary*DataFormats.
+	- Impliment binary data writing in DataCube.
 
 	- always use constants (sPCDATAAttribute = "value") 
           check that all Constants in CONSTANTS class are used. Make attribute names
@@ -26,6 +26,8 @@
 	A list of things that have to be done before we can consider
 	this package "FINAL" 
         ------------------------------------------------------------
+
+        - handle Href's other than to files (URL's, socket?)
 
         - Need to examine bufferedIO. In particular, check for buffered reading of 
           files (incl. href case where data is stored in a file separate from XML 

@@ -51,7 +51,8 @@
 	  using the following decimalFormat pattern: "#0.0E0;-0.0E0" 
 	  print out as: .101E0, 30.0E4, -13E-8, 10.2E2
 
-        - Treatment of XML comments (the stuff in an XML file that occurs between the "<--" "-->").
+        - Treatment of XML comments (the stuff in an XML file that occurs between 
+          the "<--" "-->").
           This information is currently dropped during the parsing of the XDF file.
           This would seem to be the correct thing to do; machine readable comments ought
           to be placed in an appropriate node, e.g. parameter, note or attribute
@@ -61,5 +62,22 @@
           within the package. Missing any Exception classes? 
 
         - If the user improperly specifies Axis sizes/values, the Reader will overwrite
-          prior cells without warning. Better warning messages needed.
+          prior cells without warning. Better warning messages are needed.
+
+        - Determination of the byte ordering is assumed to apply equally across 
+          integers and floats. We have established that this is indeed the case for
+          several archetectures, Intel, Sparc, Alpha and SGI, however, I dont know
+          for a fact that this is uniformly true for ALL computer archetechures. 
+          I list this as a bug simply to warn the user that this could be a major
+          problem in the portability of binary data.
+         
+        - Another binary data issue: byte swapping can get you pretty far in terms 
+          of portability, but even on the above machines the user should beware 
+          contamination of data. One important issue: the interpreted value for underflow
+          varies between archectures. Portability of your binary data is improved
+          by avoiding such very small numbers (with magnitude < 1e-36 or so). 
+          I am unaware of other constraints on portability of binary data, however,
+          Im sure they exist. At this time, my recomendation is to _avoid the binary 
+          data format_ if you worry at all about contaminated data (-b.t.).
+
 
