@@ -26,6 +26,10 @@
  
         - problem carrying over some parameter entities from the DTD.
 
+        - Current DTD understanding of how arrays should be appended will create un-validatable
+          XDF files. The function works right now, but will have to be changed to satisfy 
+          the above need.
+
         - Automatic Unique Id generation may fail when a later node has an id that matches
           a machine generated one on an earlier node. We need a final pass thru the Id 
           stacks to enforce uniqueness in objects (or better yet internal checking of ids to

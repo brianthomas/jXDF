@@ -66,24 +66,28 @@
                       - Added get/set Long/Short Data methods in DataCube.
                       - Higher dimesional arrays not implemented correctly (!! in 3+ dimensions). Fixed.
                       - Added get/setIOAxesOrder in XMLDataIOStyle.
-                      - public add methods now uniformly return "boolean" rather than an object.
-                      - added compression/decompression support for GZIP, Zip (bzip2, UNIX "compress" 
+                      - Public add methods now uniformly return "boolean" rather than an object.
+                      - Added compression/decompression support for GZIP, Zip (bzip2, UNIX "compress" 
                         and Xmill still missing)
-                      - bug fix to valueGroup printing in toXMLOutputStream.
-                      - re-wrote toXMLOutputStream. Now using buffered writing. Faster.
-                      - added convience methods for populating axis, fieldAxis at construction time.
+                      - Bug fix to valueGroup printing in toXMLOutputStream.
+                      - Re-wrote toXMLOutputStream. Now using buffered writing. Faster.
+                      - Added convience methods for populating axis, fieldAxis at construction time.
                       - further cleanup of deprecated classes from old xml-tr2 package. It should NOT
                         be needed at all now. Note that we are not making full use of namespaces (yet).
-                      - tightening of toXMLOutputstream method. Only XDF object may print notation hash,
+                      - Tightening of toXMLOutputstream method. Only XDF object may print notation hash,
                         DOCTYPE and xml decl statement.
-                      - added toXMLString method to BaseObject. All inheriting classes may now write
+                      - Added toXMLString method to BaseObject. All inheriting classes may now write
                         their XML representation string when called.
-                      - added class XML attribute to FieldGroup.
-                      - bug fix to allow integer data starting with "+" sign.
-                      - added ValueListAlgorithm, ValueListDelimitedList and ValueList(internal reader class)
+                      - Added class XML attribute to FieldGroup.
+                      - Bug fix to allow integer data starting with "+" sign.
+                      - Added ValueListAlgorithm, ValueListDelimitedList and ValueList(internal reader class)
                         to treat <valueList> nodes.
-                      - added XDF::DOM functionality. Any XML document may be read into this DOM which 
+                      - Added XDF::DOM functionality. Any XML document may be read into this DOM which 
                         contains convience methods for accessing/manipulation of the XDF element nodes.
-                      - support for correct output formatting under delimited and tagged data added.
-                      - better support for reading file href Entities that reside in different locations
+                      - Support for correct output formatting under delimited and tagged data added.
+                      - Better support for reading file href Entities that reside in different locations
                         from the metadata.
+                      - Added CreateXdf.java program. More sample data incl. the currently unreadable bzip2
+                        data style (XDF_sample10.xml).
+                      - Improved error messaging. Throwing more exceptions as we should. Not optimal, but
+                        better.
