@@ -1504,8 +1504,8 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
     if (hasFieldAxis)
        fieldAxis = parentArray.getFieldAxis();
 
-    String delimiter = readObj.getDelimiter();
-    String recordTerminator = readObj.getRecordTerminator();
+    String delimiter = readObj.getDelimiter().getStringValue();
+    String recordTerminator = readObj.getRecordTerminator().getStringValue();
 
     // safety
     if (recordTerminator == null)
@@ -1538,7 +1538,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
          String noData = noDataValues[lastFieldIndex];
 
          if (noData == null) {
-            if(readObj.getRepeatable().equals("yes"))
+            if(readObj.getDelimiter().getRepeatable().equals("yes"))
             {
                // should throw an error
                Log.errorln("Error: you have not set noDataValue and have a repeatable delimiter. Can't write data. Aborting.");
@@ -1697,7 +1697,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                                                  SkipCharFormattedIOCmd skipCharCommand)
    throws java.io.IOException
    {
-       outputWriter.write( skipCharCommand.getOutput());
+
+       String charData = skipCharCommand.getOutput().getValue();
+       outputWriter.write(charData);
    }
 
 
@@ -2027,203 +2029,4 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
   }
 
 }
- /**
-  * Modification History:
-  * $Log$
-  * Revision 1.53  2001/10/15 17:06:47  thomas
-  * merged in changes from ver017
-  *
-  * Revision 1.52.2.1  2001/10/09 18:41:04  huang
-  * fixed a bug in expecting null systemID
-  *
-  * Revision 1.52  2001/09/27 17:19:54  thomas
-  * fixes to allow writing out of TaggedXMLDataIOStyle
-  *
-  * Revision 1.51  2001/09/21 16:50:17  thomas
-  * setData now throw SetDataException w/ messages now
-  *
-  * Revision 1.50  2001/09/20 20:59:36  thomas
-  * checkBounds now checks for neg. short/long internal axes values
-  *
-  * Revision 1.49  2001/09/20 15:07:48  thomas
-  * added some float handling
-  *
-  * Revision 1.48  2001/09/19 16:39:25  thomas
-  * clean up of write data code; better implementation of file href writing
-  *
-  * Revision 1.47  2001/09/18 21:40:45  thomas
-  * I saw the light and yanked the 'fastestAxis' code in writeFormatted/Delimited data as per earlier stuff in tagged data writes. We should be thinking only in terms of the field axis when we need to determine if a new dataformat is needed for the next datacell we are writing. These changes should make it much more likely that the higher dimensional data will write out correctly (but it still needs to be tested!)
-  *
-  * Revision 1.46  2001/09/18 19:35:54  thomas
-  * subtracted unused code
-  *
-  * Revision 1.45  2001/09/18 17:42:57  thomas
-  * fixes to writing out tagged data, small code clean up
-  *
-  * Revision 1.44  2001/09/13 21:39:25  thomas
-  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
-  *
-  * Revision 1.43  2001/09/06 15:55:16  thomas
-  * added byte set/getData stuff; changed basicXMLWriter to return String (nodeName)
-  *
-  * Revision 1.42  2001/09/05 22:01:36  thomas
-  * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter. Made Href->Entity change
-  *
-  * Revision 1.41  2001/09/04 21:17:52  thomas
-  * added 8, 16 bit Integers
-  *
-  * Revision 1.40  2001/07/26 15:55:42  thomas
-  * added flush()/close() statement to outputWriter object as
-  * needed to get toXMLOutputStream to work properly.
-  *
-  * Revision 1.39  2001/07/19 21:52:39  thomas
-  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
-  * in the XDF class)
-  *
-  * Revision 1.38  2001/07/11 22:35:21  thomas
-  * Changes related to adding valueList or removeal of unneeded interface files.
-  *
-  * Revision 1.37  2001/07/06 19:04:23  thomas
-  * toXMLOutputStream and related methods now pass on IOExceptions
-  * to the application writer (e.g. they throw the error).
-  *
-  * Revision 1.36  2001/06/27 21:19:45  thomas
-  * Implimented writing of compressed data to external file (GZIP, Zip only).
-  *
-  * Revision 1.35  2001/06/26 19:46:08  thomas
-  * moved calculation of long, short axis up to
-  * the Array. Probably will be moved again (to locator?)
-  * in the near future.
-  *
-  * Revision 1.34  2001/06/25 15:13:56  thomas
-  * implimented negativeExponentFormatPatterns in floats as an alt.
-  * pattern when N <0 && N>-1 and an exponent is specified.
-  *
-  * Revision 1.33  2001/06/19 19:04:16  thomas
-  * bug fix on getInt, getShort, getLongData methods.
-  *
-  * Revision 1.32  2001/06/18 21:42:29  thomas
-  * first implemntation of reset() method. Antipated a possible
-  * bug in getting shortArrayIndex when DataCube was 1-D.
-  *
-  * Revision 1.31  2001/06/18 17:07:26  thomas
-  * total re-vamp of internal data storage. Will
-  * actually handle more than 2D of data now.
-  * More work needed to optimize.
-  *
-  * Revision 1.30  2001/05/29 21:56:39  thomas
-  * added [set/get][Long/Short]Data methods.
-  *
-  * Revision 1.29  2001/05/10 21:08:51  thomas
-  * init method is now protected. Added resetAttributes
-  * call to init.
-  *
-  * Revision 1.28  2001/05/04 20:22:01  thomas
-  * Minor bugfixes. Implement ArrayInterface for parentArray. Implement
-  * AxisInterface in places, but not complete with this work.
-  *
-  * Revision 1.27  2001/05/02 18:16:39  thomas
-  * Minor changes related to API standardization effort.
-  *
-  * Revision 1.26  2001/04/27 21:27:50  thomas
-  * Small change to accomodate moving get/set LessThan, etc methods
-  * from dataformat to Field class.
-  *
-  * Revision 1.25  2001/03/28 21:55:43  thomas
-  * Doh! Perl code doesnt run in Java file. Fixed.
-  *
-  * Revision 1.24  2001/03/07 23:15:29  thomas
-  * was missing newNodeNameString rename in toXMLfilehandle (or subroutine).
-  *
-  * Revision 1.23  2001/02/07 18:40:15  thomas
-  * Added new setData methods. Converted XML attribute decl
-  * to use constants (final static fields within the object). These
-  * are private decl for now. -b.t.
-  *
-  * Revision 1.22  2001/01/29 19:29:34  thomas
-  * Changes related to combining ExponentialDataFormat
-  * and FloatDataFormat classes. -b.t.
-  *
-  * Revision 1.21  2001/01/29 05:03:37  thomas
-  * Half-hearted code for binary writing. Disabled
-  * for the time being. -b.t.
-  *
-  * Revision 1.20  2001/01/19 22:33:12  thomas
-  * Some small changes to the output when Href is
-  * used. -b.t.
-  *
-  * Revision 1.19  2001/01/19 17:23:20  thomas
-  * Fixed Href stuff to DTD standard. Now using
-  * notation and entities at the beginning of the
-  * file. -b.t.
-  *
-  * Revision 1.18  2000/11/27 22:39:25  thomas
-  * Fix to allow attribute text to have newline, carriage
-  * returns in them (print out as entities: &#010; and
-  * &#013;) This allows files printed out to be read back
-  * in again(yeah!). -b.t.
-  *
-  * Revision 1.17  2000/11/22 20:42:00  thomas
-  * beaucoup changes to make formatted reads work.
-  * DataFormat methods now store the "template" or
-  * formatPattern that will be needed to print them
-  * back out. Removed sprintfNotation, Perl regex and
-  * Perl attributes from DataFormat classes. -b.t.
-  *
-  * Revision 1.16  2000/11/20 22:06:08  thomas
-  * plit up Attribute type NUMBER_TYPE into
-  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
-  * some needed handling in the SaxDocHandler when
-  * parsing data for the formatted read. Put prior NUMBER_TYPE
-  * attributes into appropriate new category. -b.t.
-  *
-  * Revision 1.15  2000/11/16 19:51:25  kelly
-  * fixed documentation.  -k.z.
-  *
-  * Revision 1.14  2000/11/10 15:35:08  kelly
-  * minor fix related to cvs check in.
-  *
-  * Revision 1.13  2000/11/10 04:32:44  thomas
-  * Updated to fix compile problems. -b.t.
-  *
-  * Revision 1.12  2000/11/09 23:22:59  kelly
-  * handles formatted read now.  -k.z.
-  *
-  * Revision 1.11  2000/11/09 04:52:00  thomas
-  * In toXML* method, CDATA miss-spelled CDDATA (!)
-  * Fixed. -b.t.
-  *
-  * Revision 1.10  2000/11/08 22:30:12  thomas
-  * Changed set methods to return void. -b.t.
-  *
-  * Revision 1.9  2000/11/08 19:18:07  thomas
-  * Changed the name of toXDF* methods to toXML* to
-  * better reflect the nature of the output (its not XDF
-  * unless you call th emethod from strcuture object;
-  * otherwise, it wont validate as XDF; it is still XML
-  * however). -b.t.
-  *
-  * Revision 1.8  2000/11/06 21:11:01  kelly
-  * --added removeData method
-  * --added deep cloning
-  *
-  * Revision 1.7  2000/11/01 16:28:25  thomas
-  * Updated taggedIOsection to write out noDataValued
-  * data that has no noDataValue defined to be an empty
-  * tag. -b.t.
-  *
-  * Revision 1.6  2000/10/31 21:37:18  kelly
-  * --completed *toXDF* for delimited IO style.
-  * --added NoDataException handling  -k.z.
-  *
-  * Revision 1.5  2000/10/30 18:16:24  kelly
-  * changed are made for relevant FieldAxis stuff.  -k.z.
-  *
-  *
-  */
-
-
-
-
-
 

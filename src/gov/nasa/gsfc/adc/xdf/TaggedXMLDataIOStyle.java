@@ -240,13 +240,20 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
                                         // in the least, its tagToAxis that is important.
       int numberOfAxes = axisList.size();   
 */
+      if (niceOutput) {
+            outputWriter.write( Constants.NEW_LINE);
+            outputWriter.write( indent);
+      }
+
+      outputWriter.write("<taggedStyle>");
+      String moreIndent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
 
       for (int i = 0, size = tags.length; i < size; i++) {
          String tag = tags[i];
          String axisId = (String) axisIdHash.get(tag); // ((AxisInterface) axisList.get(i)).getAxisId();
          if (niceOutput) {
             outputWriter.write( Constants.NEW_LINE);
-            outputWriter.write( indent);
+            outputWriter.write( moreIndent);
          }
          outputWriter.write( "<" + TagToAxisNodeName + " axisIdRef=\"");
          writeOutAttribute(outputWriter, axisId);
@@ -255,6 +262,13 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
          writeOutAttribute(outputWriter, tag);
          outputWriter.write( "\"/>");
       }
+
+      if (niceOutput) {
+         outputWriter.write( Constants.NEW_LINE);
+         outputWriter.write( indent);
+      }
+
+      outputWriter.write("</taggedStyle>");
 
       // wrap up newline 
       if (niceOutput) {
@@ -325,78 +339,4 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
    }
 
 }
-/* Modification History:
- *
- * $Log$
- * Revision 1.20  2001/09/27 17:21:48  thomas
- * added method getAxisIdByTag; fix to writing out tagged data
- *
- * Revision 1.19  2001/09/20 21:00:33  thomas
- * clean up plus bug fix: tag to axis could be reversed!
- *
- * Revision 1.18  2001/09/18 17:47:27  thomas
- * bug fixes for tagged data which has non-'d0' field axis (e.g. transposed data)
- *
- * Revision 1.17  2001/07/26 15:55:42  thomas
- * added flush()/close() statement to outputWriter object as
- * needed to get toXMLOutputStream to work properly.
- *
- * Revision 1.16  2001/07/11 22:35:21  thomas
- * Changes related to adding valueList or removeal of unneeded interface files.
- *
- * Revision 1.15  2001/07/06 19:04:23  thomas
- * toXMLOutputStream and related methods now pass on IOExceptions
- * to the application writer (e.g. they throw the error).
- *
- * Revision 1.14  2001/06/18 21:34:09  thomas
- * changes reflecting new getIOAxesOrder in parent and cleanup
- * of specificIO method output.
- *
- * Revision 1.13  2001/05/10 21:41:52  thomas
- * minor change to specificStyletoXDF. Small
- * change to constructors realated to inheritance
- * scheme.
- *
- * Revision 1.12  2001/05/04 20:23:40  thomas
- * Added Interface stuff.
- *
- * Revision 1.11  2001/05/02 18:16:39  thomas
- * Minor changes related to API standardization effort.
- *
- * Revision 1.10  2001/02/07 18:44:03  thomas
- * Converted XML attribute decl
- * to use constants (final static fields within the object). These
- * are private decl for now. -b.t.
- *
- * Revision 1.9  2000/11/27 22:39:25  thomas
- * Fix to allow attribute text to have newline, carriage
- * returns in them (print out as entities: &#010; and
- * &#013;) This allows files printed out to be read back
- * in again(yeah!). -b.t.
- *
- * Revision 1.8  2000/11/16 20:09:35  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.7  2000/11/08 22:30:11  thomas
- * Changed set methods to return void. -b.t.
- *
- * Revision 1.6  2000/11/08 20:12:39  thomas
- * Trimmed down import path to just needed classes -b.t
- *
- * Revision 1.5  2000/10/31 21:44:39  kelly
- * minor fix to *toXDF*, the read opening/closing node is handled by
- * XMLDataIOSytle now.  -k.z.
- *
- * Revision 1.4  2000/10/30 18:17:38  kelly
- * Axis and FieldAxis now share common interface -k.z.
- *
- * Revision 1.3  2000/10/26 14:22:45  kelly
- * fixed some for loops (use a simple variable for end condition now).  fixed a bug in *toXDF*.  -k.z.
- *
- * Revision 1.2  2000/10/17 22:03:54  kelly
- * completed the class.  -k.z.
- *
- * Revision 1.1  2000/10/11 19:05:53  kelly
- * created the class.
- *
- */
+

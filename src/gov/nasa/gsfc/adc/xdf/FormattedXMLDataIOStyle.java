@@ -142,57 +142,114 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   /**specific tailoring when writing out
    */
 
+/*
+  read SECTION for formatted data now looks like:
+
+         <fixedWidthStyle>
+            <fixedWidthReadInstructions>
+               <repeat count="9">
+                  <readCell/>
+                  <skip count="1"/> <!-- just outputs a space -->
+               </repeat>
+               <readCell/>
+               <skip count="1"><newLine/></skip> <!-- will output logical newLine -->
+            </fixedWidthReadInstructions>
+            <for axisIdRef="y-axis">
+               <for axisIdRef="x-axis">
+                  <doReadInstructions/>
+               </for>
+            </for>
+         </fixedWidthStyle>
+*/
+
   protected void specificIOStyleToXDF( Writer outputWriter, String indent)
   throws java.io.IOException
   {
 
-     //List axisList = parentArray.getAxes();
      List axisList = getIOAxesOrder();
      int numberOfAxes = axisList.size(); 
+     boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
+     String moreIndent = Specification.getInstance().getPrettyXDFOutputIndentation();
+     String sectionIndent = indent + moreIndent;
+
+     if (niceOutput) {
+        outputWriter.write( Constants.NEW_LINE);
+        outputWriter.write( indent );
+     }
+
+     outputWriter.write("<fixedWidthStyle>");
+
+     /* SECTION 1: open up the read instruction section */
+     if (niceOutput) {
+        outputWriter.write( Constants.NEW_LINE);
+        outputWriter.write( sectionIndent);
+     }
+
+     outputWriter.write("<fixedWidthReadInstructions>");
+
+     if (niceOutput) 
+        outputWriter.write( Constants.NEW_LINE);
+
+     //write out nodes in formatCommandList
+     synchronized (formatCommandList) {
+        int stop = formatCommandList.size();
+        for (int i = 0; i <stop; i++) {
+           ((BaseObject) formatCommandList.get(i)).toXMLWriter(outputWriter, sectionIndent + moreIndent);
+        }
+     } // end formatCommandList sync 
+
+     if (niceOutput) { 
+          outputWriter.write( sectionIndent);
+     }
+
+     outputWriter.write("</fixedWidthReadInstructions>");
+
+     /* SECTION 2: now print the For nodes */
+
      for (int i = (numberOfAxes-1); i >= 0; i--) {
         AxisInterface axis = (AxisInterface) axisList.get(i);
-        if (Specification.getInstance().isPrettyXDFOutput()) {
+        if (niceOutput) {
            outputWriter.write( Constants.NEW_LINE);
-           outputWriter.write( indent);
-           indent = indent + Specification.getInstance().getPrettyXDFOutputIndentation(); 
+           outputWriter.write( sectionIndent);
+           sectionIndent = sectionIndent + moreIndent;
         }
         outputWriter.write( "<"+UntaggedInstructionNodeName+" "+UntaggedInstructionAxisIdRefName+"=\"");
         writeOutAttribute(outputWriter, axis.getAxisId());
         outputWriter.write( "\">");
      }
 
-     if (Specification.getInstance().isPrettyXDFOutput()) 
-              outputWriter.write( Constants.NEW_LINE);
+     if (niceOutput) { 
+          outputWriter.write( Constants.NEW_LINE);
+          outputWriter.write( sectionIndent + moreIndent);
+     }
 
-     String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
+     //write out  the instruction to read the commands
+     outputWriter.write("<doReadInstructions/>");
 
-     //write out nodes in formatCommandList
-     synchronized (formatCommandList) {
-        int stop = formatCommandList.size();
-        for (int i = 0; i <stop; i++) {
-           // if (Specification.getInstance().isPrettyXDFOutput()) {
-           //   outputWriter.write( Constants.NEW_LINE);
-           //   outputWriter.write( indent);
-          // }
-           // ((XMLDataIOStyle) formatCommandList.get(i)).specificIOStyleToXDF(outputWriter, indent);
-           ((BaseObject) formatCommandList.get(i)).toXMLWriter(outputWriter, newindent);
-        }
-     } // end formatCommandList sync 
+     if (niceOutput)
+          outputWriter.write( Constants.NEW_LINE);
 
      // print out remaining for statements
      while(numberOfAxes-- > 0) 
      {
-        if (Specification.getInstance().isPrettyXDFOutput()) {
+        if (niceOutput) {
            // peel off some indent
-           indent = indent.substring(0,indent.length() - 
-                          Specification.getInstance().getPrettyXDFOutputIndentation().length());
-           outputWriter.write( indent);
+           sectionIndent = sectionIndent.substring(0,sectionIndent.length() - moreIndent.length());
+           outputWriter.write( sectionIndent);
         }
         outputWriter.write( "</"+UntaggedInstructionNodeName+">");
-        if (Specification.getInstance().isPrettyXDFOutput()) {
+        if (niceOutput) {
            outputWriter.write( Constants.NEW_LINE);
         }
      }
+
+     if (niceOutput) 
+         outputWriter.write( indent);
+
+     outputWriter.write("</fixedWidthStyle>");
+
+     if (niceOutput) 
+           outputWriter.write( Constants.NEW_LINE);
 
   }
 
@@ -201,128 +258,6 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   // Private Methods
   //
 
-/*
-  private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) 
-  throws java.io.IOException
-  {
-    //base condition
-    if (which > stop) {
-      if (Specification.getInstance().isPrettyXDFOutput()) {
-        writeOut(outputstream, Constants.NEW_LINE);
-        writeOut(outputstream, indent);
-      }
-      synchronized (formatCommandList) {
-        int end = formatCommandList.size();
-        for (int i = 0; i < end; i++) {
-          Object command = formatCommandList.get(i);
-          ((XMLDataIOStyle) command).specificIOStyleToXDF(outputstream, indent);
-           if (Specification.getInstance().isPrettyXDFOutput()) {
-           writeOut(outputstream, Constants.NEW_LINE);
-           writeOut(outputstream, indent);
-          }
-        }
-      }
-    }
-    else {
-      if (Specification.getInstance().isPrettyXDFOutput()) {
-        writeOut(outputstream, Constants.NEW_LINE);
-        writeOut(outputstream, indent);
-      }
-      writeOut(outputstream, "<" + UntaggedInstructionNodeName + " "+UntaggedInstructionAxisIdRefName+"=\"");
-      writeOut(outputstream, ((AxisInterface) parentArray.getAxes().get(which)).getAxisId() + "\">");
-      which++;
-      nestedToXDF(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation(), which, stop);
-
-      if (Specification.getInstance().isPrettyXDFOutput()) {
-        writeOut(outputstream, Constants.NEW_LINE);
-        writeOut(outputstream, indent);
-      }
-       writeOut(outputstream, "</" + UntaggedInstructionNodeName + ">");
-    }
-   }
-*/
-
 
 }
-
-/* Modification History:
- *
- * $Log$
- * Revision 1.21  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.20  2001/07/26 15:55:42  thomas
- * added flush()/close() statement to outputWriter object as
- * needed to get toXMLOutputStream to work properly.
- *
- * Revision 1.19  2001/07/11 22:35:21  thomas
- * Changes related to adding valueList or removeal of unneeded interface files.
- *
- * Revision 1.18  2001/07/06 19:05:01  thomas
- * toXMLOutputStream and related methods now throw
- * java.io.IOException
- *
- * Revision 1.17  2001/06/28 16:50:54  thomas
- * changed add method(s) to return boolean.
- *
- * Revision 1.16  2001/06/19 19:29:22  thomas
- * *** empty log message ***
- *
- * Revision 1.15  2001/06/18 21:32:35  thomas
- * changes to reflect new getIOAxisOrder method of parent.
- *
- * Revision 1.14  2001/05/10 21:16:10  thomas
- * changes related to inheritance. call super in constructor.
- * FormattedIO objects arent type XMLDataIOSTYLE!!
- * changed to make them BaseObject.
- *
- * Revision 1.13  2001/05/04 20:23:16  thomas
- * Added Interface stuff.
- *
- * Revision 1.12  2001/05/02 18:16:39  thomas
- * Minor changes related to API standardization effort.
- *
- * Revision 1.11  2001/02/07 18:44:03  thomas
- * Converted XML attribute decl
- * to use constants (final static fields within the object). These
- * are private decl for now. -b.t.
- *
- * Revision 1.10  2000/11/27 22:39:26  thomas
- * Fix to allow attribute text to have newline, carriage
- * returns in them (print out as entities: &#010; and
- * &#013;) This allows files printed out to be read back
- * in again(yeah!). -b.t.
- *
- * Revision 1.9  2000/11/22 21:56:03  thomas
- * Fix to print out for nodes in toXML* methods. -b.t.
- *
- * Revision 1.8  2000/11/20 22:07:58  thomas
- * Implimented some changes needed by SaxDocHandler
- * to allow formatted reads (e.g. these classes were not
- * working!!). Implemented new Attribute INTEGER_TYPE
- * in count attributes for repeat/skipChar classes. -b.t.
- *
- * Revision 1.7  2000/11/17 22:29:55  thomas
- * Some minor changes to code layout. -b.t.
- *
- * Revision 1.6  2000/11/16 20:00:19  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.5  2000/11/10 15:36:21  kelly
- * minor fix related to cvs checkin
- *
- * Revision 1.4  2000/11/10 01:40:41  thomas
- * Bug fix. This code was keeping the package from
- * compiling. Kelly, please review code carefully.
- * -b.t.
- *
- * Revision 1.3  2000/11/09 23:25:01  kelly
- * completed specificIOStyleToXDF()
- *
- * Revision 1.2  2000/11/01 16:14:13  thomas
- *
- *   Another version, not finished but has more in it that before. -b.t.
- *
- *
- */
 

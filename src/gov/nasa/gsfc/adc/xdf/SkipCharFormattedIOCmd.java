@@ -45,7 +45,7 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
 
   /* XML attribute names */
   private static final String COUNT_XML_ATTRIBUTE_NAME = new String("count");
-  private static final String OUTPUT_STRING_XML_ATTRIBUTE_NAME = new String("output");
+  private static final String OUTPUT_XML_ATTRIBUTE_NAME = new String("output");
 
   /* default attribute values */
   public static final int DEFAULT_COUNT = 1;
@@ -98,14 +98,14 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
 
   /**setOutput: set the *output* attribute
    */
-  public void setOutput(String strOutput) {
-     ((Attribute) attribHash.get(OUTPUT_STRING_XML_ATTRIBUTE_NAME)).setAttribValue(strOutput);
+  public void setOutput(OutputCharDataInterface outputObj) {
+     ((Attribute) attribHash.get(OUTPUT_XML_ATTRIBUTE_NAME)).setAttribValue(outputObj);
   }
 
   /**getOutput: get the *output* attribute
    */
-  public String getOutput() {
-    return (String)  ((Attribute) attribHash.get(OUTPUT_STRING_XML_ATTRIBUTE_NAME)).getAttribValue();
+  public OutputCharDataInterface getOutput() {
+     return (OutputCharDataInterface)  ((Attribute) attribHash.get(OUTPUT_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   //
@@ -140,15 +140,28 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
          outputWriter.write("\"");
       }
 
-      if ((attrib=getOutput()) !=null)
+      // we put in a slight logic hack to make it look 'neat' for default case of 
+      // a single space within a Chars object. ONLY do the full string when
+      // its something else 
+      if ((attrib=getOutput()) !=null && !((OutputCharDataInterface) attrib).getValue().equals(" ") )
       { 
-         outputWriter.write(" "+OUTPUT_STRING_XML_ATTRIBUTE_NAME+"=\"");
-         writeOutAttribute(outputWriter, (String) attrib);
-         outputWriter.write("\"");
+
+
+         outputWriter.write(">");
+         if(niceOutput) 
+            outputWriter.write(Constants.NEW_LINE);
+
+         ((BaseObject) attrib).toXMLWriter(outputWriter, indent + Specification.getInstance().getPrettyXDFOutputIndentation());
+
+         if(niceOutput) outputWriter.write(indent);
+         outputWriter.write("</"+classXDFNodeName+">");
+
+      } else {
+
+         // just close the node
+         outputWriter.write("/>");
       }
 
-      //close the node
-      outputWriter.write("/>");
     }
 
     //if(niceOutput) outputWriter.write(Constants.NEW_LINE);
@@ -162,79 +175,18 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
   protected void init()
   {
 
-    resetAttributes();
-    classXDFNodeName = "skipChars";
+     resetAttributes();
+     classXDFNodeName = "skip";
 
-    attribOrder.add(0, OUTPUT_STRING_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, COUNT_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, OUTPUT_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, COUNT_XML_ATTRIBUTE_NAME);
 
-    attribHash.put(COUNT_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_COUNT), Constants.INTEGER_TYPE));
-    attribHash.put("output", new Attribute(DEFAULT_OUTPUT, Constants.STRING_TYPE));
+     //set up the axisUnits attribute
+     Chars outputObj = new Chars();
+     attribHash.put(OUTPUT_XML_ATTRIBUTE_NAME, new Attribute(outputObj, Constants.OBJECT_TYPE));
+     attribHash.put(COUNT_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_COUNT), Constants.INTEGER_TYPE));
 
   }
 
 }
 
-
-/* Modification History:
- *
- * $Log$
- * Revision 1.14  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.13  2001/09/06 15:56:41  thomas
- * changed basicXMLWriter to return String (nodeName)
- *
- * Revision 1.12  2001/09/05 22:00:58  thomas
- * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter
- *
- * Revision 1.11  2001/07/26 15:55:42  thomas
- * added flush()/close() statement to outputWriter object as
- * needed to get toXMLOutputStream to work properly.
- *
- * Revision 1.10  2001/07/19 21:59:44  thomas
- * yanked XMLDeclAttribs from toXMLOutputStream (only needed
- * in the XDF class)
- *
- * Revision 1.9  2001/07/06 19:04:23  thomas
- * toXMLOutputStream and related methods now pass on IOExceptions
- * to the application writer (e.g. they throw the error).
- *
- * Revision 1.8  2001/05/10 21:40:20  thomas
- * added resetAttributes to init().
- * replaced specificIOStyleToXDF w/ appropriate
- * toXMLOutputStream method.
- *
- * Revision 1.7  2001/02/07 18:44:04  thomas
- * Converted XML attribute decl
- * to use constants (final static fields within the object). These
- * are private decl for now. -b.t.
- *
- * Revision 1.6  2000/11/27 22:39:25  thomas
- * Fix to allow attribute text to have newline, carriage
- * returns in them (print out as entities: &#010; and
- * &#013;) This allows files printed out to be read back
- * in again(yeah!). -b.t.
- *
- * Revision 1.5  2000/11/20 22:07:58  thomas
- * Implimented some changes needed by SaxDocHandler
- * to allow formatted reads (e.g. these classes were not
- * working!!). Implemented new Attribute INTEGER_TYPE
- * in count attributes for repeat/skipChar classes. -b.t.
- *
- * Revision 1.4  2000/11/16 20:08:27  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.3  2000/11/10 15:36:44  kelly
- * minor fix related to cvs checkin
- *
- * Revision 1.2  2000/11/10 01:40:41  thomas
- * Bug fix. This code was keeping the package from
- * compiling. Kelly, please review code carefully.
- * -b.t.
- *
- * Revision 1.1  2000/11/09 23:32:06  kelly
- * created the class to handle skipChars
- *
- *
- */
