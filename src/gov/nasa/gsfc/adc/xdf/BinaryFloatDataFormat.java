@@ -41,6 +41,8 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
 
   /* XML attribute names */
   private static final String BITS_XML_ATTRIBUTE_NAME = "bits";
+ 
+  private int numOfBytes = 0;
 
   /* default attribute setting */
   public static final int DEFAULT_BINARY_FLOAT_BITS = 32;
@@ -67,8 +69,10 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
 
     int bits = numBits.intValue();
     if (Utility.isValidFloatBits(bits)) 
+    {
        ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(numBits);
-    else {
+       updateNumOfBytes();
+    } else {
       Log.warn("The requested number of bits:["+bits+"] for binary float is not allowed");
       Log.warnln("ignoring 'set' request.");
     }
@@ -79,8 +83,10 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
   public void setBits (int bits) {
 
      if (Utility.isValidFloatBits(bits))
+     {
         ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(new Integer(bits));
-     else {
+        updateNumOfBytes();
+     } else {
         Log.warn("The requested number of bits:["+bits+"] for binary float is not allowed");
         Log.warnln("ignoring 'set' request.");
      }
@@ -101,8 +107,9 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
   /** A convenience method.
    * @Return: the number of bytes this BinaryFloatDataFormat holds.
    */
-  public int numOfBytes() {
-     return getBits().intValue()/8;
+  public int numOfBytes() 
+  {
+     return numOfBytes;
   }
 
    // We need this here so that we will properly update the
@@ -133,13 +140,22 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
       attribOrder.add(0, BITS_XML_ATTRIBUTE_NAME);  //add bits as the first attribute;
 
       attribHash.put(BITS_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_BINARY_FLOAT_BITS), Constants.INTEGER_TYPE));
+      updateNumOfBytes();
    }
+
+   private void updateNumOfBytes () {
+      numOfBytes = getBits().intValue()/8;
+   }
+
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/09/18 17:41:52  thomas
+ * caches numOfBytes now
+ *
  * Revision 1.11  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *

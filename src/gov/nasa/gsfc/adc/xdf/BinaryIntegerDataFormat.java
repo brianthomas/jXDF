@@ -43,6 +43,8 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
   private static final String BITS_XML_ATTRIBUTE_NAME = "bits";
   private static final String SIGNED_XML_ATTRIBUTE_NAME = "signed";
 
+  private int numOfBytes = 0;
+
   /* default attribute settings */
   public static final int DEFAULT_BINARY_INTEGER_BITS = 16;
   public static final String DEFAULT_BINARY_INTEGER_SIGNED = "yes";
@@ -71,6 +73,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
      {
         if(Utility.isValidIntegerBits(numBits.intValue())) { 
            ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(numBits);
+           updateNumOfBytes(); 
         } else { 
            Log.warnln(numBits.toString()+" is not a valid number of BinaryInteger bits, ignoring set request.");
         }
@@ -86,6 +89,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
 
         if(Utility.isValidIntegerBits(numBits)) { 
            ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(new Integer(numBits));
+           updateNumOfBytes(); 
         } else { 
            Log.warnln(numBits+" is not a valid number of BinaryInteger bits, ignoring set request.");
         }
@@ -129,7 +133,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
      @Return: the number of bytes this BinaryIntegerDataFormat holds.
    */
    public int numOfBytes() {
-      return getBits().intValue()/8;
+      return numOfBytes;
    }
 
    // We need this here so that we will properly update the
@@ -164,14 +168,21 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
      attribHash.put( SIGNED_XML_ATTRIBUTE_NAME, 
                       new Attribute(DEFAULT_BINARY_INTEGER_SIGNED, Constants.STRING_TYPE));
 
+     updateNumOfBytes(); 
   }
 
+  private void updateNumOfBytes () {
+     numOfBytes = getBits().intValue()/8;
+  }
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/09/18 17:41:52  thomas
+ * caches numOfBytes now
+ *
  * Revision 1.12  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
