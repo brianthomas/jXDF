@@ -752,15 +752,23 @@ public class DataCube extends BaseObject {
       // situations we do want to do so. :P For the time being we just
       // take the following 'dumb' approach.
       if (hrefObj != null) {  
+
+        // we always check SystemID first
         String fileName = hrefObj.getSystemId();
+
+	// if systemId == null, use publicID
+	if (fileName == null || fileName.length() == 0) {
+	    fileName = hrefObj.getPublicId();
+
+	} else {
+	    // in the future, systemID should return a URL, ...
+	    int index = fileName.indexOf("file:");
+	    if (index == 0)
+		fileName = fileName.substring(5);
+	}
+
         String hrefName = hrefObj.getName();
   
-        // Some parsers return systemId with the 'file:' prefix. Java
-        // doenst currently understand this so we need to peal it off.
-        int index = fileName.indexOf("file:");
-        if (index == 0)
-           fileName = fileName.substring(5);
-
         if(hrefName == null) 
         {
           Log.errorln("Error: href object in dataCube lacks name. Data being written into metadata instead.\n");
@@ -2022,6 +2030,12 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.53  2001/10/15 17:06:47  thomas
+  * merged in changes from ver017
+  *
+  * Revision 1.52.2.1  2001/10/09 18:41:04  huang
+  * fixed a bug in expecting null systemID
+  *
   * Revision 1.52  2001/09/27 17:19:54  thomas
   * fixes to allow writing out of TaggedXMLDataIOStyle
   *

@@ -96,3 +96,8 @@
                       - bug in reading external TaggedXMLDataIOStyle, DelimitedXMLDataIOStyle formatted files fixed
                       - added create tests for external data files to build.xml
 
+
+0.17-beta1  10/15/01  ~ 2nd Beta, Patch Level 2 
+                      - small fixes needed by FITSML
+
+

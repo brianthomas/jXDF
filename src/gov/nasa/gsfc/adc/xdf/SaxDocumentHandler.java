@@ -80,10 +80,10 @@ public class SaxDocumentHandler extends DefaultHandler {
 //    private static final String sHandlerXDFDTDName = "XDF_017.dtd";
 
     // The XDF structure that is populated by the XDF DocumentHandler
-    private XDF XDF; 
+    protected XDF XDF; 
 
     // Options for the document handler
-    private Hashtable Options;
+    protected Hashtable Options;
 
     // dispatch table action handler hashtables
     protected Hashtable startElementHandlerHashtable; // start node handler
@@ -101,9 +101,9 @@ public class SaxDocumentHandler extends DefaultHandler {
     protected ArrayList CurrentFormatObjectList = new ArrayList ();
 
     // group objects
-    private ArrayList CurrentParameterGroupList = new ArrayList();
-    private ArrayList CurrentFieldGroupList = new ArrayList();
-    private ArrayList CurrentValueGroupList = new ArrayList();
+    protected ArrayList CurrentParameterGroupList = new ArrayList();
+    protected ArrayList CurrentFieldGroupList = new ArrayList();
+    protected ArrayList CurrentValueGroupList = new ArrayList();
 
     // the last object created by a startElementNodeActionHandler
     protected Object ParentObject; 
@@ -119,15 +119,15 @@ public class SaxDocumentHandler extends DefaultHandler {
     // GLOBALs for saving these between dataFormat/read node and later when we 
     // know what kind of DataFormat/DataIOStyle object we really have
     private Hashtable ValueAttribs = new Hashtable();
-    private Hashtable DataIOStyleAttribs = new Hashtable();
-    private Attributes DataFormatAttribs;
+    protected Hashtable DataIOStyleAttribs = new Hashtable();
+    protected Attributes DataFormatAttribs;
 
     // for tagged reads only. Keeps track of which data tags are open
     // so we know which datacell in the current datacube to shunt the 
     // data to.
-    private Hashtable DataTagCount = new Hashtable();
+    protected Hashtable DataTagCount = new Hashtable();
 
-    private Hashtable DoctypeObjectAttributes;
+    protected Hashtable DoctypeObjectAttributes;
 
     protected int BASEINPUTREADSIZE =     4096; // base byte buffer for reads 
     protected int MAXINPUTREADSIZE  = 16777216; // maximum byte buffer for reads
@@ -170,6 +170,8 @@ public class SaxDocumentHandler extends DefaultHandler {
 //    private AxisInterface FastestAxis;
     private int LastFieldAxisCoordinate;
     private ArrayList AxisReadOrder;
+
+    private String currentValueString;
 
     // lookup tables holding objects that have id/idref stuff
     public Hashtable ArrayObj = new Hashtable();
@@ -308,6 +310,10 @@ public class SaxDocumentHandler extends DefaultHandler {
      */
     public void setForceSetXMLHeaderStuffOnXDFObject (boolean value) {
        ForceSetXMLHeaderStuff = value;
+    }
+
+    protected boolean getForceSetXMLHeaderStuffOnXDFObject() {
+       return ForceSetXMLHeaderStuff;
     }
 
     //
@@ -494,9 +500,6 @@ public class SaxDocumentHandler extends DefaultHandler {
         String element = qName;
         Log.debugln("H_END:["+namespaceURI+","+localName+","+qName+"]");
 
-        // peel off the last element in the current path
-        CurrentNodePath.remove(CurrentNodePath.size()-1); 
-
         // if a handler exists, run it, else give a warning
         if ( endElementHandlerHashtable.containsKey(element) ) {
 
@@ -513,6 +516,9 @@ public class SaxDocumentHandler extends DefaultHandler {
            defaultEvent.action(this);
 
         }
+
+        // peel off the last element in the current path
+        CurrentNodePath.remove(CurrentNodePath.size()-1); 
 
         // peel off last object in object list
         CurrentObjectList.remove(CurrentObjectList.size()-1);
@@ -1591,6 +1597,7 @@ Log.errorln("");
        endElementHandlerHashtable.put(XDFNodeName.TD6, new dataTagEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.TD7, new dataTagEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.TD8, new dataTagEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.VALUE, new valueEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListEndElementHandlerFunc());
 
@@ -4347,14 +4354,13 @@ while (iter.hasNext()) {
                  {
 		     //                    newvalue = LastParameterObject.addValue(newvalue);
 		     LastParameterObject.addValue(newvalue);
-                 } else if ( parentNodeName.equals(XDFNodeName.AXIS) )
-                 {
+                 } else if ( parentNodeName.equals(XDFNodeName.AXIS) ) {
 
                     List axisList = (List) CurrentArray.getAxes();
                     Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
 		    lastAxisObject.addAxisValue(newvalue);
                  } else {
-                    Log.errorln("Error: weird parent node "+parentNodeName+" for value. Ignoring.");
+                    Log.errorln("Error: valueStart: weird parent node "+parentNodeName+" for value. Ignoring.");
                  }
 
                  // Now add this object to all open groups
@@ -4369,15 +4375,26 @@ while (iter.hasNext()) {
               }
           }
 
+	  currentValueString = new String();
           return (Object) null; 
       }
    }
+
 
    class valueCharDataHandlerFunc implements CharDataHandlerAction {
       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
       throws SAXException
       {
+	  currentValueString = currentValueString + new String(buf,offset,len);
+      }
+   }
 
+
+    class valueEndElementHandlerFunc implements EndElementHandlerAction 
+    {
+	public void action (SaxDocumentHandler handler)
+	    throws SAXException
+	{
           //  grab parent node name
           // this special call will find the first parent node name 
           // that doesnt match XDFNodeName.VALUEGROUP
@@ -4387,9 +4404,7 @@ while (iter.hasNext()) {
           // create new object appropriately 
           Value newvalue = new Value();
           newvalue.hashtableInitXDFAttributes(ValueAttribs);
-          // reconsitute the value node PCdata from passed information.
-          // and add value to object
-          newvalue.setValue( new String (buf, offset, len) );
+          newvalue.setValue( currentValueString);
 
          // add this object to the lookup table, if it has an ID
           String valueId = newvalue.getValueId();
@@ -4448,7 +4463,7 @@ while (iter.hasNext()) {
 	      lastAxisObject.addAxisValue(newvalue);
 
           } else {
-             Log.errorln("Error: weird parent node "+parentNodeName+" for value. Ignoring.");
+             Log.errorln("Error: valueEnd: weird parent node "+parentNodeName+" for value. Ignoring.");
           }
 
           // 4. add this object to all open groups
@@ -4459,8 +4474,10 @@ while (iter.hasNext()) {
           }
 
           ValueAttribs.clear();
+	  currentValueString = null;
        }
     }
+
 
     // VALUEGROUP 
     //
@@ -4846,269 +4863,4 @@ while (iter.hasNext()) {
 
 } // End of SaxDocumentHandler class 
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.67  2001/10/03 16:12:27  thomas
- * added fix for adding notes to Structure/XDF objects
- *
- *
- * Revision 1.66  2001/10/02 20:57:54  thomas
- * made some fields public/protected from private
- *
- * Revision 1.65  2001/10/02 20:17:36  thomas
- * merged from ver017 branch
- *
- * Revision 1.64.2.1  2001/10/02 20:13:20  thomas
- *  implemented Units stuf
- *
- * Revision 1.64  2001/10/01 17:03:00  thomas
- * added capabilty to add external, delmited data; small fix to trim off whitespace before running the Integer.parseInt stuff in addData..
- *
- * Revision 1.63  2001/09/27 17:22:33  thomas
- * added ability to write tagged data to an external file
- *
- * Revision 1.62  2001/09/24 19:50:32  thomas
- * fixed bug: reads tagged data again(!)
- *
- * Revision 1.61  2001/09/24 19:44:15  thomas
- * bug fix: CurrentReadBytes wasnt being correctly calculated for Formatted data!
- *
- * Revision 1.60  2001/09/21 16:50:59  thomas
- * changes to make array appending work again. *sigh* the whole thing breaks the DTD however
- *
- * Revision 1.59  2001/09/21 14:08:58  thomas
- * *** empty log message ***
- *
- * Revision 1.58  2001/09/20 21:00:58  thomas
- * action handlers now throw SAXExceptions
- *
- * Revision 1.57  2001/09/20 15:06:32  thomas
- * changed handling of addByteData method, fix to valueList non-whitespace char data for algorithm version
- *
- * Revision 1.56  2001/09/19 17:52:13  thomas
- * inserted safety check for valueList end elements that have whitespace chardata but are algorithm prescription
- *
- * Revision 1.55  2001/09/19 17:32:46  thomas
- * changed weird parent handling, no need to dump core, we'll just ignore the miscreant object for now
- *
- * Revision 1.54  2001/09/19 16:40:10  thomas
- * implemented better handling of file hrefs in different directories
- *
- * Revision 1.53  2001/09/18 19:36:29  thomas
- * intermediate code, may fail for delmited/formatted data
- *
- * Revision 1.52  2001/09/18 17:46:45  thomas
- * fixes for tagged data, small speed up for binary numbers fix
- *
- * Revision 1.51  2001/09/14 18:21:20  thomas
- * Added in  XDF object XMLheader stuff and a few odd error handlers (not really needed but im feeling anal today :)
- *
- * Revision 1.50  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.49  2001/09/05 22:02:09  thomas
- * Added in new NotationNode class. Made Href->Entity change
- *
- * Revision 1.48  2001/09/04 21:50:53  thomas
- * added 8, 24 bit integer handling
- *
- * Revision 1.47  2001/09/04 21:19:19  thomas
- * added in 8,24,32 bit BInary integers
- *
- * Revision 1.46  2001/08/31 20:01:25  thomas
- * bug fix to integer parsing, couldnt understand values that began w/ + signcvs diff SaxDocumentHandler.java and added estructureEndElementHandler funct
- *
- * Revision 1.45  2001/07/30 19:24:39  thomas
- * bug fix: read obj not init'ing if didnt have readId!
- *
- * Revision 1.44  2001/07/30 18:28:11  thomas
- * Fix for XDF_sample4 reading: cloned read object child axes need to be the ones in the parent array, not default cloned ones.
- *
- * Revision 1.43  2001/07/26 15:57:24  thomas
- * changes related to name change in ElementNode class.
- *
- * Revision 1.42  2001/07/23 16:01:32  thomas
- * trivial chage to comments.
- *
- * Revision 1.41  2001/07/19 22:04:08  thomas
- * fixed bug in ValueList (algorithm) stuff. Start, size, step
- * not being correctly stored as String, fixed.
- *
- * Revision 1.40  2001/07/17 19:06:23  thomas
- * upgrade to use JAXP (SAX2) only. Namespaces NOT
- * implemented (yet).
- *
- * Revision 1.39  2001/07/11 22:38:37  thomas
- * Changes related to ValueList objects
- *
- * Revision 1.38  2001/07/02 21:17:57  thomas
- * bug fix: missed inserting special values for algorithm valueList expansion.
- *
- * Revision 1.37  2001/06/28 16:50:54  thomas
- * changed add method(s) to return boolean.
- *
- * Revision 1.36  2001/06/27 21:19:01  thomas
- * Better buffered reading of href data implimented
- * (still not as good as it could be).
- * Implemented reading of GZIP, Zip compressed Href data.
- *
- * Revision 1.35  2001/06/26 21:22:25  huang
- * changed return type to boolean for all addObject()
- *
- * Revision 1.34  2001/06/19 15:06:56  thomas
- * removed DTD handler info, as its duplicated in Specification class
- *
- * Revision 1.33  2001/06/18 21:40:15  thomas
- * now uses set/getIOAxesOrder from dataIOStyle obj. and
- * for nodes.
- *
- * Revision 1.32  2001/05/10 21:40:02  thomas
- * AxisObj, ArrayObj, etc. fields public. Several methods
- * made public. split character data handler into tagged
- * and untagged handlers, added as appropriate to the
- * character data handler table. Added default handlers
- * for start/end/charData. Added abilbity to set these
- * handlers.
- *
- * Revision 1.31  2001/05/04 21:00:07  thomas
- * Implemented interface stuff. ReadAxisOrder stuff was
- * not really right, fixed. More fixes on that topic needed still.
- *
- * Revision 1.30  2001/05/02 18:16:39  thomas
- * Minor changes related to API standardization effort.
- *
- * Revision 1.29  2001/02/07 18:46:25  thomas
- * Enabled append array and binary writing. Fixed up
- * the binary r/w code somewhat but it needs to be
- * redone properly. Some small changes for Jaxp (SAX1)
- * compatiblity. -b.t.
- *
- * Revision 1.28  2001/01/29 19:29:35  thomas
- * Changes related to combining ExponentialDataFormat
- * and FloatDataFormat classes. -b.t.
- *
- * Revision 1.27  2001/01/29 05:05:42  thomas
- * Code for reading binary values. The implemented code
- * is a travesty, it converts bytes to Strings, then decides
- * how to make strings into numbers and so forth. There
- * is some better (but still lousy) code for reading in
- * bytes directly into the array. Lots of needless globals
- * and messy code. This will need further work. -b.t.
- *
- * Revision 1.26  2001/01/22 22:11:58  thomas
- * Added id/idref struff to valueList, value and parameter. Read
- * id/idref stuff fixed. valueList values may now be added to
- * parameter objects. -b.t.
- *
- * Revision 1.25  2001/01/19 22:34:28  thomas
- * Fixed handling of readId/IdRef stuff. Added Id/IdRef stuff
- * for value, parameter. valuelist is not done yet. -b.t.
- *
- * Revision 1.24  2001/01/19 17:23:03  thomas
- * Fixed Href stuff to DTD standard. Now using
- * notation and entities at the beginning of the
- * file. -b.t.
- *
- * Revision 1.23  2001/01/17 18:28:46  thomas
- * removed unneeded debug comments. -b.t.
- *
- * Revision 1.22  2001/01/17 18:08:25  thomas
- * Minor bug, changed exponential node name
- * from "exponent" to "exponential". -b.t.
- *
- * Revision 1.21  2000/11/27 22:40:44  thomas
- * Fix to allow attribute text to have newline, carriage
- * returns in them (print out as entities: &#010; and
- * &#013;) This allows files printed out to be read back
- * in again(yeah!). Also, a fix to ValueGroup, added
- * method of getParentNode(ignoreThisNode) to allow
- * us to find the correct parent. Now, axis node is getting
- * its child values correctly. Need to check that this is
- * in place for ParameterGroup and FieldGroup. -b.t.
- *
- * Revision 1.20  2000/11/27 19:58:52  thomas
- * Added repeatable functionality to splitstringInotObj
- * method. -b.t.
- *
- * Revision 1.19  2000/11/22 22:04:06  thomas
- * Cloned objects for Id/IDRef stuff *shouldnt* have
- * an idRef after cloning. Inserted line to set this
- * attribute to null in the new object. -b.t.
- *
- * Revision 1.18  2000/11/22 21:23:24  thomas
- * Implimented Formatted Reads. Fixed AxisId/IdRef
- * problem of not having unique id on cloned axis.
- * (in fact, fixed this for all other id/idRef type objects
- * too). -b.t.
- *
- * Revision 1.17  2000/11/20 22:09:05  thomas
- * *** empty log message ***
- *
- * Revision 1.16  2000/11/17 22:29:23  thomas
- * Some changes to allow formattedIO, not finished with
- * the data handler yet tho. -b.t.
- *
- * Revision 1.15  2000/11/17 16:01:43  thomas
- * Minor bug fix, needed to switch to using Specification
- * class. -b.t.
- *
- * Revision 1.14  2000/11/10 06:14:43  thomas
- * Added set/get for Current/Array/Structure/DatatypeObject
- * methods . -b.t.
- *
- * Revision 1.13  2000/11/10 05:49:44  thomas
- * Updated start/end element handlers to update
- * CUrrentObjectList appropriately. Added getLastObject
- * method. -b.t.
- *
- * Revision 1.12  2000/11/09 23:04:56  thomas
- * Updated version, made changes to allow extension
- * to other dataformats (e.g. FITSML). -b.t.
- *
- * Revision 1.11  2000/11/09 04:24:12  thomas
- * Implimented small efficiency improvements to traversal
- * loops. -b.t.
- *
- * Revision 1.10  2000/11/08 22:30:11  thomas
- * Changed set methods to return void. -b.t.
- *
- * Revision 1.9  2000/11/07 21:53:53  thomas
- * 2 Fixes: null problem wi/ reading in axisUnits and
- * reading in of valueList from an algoritm. -b.t.
- *
- * Revision 1.8  2000/11/06 14:47:32  thomas
- * First Cut at delimited implimented. Problem in
- * Locator (?) prevents it from being fully functional.
- * -b.t.
- *
- * Revision 1.7  2000/11/03 20:10:07  thomas
- * Now tagged data is read into the dataCube with the
- * correct formatting. -b.t.
- *
- * Revision 1.6  2000/11/02 19:45:13  thomas
- * Updated to read in Notes objects. -b.t.
- *
- * Revision 1.5  2000/11/01 22:14:03  thomas
- * Updated for new cloning scheme. -b.t.
- *
- * Revision 1.4  2000/11/01 21:59:31  thomas
- * Implimented ValueGroup, FieldGroup fully. -b.t.
- *
- * Revision 1.3  2000/10/31 20:38:00  thomas
- * This version is ALMOST capable of full ascii tagged
- * read. Problems that remain are grouping, notes location
- * and note.addText function is off a bit. Also consideration
- * of dataFormat when addData occurs needs to be implemented.
- * -b.t.
- *
- * Revision 1.2  2000/10/26 20:42:33  thomas
- * Another interim version. Putting into CVS so I can
- * sync w/ kellys other changes easier. -b.t.
- *
- * Revision 1.1  2000/10/25 17:57:00  thomas
- * Initial Version. -b.t.
- *
- * 
- */
 

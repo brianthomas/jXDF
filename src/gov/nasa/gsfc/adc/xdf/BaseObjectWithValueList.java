@@ -287,7 +287,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
         // print out PCDATA, if any
         if(pcdata != null)  {
-          outputWriter.write(pcdata);
+          outputWriter.write(entifyString(pcdata));
         };
 
         // if there are no PCDATA or child objects/nodes then
@@ -355,6 +355,12 @@ public abstract class BaseObjectWithValueList extends BaseObject
 /** Modification Log 
   *
   * $Log$
+  * Revision 1.9  2001/10/15 17:06:47  thomas
+  * merged in changes from ver017
+  *
+  * Revision 1.8.2.1  2001/10/05 04:29:00  thomas
+  * *** empty log message ***
+  *
   * Revision 1.8  2001/09/13 21:39:25  thomas
   * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
   *

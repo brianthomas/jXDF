@@ -104,6 +104,27 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
      return (Integer) ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
+
+    public void setSigned (boolean signed) {
+	if (signed)
+	    ((Attribute) attribHash.get(SIGNED_XML_ATTRIBUTE_NAME)).setAttribValue("yes");
+	else
+	    ((Attribute) attribHash.get(SIGNED_XML_ATTRIBUTE_NAME)).setAttribValue("no");
+    }
+
+
+    /*
+    public boolean getSigned()
+    {
+	String ignedStr = (String) ((Attribute) attribHash.get(SIGNED_XML_ATTRIBUTE_NAME)).getAttribValue();
+	if (signedStr.equals("yes"))
+	    return true;
+	else
+	    return false;
+    }
+    */
+
+
   /** set the *signed* attribute
    */
   public void setSigned(String strSigned) {
@@ -180,6 +201,12 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/10/15 17:06:47  thomas
+ * merged in changes from ver017
+ *
+ * Revision 1.13.2.1  2001/10/06 16:17:32  huang
+ * added a setSigned(booen)
+ *
  * Revision 1.13  2001/09/18 17:41:52  thomas
  * caches numOfBytes now
  *

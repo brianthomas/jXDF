@@ -427,7 +427,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
         // print out PCDATA, if any
         if(pcdata != null)  {
-          outputWriter.write(pcdata);
+          outputWriter.write(entifyString(pcdata));
         };
 
         // if there are no PCDATA or child objects/nodes then
@@ -850,6 +850,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
   throws java.io.IOException
   {
 
+     outputWriter.write(entifyString(text));
+
+/*
      StringCharacterIterator iter = new StringCharacterIterator(text);
 
      for(char c = iter.first(); c != CharacterIterator.DONE; c = iter.next()) 
@@ -870,7 +873,38 @@ public abstract class BaseObject implements Serializable, Cloneable {
         }
 
      }
+*/
 
+  }
+
+  protected String entifyString ( String text)
+  {
+
+       StringBuffer newStringBuf = new StringBuffer();
+       StringCharacterIterator iter = new StringCharacterIterator(text);
+
+       for(char c = iter.first(); c != CharacterIterator.DONE; c = iter.next())
+       {
+
+          switch (c) {
+             // do what "Canonical XML" expects
+             case '<':  newStringBuf.append("&lt;"); continue;
+             case '>':  newStringBuf.append("&gt;"); continue;
+             case '&':  newStringBuf.append("&amp;"); continue;
+             case '\'': newStringBuf.append("&apos;"); continue;
+             case '"':  newStringBuf.append("&quot;"); continue;
+/*
+             // now for our XDF specific stuff
+             case '\n': newStringBuf.append("&#010;"); continue;
+             case '\r': newStringBuf.append("&#013;"); continue;
+*/
+             // all other characters
+             default:   newStringBuf.append(c); continue;
+          }
+
+       }
+
+       return newStringBuf.toString();
   }
 
   /** Method determines if any of the group objects to which the passed object
@@ -946,6 +980,12 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.62  2001/10/15 17:06:47  thomas
+ * merged in changes from ver017
+ *
+ * Revision 1.61.2.1  2001/10/05 04:29:00  thomas
+ * *** empty log message ***
+ *
  * Revision 1.61  2001/09/18 21:38:50  thomas
  * fixed typo
  *

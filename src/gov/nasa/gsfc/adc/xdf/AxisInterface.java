@@ -41,13 +41,16 @@ public interface AxisInterface {
    public boolean addElementNode (ElementNode element);
    public void toXMLWriter (Writer outputWriter, String indent) throws java.io.IOException;
    public void toXMLOutputStream (OutputStream o, String indent) throws java.io.IOException;
-   public Object clone() throws CloneNotSupportedException; 
+   public Object clone() throws CloneNotSupportedException;
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/10/15 17:06:47  thomas
+ * merged in changes from ver017
+ *
  * Revision 1.13  2001/10/02 20:17:36  thomas
  * merged from ver017 branch
  *

@@ -233,7 +233,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
    
            // print out PCDATA, if any
            if(pcdata != null)  {
-             outputWriter.write(pcdata);
+             outputWriter.write(entifyString(pcdata));
            };
    
            // if there are no PCDATA or child objects/nodes then
