@@ -26,6 +26,7 @@ package gov.nasa.gsfc.adc.xdf;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Collections;
 import java.util.List;
 
 import java.io.OutputStream;
@@ -46,6 +47,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
    private static final String ENCODING_XML_ATTRIBUTE_NAME = new String("encoding");
    private static final String ID_XML_ATTRIBUTE_NAME = new String("readId");
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("readIdRef");
+
+   // have to have this init'd here to avoid null pointer in first sync block of setIOAxesOrder
+   private List axesIOList = Collections.synchronizedList(new ArrayList());
 
    /* attribute defaults */
    public final static String DEFAULT_ENCODING = Constants.IO_ENCODING_ISO_8859_1;
@@ -237,38 +241,73 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
   }
 
-  // Kelly, is this needed?
-  public Object clone() throws CloneNotSupportedException { 
-     return super.clone(); 
-  }
+   // Kelly, is this needed?
+   public Object clone() throws CloneNotSupportedException { 
+      return super.clone(); 
+   }
 
-  // 
-  // Private Methods
-  //
+   /** getIOAxesOrder:
+    * Retrieve the order in which the axes will be read in/written out
+    * from the Array. This ordering is NOT nesscesarily the same as
+    * that returned by the parent Array.getAxes() method. This method   
+    * returns a List of Axis objects in the order of 'fastest' to 'slowest'. 
+    */
+   public List getIOAxesOrder() {
+      synchronized (axesIOList) {
+         return axesIOList;
+      }
+   }
 
-  /** init -- special method used by constructor methods to
-   *  convienently build the XML attribute list for a given class.
-   */
-  protected void init()
-  {
+   public void setIOAxesOrder(List axisOrderList) {
 
-     resetXMLAttributes();
+      int parentSize = getParentArray().getAxes().size();
 
-     classXDFNodeName = "read";
+      if (axisOrderList.size() != parentSize) {
+          Log.errorln("Can't setIOAxisOrder(), passed list has wrong number of axes!, Ignoring request.");
+          return;
+      } else {
 
-     // order matters! these are in *reverse* order of their
-     // occurence in the XDF DTD
-     attribOrder.add(0, ENDIAN_XML_ATTRIBUTE_NAME);
-     attribOrder.add(0, ENCODING_XML_ATTRIBUTE_NAME);
-     attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
-     attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+         synchronized (axesIOList) {
+            axesIOList = Collections.synchronizedList(new ArrayList());
+            for (int i = 0; i < parentSize; i++) {
+               axesIOList.add(axisOrderList.get(i));
+            }
+         }
+      }
 
-     //set up the attribute hashtable key with the default initial value
-     attribHash.put(ENDIAN_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENDIAN, Constants.STRING_TYPE));
-     attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENCODING, Constants.STRING_TYPE));
-     attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-  };
+   }
+
+   // 
+   // Private Methods
+   //
+
+   /** init -- special method used by constructor methods to
+    *  convienently build the XML attribute list for a given class.
+    */
+   protected void init()
+   {
+
+      resetXMLAttributes();
+
+      classXDFNodeName = "read";
+     
+      // order matters! these are in *reverse* order of their
+      // occurence in the XDF DTD
+      attribOrder.add(0, ENDIAN_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, ENCODING_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+
+      //set up the attribute hashtable key with the default initial value
+      attribHash.put(ENDIAN_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENDIAN, Constants.STRING_TYPE));
+      attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENCODING, Constants.STRING_TYPE));
+      attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+      attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+
+      // initialize axisIOOrder list to parent 
+      setIOAxesOrder(getParentArray().getAxes());
+
+   };
 
 
   /** set the parentArray.
@@ -282,29 +321,15 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
   protected abstract void specificIOStyleToXDF(OutputStream out, String indent);
 
-  /** getReadAxisOrder:
-   * Retrieve the order in which the axis will be read in/written out.
-   * from the data cube.
-   * Returns a scalar ARRAY reference of axisId values.
-   */
-   public List getReadAxisOrder() {
-    List readList = new ArrayList();
-    List axisList = getParentArray().getAxes();
-    AxisInterface axisObj;
-    int size =  axisList.size();
-    for (int i = 0; i < size; i++) {
-      axisObj = (AxisInterface) axisList.get(i);
-      readList.add(axisObj.getAxisId());
-    }
-
-    return readList;
-  }
-
-
 }
+
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2001/06/18 21:39:28  thomas
+ * added back in a write/readAxisOrder mthod (ugh). Now called
+ * get/setIOAxes
+ *
  * Revision 1.18  2001/05/10 21:45:33  thomas
  * added resetXMLAttributes to init().
  * small change to constructor related to inheritance.
