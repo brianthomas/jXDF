@@ -37,12 +37,29 @@ import org.apache.xerces.dom.CoreDocumentImpl;
 
 public abstract class Constants {
 
+  /** The version of XML that will be output from a toXML* method call.
+  */
+  public static final String XML_SPEC_VERSION = "1.0";
+
+  /** The root node name for any XDF document. The root node is an XDF
+      node.
+  */
+  public static final String XDF_ROOT_NODE_NAME = "XDF";
+
+  /** The name of the relevant version of XDF DTD file for this package.
+  */
+  public static final String XDF_DTD_NAME = "XDF_017.dtd";
+
+  /** The name of the XMLAttribute which is written out as PCDATA rather than as
+      a node attribute (String/Number type XMLAttributes) or child node (Object
+      and List type XMLAttributes). At this time only String-type XMLAttributes
+      should be named 'value' (yes, it would be an interesting experiment to call
+      an Object-type XMLAttribute 'value'!).
+  */
+  public static final String PCDATA_ATTRIBUTE = "value";
+
+  // done this way to minimize needed to instanciate and waste memory
   private static CoreDocumentImpl InternalDOMDocument;
-
-  //
-  // XML attributes
-  //
-
   public static CoreDocumentImpl getInternalDOMDocument () { 
 
      if (InternalDOMDocument == null) {
@@ -157,6 +174,9 @@ public abstract class Constants {
 /* Modification History
  * 
  * $Log$
+ * Revision 1.15  2001/09/05 21:59:02  thomas
+ * moved PCDATA_ATTR, XDF_ROOT_NODE_NAME, XML_SPEC_VERSION, and XDF_DTD_NAME here from Specification
+ *
  * Revision 1.14  2001/08/31 19:59:35  thomas
  * added getInternalDOMDocument method. Its public (ugh)
  *
