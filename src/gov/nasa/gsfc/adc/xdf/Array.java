@@ -98,7 +98,7 @@ import java.util.Vector;
    * object ref of the FieldAxis object.
    */
 
-  public class Array extends BaseObject 
+  public class Array extends BaseObject
   {
 
      //
@@ -123,7 +123,7 @@ import java.util.Vector;
      private static final String AXISLIST_XML_ATTRIBUTE_NAME = new String("axisList");
      private static final String XMLDATAIOSTYLE_XML_ATTRIBUTE_NAME = new String("xmlDataIoStyle");
      private static final String DATACUBE_XML_ATTRIBUTE_NAME = new String("dataCube");
-     private static final String NOTES_XML_ATTRIBUTE_NAME = new String("notes");
+     private static final String NOTES_XML_ATTRIBUTE_NAME = new String("arrayNotes");
  
      /** This field stores object references to those parameter group objects
         to which this array object belongs
@@ -378,32 +378,61 @@ import java.util.Vector;
    
      /** set the Notes object held by this Array object
       */
+     public void setArrayNotes (Notes notes)
+     {
+        ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
+     }
+
+     /** set the Notes object held by this Array object
+         @deprecated use the setArrayNotes method instead.
+      */
      public void setNotesObject (Notes notes)
      {
         ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
      }
    
      /**
-        @return the current *Notes* attribute object
+        @return the current (array) Notes object that describes the notes held by this array. 
       */
-     public Notes getNotesObject()
+     public Notes getArrayNotes()
      {
         return (Notes) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
    
-      /** set the *axisList* attribute
+     /**
+        @return the current (array) Notes object that describes the notes held by this array. 
+        @deprecated use the getArrayNotes method instead.
+     */
+     public Notes getNotesObject()
+        return (Notes) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
+     }
+
+     /* set the *axisList* attribute
+      *  @deprecated This method is dangerous, not all of the internal linkage that needs to happen
+      *   will occur if this is used.
       */
+      // this looks dangerous, lets remove from package for now
+/*
      public void setAxisList(List axis) {
         ((XMLAttribute) attribHash.get(AXISLIST_XML_ATTRIBUTE_NAME)).setAttribValue(axis);
      }
+*/
    
      /**
-      * @return the current *axisList* attribute
+      * @return the current a list of FieldAxis and Axis Objects in this array. 
       */
-     public List getAxisList() {
+     public List getAxes () {
        return (List) ((XMLAttribute) attribHash.get(AXISLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
-   
+
+     /**
+      * @return the current a list of FieldAxis and Axis Objects in this array. 
+      * @deprecated This name does not make clear that fieldAxis will also be returned.
+      */
+     public List getAxisList () {
+       return (List) ((XMLAttribute) attribHash.get(AXISLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+     }
+
      /** set the *xmlDataIOStyle* attribute
       * note we have to insure that _parentArray is properly updated
       */
@@ -425,19 +454,6 @@ import java.util.Vector;
        return (XMLDataIOStyle) ((XMLAttribute) attribHash.get(XMLDATAIOSTYLE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
    
-     /*  set the *dataCube* attribute
-      */
-   
-      //
-      // Hurm.. This is a dangerous method. All sorts of array meta-data arent updated
-      // properly when this is used. Making it private for now. -b.t.
-      //
-      private void setDataCube(DataCube dataCube)
-      {
-         ((XMLAttribute) attribHash.get(DATACUBE_XML_ATTRIBUTE_NAME)).setAttribValue(dataCube);
-      }
-   
-   
      /**
          @return the current *DataCube* attribute
       */
@@ -449,17 +465,17 @@ import java.util.Vector;
       /** Set the *noteList* attribute
        */
       public void setNoteList(List note) {
-         getNotesObject().setNoteList(note);
+         getArrayNotes().setNoteList(note);
       }
    
       /**
          @return the current *noteList* attribute
       */
       public List getNoteList() {
-         return getNotesObject().getNoteList();
+         return getArrayNotes().getNoteList();
       }
    
-      /** set the dimension of the DataCube held within this Array.
+      /** get the dimension of the DataCube held within this Array.
       */
       public int getDimension() {
         return getDataCube().getDimension();
@@ -502,17 +518,19 @@ import java.util.Vector;
           @param axis - Axis to be added
           @return an Axis object on success, null on failure
       */
-      public Axis addAxis(Axis axis) {
-   
-        if (!canAddAxisObjToArray(axis)) //check if the axis can be added
+      public AxisInterface addAxis(AxisInterface axis) {
+
+        if (axis instanceof FieldAxis) 
+        {
+           setFieldAxis((FieldAxis) axis);
+        } else if (canAddAxisObjToArray((Axis) axis)) { //check if the axis can be added
+           getDataCube().incrementDimension((Axis) axis);  //increment the DataCube dimension by 1
+           getAxes().add((Axis) axis);
+           updateChildLocators((Axis) axis, "add");
+           updateNotesLocationOrder(); // reset to the current order of the axes
+        } else {  
            return null;
-   
-        getDataCube().incrementDimension(axis );  //increment the DataCube dimension by 1
-   
-        getAxisList().add(axis);
-   
-        updateNotesLocationOrder(); // reset to the current order of the axes
-        updateChildLocators(axis, "add");
+        }
    
         return axis;
      }
@@ -523,10 +541,10 @@ import java.util.Vector;
       *          false on failure and keep the dimension unchanged
       * double check the implication on datacube
       */
-     public boolean removeAxis(Axis axisObj) {
-       boolean isRemoveSuccess = removeFromList(axisObj, getAxisList(), AXISLIST_XML_ATTRIBUTE_NAME);
+     public boolean removeAxis (AxisInterface axisObj) {
+       boolean isRemoveSuccess = removeFromList(axisObj, getAxes(), AXISLIST_XML_ATTRIBUTE_NAME);
        if (isRemoveSuccess) {   //remove successful
-          getDataCube().decrementDimension();   //decrease the dimension by 1
+          getDataCube().decrementDimension(axisObj);   //decrease the dimension by 1
           updateChildLocators(axisObj, "remove");
        }
        return isRemoveSuccess;
@@ -537,10 +555,11 @@ import java.util.Vector;
       *  @return true on success and decrement the dimension,
       *           false on failure and keep the dimension unchanged
       */
-     public boolean removeAxis(int index) {
-       boolean isRemoveSuccess = removeFromList(index, getAxisList(), AXISLIST_XML_ATTRIBUTE_NAME);
+     public boolean removeAxis (int index) {
+       AxisInterface removeAxis = (AxisInterface) getAxes().get(index);
+       boolean isRemoveSuccess = removeFromList(index, getAxes(), AXISLIST_XML_ATTRIBUTE_NAME);
        if (isRemoveSuccess) {  //remove successful
-          getDataCube().decrementDimension();   //decrease the dimension by 1
+          getDataCube().decrementDimension(removeAxis);   //decrease the dimension by 1
           updateChildLocators(index, "remove");
        }
        return isRemoveSuccess;
@@ -628,7 +647,7 @@ import java.util.Vector;
     * @return a Note object
     */
    public Note addNote(Note n) {
-       return getNotesObject().addNote(n);
+       return getArrayNotes().addNote(n);
    }
    
    /**removes a Note object from the list of notes in this Array object
@@ -636,7 +655,7 @@ import java.util.Vector;
     * @return true on success, false on failure
     */
    public boolean removeNote(Note what) {
-        return (boolean) getNotesObject().removeNote(what);
+        return (boolean) getArrayNotes().removeNote(what);
    }
    
    
@@ -645,14 +664,14 @@ import java.util.Vector;
     * @return true on success, false on failure
     */
    public boolean removeNote(int index) {
-        return (boolean) getNotesObject().removeNote(index); 
+        return (boolean) getArrayNotes().removeNote(index); 
    }
    
-   /**Convenience method which returns a list of the notes held by
-    * this object.
+   /** Convenience method which returns a list of the notes held by
+    *  the array notes object of this array.
     */
    public List getNotes() {
-       return (List) getNotesObject().getNoteList();
+       return (List) getArrayNotes().getNoteList();
    }
    
    /** Append the string value onto the requested datacell
@@ -766,35 +785,51 @@ import java.util.Vector;
        }
    }
 
-   /** A convenience method (same as setFieldAxis()).
-       Changes the FieldAxis object in this Array to the indicated one.
-       @return reference to fieldAxis if successful, null if not.
+   /** Changes the FieldAxis object in this Array to the indicated one.
+       @return true if successful, false if not.
     */
-   public FieldAxis addFieldAxis(FieldAxis fieldAxis) {
+   public boolean setFieldAxis (FieldAxis fieldAxis) {
+
        if (!canAddAxisObjToArray(fieldAxis))
-         return null;
+         return false;
    
-       if (getFieldAxis() !=null) {
-         List axisList = getAxisList();
+       hasFieldAxis = false; 
+
+       if (getFieldAxis() != null) { // replace or removal 
+         List axisList = getAxes();
          axisList.remove(0);
-         axisList.add(0, fieldAxis);  //replace the old fieldAxis with the new one
+         if (fieldAxis != null) { 
+            axisList.add(0, fieldAxis);  //replace the old fieldAxis with the new one
+            hasFieldAxis = true;
+         }
+       } else {  //add a fieldAxis where none prev existed.
+         if (fieldAxis != null) { // only if we have something to add 
+            getAxes().add(0, fieldAxis);
+            getDataCube().incrementDimension(fieldAxis); // increment dimension
+            hasFieldAxis = true;
+         }
        }
-       else {  //add fieldAxis and increment dimension
-         getAxisList().add(0, fieldAxis);
-         getDataCube().incrementDimension(fieldAxis);
+
+       // IF we had an object, update the locators
+       if (fieldAxis != null) {
+          updateChildLocators(fieldAxis, "add");
        }
-       hasFieldAxis = true;
-   
-       updateChildLocators(fieldAxis, "add");
+
+       updateNotesLocationOrder(); // reset to the current order of the axes
+                                   // may not be needed, but we do for all cases anyways
    
        //array doenst hold a dataformat anymore
        //each field along the fieldAxis should have dataformat
-       setDataFormat(null);
-       return fieldAxis;
+       // IF fieldAxis exists
+       if (hasFieldAxis) { 
+          setDataFormat(null);
+       }
+
+       return true;
    }
    
    public FieldAxis getFieldAxis() {
-       List axisList = getAxisList();
+       List axisList = getAxes();
        if (axisList.size() == 0){  //empty axisList
          return null;
        }
@@ -807,18 +842,44 @@ import java.util.Vector;
          return null;
    }
    
-   public void setFieldAxis(FieldAxis fieldAxis) {
-        addFieldAxis(fieldAxis);
-   }
-   
    public boolean hasFieldAxis() {
        return hasFieldAxis;
    }
+
+
+   /** a deep clone of this array. 
+    */
+   public Object clone() throws CloneNotSupportedException {
+       Array cloneObj = (Array) super.clone();
+       //deep clone for DataCube
+       cloneObj.setDataCube((DataCube) this.getDataCube().clone());
+
+       //there are no locators that are related to the cloned Array object
+       cloneObj.locatorList = new Vector();
+
+       //set the parentArray correctly for child object
+       cloneObj.getDataCube().setParentArray(cloneObj);
+       cloneObj.getXMLDataIOStyle().setParentArray(cloneObj);
+
+       synchronized (this.paramGroupOwnedHash) {
+         synchronized(cloneObj.paramGroupOwnedHash) {
+           cloneObj.paramGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.paramGroupOwnedHash.size()));
+           Iterator iter = this.paramGroupOwnedHash.iterator();
+           while (iter.hasNext()) {
+             cloneObj.paramGroupOwnedHash.add(((Group) iter.next()).clone());
+           }
+         }
+       }
+
+       return cloneObj;
+
+   }  //end of clone
    
+
    //
-   // PRIVATE Methods
+   // Protected Methods
    //
-   
+
    /** a special private method used by constructor methods to
        conviently build the XML attribute list for a given class.
     */
@@ -871,6 +932,20 @@ import java.util.Vector;
    
    };
    
+
+   //
+   // PRIVATE Methods
+   //
+
+   /**  set the *dataCube* that this array describes
+     */
+      // Hurm.. This is a dangerous method. All sorts of array meta-data arent updated
+      // properly when this is used. Making it private for now. -b.t.
+   private void setDataCube(DataCube dataCube)
+   {
+         ((XMLAttribute) attribHash.get(DATACUBE_XML_ATTRIBUTE_NAME)).setAttribValue(dataCube);
+   }
+
    /**canAddAxisObjToArray: check if we can add this Axis or FieldAxis Object
      * to the array
      * 1- check to see that it has an id
@@ -878,7 +953,6 @@ import java.util.Vector;
     */
    private boolean canAddAxisObjToArray (AxisInterface axisToAdd) {
       if (axisToAdd.getAxisId() == null) {
-         Log.warnln("Warning: Can't add Axis Object without axisId attribute defined");
          return false;
        }
        return true;
@@ -918,8 +992,7 @@ import java.util.Vector;
    // then this could become a real processing bottleneck
    private void updateNotesLocationOrder () {
    
-         // ArrayList axisList = (ArrayList) getAxisList();
-         List axisList = getAxisList();
+         List axisList = getAxes();
          ArrayList axisIdList = new ArrayList();
    
          // assemble the list of axisId's
@@ -930,41 +1003,19 @@ import java.util.Vector;
             ((ArrayList) axisIdList).add(axisIdRef);
          }
    
-         Notes notesObj = getNotesObject();
+         Notes notesObj = getArrayNotes();
          notesObj.setLocationOrderList(axisIdList);
    }
-   
-   public Object clone() throws CloneNotSupportedException {
-       Array cloneObj = (Array) super.clone();
-       //deep clone for DataCube
-       cloneObj.setDataCube((DataCube) this.getDataCube().clone());
-   
-       //there are no locators that are related to the cloned Array object
-       cloneObj.locatorList = new Vector();
-   
-       //set the parentArray correctly for child object
-       cloneObj.getDataCube().setParentArray(cloneObj);
-       cloneObj.getXMLDataIOStyle().setParentArray(cloneObj);
-   
-       synchronized (this.paramGroupOwnedHash) {
-         synchronized(cloneObj.paramGroupOwnedHash) {
-           cloneObj.paramGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.paramGroupOwnedHash.size()));
-           Iterator iter = this.paramGroupOwnedHash.iterator();
-           while (iter.hasNext()) {
-             cloneObj.paramGroupOwnedHash.add(((Group) iter.next()).clone());
-           }
-         }
-       }
-   
-       return cloneObj;
-   
-   }  //end of clone
    
 }  //end of Array class
 
 /**
   * Modification History:
   * $Log$
+  * Revision 1.23  2001/05/02 18:14:54  thomas
+  * Minor changes related to API standardization
+  * effort.
+  *
   * Revision 1.22  2001/02/07 18:40:15  thomas
   * Added new setData methods. Converted XML attribute decl
   * to use constants (final static fields within the object). These

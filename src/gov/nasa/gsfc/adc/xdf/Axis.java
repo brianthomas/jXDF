@@ -220,6 +220,15 @@ public class Axis extends BaseObject implements AxisInterface {
     return valueGroupOwnedHash;
   }
 
+  /**
+       @return a list of units describing this axis. 
+    */
+   public List getUnits()
+   {
+      return (List) getAxisUnits().getUnits();
+   }
+
+
   /** Get the length of this axis (eg number of axis value objects)
    *
    */
@@ -311,7 +320,7 @@ public class Axis extends BaseObject implements AxisInterface {
    * @return ref to UnitDirection object if successful, null if not
    */
 
-   public UnitDirection addAxisUnitDirectoin(UnitDirection unitDirectionObj) {
+   public UnitDirection addAxisUnitDirection(UnitDirection unitDirectionObj) {
     if (unitDirectionObj == null) {
       Log.warn("in Axis, addAxisUnitDirection(), the UnitDirection object passed in is null");
       return null;
@@ -515,6 +524,10 @@ public class Axis extends BaseObject implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/05/02 18:15:53  thomas
+ * Minor changes related to API standardization
+ * effort.
+ *
  * Revision 1.17  2001/02/07 18:44:04  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These
