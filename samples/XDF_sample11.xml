@@ -69,23 +69,23 @@
       </axis>
 
      <!-- declare the ordering of how to read this in, assoc. of axis to data -->
-      <read encoding="UTF-8">
-         <fixedWidthStyle>
-           <fixedWidthReadInstructions>
+      <dataStyle encoding="UTF-8">
+         <fixedWidth>
+           <fixedWidthInstruction>
              <repeat count="7">
                <readCell/>
                <skip/>
              </repeat>
              <readCell/>
              <skip><newLine/></skip>
-           </fixedWidthReadInstructions>
+           </fixedWidthInstruction>
            <for axisIdRef="rows">
               <for axisIdRef="fields"> <!-- the "fast" axis --> 
-                <doReadInstructions/>
+                <doInstruction/>
               </for>
            </for>
-         </fixedWidthStyle>
-      </read>
+         </fixedWidth>
+      </dataStyle>
 
       <data href="table1" compression="zip"/>
 

@@ -57,28 +57,28 @@
       </fieldAxis>
       <axis axisId="rows" axisDatatype="integer">
          <axisUnits><unitless/></axisUnits>
-         <valueGroup name="rows"> 
+         <valueGroup name="row values"> 
            <valueList delimiter=" ">0 1 2</valueList> 
          </valueGroup> 
       </axis>
      <!-- declare the ordering of how to read this in, assoc. of axis to data -->
-      <read encoding="UTF-8">
-         <fixedWidthStyle>
-            <fixedWidthReadInstructions>
+      <dataStyle encoding="UTF-8">
+         <fixedWidth>
+            <fixedWidthInstruction>
                <repeat count="7">
                   <readCell/>
                   <skip/>
                </repeat>
                <readCell/>
                <skip count="1"><newLine/></skip>
-            </fixedWidthReadInstructions>
+            </fixedWidthInstruction>
             <for axisIdRef="rows">
                <for axisIdRef="fields"> <!-- the "fast" axis -->
-                  <doReadInstructions/>
+                  <doInstruction/>
                </for>
             </for>
-         </fixedWidthStyle>
-      </read>
+         </fixedWidth>
+      </dataStyle>
       <!-- note that the numbering of startByte, endByte start at "0" (C/Java numbering) 
            and are inclusive.
         -->

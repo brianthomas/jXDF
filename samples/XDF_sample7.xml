@@ -85,23 +85,23 @@
         <value>2</value>
       </valueGroup>
     </axis>
-    <read encoding="UTF-8" endian="LittleEndian">
-      <fixedWidthStyle>
-        <fixedWidthReadInstructions> 
+    <dataStyle encoding="UTF-8" endian="LittleEndian">
+      <fixedWidth>
+        <fixedWidthInstruction> 
           <repeat count="7">
             <readCell/>
             <skip/>
           </repeat>
           <readCell/>
           <skip><newLine/></skip>
-        </fixedWidthReadInstructions> 
+        </fixedWidthInstruction> 
         <for axisIdRef="rows">
           <for axisIdRef="fields">
-             <doReadInstructions/>
+             <doInstruction/>
           </for>
         </for>
-      </fixedWidthStyle>
-    </read>
+      </fixedWidth>
+    </dataStyle>
     <data href="table1"></data> 
     <notes>
       <locationOrder>

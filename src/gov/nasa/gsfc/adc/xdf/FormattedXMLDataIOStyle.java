@@ -145,21 +145,23 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /*
   read SECTION for formatted data now looks like:
 
-         <fixedWidthStyle>
-            <fixedWidthReadInstructions>
+      <dataStyle>
+         <fixedWidth>
+            <fixedWidthInstruction>
                <repeat count="9">
                   <readCell/>
                   <skip count="1"/> <!-- just outputs a space -->
                </repeat>
                <readCell/>
                <skip count="1"><newLine/></skip> <!-- will output logical newLine -->
-            </fixedWidthReadInstructions>
+            </fixedWidthInstruction>
             <for axisIdRef="y-axis">
                <for axisIdRef="x-axis">
-                  <doReadInstructions/>
+                  <doInstruction/>
                </for>
             </for>
-         </fixedWidthStyle>
+         </fixedWidth>
+      </dataStyle>
 */
 
   protected void specificIOStyleToXDF( Writer outputWriter, String indent)
@@ -177,7 +179,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         outputWriter.write( indent );
      }
 
-     outputWriter.write("<fixedWidthStyle>");
+     outputWriter.write("<fixedWidth>");
 
      /* SECTION 1: open up the read instruction section */
      if (niceOutput) {
@@ -185,7 +187,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         outputWriter.write( sectionIndent);
      }
 
-     outputWriter.write("<fixedWidthReadInstructions>");
+     outputWriter.write("<fixedWidthInstruction>");
 
      if (niceOutput) 
         outputWriter.write( Constants.NEW_LINE);
@@ -202,7 +204,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
           outputWriter.write( sectionIndent);
      }
 
-     outputWriter.write("</fixedWidthReadInstructions>");
+     outputWriter.write("</fixedWidthInstruction>");
 
      /* SECTION 2: now print the For nodes */
 
@@ -224,7 +226,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
      }
 
      //write out  the instruction to read the commands
-     outputWriter.write("<doReadInstructions/>");
+     outputWriter.write("<doInstruction/>");
 
      if (niceOutput)
           outputWriter.write( Constants.NEW_LINE);
@@ -246,7 +248,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
      if (niceOutput) 
          outputWriter.write( indent);
 
-     outputWriter.write("</fixedWidthStyle>");
+     outputWriter.write("</fixedWidth>");
 
      if (niceOutput) 
            outputWriter.write( Constants.NEW_LINE);

@@ -133,7 +133,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
            outputWriter.write( indent + moreIndent);
         }
   
-        outputWriter.write( "<delimitedReadInstructions>");
+        outputWriter.write( "<delimitedInstruction>");
   
         if (niceOutput) {
            outputWriter.write( Constants.NEW_LINE);
@@ -145,7 +145,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
         if (niceOutput) 
            outputWriter.write( indent+moreIndent);
   
-        outputWriter.write( "</delimitedReadInstructions>");
+        outputWriter.write( "</delimitedInstruction>");
   
         // for instuctions are here 
         nestedToXDF(outputWriter, indent+moreIndent, stop, 0, niceOutput);
@@ -169,18 +169,18 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 
 /*
   Format is now:
-            <delimitedStyle>
-                <delimitedReadInstructions>
+            <delimited>
+                <delimitedInstruction>
                    <!-- next line sez: use any number of space characters as the delimiter -->
                    <delimiter repeatable="yes"><chars value=" "/></delimiter>
                    <recordTerminator><newLine/></recordTerminator>
-                </delimitedReadInstructions>
+                </delimitedInstruction>
                 <for axisIdRef="y-axis">
                    <for axisIdRef="x-axis">
-                      <doReadInstructions/>
+                      <doInstruction/>
                    </for>
                 </for>
-             </delimitedStyle>
+             </delimited>
 */
 
    private void nestedToXDF(Writer outputWriter, String indent, int which, int stop, boolean niceOutput) 
@@ -192,7 +192,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
       if (niceOutput) 
         outputWriter.write(Constants.NEW_LINE + indent);
 
-      outputWriter.write( "<doReadInstructions/>");
+      outputWriter.write( "<doInstruction/>");
      
     } else {
 
@@ -229,7 +229,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 
       super.init(); 
 
-      classXDFNodeName = "delimitedStyle";
+      classXDFNodeName = "delimited";
 
       attribOrder.add(0, END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME);
       attribOrder.add(0, DELIMITER_XML_ATTRIBUTE_NAME);

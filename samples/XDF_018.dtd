@@ -155,7 +155,7 @@ calls XDF.dtd by a parameter entity.
         on each axis of the current array to properly assemble it.
 
 -->
-<!ELEMENT array (%ARRAY_CHILDREN;(parameter | parameterGroup)*, axis*, (fieldAxis | (units, dataFormat)), axis*, read, data, notes?)>
+<!ELEMENT array (%ARRAY_CHILDREN;(parameter | parameterGroup)*, axis*, (fieldAxis | (units, dataFormat)), axis*, dataStyle, data, notes?)>
 <!ATTLIST array
 	name CDATA #IMPLIED
 	description CDATA #IMPLIED
@@ -308,12 +308,12 @@ grouped together with name="position".
 -->
 <!ELEMENT dataFormat (float | integer | string | binaryInteger | binaryFloat)>
 
-<!ELEMENT read (taggedStyle | delimitedStyle | fixedWidthStyle ) >
-<!ATTLIST read
+<!ELEMENT dataStyle (tagged | delimited | fixedWidth ) >
+<!ATTLIST dataStyle
         encoding (ANSI | ISO-8859-1 | UTF-8 | UTF-16) "ISO-8859-1"
         endian (BigEndian | LittleEndian) #IMPLIED
-        readId ID #IMPLIED
-        readIdRef IDREF #IMPLIED
+        dataStyleId ID #IMPLIED
+        dataStyleIdRef IDREF #IMPLIED
 >
 <!--    for elements are instructions for reading in the data, 
 	they refer to axis elements. The order 
@@ -322,18 +322,18 @@ grouped together with name="position".
 	The format information and the data appear inside the most 
 	nested read element.  
 -->
-<!ELEMENT for (for | doReadInstructions)>
+<!ELEMENT for (for | doInstruction)>
 <!ATTLIST for
 	axisIdRef IDREF #REQUIRED
 >
-<!ELEMENT doReadInstructions EMPTY>
+<!ELEMENT doInstruction EMPTY>
 
-<!ELEMENT fixedWidthReadInstructions (readCell | skip | repeat)+ >
-<!ELEMENT delimitedReadInstructions (delimiter, recordTerminator)>
+<!ELEMENT fixedWidthInstruction (readCell | skip | repeat)+ >
+<!ELEMENT delimitedInstruction (delimiter, recordTerminator)>
 
-<!ELEMENT taggedStyle (tagToAxis+) > 
-<!ELEMENT fixedWidthStyle (fixedWidthReadInstructions, for)> 
-<!ELEMENT delimitedStyle (delimitedReadInstructions, for) >
+<!ELEMENT tagged (tagToAxis+) > 
+<!ELEMENT fixedWidth (fixedWidthInstruction, for)> 
+<!ELEMENT delimited (delimitedInstruction, for) >
 
 <!ELEMENT recordTerminator ((chars | newLine)?) >
 <!ELEMENT delimiter ((chars | newLine)?) >

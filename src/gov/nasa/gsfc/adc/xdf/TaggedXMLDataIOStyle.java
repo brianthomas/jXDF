@@ -245,7 +245,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
             outputWriter.write( indent);
       }
 
-      outputWriter.write("<taggedStyle>");
+      outputWriter.write("<tagged>");
       String moreIndent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
 
       for (int i = 0, size = tags.length; i < size; i++) {
@@ -268,7 +268,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
          outputWriter.write( indent);
       }
 
-      outputWriter.write("</taggedStyle>");
+      outputWriter.write("</tagged>");
 
       // wrap up newline 
       if (niceOutput) {

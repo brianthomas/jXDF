@@ -768,7 +768,7 @@ public class SaxDocumentHandler extends DefaultHandler {
     // creates object & adds to appropriate lists, etc. 
     private XMLDataIOStyle checkReadObjectIsOk (XMLDataIOStyle readObj) {
 
-       String readId = readObj.getReadId();
+       String readId = readObj.getDataStyleId();
        // add this object to the lookup table, if it has an ID
        if (readId != null) 
        {
@@ -2338,7 +2338,7 @@ Log.errorln(" TValue:"+valueString);
        public static final String DATA = "data";
        public static final String DATAFORMAT = "dataFormat";
        public static final String DELIMITER = "delimiter";
-       public static final String DO_READ_INSTRUCTIONS = "doReadInstructions";
+       public static final String DO_READ_INSTRUCTIONS = "doInstruction";
        public static final String FIELD = "field";
        public static final String FIELDAXIS = "fieldAxis";
        public static final String FIELDRELATIONSHIP = "relation";
@@ -2354,13 +2354,13 @@ Log.errorln(" TValue:"+valueString);
        public static final String PARAMETER = "parameter";
        public static final String PARAMETERGROUP = "parameterGroup";
        public static final String ROOT = "XDF"; // beware setting this to the same name as structure 
-       public static final String READ = "read";
+       public static final String READ = "dataStyle";
        public static final String RECORDTERMINATOR = "recordTerminator";
-       public static final String READ_DELIMITED_STYLE = "delimitedStyle";
-       public static final String READ_FIXEDWIDTH_STYLE = "fixedWidthStyle";
-       public static final String READ_TAGGED_STYLE = "taggedStyle";
-       public static final String READ_INSTRUCTIONS_FIXED = "fixedWidthReadInstructions";
-       public static final String READ_INSTRUCTIONS_DELIMITED = "delimitedReadInstructions";
+       public static final String READ_DELIMITED_STYLE = "delimited";
+       public static final String READ_FIXEDWIDTH_STYLE = "fixedWidth";
+       public static final String READ_TAGGED_STYLE = "tagged";
+       public static final String READ_INSTRUCTIONS_FIXED = "fixedWidthInstruction";
+       public static final String READ_INSTRUCTIONS_DELIMITED = "delimitedInstruction";
        public static final String READCELL = "readCell";
        public static final String REPEAT = "repeat";
        public static final String SKIPCHAR = "skip";
@@ -4087,11 +4087,11 @@ while (iter.hasNext()) {
                 readObj.hashtableInitXDFAttributes(DataIOStyleAttribs);
 
                 // give the clone a unique Id and remove IdRef 
-                readObj.setReadId(findUniqueIdName(ReadObj, readObj.getReadId()));
-                readObj.setReadIdRef(null);
+                readObj.setDataStyleId(findUniqueIdName(ReadObj, readObj.getDataStyleId()));
+                readObj.setDataStyleIdRef(null);
 
                 // add this into the list of Read objects
-                ReadObj.put(readObj.getReadId(), readObj);
+                ReadObj.put(readObj.getDataStyleId(), readObj);
 
                 // we need to put in the local axes refs here, not use cloned ones
                 // otherwise, references will be all screwy and nothing will work for
