@@ -148,6 +148,8 @@ public class Value extends BaseObject {
    protected void init()
    {
 
+       resetXMLAttributes();
+
        classXDFNodeName = "value";
 
        // order matters! these are in *reverse* order of their
@@ -171,6 +173,9 @@ public class Value extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/05/10 21:43:06  thomas
+ * added resetXMLAttributes to init().
+ *
  * Revision 1.10  2001/02/07 18:44:04  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These

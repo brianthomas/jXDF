@@ -241,6 +241,8 @@ import java.io.OutputStream;
   protected void init()
   {
 
+    resetXMLAttributes();
+
     classXDFNodeName = "units";
     XDFNodeName = classXDFNodeName;
 
@@ -261,6 +263,9 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/05/10 21:43:06  thomas
+ * added resetXMLAttributes to init().
+ *
  * Revision 1.12  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
  *

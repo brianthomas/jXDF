@@ -35,11 +35,18 @@ public class UnitDirection extends BaseObject{
 
    }
 
+   protected void init() {
+      resetXMLAttributes();
+   }
+
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/05/10 21:43:06  thomas
+ * added resetXMLAttributes to init().
+ *
  * Revision 1.2  2000/11/08 20:14:45  thomas
  * Added GPL blurb to header. -b.t.
  *
