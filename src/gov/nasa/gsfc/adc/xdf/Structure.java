@@ -382,27 +382,26 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    // overrides BaseObjectw/XMLElements.init() method
    protected void init()
    {
+     super.init();
 
-    super.init();
+     classXDFNodeName = "structure";
 
-    classXDFNodeName = "structure";
+     // order matters! these are in *reverse* order of their
+     // occurence in the XDF DTD
+     attribOrder.add(0, NOTELIST_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, ARRAYLIST_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, STRUCTURELIST_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, PARAMETERLIST_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0, NOTELIST_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, ARRAYLIST_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, STRUCTURELIST_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, PARAMETERLIST_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
-
-    //set up the attribute hashtable key with the default initial value
-    attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put(ARRAYLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put(STRUCTURELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     //set up the attribute hashtable key with the default initial value
+     attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(ARRAYLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(STRUCTURELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
   };
 
@@ -412,6 +411,9 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2001/05/10 21:41:06  thomas
+ * minor typesetting changes.
+ *
  * Revision 1.18  2001/05/04 20:36:51  thomas
  * moved out type attrib and some methods to XDF class.
  * some small changes to accomodate inheriting XDF from Structure.
