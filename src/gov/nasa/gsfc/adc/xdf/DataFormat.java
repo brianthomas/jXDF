@@ -1,9 +1,5 @@
 // XDF DataFormat Class
 // CVS $Id$
-package gov.nasa.gsfc.adc.xdf;
-
-import java.util.*;
-import java.io.OutputStream;
 
 // DataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -25,7 +21,11 @@ import java.io.OutputStream;
 
 */
 
+package gov.nasa.gsfc.adc.xdf;
 
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 /**
  * DataFormat.java:
@@ -199,6 +199,9 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/08 19:38:57  thomas
+ * Cleaned up import path. -b.t.
+ *
  * Revision 1.5  2000/11/08 19:18:07  thomas
  * Changed the name of toXDF* methods to toXML* to
  * better reflect the nature of the output (its not XDF
