@@ -2,19 +2,35 @@
 // XDF BaseObject Class
 // CVS $Id$
 
+// BaseObject.java Copyright (C) 2000 Brian Thomas,
+// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+ 
+/*
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*/
+
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.*;
 import java.io.*;
 
 /**
- * BaseObject.java: The base class for most XDF objects
- * @author: Brian Thomas (thomas@adc.gsfc.nasa.gov)
- *          Kelly Zeng (kelly.zeng@commerceone.com)
- * @version: $Revision$
- *
+    BaseObject.java: The base class for most XDF objects
+ 
  */
-
 
 public abstract class BaseObject implements Serializable {
 
@@ -583,6 +599,42 @@ public abstract class BaseObject implements Serializable {
 
 
   }
+
+  // 
+  // Static Classes
+  //
+
+  /** XMLAttribute
+  */
+  public static class XMLAttribute {
+
+  protected Object attribValue;
+  protected String attribType;
+
+  public XMLAttribute (Object objValue, String strType) {
+    attribValue = objValue;
+    attribType = strType;
+  }
+
+  public Object setAttribValue(Object objValue) {
+    attribValue = objValue;
+    return attribValue;
+  }
+
+  public String setAttribType(String strType) {
+    attribType = strType;
+    return attribType;
+  }
+
+  public Object getAttribValue() {
+    return attribValue;
+  }
+
+  public String getAttribType() {
+    return attribType;
+  }
+
+}
 
   // end of BaseObject Class
 
