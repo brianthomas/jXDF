@@ -25,7 +25,6 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import org.apache.xerces.dom.CoreDocumentImpl;
 
 // Hmm. this file amounts to a header file in C. Might be better to put
 // these various things in the objects where they are used. 
@@ -66,16 +65,6 @@ public abstract class Constants {
       for tagged data.
    */
   public static final int MAX_TAGGED_DIMENSIONS = 10;
-
-  // done this way to minimize needed to instanciate and waste memory
-  private static CoreDocumentImpl InternalDOMDocument;
-  public static CoreDocumentImpl getInternalDOMDocument () { 
-
-     if (InternalDOMDocument == null) {
-        InternalDOMDocument = new CoreDocumentImpl();
-     }
-     return InternalDOMDocument;
-  }
 
   public static final String STRING_TYPE = "String";
   public static final String LIST_TYPE   = "List";
