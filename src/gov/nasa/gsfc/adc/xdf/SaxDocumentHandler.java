@@ -116,6 +116,11 @@ class SaxDocumentHandler implements DocumentHandler {
     private Locator TaggedLocatorObj;
     private String DATABLOCK = new String();
     private boolean CDATAIsArrayData = false;
+    private int MaxDataFormatIndex = 0;     // max allowed index in the DataFormatList[]
+    private int CurrentDataFormatIndex = 0; // which dataformat index (in DatFormatList[]) we currently are reading
+    private DataFormat DataFormatList[];       // list of CurrentArray.getDataFormatList();
+    private int LastFastAxisCoordinate = 0;
+    private AxisInterface FastestAxis;
 
     // lookup tables holding objects that have id/idref stuff
     private Hashtable AxisObj = new Hashtable();
@@ -780,6 +785,8 @@ class SaxDocumentHandler implements DocumentHandler {
     // DATATAG
     //
 
+    // REMINDER: these functions only get called when tagged data is being read..
+
     class dataTagStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
           CurrentDataTagLevel++;
@@ -791,6 +798,19 @@ class SaxDocumentHandler implements DocumentHandler {
 
           if (CurrentDataTagLevel == DataTagLevel)
              TaggedLocatorObj.next();
+
+          // bump up DataFormat appropriately
+          if (MaxDataFormatIndex > 0) { 
+             int currentFastAxisCoordinate = TaggedLocatorObj.getAxisLocation(FastestAxis);
+             if ( currentFastAxisCoordinate != LastFastAxisCoordinate ) 
+             { 
+                LastFastAxisCoordinate = currentFastAxisCoordinate;
+                if (CurrentDataFormatIndex == MaxDataFormatIndex)
+                   CurrentDataFormatIndex = 0;
+                else
+                   CurrentDataFormatIndex++;
+             }
+          }
 
           CurrentDataTagLevel--;
 
@@ -815,13 +835,48 @@ class SaxDocumentHandler implements DocumentHandler {
 
                 DataTagLevel = CurrentDataTagLevel;
 
-                // adding data based on what type..
-                try {
-                   CurrentArray.setData(TaggedLocatorObj, thisString);
-                } catch (SetDataException e) {
-                   Log.errorln("Unable to setData:["+thisString+"], ignoring request");
-                }
+                DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
 
+                // To read in data appropriately to dataCube
+                // we have to type it appropriately as determined from
+                // the CurrentDataFormat object 
+
+                // I just want to say upfront here that YES, we are doing a 
+                // crappy job here. Probably desirable to not convert character data
+                // into a String object ("thisString") then decode it again back into
+                // a double, int, etc. LOADS of overhead, as you can imagine. 
+                // We need better routine to directly convert from chars to numbers
+                // and so forth..
+
+                // adding data based on what type..
+                // Note that we dont treat binary data at all (since you would have
+                // to break the XML spec to store it in tags :P)
+                try {
+
+                   if ( CurrentDataFormat instanceof StringDataFormat) {
+                       CurrentArray.setData(TaggedLocatorObj, thisString);
+                   } else if ( CurrentDataFormat instanceof FixedDataFormat) {
+                       Double number = new Double (thisString);
+                       CurrentArray.setData(TaggedLocatorObj, number.doubleValue());
+                   } else if ( CurrentDataFormat instanceof IntegerDataFormat) {
+                       Integer number = new Integer (thisString);
+                       CurrentArray.setData(TaggedLocatorObj, number.intValue());
+                   } else if ( CurrentDataFormat instanceof ExponentialDataFormat) {
+                       // hurm.. this is a stop-gap. Exponential format needs to be
+                       // preserved better than this. -b.t. 
+                       Double number = new Double (thisString);
+                       CurrentArray.setData(TaggedLocatorObj, number.doubleValue());
+                   } else {
+                       Log.warnln("The dataFormat:"+CurrentDataFormat.toString()+" is not allowed in tagged data.");
+                       Log.warnln("Unable to setData:["+thisString+"], ignoring request");
+                   } 
+
+                } catch (SetDataException e) {
+                   // bizarre error. Cant add data (out of memory??) :P
+                   Log.errorln("Unable to setData:["+thisString+"], ignoring request");
+                   Log.printStackTrace(e);
+                }
+               
              }
 
           } else if ( readObj instanceof DelimitedXMLDataIOStyle ||
@@ -886,16 +941,37 @@ class SaxDocumentHandler implements DocumentHandler {
     class dataStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
 
-          // we only need to do this for the first time we enter
+          // we only need to do these things for the first time we enter
+          // a data node
           if (DataNodeLevel == 0) {
-              // update the array dataCube with passed attributes
-              CurrentArray.getDataCube().setXMLAttributes(attrs);
+
+             // update the array dataCube with passed attributes
+             CurrentArray.getDataCube().setXMLAttributes(attrs);
+
+             // determine the size of the dataFormat (s) in our dataCube
+             if (CurrentArray.hasFieldAxis()) {
+                 // if there is a field axis, then its set to the number of fields
+                 FieldAxis fieldAxis = CurrentArray.getFieldAxis();
+                 MaxDataFormatIndex = (fieldAxis.getLength()-1);
+             } else {
+                 // its homogeneous 
+                 MaxDataFormatIndex = 0;
+             }
+                  
+             // reset to start of which dataformat type we currently are reading
+             CurrentDataFormatIndex = 0;    
+
+             // reset the list of dataformats we are reading
+             DataFormatList = CurrentArray.getDataFormatList();
+
           }
 
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
 
           if ( readObj instanceof TaggedXMLDataIOStyle) {
              TaggedLocatorObj = CurrentArray.createLocator();
+             LastFastAxisCoordinate = 0;
+             FastestAxis = (AxisInterface) CurrentArray.getAxisList().get(0);
           } else {
              // A safety. We clear datablock when this is the first datanode we 
              // have entered DATABLOCK is used in cases where we read in untagged data
@@ -1984,6 +2060,10 @@ class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/03 20:10:07  thomas
+ * Now tagged data is read into the dataCube with the
+ * correct formatting. -b.t.
+ *
  * Revision 1.6  2000/11/02 19:45:13  thomas
  * Updated to read in Notes objects. -b.t.
  *
