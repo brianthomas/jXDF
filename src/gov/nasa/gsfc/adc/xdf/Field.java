@@ -130,7 +130,7 @@ public class Field extends BaseObject{
      //set up the attribute hashtable key with the default initial value
     attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("relation", new XMLAttribute(null, Constants.OBJECT_TYPE));  //double check
-    attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
+    attribHash.put("units", new XMLAttribute(null, Constants.OBJECT_TYPE));
     attribHash.put("dataFormat", new XMLAttribute(null, Constants.OBJECT_TYPE));
     attribHash.put("class", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("fieldIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
@@ -301,7 +301,16 @@ public class Field extends BaseObject{
    * @return: an XDF::Unit object if successfull, null if not.
    */
   public Unit addUnit(Unit unit) {
-    return  getUnits().addUnit(unit);
+    if (unit == null) {
+      Log.warn("in Array.addUnit(), the Unit passed in is null");
+      return null;
+    }
+    Units u = getUnits();
+    if (u == null) {
+      u = new Units();
+      setUnits(u);
+    }
+    return  u.addUnit(unit);
   }
 
   /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
@@ -310,7 +319,14 @@ public class Field extends BaseObject{
    * @return: true if successful, false if not
    */
   public boolean removeUnit(Unit what) {
-    return getUnits().removeUnit(what);
+    Units u = getUnits();
+    if (u !=null) {
+      if (u.getUnitList().size()==0)
+        setUnits(null);
+      return u.removeUnit(what);
+    }
+    else
+      return false;
   }
 
   /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
@@ -319,7 +335,14 @@ public class Field extends BaseObject{
    * @return: true if successful, false if not
    */
   public boolean removeUnit(int index) {
-    return getUnits().removeUnit(index);
+   Units u = getUnits();
+    if (u !=null) {
+      if (u.getUnitList().size()==0)
+        setUnits(null);
+      return u.removeUnit(index);
+    }
+    else
+      return false;
   }
 
 }
@@ -328,6 +351,9 @@ public class Field extends BaseObject{
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/10/27 21:16:48  kelly
+ * units are initialized as null now.  changed add/remove units methods.  -k.z.
+ *
  * Revision 1.4  2000/10/26 20:27:39  kelly
  * fixed a little documentation
  *
