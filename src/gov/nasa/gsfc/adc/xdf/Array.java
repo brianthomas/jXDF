@@ -512,7 +512,7 @@ import java.util.Vector;
 
      /**
       * @return the current a list of FieldAxis and Axis Objects in this array. 
-      * @deprecated This name does not make clear that fieldAxis will also be returned.
+      * @deprecated Use getAxes() method. This name does not make clear that fieldAxis will also be returned.
       */
      public List getAxisList () {
        return (List) ((Attribute) attribHash.get(AXISLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
@@ -1420,6 +1420,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.38  2001/09/19 17:43:05  thomas
+  * trival doc change
+  *
   * Revision 1.37  2001/09/18 17:41:23  thomas
   * removed maxDataIndex convience method
   *
