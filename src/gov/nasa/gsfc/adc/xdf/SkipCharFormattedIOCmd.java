@@ -95,33 +95,26 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
     return (String)  ((XMLAttribute) attribHash.get("output")).getAttribValue();
   }
 
-  public void toXMLOutputStream( OutputStream outputstream, String indent) {
-    //open the node
-    writeOut(outputstream, "<" + classXDFNodeName);
-
-    //writeOutAttributes
-/*
-    String attrib=null;
-    if ( (attrib=getCount()) !=null)
-      writeOut( outputstream, " count=\"" + attrib + "\"");
-    if ((attrib=getOutput()) !=null)
-      writeOut(outputstream, " output=\"" + attrib + "\"");
-    //close the node
-*/
-
-    writeOut(outputstream, " />");
-
-  }
-
-  public void specificIOStyleToXDF (OutputStream outputstream, String what) {
-
-
-  } 
-
   //
   // Protected Methods
   //
+  protected void specificIOStyleToXDF( OutputStream outputstream, String indent) {
+    synchronized (attribHash) {
+      //open the node
+      writeOut(outputstream, "<" + classXDFNodeName);
 
+      //writeOutAttributes
+      Object attrib=null;
+      if ( (attrib=getCount()) !=null)
+        writeOut( outputstream, " count=\"" + attrib + "\"");
+      if ((attrib=getOutput()) !=null)
+        writeOut(outputstream, " output=\"" + attrib + "\"");
+
+      //close the node
+      writeOut(outputstream, "/>");
+    }
+
+  }
 
 
   //
@@ -147,6 +140,9 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/11/10 15:36:44  kelly
+ * minor fix related to cvs checkin
+ *
  * Revision 1.2  2000/11/10 01:40:41  thomas
  * Bug fix. This code was keeping the package from
  * compiling. Kelly, please review code carefully.

@@ -47,10 +47,12 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   //constructor and related methods
   //
 
-  //no-arg constructor
-  public FormattedXMLDataIOStyle ()
+  // constructor
+  public FormattedXMLDataIOStyle (Array parentArray)
   {
-     init();
+    this.parentArray = parentArray;
+    init();
+
   }
 
   /**  This constructor takes a Java Hashtable as an initializer of
@@ -112,7 +114,17 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 
   protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
   {
-
+     //write out nodes in formatCommandList
+     synchronized (formatCommandList) {
+      int stop = formatCommandList.size();
+      for (int i = 0; i <stop; i++) {
+         if (sPrettyXDFOutput) {
+          writeOut(outputstream, Constants.NEW_LINE);
+          writeOut(outputstream, indent);
+        }
+        ((XMLDataIOStyle) formatCommandList.get(i)).specificIOStyleToXDF(outputstream, indent);
+      }
+     }
   }
 
 
@@ -136,10 +148,10 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, indent);
       }
       synchronized (formatCommandList) {
-        int stop2 = formatCommandList.size();
-        for (int i = 0; i < stop2; i++) {
-          FormattedIOCmd command = (FormattedIOCmd) formatCommandList.get(i);
-          command.toXMLOutputStream(outputstream, indent);
+        int end = formatCommandList.size();
+        for (int i = 0; i < end; i++) {
+          Object command = formatCommandList.get(i);
+          ((XMLDataIOStyle) command).specificIOStyleToXDF(outputstream, indent);
            if (sPrettyXDFOutput) {
            writeOut(outputstream, Constants.NEW_LINE);
            writeOut(outputstream, indent);
@@ -168,10 +180,12 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 
 }
 
-
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/10 15:36:21  kelly
+ * minor fix related to cvs checkin
+ *
  * Revision 1.4  2000/11/10 01:40:41  thomas
  * Bug fix. This code was keeping the package from
  * compiling. Kelly, please review code carefully.
