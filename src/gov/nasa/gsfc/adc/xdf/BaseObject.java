@@ -602,8 +602,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
             }
           }
           else {
-            if(obj.attribType == Constants.NUMBER_TYPE ||
-               obj.attribType == Constants.STRING_OR_NUMBER_TYPE) {  //it's an attribute of Number type
+            if(obj.attribType == Constants.INTEGER_TYPE ||
+               obj.attribType == Constants.DOUBLE_TYPE) {  //it's an attribute of Number type
               Hashtable item = new Hashtable();
               item.put("name", attribName);
               item.put("value", obj.attribValue.toString());
@@ -639,7 +639,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
     }
   }
 
-  /** Set the XMLattributes of this object using the passed AttributeList
+  /** Set the XMLattributes of this object using the passed AttributeList.
    */
   // NOTE: this is essentially the Perl update method
   protected void setXMLAttributes (AttributeList attrs) {
@@ -651,12 +651,26 @@ public abstract class BaseObject implements Serializable, Cloneable {
           int size = attrs.getLength();
           for (int i = 0; i < size; i++) {
              String name = attrs.getName(i);
-            String value = attrs.getValue(i);
-            if (name != null && value != null)
-              ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
+             String value = attrs.getValue(i); // yes, AttributeList can only return strings 
+
+             // set it as appropriate to the type
+             if (name != null && value != null) { 
+                String type = ((XMLAttribute) this.attribHash.get(name)).getAttribType();
+                if(type.equals(Constants.INTEGER_TYPE)) 
+                   // convert string to proper Integer
+                   ((XMLAttribute) this.attribHash.get(name)).setAttribValue(new Integer(value));
+                else if(type.equals(Constants.DOUBLE_TYPE)) 
+                   // convert string to proper Double
+                   ((XMLAttribute) this.attribHash.get(name)).setAttribValue(new Double(value));
+                else 
+                   ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
+             }
+
           }
+
       }
-     }//synchronize
+
+     } //synchronize
   }
 
 
@@ -773,6 +787,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.33  2000/11/20 22:04:41  thomas
+ * Implimented new INTEGER_TYPE/DOUBLE_TYPE for
+ * XMLAttribute printout in toXMLOutputStream. -b.t.
+ *
  * Revision 1.32  2000/11/16 19:55:35  kelly
  * fixed documentation.  -k.z. and singleton related stuff.
  *
