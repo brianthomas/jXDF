@@ -2,6 +2,9 @@
 // XDF Value
 // CVS $Id$
 
+// Value.java Copyright (C) 2000 Brian Thomas,
+// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+
 /*
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,13 +24,14 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-/** Value.java: holds mathematical values. ErroredValue inherits
- *  from this object; this object is also used
- * at every indice on an Axis object to denote the coordinate
- * value of a given index. The Value class can hold a scalar value.
- * To hold a vector (unit direction) value use XDF::UnitDirection instead.
- *  @version $Revision$
+/** Holds 'values' (either mathematical or string). ErroredValue inherits
+    from this object (but unlike this class only holds math values); 
+    This object is used at every indice on an Axis object to denote the 
+    coordinate value of a given index. The Value class can hold a scalar value.
+    To hold a vector (unit direction) value use UnitDirection class instead.
+    @version $Revision$
  */
+
 public class Value extends BaseObject {
 
    //
@@ -156,6 +160,9 @@ public class Value extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/08 20:24:00  thomas
+ * Inserted copywrite, fixed some documentation. -b.t.
+ *
  * Revision 1.6  2000/11/02 20:33:49  kelly
  * finished the class
  *
