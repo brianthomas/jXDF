@@ -262,6 +262,7 @@ import java.io.IOException;
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
+    attribOrder.add(0,DESCRIPTION_XML_ATTRIBUTE_NAME);
     attribOrder.add(0,"unitList");
     attribOrder.add(0,"system");
     attribOrder.add(0,"factor");
@@ -269,6 +270,7 @@ import java.io.IOException;
     attribHash.put("unitList", new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("system", new Attribute(null, Constants.STRING_TYPE));
     attribHash.put("factor", new Attribute(null, Constants.DOUBLE_TYPE));
+    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
   }
 
 
@@ -277,6 +279,9 @@ import java.io.IOException;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.24  2001/09/20 20:10:38  huang
+ * fixed a bug in set/getDescription()
+ *
  * Revision 1.23  2001/09/19 17:51:32  thomas
  * made some set*List methods deprecated
  *
