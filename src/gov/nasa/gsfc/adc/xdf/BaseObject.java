@@ -86,7 +86,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
   */
   protected List attribOrder;
 
-  private HashSet XMLNotationHash;
+  // stores notation entries for the XMLDeclaration
+  private HashSet XMLNotationHash = new HashSet();
 
   //
   // Constructor Methods
@@ -979,6 +980,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.39  2001/03/28 21:59:46  thomas
+ * Forgot to declare an empty hashset for XMLNotationHash
+ * on init. This resulted in bomb on toXMLOutputStream
+ * call from objects built by hand. One line fixed.
+ *
  * Revision 1.38  2001/02/07 18:44:03  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These
