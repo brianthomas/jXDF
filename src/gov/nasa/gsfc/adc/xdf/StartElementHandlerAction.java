@@ -28,17 +28,21 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /** Interface for all start element actions in the Reader start
     element dispatch table. 
 */
 public interface StartElementHandlerAction {
-  public Object action (SaxDocumentHandler handler, Attributes attrs);
+  public Object action (SaxDocumentHandler handler, Attributes attrs) throws SAXException;
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/09/20 20:58:37  thomas
+ * action handler now throws SAXException
+ *
  * Revision 1.3  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
