@@ -48,21 +48,31 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
   protected String repeatable = DefaultRepeatable;
   protected String recordTerminator = DefaultRecordTerminator;
 
-  //constructor
-  public DelimitedXMLDataIOStyle (Array parentArray)
-  {
-    this.parentArray = parentArray;
-    init();
-  }
+   //
+   // Constructors 
+   //
+   public DelimitedXMLDataIOStyle (Array parentArray)
+   {
+      this.parentArray = parentArray;
+      init();
+   }
 
+   /**  This constructor takes a Java Hashtable as an initializer of
+        the XML attributes of the object to be constructed. The
+        Hashtable key/value pairs coorespond to the class XDF attribute
+        names and their desired values.
+    */
+   public DelimitedXMLDataIOStyle ( Array parentArray, Hashtable InitXDFAttributeTable )
+   {
 
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init()
-  {
-      classXDFNodeName = "textDelimiter";
-  }
+      this.parentArray = parentArray;
+
+      // init the XML attributes (to defaults)
+      init();
+
+      // init the value of selected XML attributes to HashTable values
+      hashtableInitXDFAttributes(InitXDFAttributeTable);
+   }
 
 
   //
@@ -85,8 +95,6 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
   {
     return delimiter;
   }
-
-
 
   /**setRepeatable: set the *repeatable* attribute
    * @return: the current *repeatable* attribute
@@ -175,6 +183,24 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
     }
    }
 
+   /** A special private method used by constructor methods to
+       convienently build the XML attribute list for a given class.
+    */
+   private void init()
+   {   
+      classXDFNodeName = "textDelimiter";
+
+      attribOrder.add(0,"delimiter");
+      attribOrder.add(0,"repeatable");
+      attribOrder.add(0,"recordTerminator");
+
+      attribHash.put("delimiter", new XMLAttribute(new String(" "), Constants.STRING_TYPE));
+      attribHash.put("repeatable", new XMLAttribute(new String("yes"), Constants.STRING_TYPE));
+      attribHash.put("recordTerminator", new XMLAttribute(Constants.NEW_LINE, Constants.STRING_TYPE));
+
+   }
+
+
 
 
 
@@ -182,6 +208,10 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/11/03 21:22:23  thomas
+ * Had to add in XMLAttributes to init method. Added
+ * Hashtable init constructor also. -b.t.
+ *
  * Revision 1.2  2000/10/31 21:43:11  kelly
  * --completed the *toXDF*.
  * --got rid of the Perl specific stuff  -k.z.
