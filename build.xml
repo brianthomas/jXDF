@@ -189,12 +189,15 @@
              use="true"
              windowtitle="eXtensible Data Format API">
         <header><![CDATA[<h2><a href="${adc_xml_homepage}">ADC XML Group</a></h2><A HREF="http://www.nasa.gov/"><IMG SRC="http://adc.gsfc.nasa.gov/adc/images/nasalogo.gif" BORDER=0 ALT=\"NASA insignia\"></A><br>
-<h2><A HREF="mailto:xdf@xml.gsfc.nasa.gov">Contact the ADC XDF Group</a></h2>]]></header>
-        <doctitle><![CDATA[<h2>DOC TITLE</h2>]]></doctitle>
+<h2><A HREF="mailto:xdf@xdf.gsfc.nasa.gov">Contact the ADC XDF Group</a></h2>]]></header>
+        <doctitle><![CDATA[<h2>Java XDF API</h2>]]></doctitle>
+<!--
         <footer>FOOTER</footer>
+-->
+        <footer></footer>
         <bottom><![CDATA[<i>Copyright &#169; 2001 Brian Thomas. All Rights Reserved.  This is free software, and you are welcome to redistribute it under certain conditions.  This software comes with ABSOLUTELY NO WARRANTY. For details on terms and conditions of use refer to the README and LICENCE files included in the software distribution.</i>]]></bottom>
-        <group title="Group 1 Packages" packages="gov.nasa.gsfc.adc.xdf.*"/>
-        <group title="Group 2 Packages" packages="gov.nasa.gsfc.adc.xdf.DOM.*"/>
+        <group title="Core Package" packages="gov.nasa.gsfc.adc.xdf.*"/>
+        <group title="XDF/DOM Package" packages="gov.nasa.gsfc.adc.xdf.DOM.*"/>
         <link offline="true" href="http://java.sun.com/products/jdk/1.2/docs/api/" packagelistLoc="C:\tmp"/>
         <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
     </javadoc>
