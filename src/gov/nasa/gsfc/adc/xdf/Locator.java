@@ -36,39 +36,35 @@ import java.util.List;
    the range of valid datum indexes.
  */
 
-
  public class Locator implements Cloneable {
 
   //
   //Fields
   //
   protected Array parentArray;
-  protected List axisOrderList = Collections.synchronizedList(new ArrayList());
+  protected List axisOrderList;
 
   //hashtable to store the (axis, index) pair
   protected Hashtable locations;
 
   //constructor
-  public Locator(Array array) {
-    parentArray = array;
-    List axisList = parentArray.getAxisList();
+  public Locator (Array array) {
+    init(array);
+  }
 
-    /**now, since we KNOW _parentArray is defined
-     * (has to be instanciated via Array ONLY)
-     * we can proceed to initialize the axis, index positions
-     * to the origin (ie index 0 for each axis).
-     * We choose the parent Array axisList ordering for our
-     * default location ordering.
-     */
+  //
+  // Public Get/Set Methods
+  //
 
-    locations = new Hashtable(axisList.size());
-    int stop = axisList.size();
+  public void setIterationOrder (List axisIterationList) {
 
+    int stop = axisIterationList.size();
     for (int i = 0; i < stop; i++) {
-      Object axisObj =  axisList.get(i);
+      Object axisObj =  axisIterationList.get(i);
       axisOrderList.add(axisObj);
       locations.put(axisObj, new Integer(0));
     }
+
   }
 
   /** set the index of an axis
@@ -159,8 +155,6 @@ import java.util.List;
     return !outofDataCells;
   }
 
-
-
   /** Change the locator coordinates to the previous datacell as
    * determined from the locator iteration order.
    * Returns '0' if it must cycle to the last datacell.
@@ -186,12 +180,11 @@ import java.util.List;
     return !outofDataCell;
   }
 
+  // Umm. Not sure what Kelly is doing here. Bizarre. -b.t.
+/*
   public void setIterationOrder(List axisOrderListRef) {
+
     //have to check the list elements are of type Axis, double check
-    if (axisOrderListRef == null) {
-      Log.error("Locator can't setIterationOrder, axisOrderList arg is null");
-      return;
-    }
     List oldList = axisOrderList;
     axisOrderList = Collections.synchronizedList(new ArrayList());
     int index = 0;
@@ -212,6 +205,7 @@ import java.util.List;
     return;
 
   }
+*/
 
   /**
    * @return an array of Axises, whose order in the array correspondes to
@@ -222,6 +216,9 @@ import java.util.List;
 
   }
 
+  //
+  // Other Public Methods
+  //
 
   /** reset the locator to the origin
    *
@@ -269,6 +266,7 @@ import java.util.List;
     //
     //PROTECTED methods
     //
+
     /** adjust its axisOrderList and hashtable locations according
      * to parentArray's axes change
      */
@@ -285,6 +283,33 @@ import java.util.List;
 
     }
 
+    //
+    // Private Methods
+    //
+
+
+    private void init (Array array) {
+
+       // set the parentArray
+       parentArray = array;
+
+      /**now, since we KNOW parentArray is defined
+         (has to be instanciated via Array ONLY)
+         we can proceed to initialize the axis, index positions
+         to the origin (ie index 0 for each axis).
+         We choose the parent Array axisList ordering for our
+         default location ordering.
+       */
+
+      List axisList = parentArray.getAxisList();
+
+      locations = new Hashtable(axisList.size());
+      axisOrderList = Collections.synchronizedList(new ArrayList());
+
+      // lastly, set the iteration order.
+      setIterationOrder(axisList);
+
+   }
 
 
 
@@ -294,6 +319,12 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2000/11/20 22:01:50  thomas
+ * Bad bug in setIterationOrder method. Commented
+ * out prior method. Instituted init() method and
+ * made used part of it as the new setIterationOrder
+ * method. -b.t.
+ *
  * Revision 1.15  2000/11/20 20:34:29  thomas
  * Removed debugging message. -b.t.
  *
