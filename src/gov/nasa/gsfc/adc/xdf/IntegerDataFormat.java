@@ -89,13 +89,20 @@ public class IntegerDataFormat extends NumberDataFormat {
     */
    public void setWidth(Integer width) {
 
-      if (!Utility.isValidNumberObject(width)) 
+      if (Utility.isValidNumberObject(width)) 
       {
          ((XMLAttribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).setAttribValue(width);
          generateFormatPattern();
       } else 
          Log.warnln("Invalid object for IntegerDataFormat.setWidth(). Ignoring set request.");
 
+   }
+
+   /** set the *width* attribute
+    */
+   public void setWidth (int width) {
+      Integer value = new Integer(width);
+      setWidth(value);
    }
 
    /**
@@ -184,6 +191,9 @@ public class IntegerDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/06/19 19:29:22  thomas
+ * *** empty log message ***
+ *
  * Revision 1.10  2001/05/04 20:20:09  thomas
  * added super.init() in init() method. This may have to be undone
  * in the future.  Consider this to be a 'side-ways' change.

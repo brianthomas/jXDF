@@ -48,7 +48,6 @@ public abstract class XMLDataIOStyle extends BaseObject {
    private static final String ID_XML_ATTRIBUTE_NAME = new String("readId");
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("readIdRef");
 
-   // have to have this init'd here to avoid null pointer in first sync block of setIOAxesOrder
    private List axesIOList = Collections.synchronizedList(new ArrayList());
 
    /* attribute defaults */
@@ -253,14 +252,16 @@ public abstract class XMLDataIOStyle extends BaseObject {
     * returns a List of Axis objects in the order of 'fastest' to 'slowest'. 
     */
    public List getIOAxesOrder() {
+
       synchronized (axesIOList) {
          return axesIOList;
       }
+
    }
 
    public void setIOAxesOrder(List axisOrderList) {
 
-      int parentSize = getParentArray().getAxes().size();
+      int parentSize = parentArray.getAxes().size();
 
       if (axisOrderList.size() != parentSize) {
           Log.errorln("Can't setIOAxisOrder(), passed list has wrong number of axes!, Ignoring request.");
@@ -304,8 +305,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
       attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
       attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
-      // initialize axisIOOrder list to parent 
-      setIOAxesOrder(getParentArray().getAxes());
+      setIOAxesOrder(parentArray.getAxes());
 
    };
 
@@ -326,6 +326,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/06/19 19:29:22  thomas
+ * *** empty log message ***
+ *
  * Revision 1.19  2001/06/18 21:39:28  thomas
  * added back in a write/readAxisOrder mthod (ugh). Now called
  * get/setIOAxes

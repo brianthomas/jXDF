@@ -158,8 +158,6 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, "<"+UntaggedInstructionNodeName+" "+UntaggedInstructionAxisIdRefName+"=\"");
         writeOutAttribute(outputstream, axis.getAxisId());
         writeOut(outputstream, "\">");
-
-        numberOfAxes++;
      }
 
      if (Specification.getInstance().isPrettyXDFOutput()) 
@@ -247,6 +245,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/06/19 19:29:22  thomas
+ * *** empty log message ***
+ *
  * Revision 1.15  2001/06/18 21:32:35  thomas
  * changes to reflect new getIOAxisOrder method of parent.
  *

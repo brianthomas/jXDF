@@ -11,6 +11,8 @@
 
         - UTF16 not implemented (at least not checked, reading *may* work).
 
+        - unique axisId's are not enforced, but should be.
+
         - resolve issue with writing float/exponential data (e.g. the "-.9" to
   	  "-0.9" issue. Does Java XDF have this problem?)
 
