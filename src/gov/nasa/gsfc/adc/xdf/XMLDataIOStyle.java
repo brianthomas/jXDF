@@ -264,9 +264,10 @@ public abstract class XMLDataIOStyle extends BaseObject {
     */
    public List getIOAxesOrder() {
 
-      synchronized (axesIOList) {
+      if (axesIOList == null) 
+         return parentArray.getAxes();
+      else 
          return axesIOList;
-      }
 
    }
 
@@ -340,7 +341,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
          synchronized (axesIOList) {
             axesIOList = Collections.synchronizedList(new ArrayList());
-            for (int i = 0, size = axesIOList.size(); i < size; i++) {
+            for (int i = 0, size = axisOrderList.size(); i < size; i++) {
                axesIOList.add(axisOrderList.get(i));
             }
          }
@@ -352,6 +353,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.29  2001/09/18 19:35:15  thomas
+ * Opps. bug in setIOAxesOrder fixed
+ *
  * Revision 1.28  2001/09/18 17:43:51  thomas
  * small change to prevent endian attrib from writing out if undefined
  *
