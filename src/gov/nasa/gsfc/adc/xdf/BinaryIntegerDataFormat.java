@@ -33,14 +33,24 @@ import java.util.Hashtable;
  */
 
 
-public class BinaryIntegerDataFormat extends DataFormat {
+public class BinaryIntegerDataFormat extends NumberDataFormat {
 
   //
   //Fields
   //
-  int DefaultBinaryIntegerBits = 64;
-  String DefaultBinaryIntegerSigned = "yes";
 
+  /* XML attribute names */
+  private static final String BITS_XML_ATTRIBUTE_NAME = "bits";
+  private static final String SIGNED_XML_ATTRIBUTE_NAME = "signed";
+
+  /* default attribute settings */
+  public static final int DEFAULT_BINARY_INTEGER_BITS = 16;
+  public static final String DEFAULT_BINARY_INTEGER_SIGNED = "yes";
+
+
+  //
+  // Constructors
+  //
 
   /** The no argument constructor.
    */
@@ -50,77 +60,56 @@ public class BinaryIntegerDataFormat extends DataFormat {
   }
 
   //
-  //Set Methods
+  // Get/Set Methods
   //
-
-  /** set the *lessThanValue* attribute
-   */
-  public void setLessThanValue(Object numLessThanValue) {
-     ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
-  }
-
-  /** set the *lessThanValueOrEqualValue* attribute
-   */
-  public void setLessThanOrEqualValue(Object numLessThanOrEqualValue) {
-     ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(numLessThanOrEqualValue);
-  }
-
-  /** set the *greaterThanValue* attribute
-   */
-  public void setGreaterThanValue(Object numGreaterThanValue) {
-    ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(numGreaterThanValue);
-  }
-
-  /** set the *greaterThanOrEqualValue* attribute
-   */
-  public void setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
-     ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
-  }
-
-  /** set the *infiniteValue* attribute
-   */
-  public void setInfiniteValue(Object numInfiniteValue) {
-     ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(numInfiniteValue);
-  }
-
-  /** set the *infiniteNegativeValue* attribute
-   */
-  public void setInfiniteNegativeValue(Object numInfiniteNegativeValue) {
-     ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(numInfiniteNegativeValue);
-  }
-
-  /** set the *noDataValue* attribute
-   */
-  public void setNoDataValue(Object numNoDataValue) {
-     ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
-  }
 
   /** set the *bits* attribute
    */
   public void setBits(Integer numBits) {
-     ((XMLAttribute) attribHash.get("bits")).setAttribValue(numBits);
+
+     if( numBits != null) 
+     {
+        if(Utility.isValidIntegerBits(numBits.intValue())) { 
+           ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(numBits);
+        } else { 
+           Log.warnln(numBits.toString()+" is not a valid number of BinaryInteger bits, ignoring set request.");
+        }
+     } else { 
+        Log.warnln("Cannot set BinaryInteger bits to null, ignoring set request.");
+     }
 
   }
+
+  /** set the *bits* attribute
+  */
+  public void setBits (int numBits) {
+
+        if(Utility.isValidIntegerBits(numBits)) { 
+           ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(new Integer(numBits));
+        } else { 
+           Log.warnln(numBits+" is not a valid number of BinaryInteger bits, ignoring set request.");
+        }
+
+  }
+
   /**
    * @return the current *bits* attribute.  
    */
   public Integer getBits()
   {
-    return (Integer) ((XMLAttribute) attribHash.get("bits")).getAttribValue();
+     return (Integer) ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *signed* attribute
    */
   public void setSigned(String strSigned) {
 
-    if (!strSigned.equals("yes")  && !strSigned.equals("yes") ) {
-      Log.error("*signed* attribute can only be set to yes or no");
-      Log.error("tend to set as" + strSigned);
-      Log.error("invalid. ignoring request");
+    if (!Utility.isValidBinaryIntegerSigned(strSigned)) {
+      Log.warnln("BinaryInteger signed attribute can only be set to 'yes' or 'no'. Ignoring set request.");
       return;
     }
 
-    ((XMLAttribute) attribHash.get("signed")).setAttribValue(strSigned);
+    ((XMLAttribute) attribHash.get(SIGNED_XML_ATTRIBUTE_NAME)).setAttribValue(strSigned);
 
   }
 
@@ -129,34 +118,48 @@ public class BinaryIntegerDataFormat extends DataFormat {
    */
   public String getSigned()
   {
-    return (String) ((XMLAttribute) attribHash.get("signed")).getAttribValue();
-  }
-  //
-  //Other PUBLIC Methods
-  //
-
-  /** A convenience method.
-   * @Return: the number of bytes this BinaryIntegerDataFormat holds.
-   */
-  public int numOfBytes() {
-    return getBits().intValue()/8;
+     return (String) ((XMLAttribute) attribHash.get(SIGNED_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    //
-   // Private Methods
+   // Other PUBLIC Methods
    //
 
-  /** Special private method used by constructor methods to
-      conviently build the XML attribute list for a given class.
+   /** A convenience method.
+     @Return: the number of bytes this BinaryIntegerDataFormat holds.
    */
-   private void init() {
+   public int numOfBytes() {
+      return getBits().intValue()/8;
+   }
+
+   // We need this here so that we will properly update the
+   // formatPattern of the class. -b.t. 
+   // Note: we never have a need for ASCII formatting of these numbers
+   // so this isnt needed.
+/*
+   public void setXMLAttributes (AttributeList attrs) {
+      super.setXMLAttributes(attrs);
+      generateFormatPattern();
+   }
+*/
+
+   //
+   // Protected Methods
+   //
+
+  /** Special method used by constructor methods to
+      build the XML attribute list for a given class.
+   */
+   protected void init() {
       specificDataFormatName = "binaryInteger";
      //add attributes
-     attribOrder.add(0,"bits");
-     attribOrder.add(0, "signed");
+     attribOrder.add(0, BITS_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, SIGNED_XML_ATTRIBUTE_NAME);
 
-     attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryIntegerBits), Constants.INTEGER_TYPE));
-     attribHash.put("signed", new XMLAttribute(DefaultBinaryIntegerSigned, Constants.STRING_TYPE));
+     attribHash.put( BITS_XML_ATTRIBUTE_NAME, 
+                      new XMLAttribute(new Integer(DEFAULT_BINARY_INTEGER_BITS), Constants.INTEGER_TYPE));
+     attribHash.put( SIGNED_XML_ATTRIBUTE_NAME, 
+                      new XMLAttribute(DEFAULT_BINARY_INTEGER_SIGNED, Constants.STRING_TYPE));
 
   }
 
@@ -166,6 +169,11 @@ public class BinaryIntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/02/07 18:42:25  thomas
+ * Changes to enable binary read/writing. Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.8  2000/11/22 20:42:00  thomas
  * beaucoup changes to make formatted reads work.
  * DataFormat methods now store the "template" or

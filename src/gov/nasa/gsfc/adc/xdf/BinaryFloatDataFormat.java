@@ -33,13 +33,22 @@ import java.util.Hashtable;
  */
 
 
-public class BinaryFloatDataFormat extends DataFormat {
+public class BinaryFloatDataFormat extends NumberDataFormat {
 
   //
-  //Fields
+  // Fields
   //
-  public static final int DefaultBinaryFloatBits = 32;
 
+  /* XML attribute names */
+  private static final String BITS_XML_ATTRIBUTE_NAME = "bits";
+
+  /* default attribute setting */
+  public static final int DEFAULT_BINARY_FLOAT_BITS = 32;
+
+
+  //
+  // Constructors 
+  //
 
   /** The no argument constructor.
    */
@@ -49,66 +58,32 @@ public class BinaryFloatDataFormat extends DataFormat {
   }
 
   //
-  //Set Methods
+  // Get/Set Methods
   //
 
-  /** set the *lessThanValue* attribute
+  /** set the *bits* attribute
    */
-  public void setLessThanValue(Object numLessThanValue) {
-    if (numLessThanValue.getClass().getName().endsWith("Number"))
-       ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
-    else
-      Log.warnln("Couldnt set the lessThanValue, ignoring request.");
-  }
+  public void setBits (Integer numBits) {
 
-  /** set the *lessThanValueOrEqualValue* attribute
-   */
-  public void setLessThanOrEqualValue(Object numLessThanOrEqualValue) {
-     ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(numLessThanOrEqualValue);
-  }
-
-  /** set the *greaterThanValue* attribute
-   */
-  public void setGreaterThanValue(Object numGreaterThanValue) {
-     ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(numGreaterThanValue);
-  }
-
-  /** set the *greaterThanOrEqualValue* attribute
-   *
-   */
-  public void setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
-     ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
-  }
-
-  /** set the *infiniteValue* attribute
-   */
-  public void setInfiniteValue(Object numInfiniteValue) {
-     ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(numInfiniteValue);
-  }
-
-  /** set the *infiniteNegativeValue* attribute
-   */
-  public void setInfiniteNegativeValue(Object numInfiniteNegativeValue) {
-     ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(numInfiniteNegativeValue);
-  }
-
-  /** set the *noDataValue* attribute
-   */
-  public void setNoDataValue(Object numNoDataValue) {
-     ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
+    int bits = numBits.intValue();
+    if (Utility.isValidFloatBits(bits)) 
+       ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(numBits);
+    else {
+      Log.warn("The requested number of bits:["+bits+"] for binary float is not allowed");
+      Log.warnln("ignoring 'set' request.");
+    }
   }
 
   /** set the *bits* attribute
    */
-  public void setBits(Integer numBits) {
+  public void setBits (int bits) {
 
-    int bits = numBits.intValue();
-    if ((bits == 32) || (bits == 64)) //check that bits are either 32 or 64
-       ((XMLAttribute) attribHash.get("bits")).setAttribValue(numBits);
-    else {
-      Log.warn("number of bits for binary float has to be either 32 or 64");
-      Log.warnln("ignoring 'set' request.");
-    }
+     if (Utility.isValidFloatBits(bits))
+        ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(new Integer(bits));
+     else {
+        Log.warn("The requested number of bits:["+bits+"] for binary float is not allowed");
+        Log.warnln("ignoring 'set' request.");
+     }
   }
 
   /**
@@ -116,37 +91,58 @@ public class BinaryFloatDataFormat extends DataFormat {
    */
   public Integer getBits()
   {
-    return (Integer) ((XMLAttribute) attribHash.get("bits")).getAttribValue();
+     return (Integer) ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   //
-  //Other PUBLIC Methods
+  // Other PUBLIC Methods
   //
 
   /** A convenience method.
    * @Return: the number of bytes this BinaryFloatDataFormat holds.
    */
   public int numOfBytes() {
-    return getBits().intValue()/8;
+     return getBits().intValue()/8;
   }
 
-   //
-   // Private Methods
-   //
-   /** Special private method used by constructor methods to
-       conviently build the XML attribute list for a given class.
-    */
-   private void init() {
-      specificDataFormatName = "binaryFloat";
-      attribOrder.add(0, "bits");  //add bits as the first attribute;
+   // We need this here so that we will properly update the
+   // formatPattern of the class. -b.t. 
+   // Note: we never have a need for ASCII formatting of these numbers
+   // so this isnt needed.
+/*
+   public void setXMLAttributes (AttributeList attrs) {
+      super.setXMLAttributes(attrs);
+      generateFormatPattern();
+   }
+*/
 
-      attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryFloatBits), Constants.INTEGER_TYPE));
+  //
+  // Protected Methods
+  //
+
+  /** Special method used by constructor methods to
+      easily build the XML attribute list for a given class.
+   */
+
+   protected void init() {
+
+      specificDataFormatName = "binaryFloat";
+
+      attribOrder.add(0, BITS_XML_ATTRIBUTE_NAME);  //add bits as the first attribute;
+
+      attribHash.put(BITS_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_BINARY_FLOAT_BITS), Constants.INTEGER_TYPE));
    }
 
 }
+
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/02/07 18:42:25  thomas
+ * Changes to enable binary read/writing. Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.7  2000/11/22 20:42:00  thomas
  * beaucoup changes to make formatted reads work.
  * DataFormat methods now store the "template" or
