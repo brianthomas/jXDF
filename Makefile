@@ -96,7 +96,8 @@ test: compile
 #
 clean: 
 	(cd $(XDF_SRC_DIR);  $(MAKE) $(MFLAGS) 'MFLAGS=$(MFLAGS)' clean; ) 
-	-rm -f $(ALL_CLASSES)
+	-rm -f ./gov/nasa/gsfc/adc/xdf/*.class
+	#-rm -f $(ALL_CLASSES)
 
 distclean: xdfdistclean
 	#-rcsclean -u
