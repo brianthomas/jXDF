@@ -49,10 +49,12 @@ import java.util.*;
      */
 
     locations = new Hashtable(axisList.size());
-    for (int i = 0; i < axisList.size(); i++) {
-      Axis axis = (Axis) axisList.get(i);
-      axisOrderList.add(axis);
-      locations.put(axis, new Integer(0));
+    int stop = axisList.size();
+
+    for (int i = 0; i < stop; i++) {
+      Object axisObj =  axisList.get(i);
+      axisOrderList.add(axisObj);
+      locations.put(axisObj, new Integer(0));
     }
   }
 
@@ -61,6 +63,22 @@ import java.util.*;
    * @return: index if successful
    */
   public int setAxisLocation (Axis axisObj, int index) throws AxisLocationOutOfBoundsException {
+    if ((!parentArray.getAxisList().contains(axisObj)) ||
+        (index < 0) ||
+        (index > axisObj.getLength()-1) ) {
+        throw new AxisLocationOutOfBoundsException();
+    }
+    //now update the axis and index pair in the hashtable
+    //locations.remove(axisObj);
+    locations.put(axisObj, new Integer(index));
+    return index;
+  }
+
+  /**setAxisLocation: set the index of an axis
+   * @param: FieldAxis, index
+   * @return: index if successful
+   */
+  public int setAxisLocation (FieldAxis axisObj, int index) throws AxisLocationOutOfBoundsException {
     if ((!parentArray.getAxisList().contains(axisObj)) ||
         (index < 0) ||
         (index > axisObj.getLength()-1) ) {
@@ -89,7 +107,25 @@ import java.util.*;
       Log.error("error, parentArray constains the axisObj, but Location doens't");
       return -1;
     }
+  }
 
+  /**getAxisLocation: get the index of an Axis in the Locator object
+   * @param: FieldAxis
+   * @return: index if successful, -1 if not
+   */
+  public int getAxisLocation (FieldAxis axisObj) {
+     if ((!parentArray.getAxisList().contains(axisObj)) ) {
+        Log.error("axisObj is not an Axis ref contained in Locator's parentArray");
+        Log.error("regnore request");
+        return -1;
+     }
+     Integer loc = (Integer) locations.get(axisObj);
+     if (loc !=null)
+      return loc.intValue();
+     else {
+      Log.error("error, parentArray constains the axisObj, but Location doens't");
+      return -1;
+    }
   }
 
 
@@ -122,7 +158,7 @@ import java.util.*;
     boolean outofDataCells = true;
 
     for (int i = 0; i <axisOrderList.size() ; i++) {
-      Axis axis = (Axis) axisOrderList.get(i);
+      AxisInterface axis = (AxisInterface) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
       if (index < axis.getLength()-1) {
         outofDataCells = false;
@@ -143,7 +179,7 @@ import java.util.*;
     boolean outofDataCell = true;
 
     for (int i = 0; i <axisOrderList.size() ; i++) {
-      Axis axis = (Axis) axisOrderList.get(i);
+      AxisInterface axis = (AxisInterface) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
       index--;
       if (index < 0) {
@@ -169,9 +205,9 @@ import java.util.*;
     axisOrderList = Collections.synchronizedList(new ArrayList());
     int index = 0;
     for (int i = 0; i < axisOrderListRef.size(); i++) {
-      Axis axis = (Axis) axisOrderListRef.get(i);
+      AxisInterface axis = (AxisInterface) axisOrderListRef.get(i);
       for (int j = 0; j < oldList.size(); j++) {
-        Axis oldAxis = (Axis) oldList.get(j);
+        AxisInterface oldAxis = (AxisInterface) oldList.get(j);
         if (oldAxis.equals(axis)) {
           axisOrderList.add(axis);
           break;
@@ -202,7 +238,7 @@ import java.util.*;
         Integer origin = new Integer(0);
         Enumeration enum = locations.keys(); // Must be in synchronized block
             while (enum.hasMoreElements()) {
-              Axis axis = (Axis) enum.nextElement();
+              AxisInterface axis = (AxisInterface) enum.nextElement();
               locations.put(axis, origin);
             }
       }
@@ -215,6 +251,9 @@ import java.util.*;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/10/30 18:14:44  kelly
+ * conform to the common interface "AxisInterface" for Axis & FieldAxis -k.z.
+ *
  * Revision 1.6  2000/10/26 14:26:08  kelly
  * retrieval order is in sync with the axisOrder now (first axis is the fastest).  -k.z.
  *
