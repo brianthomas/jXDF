@@ -225,6 +225,8 @@ import java.util.Hashtable;
    protected void init()
    {
  
+     resetXMLAttributes();
+
      classXDFNodeName = "dataFormat";
  
      // order matters! these are in *reverse* order of their
@@ -258,6 +260,9 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/05/10 21:09:38  thomas
+ * added resetXMLAttributes to init().
+ *
  * Revision 1.14  2001/05/04 20:22:25  thomas
  * changed init() to protected.
  *
