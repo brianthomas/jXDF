@@ -1068,7 +1068,6 @@ public class SaxDocumentHandler extends DefaultHandler {
 
             FormattedIOCmd currentIOCmd = (FormattedIOCmd) commandList.get(CurrentIOCmdIndex);
 
-
             // readCell
             if (currentIOCmd instanceof ReadCellFormattedIOCmd) {
 
@@ -2936,6 +2935,7 @@ while (iter.hasNext()) {
              NrofDataFormats = DataFormatList.length; 
              IntRadix = new int [NrofDataFormats];
 
+             // CALCULATE CURRENTREADBYTES
              // set up some other global information bout the dataformats
              // that will help speed reading 
              CurrentReadBytes = 0;
@@ -2954,6 +2954,25 @@ while (iter.hasNext()) {
                } else if (DataFormatList[i] instanceof BinaryIntegerDataFormat) {
                      IntRadix[i] = 10;
                }
+             }
+
+             // DONT FORGET TO ADD IN THE SKIPCHAR bytes
+             XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
+             if (readObj instanceof FormattedXMLDataIOStyle) 
+             {
+                Iterator citer = ((FormattedXMLDataIOStyle) readObj).getFormatCommands().iterator();
+                while (citer.hasNext()) {
+                   FormattedIOCmd currentIOCmd = (FormattedIOCmd) citer.next();
+                   if (currentIOCmd instanceof SkipCharFormattedIOCmd) {
+                       Integer bytes_to_skip = ((SkipCharFormattedIOCmd) currentIOCmd).getCount();
+                       CurrentReadBytes += bytes_to_skip.intValue();
+                   }
+                }
+             } else if (readObj instanceof DelimitedXMLDataIOStyle
+                         || readObj instanceof TaggedXMLDataIOStyle 
+                       ) 
+             {
+                throw new SAXException("Cant parse delimited or tagged data from external file (yet).");
              }
 
              if (CurrentReadBytes > MAXINPUTREADSIZE) {
@@ -4701,6 +4720,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.61  2001/09/24 19:44:15  thomas
+ * bug fix: CurrentReadBytes wasnt being correctly calculated for Formatted data!
+ *
  * Revision 1.60  2001/09/21 16:50:59  thomas
  * changes to make array appending work again. *sigh* the whole thing breaks the DTD however
  *
