@@ -102,9 +102,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
     // work properly: a lookup table of key/value pairs in attribHash and a
     // list containing the  proper order of the attributes.
 
-    // initialize
     attribHash  = new Hashtable(Constants.INIT_ATTRIBUTE_HASH_SIZE);
     attribOrder = Collections.synchronizedList(new ArrayList());
+
 
   }
 
@@ -531,6 +531,16 @@ public abstract class BaseObject implements Serializable, Cloneable {
   //
   // PROTECTED Methods
   //
+
+/*
+  protected void init () {
+
+    // initialize
+    attribHash  = new Hashtable(Constants.INIT_ATTRIBUTE_HASH_SIZE);
+    attribOrder = Collections.synchronizedList(new ArrayList());
+
+  }
+*/
 
   /** A little convenience method to save coding time elsewhere.
       This method initializes the XDF attributes of an object from a
@@ -969,6 +979,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.38  2001/02/07 18:44:03  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.37  2001/01/19 22:32:42  thomas
  * Removed setAttribHash, getAttribHash methods.
  * Dont seem to be needed. Also, removed update

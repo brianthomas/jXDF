@@ -37,44 +37,30 @@ import java.io.OutputStream;
 
 public abstract class XMLDataIOStyle extends BaseObject {
 
- //
-  //Fields
-  //
+   //
+   //Fields
+   //
 
-  protected Array parentArray;
-  public final static String DefaultEncoding = Constants.IO_ENCODING_ISO_8859_1;
-  public final static String DefaultEndian = Constants.BIG_ENDIAN;
-  public final static String UntaggedInstructionNodeName = "for";
+   /* XML attribute names */
+   private static final String ENDIAN_XML_ATTRIBUTE_NAME = new String("endian");
+   private static final String ENCODING_XML_ATTRIBUTE_NAME = new String("encoding");
+   private static final String ID_XML_ATTRIBUTE_NAME = new String("readId");
+   private static final String IDREF_XML_ATTRIBUTE_NAME = new String("readIdRef");
+
+   /* attribute defaults */
+   public final static String DEFAULT_ENCODING = Constants.IO_ENCODING_ISO_8859_1;
+   public final static String DEFAULT_ENDIAN = Constants.BIG_ENDIAN;
+
+   /* other */
+   protected String UntaggedInstructionNodeName = "for";
+   protected String UntaggedInstructionAxisIdRefName = "axisIdRef";
+   protected Array parentArray;
 
   //no-arg constructor
   public XMLDataIOStyle ()
   {
     init();
   }
-
-
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init()
-  {
-
-    classXDFNodeName = "read";
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"endian");
-    attribOrder.add(0,"encoding");
-    attribOrder.add(0,"readIdRef");
-    attribOrder.add(0,"readId");
-
-     //set up the attribute hashtable key with the default initial value
-    attribHash.put("endian", new XMLAttribute(DefaultEndian, Constants.STRING_TYPE));
-    attribHash.put("encoding", new XMLAttribute(DefaultEncoding, Constants.STRING_TYPE));
-    attribHash.put("readIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("readId", new XMLAttribute(null, Constants.STRING_TYPE));
-  };
-
 
   //
   //Get/Set Methods
@@ -85,7 +71,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
    public void setReadId (String strReadId)
    {
-       ((XMLAttribute) attribHash.get("readId")).setAttribValue(strReadId);
+       ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strReadId);
    }
 
   /**getReadId
@@ -93,7 +79,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String getReadId()
   {
-    return (String) ((XMLAttribute) attribHash.get("readId")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
 
@@ -103,7 +89,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
    public void setReadIdRef (String strReadIdRef)
    {
-      ((XMLAttribute) attribHash.get("readIdRef")).setAttribValue(strReadIdRef);
+      ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strReadIdRef);
    }
 
   /**getReadIdRef
@@ -111,7 +97,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String getReadIdRef()
   {
-    return (String) ((XMLAttribute) attribHash.get("readIdRef")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *encoding* attribute
@@ -120,10 +106,10 @@ public abstract class XMLDataIOStyle extends BaseObject {
    public void setEncoding (String strEncoding)
    {
       if (!Utility.isValidIOEncoding(strEncoding)) {
-         Log.error("not valid encoding.  'set' request ingored. returning null");
+         Log.warnln("setEncoding() got invalid value. Request ignored.");
          return;
       }
-      ((XMLAttribute) attribHash.get("encoding")).setAttribValue(strEncoding);
+      ((XMLAttribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).setAttribValue(strEncoding);
     }
 
   /**getEncoding
@@ -131,7 +117,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String getEncoding()
   {
-    return (String) ((XMLAttribute) attribHash.get("encoding")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *endian* attribute
@@ -140,10 +126,11 @@ public abstract class XMLDataIOStyle extends BaseObject {
    public void setEndian (String strEndian)
    {
        if (!Utility.isValidEndian(strEndian)) {
-          Log.error("not valid endian.  'set' request ingored. returning null");
+          Log.warnln("setEndian() got invalid value. Request ignored.");
           return;
        }
-       ((XMLAttribute) attribHash.get("endian")).setAttribValue(strEndian);
+
+       ((XMLAttribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).setAttribValue(strEndian);
    }
 
   /**getEndian
@@ -151,7 +138,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String getEndian()
   {
-    return (String) ((XMLAttribute) attribHash.get("endian")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
 
@@ -191,28 +178,28 @@ public abstract class XMLDataIOStyle extends BaseObject {
       String attrib;
       if ( (attrib=getEncoding()) !=null)  
       { 
-         writeOut(outputstream, " encoding=\"");
+         writeOut(outputstream, " "+ENCODING_XML_ATTRIBUTE_NAME+"=\"");
          writeOut(outputstream, attrib);
          writeOut(outputstream, "\"");
       }
 
       if ( (attrib=getEndian()) !=null)
       { 
-         writeOut(outputstream, " endian=\"");
+         writeOut(outputstream, " "+ENDIAN_XML_ATTRIBUTE_NAME+"=\"");
          writeOut(outputstream, attrib);
          writeOut(outputstream, "\"");
       }
 
       if ( (attrib=getReadId()) !=null)
       { 
-         writeOut(outputstream, " readId=\"");
+         writeOut(outputstream, " "+ID_XML_ATTRIBUTE_NAME+"=\"");
          writeOut(outputstream, attrib);
          writeOut(outputstream, "\"");
       }
 
       if ( (attrib=getReadIdRef()) !=null)
       { 
-         writeOut(outputstream, " readIdRef=\"");
+         writeOut(outputstream, " "+IDREF_XML_ATTRIBUTE_NAME+"=\"");
          writeOut(outputstream, attrib);
          writeOut(outputstream, "\"");
       }
@@ -243,8 +230,31 @@ public abstract class XMLDataIOStyle extends BaseObject {
   }
 
   // 
-  // Protected Methods
+  // Private Methods
   //
+
+  /** init -- special method used by constructor methods to
+   *  convienently build the XML attribute list for a given class.
+   */
+  private void init()
+  {
+
+    classXDFNodeName = "read";
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0, ENDIAN_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, ENCODING_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+
+     //set up the attribute hashtable key with the default initial value
+    attribHash.put(ENDIAN_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENDIAN, Constants.STRING_TYPE));
+    attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENCODING, Constants.STRING_TYPE));
+    attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+  };
+
 
   /** set the parentArray.
    * used when Array clones.
@@ -280,6 +290,11 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/02/07 18:44:04  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.14  2000/11/27 22:39:25  thomas
  * Fix to allow attribute text to have newline, carriage
  * returns in them (print out as entities: &#010; and

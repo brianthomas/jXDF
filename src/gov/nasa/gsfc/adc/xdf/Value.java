@@ -35,6 +35,17 @@ package gov.nasa.gsfc.adc.xdf;
 
 public class Value extends BaseObject {
 
+   // 
+   // Fields
+   //
+
+   /* XML attribute names */
+   private static final String VALUE_XML_ATTRIBUTE_NAME = new String("value");
+   private static final String INEQUALITY_XML_ATTRIBUTE_NAME = new String("inequality");
+   private static final String SPECIAL_XML_ATTRIBUTE_NAME = new String("special");
+   private static final String ID_XML_ATTRIBUTE_NAME = new String("valueId");
+   private static final String IDREF_XML_ATTRIBUTE_NAME = new String("valueIdRef");
+
    //
    // Constructors
    //
@@ -61,46 +72,46 @@ public class Value extends BaseObject {
    /** get the *value* (PCDATA) attribute.
    */
    public String getValue() {
-      return (String) ((XMLAttribute) attribHash.get("value")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *value* attribute.
     */
    public void setValue (String strValue)
    {
-      ((XMLAttribute) attribHash.get("value")).setAttribValue(strValue);
+      ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
   /** get the *valueId* attribute.
    */
    public String getValueId() {
-      return (String) ((XMLAttribute) attribHash.get("valueId")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *valueId* attribute.
     */
    public void setValueId (String strValueId)
    {
-      ((XMLAttribute) attribHash.get("valueId")).setAttribValue(strValueId);
+      ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strValueId);
    }
 
    /** get the *valueIdRef* attribute.
    */
    public String getValueIdRef() {
-      return (String) ((XMLAttribute) attribHash.get("valueIdRef")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *valueRef* attribute.
    */
    public void setValueIdRef (String strValueRef)
    {
-      ((XMLAttribute) attribHash.get("valueIdRef")).setAttribValue(strValueRef);
+      ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strValueRef);
    }
 
     /** get the *inequality*   attribute.
     */
    public String getInequality() {
-      return (String) ((XMLAttribute) attribHash.get("inequality")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(INEQUALITY_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
 
@@ -109,13 +120,13 @@ public class Value extends BaseObject {
    public void setInequality (String strInequality)
    {
       if (Utility.isValidValueInequality(strInequality))
-        ((XMLAttribute) attribHash.get("inequality")).setAttribValue(strInequality);
+        ((XMLAttribute) attribHash.get(INEQUALITY_XML_ATTRIBUTE_NAME)).setAttribValue(strInequality);
    }
 
   /** get the *special* attribute.
    */
    public String getSpecial() {
-      return (String) ((XMLAttribute) attribHash.get("special")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(SPECIAL_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *special* attribute.
@@ -123,37 +134,36 @@ public class Value extends BaseObject {
    public void setSpecial (String strSpecial)
    {
       if (Utility.isValidValueSpecial(strSpecial))
-       ((XMLAttribute) attribHash.get("special")).setAttribValue(strSpecial);
+       ((XMLAttribute) attribHash.get(SPECIAL_XML_ATTRIBUTE_NAME)).setAttribValue(strSpecial);
    }
 
 
    //
-   // Private Methods
+   // Protected Methods
    //
 
-   /** A special private method used by constructor methods to
-       conviently build the XML attribute list for a given class.
+   /** A special method used by constructor methods to
+       convienently build the XML attribute list for a given class.
     */
-   private void init()
+   protected void init()
    {
 
        classXDFNodeName = "value";
 
        // order matters! these are in *reverse* order of their
        // occurence in the XDF DTD
-      attribOrder.add(0,"value");
-      attribOrder.add(0,"inequality");
-      attribOrder.add(0,"special");
-      attribOrder.add(0,"valueIdRef");
-      attribOrder.add(0,"valueId");
-
+       attribOrder.add(0, VALUE_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, INEQUALITY_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, SPECIAL_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
 
        //set up the attribute hashtable key with the default initial value
-       attribHash.put("value", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("inequality", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("special", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("valueIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("valueId", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(INEQUALITY_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(SPECIAL_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
    }
 
 
@@ -161,6 +171,11 @@ public class Value extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/02/07 18:44:04  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.9  2001/01/19 22:33:52  thomas
  * ValueIdRef was misspelled!!! Now methods, attributes are
  * correct. -b.t.

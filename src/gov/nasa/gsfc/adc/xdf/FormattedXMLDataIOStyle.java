@@ -152,7 +152,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
               writeOut(outputstream, indent);
               indent = indent + Specification.getInstance().getPrettyXDFOutputIndentation(); 
            }
-           writeOut(outputstream, "<for axisIdRef=\"");
+           writeOut(outputstream, "<"+UntaggedInstructionNodeName+" "+UntaggedInstructionAxisIdRefName+"=\"");
            writeOutAttribute(outputstream, axis.getAxisId());
            writeOut(outputstream, "\">");
 
@@ -182,9 +182,8 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
                           Specification.getInstance().getPrettyXDFOutputIndentation().length());
            writeOut(outputstream, indent);
         }
-        writeOut(outputstream, "</for>");
+        writeOut(outputstream, "</"+UntaggedInstructionNodeName+">");
      }
-
 
   }
 
@@ -194,11 +193,12 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   // Private Methods
   //
 
-  /** special private method used by constructor methods to
-      conviently build the XML attribute list for a given class.
+  /** special method used by constructor methods to
+      convienently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
+
   }
 
   private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) {
@@ -225,7 +225,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, Constants.NEW_LINE);
         writeOut(outputstream, indent);
       }
-      writeOut(outputstream, "<" + UntaggedInstructionNodeName + " axisIdRef=\"");
+      writeOut(outputstream, "<" + UntaggedInstructionNodeName + " "+UntaggedInstructionAxisIdRefName+"=\"");
       writeOut(outputstream, ((AxisInterface) parentArray.getAxisList().get(which)).getAxisId() + "\">");
       which++;
       nestedToXDF(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation(), which, stop);
@@ -258,6 +258,11 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/02/07 18:44:03  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.10  2000/11/27 22:39:26  thomas
  * Fix to allow attribute text to have newline, carriage
  * returns in them (print out as entities: &#010; and

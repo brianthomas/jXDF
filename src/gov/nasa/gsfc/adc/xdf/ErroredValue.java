@@ -21,12 +21,20 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-/**  ErroredValue describes a single scalar (number or string)
-  * that has an associated error value. Parameter uses this object
-  * to store its (mathematical) value.
-   @version $Revision$
-  */
+/** ErroredValue describes a single scalar (number or string)
+    that has an associated error value. Parameter uses this object
+    to store its (mathematical) value.
+    @version $Revision$
+*/
 public class  ErroredValue extends Value {
+
+   //
+   // Fields
+   //
+
+   /* XML attribute names */
+   private static final String UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME = "upperErrorValue";
+   private static final String LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME = "lowerErrorValue";
 
    //
    // Constructors
@@ -71,68 +79,70 @@ public class  ErroredValue extends Value {
   /** get the *upperErrorValue* attribute.
    */
    public String getUpperErrorValue() {
-      return (String) ((XMLAttribute) attribHash.get("upperErrorValue")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *upperErrorValue* attribute.
     */
    public void setUpperErrorValue (Number upperErrorValue)
    {
-      ((XMLAttribute) attribHash.get("upperErrorValue")).setAttribValue(upperErrorValue);
+      ((XMLAttribute) attribHash.get(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(upperErrorValue);
    }
 
    /** get the *lowerErrorValue* attribute.
    */
    public String getLowerErrorValue() {
-      return (String) ((XMLAttribute) attribHash.get("lowerErrorValue")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *lowerErrorValue* attribute.
     */
    public void setLowerErrorValue (Number lowerErrorValue)
    {
-      ((XMLAttribute) attribHash.get("lowerErrorValue")).setAttribValue(lowerErrorValue);
+      ((XMLAttribute) attribHash.get(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(lowerErrorValue);
    }
 
-   /** get the *lowerErrorValue* attribute.
+   /** This returns the *lowerErrorValue*. 
    */
    public String getErrorValue() {
-      return (String) ((XMLAttribute) attribHash.get("errorValue")).getAttribValue();
+      return getLowerErrorValue();
    }
 
-   /** set the *errorValue* attribute.
+   /** This method sets the *lowerErrorValue*. 
     */
    public void setErrorValue (Number ErrorValue)
    {
-      ((XMLAttribute) attribHash.get("errorValue")).setAttribValue(ErrorValue);
+      setLowerErrorValue(ErrorValue);
    }
 
-
-
-
    //
-   // Private Methods
+   // Protected Methods
    //
 
-   /** A special private method used by constructor methods to
-       conviently build the XML attribute list for a given class.
+   /** A special method used by constructor methods to
+       convienently build the XML attribute list for a given class.
     */
-   private void init()
+   protected void init ()
    {
-      // append more attributes
-      attribOrder.add("upperErrorValue");
-      attribOrder.add("lowerErrorValue");
 
+       // append more attributes
+       attribOrder.add(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME);
+       attribOrder.add(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME);
 
        //set up the attribute hashtable key with the default initial value
-       attribHash.put("upperErrorValue", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("lowerErrorValue", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
    }
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/02/07 18:44:03  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.4  2001/01/19 17:23:59  thomas
  * Fixed class to match DTD standard. Now there
  * is no attribute called "errorValue". -b.t.

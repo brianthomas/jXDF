@@ -35,11 +35,24 @@ import org.xml.sax.AttributeList;
  */
 
 
-public class IntegerDataFormat extends DataFormat {
+public class IntegerDataFormat extends NumberDataFormat {
+
+   //
+   // Fields
+   //
+
+   /* XML attribute names */
+   private static final String WIDTH_XML_ATTRIBUTE_NAME = "width";
+   private static final String TYPE_XML_ATTRIBUTE_NAME = "type";
+ 
+   /* default attribute settings */
+   public static final int DEFAULT_WIDTH = 0;
+   public static final String DEFAULT_TYPE = new String(Constants.INTEGER_TYPE_DECIMAL);
 
   //
   // Constructors
   //
+
   /** The no argument constructor.
    */
   public IntegerDataFormat ()  //DataFormat no-arg constructor should be been called
@@ -47,137 +60,79 @@ public class IntegerDataFormat extends DataFormat {
     init();
   }
 
-  //
-  //Get/Set Methods
-  //
+   //
+   // Get/Set Methods
+   //
 
-  /** set the *lessThanValue* attribute
-   */
-  public void setLessThanValue(Object numLessThanValue) {
-     ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
-  }
+   /** set the *type* attribute
+     */
+   public void setType(String strType) {
 
+      if (!Utility.isValidIntegerType(strType)) 
+      {
+         Log.warnln("Invalid type for IntegerDataFormat.getType(). Ignoring set request.");
+         return;
+      }
 
-  /** set the *lessThanValueOrEqualValue* attribute
-   */
-  public void setLessThanOrEqualValue(Object numLessThanOrEqualValue) {
-     ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(numLessThanOrEqualValue);
-  }
+      ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strType);
+   }
 
+   /**
+       @return the current *type* attribute
+    */
+   public String getType()
+   {
+      return (String) ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
 
-  /** set the *greaterThanValue* attribute
-   */
-  public void setGreaterThanValue(Object numGreaterThanValue) {
-     ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(numGreaterThanValue);
-  }
+   /** set the *width* attribute
+    */
+   public void setWidth(Integer width) {
 
-  /** set the *greaterThanOrEqualValue* attribute
-   */
-  public void setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
-     ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
-  }
+      if (!Utility.isValidNumberObject(width)) 
+      {
+         ((XMLAttribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).setAttribValue(width);
+         generateFormatPattern();
+      } else 
+         Log.warnln("Invalid object for IntegerDataFormat.setWidth(). Ignoring set request.");
 
+   }
 
-  /** set the *infiniteValue* attribute
-   */
-  public void setInfiniteValue(Object numInfiniteValue) {
-     ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(numInfiniteValue);
-  }
+   /**
+       @return the current *width* attribute
+    */
+   public Integer getWidth()
+   {
+      return (Integer) ((XMLAttribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
 
-  /**set the *infiniteNegativeValue* attribute
-   */
-  public void setInfiniteNegativeValue(Object numInfiniteNegativeValue) {
-     ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(numInfiniteNegativeValue);
-  }
+   //
+   // Other PUBLIC Methods
+   //
 
-  /** set the *noDataValue* attribute
-   */
-  public void setNoDataValue(Object numNoDataValue) {
-     ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(numNoDataValue);
-  }
-
-
-  /** set the *type* attribute
-   */
-  public void setType(String strType) {
-    if (!Utility.isValidIntegerType(strType)) {
-      Log.error("invalid type for IntegerDataFormat");
-      Log.error("returning null");
-      return;
-    }
-
-     ((XMLAttribute) attribHash.get("type")).setAttribValue(strType);
-
-  }
-
-  /**
-   * @return the current *type* attribute
-   */
-  public String getType()
-  {
-    return (String) ((XMLAttribute) attribHash.get("type")).getAttribValue();
-  }
-
-  /** set the *width* attribute
-   */
-  public void setWidth(Integer width) {
-     ((XMLAttribute) attribHash.get("width")).setAttribValue(width);
-     generateFormatPattern();
-  }
-
-  /**
-   * @return the current *width* attribute
-   */
-  public Integer getWidth()
-  {
-    return (Integer) ((XMLAttribute) attribHash.get("width")).getAttribValue();
-  }
-
-  //
-  //Other PUBLIC Methods
-  //
+   /** A convenience method.
+       @return the number of bytes this IntegerDataFormat holds.
+    */
+   public int numOfBytes() {
+      return getWidth().intValue();
+   }
 
    // We need this here so that we will properly update the
-   // templateNotation of the class. -b.t. 
+   // formatPattern of the class. -b.t. 
    public void setXMLAttributes (AttributeList attrs) {
       super.setXMLAttributes(attrs);
       generateFormatPattern();
    }
 
-  /** A convenience method.
-   * @return the number of bytes this IntegerDataFormat holds.
-   */
-  public int numOfBytes() {
-    return getWidth().intValue();
-  }
+   //
+   // Private Methods
+   //
 
-  /**
-   *  Returns the class value for the hexadecimal type.
-   *
-  */
-
-  public static String  typeHexadecimal(){
-    return Constants.INTEGER_TYPE_HEX;
-  }
-
-  /**
-   * @Returns the class value for the octal type.
-    */
-  public static String typeOctal() {
-    return Constants.INTEGER_TYPE_OCTAL;
-  }
-
-  /**
-   * @Returns the class value for the (default) decimal type.
-   */
-  public static String typeDecimal() {
-   return Constants.INTEGER_TYPE_DECIMAL;
-  }
-
-  /** Template is the MessageFormat that should be used to print out data
+  /** This is the MessageFormat that should be used to print out data
       within the slice of the array covered by this object. This method is
       used by the dataCube in its toXMLOutput method. 
    */
+
   // separate method to minimize the number of times we do this.
   private void generateFormatPattern ( ) {
 
@@ -201,22 +156,22 @@ public class IntegerDataFormat extends DataFormat {
   }
 
   // 
-  // Private Methods
+  // Protected Methods
   //
-  /** Special private method used by constructor methods to
+
+  /** Special method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
-  private void init() {
+  protected void init() {
 
     specificDataFormatName = "integer";
 
     //add attributes
-    attribOrder.add(0,"width");
-    attribOrder.add(0, "type");
+    attribOrder.add(0, TYPE_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, WIDTH_XML_ATTRIBUTE_NAME);
 
-
-    attribHash.put("type", new XMLAttribute(new String(Constants.INTEGER_TYPE_DECIMAL), Constants.STRING_TYPE));
-    attribHash.put("width", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
+    attribHash.put( TYPE_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_TYPE, Constants.STRING_TYPE));
+    attribHash.put( WIDTH_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_WIDTH), Constants.INTEGER_TYPE));
 
     generateFormatPattern();
 
@@ -227,6 +182,11 @@ public class IntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/02/07 18:44:04  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.8  2000/11/22 20:42:00  thomas
  * beaucoup changes to make formatted reads work.
  * DataFormat methods now store the "template" or

@@ -37,9 +37,19 @@ import java.util.Hashtable;
   * The value of this unit (e.g. "m" or "cm" or "km", etc)
   */
 
- public class Unit extends BaseObject {
+public class Unit extends BaseObject {
+
+   //
+   // Fields
+   //
+
+   /* XML attribute names */
+   private static final String VALUE_XML_ATTRIBUTE_NAME = new String("value");
+   private static final String POWER_XML_ATTRIBUTE_NAME = new String("power");
+
+
   //
-  // Constructor and related methods
+  // Constructor
   //
 
   /** The no argument constructor.
@@ -80,28 +90,28 @@ import java.util.Hashtable;
    * @return the current *power* attribute
    */
   public void setPower (Double power) {
-     ((XMLAttribute) attribHash.get("power")).setAttribValue(power);
+     ((XMLAttribute) attribHash.get(POWER_XML_ATTRIBUTE_NAME)).setAttribValue(power);
   }
 
   /**
    * @return the current *power* attribute
    */
   public Double getPower() {
-    return (Double) ((XMLAttribute) attribHash.get("power")).getAttribValue();
+    return (Double) ((XMLAttribute) attribHash.get(POWER_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *value* attribute
    * @return the current *value* attribute
    */
   public void setValue(String value) {
-     ((XMLAttribute) attribHash.get("value")).setAttribValue(value);
+     ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(value);
   }
 
   /**
    * @return the current *value* attribute
    */
   public String getValue() {
-    return (String) ((XMLAttribute) attribHash.get("value")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   //
@@ -117,11 +127,11 @@ import java.util.Hashtable;
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
-    attribOrder.add(0,"value");
-    attribOrder.add(0,"power");
+    attribOrder.add(0, VALUE_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, POWER_XML_ATTRIBUTE_NAME);
 
-    attribHash.put("value", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("power", new XMLAttribute(null, Constants.DOUBLE_TYPE));
+    attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(POWER_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.DOUBLE_TYPE));
 
   };
 
@@ -130,6 +140,11 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/02/07 18:44:03  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.9  2000/11/27 16:57:45  thomas
  * Made init method protected so that extending
  * Dataformats may make use of them. -b.t.

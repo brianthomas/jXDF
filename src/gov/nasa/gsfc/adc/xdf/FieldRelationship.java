@@ -37,8 +37,10 @@ public class FieldRelationship extends BaseObject {
    // Fields
    // 
 
-   // allowable roles
-   String validRoles[] = {"role1", "role2", "role3"};
+   /* XML attribute names */
+   private static final String ROLE_XML_ATTRIBUTE_NAME = new String("role");
+   private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
+   private static final String IDREFS_XML_ATTRIBUTE_NAME = new String("fieldIdRefs");
 
    //
    // Constructors
@@ -75,7 +77,7 @@ public class FieldRelationship extends BaseObject {
    */
    public String getRole ( )
    {
-      return (String) ((XMLAttribute) attribHash.get("role")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(ROLE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** Set the value of the role attribute. 
@@ -83,7 +85,10 @@ public class FieldRelationship extends BaseObject {
    // NOTE: this should be limited to a few choices only. 
    public void setRole (String strRole )
    {
-       ((XMLAttribute) attribHash.get("role")).setAttribValue(strRole);
+       if (Utility.isValidRelationRole(strRole))
+          ((XMLAttribute) attribHash.get(ROLE_XML_ATTRIBUTE_NAME)).setAttribValue(strRole);
+       else 
+          Log.warnln("Invalid FieldRelationship.setRole() value. Ignoring set request.");
    }
 
    /** Get the value of the description attribute. 
@@ -91,14 +96,14 @@ public class FieldRelationship extends BaseObject {
    */
    public String getDescription ( )
    {
-      return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** Set the value of the description attribute. 
    */
    public void setDescription (String strDescription )
    {
-       ((XMLAttribute) attribHash.get("description")).setAttribValue(strDescription);
+       ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDescription);
    }
 
    /** Get the value of the fieldIdRefs attribute. 
@@ -106,38 +111,38 @@ public class FieldRelationship extends BaseObject {
    */
    public String getFieldIdRefs ( )
    {
-      return (String) ((XMLAttribute) attribHash.get("fieldIdRefs")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(IDREFS_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** Set the value of the fieldIdRefs attribute. 
    */
    public void setFieldIdRefs (String strFieldIdRefs )
    {
-       ((XMLAttribute) attribHash.get("fieldIdRefs")).setAttribValue(strFieldIdRefs);
+       ((XMLAttribute) attribHash.get(IDREFS_XML_ATTRIBUTE_NAME)).setAttribValue(strFieldIdRefs);
    }
 
    // 
-   // Private Methods
+   // Protected Methods
    //
 
-   /** A special private method used by constructor methods to
-       conviently build the XML attribute list for a given class.
+   /** A special protected method used by constructor methods to
+       convienently build the XML attribute list for a given class.
     */
-   private void init()
+   protected void init()
    {
 
-       classXDFNodeName = "relationship";
+       classXDFNodeName = "relation";
 
        // order matters! these are in *reverse* order of their
        // occurence in the XDF DTD
-       attribOrder.add(0,"fieldIdRefs");
-       attribOrder.add(0,"description");
-       attribOrder.add(0,"role");
+       attribOrder.add(0, IDREFS_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, ROLE_XML_ATTRIBUTE_NAME);
 
        //set up the attribute hashtable key with the default initial value
-       attribHash.put("fieldIdRefs", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("role", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(IDREFS_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(ROLE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
    };
 
@@ -147,6 +152,11 @@ public class FieldRelationship extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/02/07 18:44:04  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.2  2000/11/16 19:59:14  kelly
  * fixed documentation.  -k.z.
  *

@@ -28,18 +28,29 @@ import java.util.Iterator;
 
 public class Axis extends BaseObject implements AxisInterface {
 
- //
- //Fields
- //
+   //
+   // Fields
+   //
 
-  protected int length;
+   /* XML attribute names */
+   private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
+   private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
+   private static final String ID_XML_ATTRIBUTE_NAME = new String("axisId");
+   private static final String IDREF_XML_ATTRIBUTE_NAME = new String("axisIdRef");
+   private static final String ALIGN_XML_ATTRIBUTE_NAME = new String("align");
+   private static final String DATATYPE_XML_ATTRIBUTE_NAME = new String("axisDatatype");
+   private static final String UNITS_XML_ATTRIBUTE_NAME = new String("axisUnits");
+   private static final String VALUELIST_XML_ATTRIBUTE_NAME = new String("valueList");
 
-  /** This field stores object references to those value group objects
-   * to which this axis object belongs
-  */
-  protected Set valueGroupOwnedHash = Collections.synchronizedSet(new HashSet());
+   private int length;
 
- //
+   /** This field stores object references to those value group objects
+      to which this axis object belongs
+    */
+   private Set valueGroupOwnedHash = Collections.synchronizedSet(new HashSet());
+
+
+  //
   // Constructor and related methods
   //
 
@@ -76,7 +87,7 @@ public class Axis extends BaseObject implements AxisInterface {
    */
   public void setName (String strName)
   {
-     ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+     ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
   }
 
    /**
@@ -84,14 +95,14 @@ public class Axis extends BaseObject implements AxisInterface {
    */
   public String getName()
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /** set the *description* attribute
    */
   public void setDescription (String strDesc)
   {
-     ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+     ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
 
   }
 
@@ -99,32 +110,32 @@ public class Axis extends BaseObject implements AxisInterface {
    * @return the current *description* attribute
    */
   public String getDescription() {
-    return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /** set the *axisDatatype* attribute
+  /** set the *datatype* attribute
    */
   public void setDatatype(String strDatatype)
   {
-    if (Utility.isValidDatatype(strDatatype))
-      ((XMLAttribute) attribHash.get("axisDatatype")).setAttribValue(strDatatype);
+    if (strDatatype == null || Utility.isValidDatatype(strDatatype))
+      ((XMLAttribute) attribHash.get(DATATYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strDatatype);
     else
-      Log.warnln("Datatype is not valid, ignoring set request.");
+      Log.warnln("Datatype:["+strDatatype+"] is not valid, ignoring set request.");
   }
 
   /**
-   * @return the current *axisDatatype* attribute
+   * @return the current *datatype* attribute
    */
   public String getDatatype()
   {
-    return (String) ((XMLAttribute) attribHash.get("axisDatatype")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(DATATYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *axisUnits* attribute
    */
   public void setAxisUnits (Units units)
   {
-     ((XMLAttribute) attribHash.get("axisUnits")).setAttribValue(units);
+     ((XMLAttribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).setAttribValue(units);
   }
 
   /**
@@ -132,15 +143,30 @@ public class Axis extends BaseObject implements AxisInterface {
    */
   public Units getAxisUnits()
   {
-    return (Units) ((XMLAttribute) attribHash.get("axisUnits")).getAttribValue();
+      return (Units) ((XMLAttribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
+
+  /** set the *align* attribute
+   */
+  public void setAlign(String strName)
+  {
+      ((XMLAttribute) attribHash.get(ALIGN_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
+  }
+
+   /**
+   * @return the current *align* attribute
+   */
+  public String getAlign()
+  {
+     return (String) ((XMLAttribute) attribHash.get(ALIGN_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
 
   /** set the *axisId* attribute
    */
   public void setAxisId (String strAxisId)
   {
-     ((XMLAttribute) attribHash.get("axisId")).setAttribValue(strAxisId);
-
+     ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strAxisId);
   }
 
    /**
@@ -148,14 +174,14 @@ public class Axis extends BaseObject implements AxisInterface {
    */
   public String getAxisId()
   {
-    return (String) ((XMLAttribute) attribHash.get("axisId")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *axisIdRef* attribute
    */
   public void setAxisIdRef (String strAxisIdRef)
   {
-     ((XMLAttribute) attribHash.get("axisIdRef")).setAttribValue(strAxisIdRef);
+     ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strAxisIdRef);
 
   }
 
@@ -164,20 +190,20 @@ public class Axis extends BaseObject implements AxisInterface {
    */
   public String getAxisIdRef()
   {
-    return (String) ((XMLAttribute) attribHash.get("axisIdRef")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *valueList* attribute
    */
   public void setValueList(List value) {
-     ((XMLAttribute) attribHash.get("valueList")).setAttribValue(value);
+     ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).setAttribValue(value);
   }
 
   /**
    * @return the current *valueList* attribute
    */
   public List getValueList() {
-    return (List) ((XMLAttribute) attribHash.get("valueList")).getAttribValue();
+    return (List) ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the ValueGroupOwnedHash
@@ -200,8 +226,6 @@ public class Axis extends BaseObject implements AxisInterface {
   public int getLength() {
     return length;
   }
-
-
 
 
   //
@@ -302,7 +326,7 @@ public class Axis extends BaseObject implements AxisInterface {
    * @return true on success, false on failure
    */
    public boolean removeAxisValue(Value what) {
-      boolean isRemoveSuccess = removeFromList(what, getValueList(), "valueList");
+      boolean isRemoveSuccess = removeFromList(what, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
       if (isRemoveSuccess)  //decrement length if removal successful
         length--;
       return isRemoveSuccess;
@@ -315,7 +339,7 @@ public class Axis extends BaseObject implements AxisInterface {
    * @return true on success, false on failure
    */
   public boolean removeAxisValue(int index) {
-     boolean isRemoveSuccess = removeFromList(index, getValueList(), "valueList");
+     boolean isRemoveSuccess = removeFromList(index, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
       if (isRemoveSuccess) //decrement length if removal successful
         length--;
       return isRemoveSuccess;
@@ -326,7 +350,7 @@ public class Axis extends BaseObject implements AxisInterface {
    * @return true on success, false on failure
    */
    public boolean removeAxisValue(UnitDirection what) {
-      boolean isRemoveSuccess = removeFromList(what, getValueList(), "valueList");
+      boolean isRemoveSuccess = removeFromList(what, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
       if (isRemoveSuccess)  //decrement length if removal successful
         length--;
       return isRemoveSuccess;
@@ -346,11 +370,10 @@ public class Axis extends BaseObject implements AxisInterface {
    }
 
    /**
-    * This is a convenience method which returns all of the values (as strings) on this axis.
+    * This is a convenience method which returns all of the values of this axis.
     */
-   public String getAxisValues() {
-    Log.error("in Axis, getAxisValues(), empty, returning null");
-    return null;
+   public List getAxisValues() {
+      return getValueList();
    }
 
    /**Insert an Unit object into the L<Units> object
@@ -444,7 +467,7 @@ public class Axis extends BaseObject implements AxisInterface {
   // Protected Methods
   //
 
-  /** Special private method used by constructor methods to
+  /** Special method used by constructor methods to
       conviently build the XML attribute list for a given class.
    */
   protected void init()
@@ -454,41 +477,49 @@ public class Axis extends BaseObject implements AxisInterface {
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
-    attribOrder.add(0,"valueList");
-    attribOrder.add(0,"axisUnits");
-    attribOrder.add(0,"axisDatatype");
-    attribOrder.add(0,"align");  //not sure what it is???
-    attribOrder.add(0,"axisIdRef");
-    attribOrder.add(0,"axisId");
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
+    attribOrder.add(0, VALUELIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, DATATYPE_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, ALIGN_XML_ATTRIBUTE_NAME);  //not sure what it is???
+    attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
-     //set up the attribute hashtable key with the default initial value
-
-     //set the minimum array size(essentially the size of the axis)
-    attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList(Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE));
-    attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("align", new XMLAttribute(null, Constants.STRING_TYPE));  //double check???
+    //set up the attribute hashtable key with the default initial values 
+    attribHash.put(VALUELIST_XML_ATTRIBUTE_NAME, 
+        new XMLAttribute(  Collections.synchronizedList (new ArrayList (
+                           Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE
+                        )
+                  );
+    attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(ALIGN_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));  //double check???
 
     //set up the axisUnits attribute
     Units unitsObj = new Units();
-    attribHash.put("axisUnits", new XMLAttribute(unitsObj, Constants.OBJECT_TYPE));
-    unitsObj.setXDFNodeName("axisUnits");
+    attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new XMLAttribute(unitsObj, Constants.OBJECT_TYPE));
+    unitsObj.setXDFNodeName(UNITS_XML_ATTRIBUTE_NAME);
 
-    attribHash.put("axisDatatype",new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(DATATYPE_XML_ATTRIBUTE_NAME,new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
+    // set the initial length;
     length = 0;
 
   }
- 
+
 }  //end of Axis class
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/02/07 18:44:04  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.16  2000/11/27 16:57:44  thomas
  * Made init method protected so that extending
  * Dataformats may make use of them. -b.t.

@@ -58,38 +58,49 @@ import java.util.List;
 
 public class Field extends BaseObject {
 
-  //
-  //Fields
-  //
+   //
+   // Fields
+   //
 
-  //
-  //constructor and related methods
-  //
-
-  //no-arg constructor
-  public Field ()
-  {
-    init();
-  }
-
-  /**  This constructor takes a Java Hashtable as an initializer of
-       the XML attributes of the object to be constructed. The
-       Hashtable key/value pairs coorespond to the class XDF attribute
-       names and their desired values.
-    */
-  public Field ( Hashtable InitXDFAttributeTable )
-  {
-
-    // init the XML attributes (to defaults)
-    init();
-
-    // init the value of selected XML attributes to HashTable values
-    hashtableInitXDFAttributes(InitXDFAttributeTable);
-
-  }
+   /* XML attribute names */
+   private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
+   private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
+   private static final String ID_XML_ATTRIBUTE_NAME = new String("fieldId");
+   private static final String IDREF_XML_ATTRIBUTE_NAME = new String("fieldIdRef");
+   private static final String CLASS_XML_ATTRIBUTE_NAME = "class";
+   private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = "dataFormat";
+   private static final String UNITS_XML_ATTRIBUTE_NAME = "units";
+   private static final String RELATION_XML_ATTRIBUTE_NAME = "relation";
+   private static final String NOTELIST_XML_ATTRIBUTE_NAME = "noteList";
 
    //
-   //Get/Set Methods
+   // Constructors
+   //
+
+   //no-arg constructor
+   public Field ()
+   {
+      init();
+   }
+
+   /**  This constructor takes a Java Hashtable as an initializer of
+        the XML attributes of the object to be constructed. The
+        Hashtable key/value pairs coorespond to the class XDF attribute
+        names and their desired values.
+     */
+   public Field ( Hashtable InitXDFAttributeTable )
+   {
+
+      // init the XML attributes (to defaults)
+      init();
+
+      // init the value of selected XML attributes to HashTable values
+      hashtableInitXDFAttributes(InitXDFAttributeTable);
+
+   }
+
+   //
+   // Get/Set Methods
    //
 
    /** Set the *name* attribute
@@ -97,7 +108,7 @@ public class Field extends BaseObject {
     */
    public void setName (String strName)
    {
-      ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+      ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
    }
 
    /**
@@ -105,7 +116,7 @@ public class Field extends BaseObject {
     */
    public String getName()
    {
-      return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *description* attribute
@@ -113,14 +124,14 @@ public class Field extends BaseObject {
     */
    public void setDescription (String strDesc)
    {
-      ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+      ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /**
        @return the current *description* attribute
    */
    public String getDescription() {
-      return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *fieldId* attribute
@@ -128,7 +139,7 @@ public class Field extends BaseObject {
     */
    public void setFieldId (String strField)
    {
-      ((XMLAttribute) attribHash.get("fieldId")).setAttribValue(strField);
+      ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strField);
    }
 
    /**
@@ -136,7 +147,7 @@ public class Field extends BaseObject {
     */
    public String getFieldId()
    {
-      return (String) ((XMLAttribute) attribHash.get("fieldId")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *fieldIdRef* attribute
@@ -144,7 +155,7 @@ public class Field extends BaseObject {
     */
    public void setFieldIdRef (String strField)
    {
-      ((XMLAttribute) attribHash.get("fieldIdRef")).setAttribValue(strField);
+      ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strField);
    }
 
    /**
@@ -152,7 +163,7 @@ public class Field extends BaseObject {
     */
    public String getFieldIdRef()
    {
-      return (String) ((XMLAttribute) attribHash.get("fieldIdRef")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *units* attribute
@@ -160,7 +171,7 @@ public class Field extends BaseObject {
     */
    public void setUnits (Units units)
    {
-      ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
+      ((XMLAttribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).setAttribValue(units);
    }
 
    /**
@@ -168,7 +179,7 @@ public class Field extends BaseObject {
     */
    public Units getUnits()
    {
-      return (Units) ((XMLAttribute) attribHash.get("units")).getAttribValue();
+      return (Units) ((XMLAttribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**  set the *dataFormat* attribute
@@ -176,7 +187,7 @@ public class Field extends BaseObject {
     */
    public void setDataFormat (DataFormat dataFormat)
    {
-       ((XMLAttribute) attribHash.get("dataFormat")).setAttribValue(dataFormat);
+       ((XMLAttribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).setAttribValue(dataFormat);
    }
 
    /**
@@ -184,7 +195,7 @@ public class Field extends BaseObject {
    */
    public DataFormat getDataFormat()
    {
-      return (DataFormat) ((XMLAttribute) attribHash.get("dataFormat")).getAttribValue();
+      return (DataFormat) ((XMLAttribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *noteList* attribute
@@ -192,7 +203,7 @@ public class Field extends BaseObject {
     */
    public void setNoteList(List note)
    {
-      ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
+      ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(note);
    }
 
    /**
@@ -200,7 +211,7 @@ public class Field extends BaseObject {
    */
    public List getNoteList()
    {
-      return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
+      return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**  set the *relationship* attribute
@@ -208,15 +219,15 @@ public class Field extends BaseObject {
     */
    public void setRelationship (FieldRelationship fieldRelation)
    {
-       ((XMLAttribute) attribHash.get("relation")).setAttribValue(fieldRelation);
+       ((XMLAttribute) attribHash.get(RELATION_XML_ATTRIBUTE_NAME)).setAttribValue(fieldRelation);
    }
-
+ 
    /**
        @return the current *relationship* attribute
    */
    public FieldRelationship getRelationship ()
    {
-      return (FieldRelationship) ((XMLAttribute) attribHash.get("relation")).getAttribValue();
+      return (FieldRelationship) ((XMLAttribute) attribHash.get(RELATION_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    //
@@ -237,7 +248,7 @@ public class Field extends BaseObject {
    * @return true on success, false on failure
    */
    public boolean removeNote(Note what) {
-     return removeFromList(what, getNoteList(), "noteList");
+     return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
    /** removes an Note object from the list of notes in this Field object
@@ -245,7 +256,7 @@ public class Field extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeNote(int index) {
-     return removeFromList(index, getNoteList(), "noteList");
+     return removeFromList(index, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
   /**Convenience method which returns a list of the notes held by
@@ -320,26 +331,27 @@ public class Field extends BaseObject {
 
      // order matters! these are in *reverse* order of their
      // occurence in the XDF DTD
-     attribOrder.add(0,"noteList");
-     attribOrder.add(0,"relation");
-     attribOrder.add(0,"units");
-     attribOrder.add(0,"dataFormat");
-     attribOrder.add(0,"class");
-     attribOrder.add(0,"fieldIdRef");
-     attribOrder.add(0,"fieldId");
-     attribOrder.add(0,"description");
-     attribOrder.add(0,"name");
+     attribOrder.add(0, NOTELIST_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, RELATION_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, CLASS_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
       //set up the attribute hashtable key with the default initial value
-     attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-     attribHash.put("relation", new XMLAttribute(null, Constants.OBJECT_TYPE));  //double check
-     attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
-     attribHash.put("dataFormat", new XMLAttribute(null, Constants.OBJECT_TYPE));
-     attribHash.put("class", new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put("fieldIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put("fieldId", new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, 
+                new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(RELATION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));  //double check
+     attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
+     attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));
+     attribHash.put(CLASS_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
    };
 
@@ -349,6 +361,11 @@ public class Field extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/02/07 18:44:04  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.12  2000/11/27 16:57:45  thomas
  * Made init method protected so that extending
  * Dataformats may make use of them. -b.t.

@@ -64,9 +64,19 @@ import java.util.Set;
 
 public class Parameter extends BaseObject {
 
-  //
-  // Fields
-  //
+   //
+   // Fields
+   //
+
+   /* XML attribute names */
+   private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
+   private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
+   private static final String ID_XML_ATTRIBUTE_NAME = new String("paramId");
+   private static final String IDREF_XML_ATTRIBUTE_NAME = new String("paramIdRef");
+   private static final String DATATYPE_XML_ATTRIBUTE_NAME = new String("datatype");
+   private static final String UNITS_XML_ATTRIBUTE_NAME = new String("units");
+   private static final String NOTELIST_XML_ATTRIBUTE_NAME = new String("noteList");
+   private static final String VALUELIST_XML_ATTRIBUTE_NAME = new String("valueList");
 
   /** This field stores object references to those value group objects
     * to which this object belongs
@@ -109,7 +119,7 @@ public class Parameter extends BaseObject {
    */
   public void setName (String strName)
   {
-    ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+    ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
   }
 
    /**
@@ -117,14 +127,14 @@ public class Parameter extends BaseObject {
    */
   public String getName()
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /**set the *description* attribute
    */
   public void setDescription (String strDesc)
   {
-    ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+    ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
 
   }
 
@@ -132,14 +142,14 @@ public class Parameter extends BaseObject {
    * @return the current *description* attribute
    */
   public String getDescription() {
-    return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *paramId* attribute
    */
   public void setParamId (String strParam)
   {
-     ((XMLAttribute) attribHash.get("paramId")).setAttribValue(strParam);
+     ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strParam);
   }
 
   /**
@@ -147,14 +157,14 @@ public class Parameter extends BaseObject {
    */
   public String getParamId()
   {
-    return (String) ((XMLAttribute) attribHash.get("paramId")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *paramIdRef* attribute
    */
   public void setParamIdRef (String strParam)
   {
-    ((XMLAttribute) attribHash.get("paramIdRef")).setAttribValue(strParam);
+    ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strParam);
 
   }
 
@@ -163,14 +173,14 @@ public class Parameter extends BaseObject {
    */
   public String getParamIdRef()
   {
-    return (String) ((XMLAttribute) attribHash.get("paramIdRef")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *units* attribute
    */
   public void setUnits (Units units)
   {
-     ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
+     ((XMLAttribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).setAttribValue(units);
   }
 
   /**
@@ -178,7 +188,7 @@ public class Parameter extends BaseObject {
    */
   public Units getUnits()
   {
-    return (Units) ((XMLAttribute) attribHash.get("units")).getAttribValue();
+    return (Units) ((XMLAttribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *datatype* attribute
@@ -186,7 +196,7 @@ public class Parameter extends BaseObject {
   public void setDatatype(String strDatatype)
   {
     if (Utility.isValidDatatype(strDatatype))
-       ((XMLAttribute) attribHash.get("datatype")).setAttribValue(strDatatype);
+       ((XMLAttribute) attribHash.get(DATATYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strDatatype);
     else
        Log.warnln("Datatype not valid, ignoring request to set.");
   }
@@ -196,33 +206,33 @@ public class Parameter extends BaseObject {
    */
   public String getDatatype()
   {
-    return (String) ((XMLAttribute) attribHash.get("datatype")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(DATATYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *valueList* attribute
    */
   public void setValueList(List value) {
-     ((XMLAttribute) attribHash.get("valueList")).setAttribValue(value);
+     ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).setAttribValue(value);
   }
 
   /**
    * @return the current *valueList* attribute
    */
   public List getValueList() {
-    return (List) ((XMLAttribute) attribHash.get("valueList")).getAttribValue();
+    return (List) ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *noteList* attribute
    */
   public void setNoteList(List note) {
-     ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
+     ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(note);
   }
 
   /**
    * @return the current *noteList* attribute
    */
   public List getNoteList() {
-    return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
+    return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   //
@@ -243,7 +253,7 @@ public class Parameter extends BaseObject {
    * @return true on success, false on failure
    */
    public boolean removeValue(Value what) {
-     return removeFromList(what, getValueList(), "valueList");
+     return removeFromList(what, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
   }
 
 
@@ -273,7 +283,7 @@ public class Parameter extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeValue(int index) {
-     return removeFromList(index, getValueList(), "valueList");
+     return removeFromList(index, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
   }
 
   /** A convinience methods.  returns a list of values in this parameter
@@ -296,7 +306,7 @@ public class Parameter extends BaseObject {
    * @return true on success, false on failure
    */
    public boolean removeNote(Note what) {
-     return removeFromList(what, getNoteList(), "noteList");
+     return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
 
@@ -306,7 +316,7 @@ public class Parameter extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeNote(int index) {
-     return removeFromList(index, getNoteList(), "noteList");
+     return removeFromList(index, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
   /** Convenience method which returns a list of the notes held by
@@ -373,24 +383,24 @@ public class Parameter extends BaseObject {
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
-    attribOrder.add(0,"noteList");
-    attribOrder.add(0,"valueList");
-    attribOrder.add(0,"units");
-    attribOrder.add(0,"datatype");
-    attribOrder.add(0,"paramIdRef");
-    attribOrder.add(0,"paramId");
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
+    attribOrder.add(0, NOTELIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, VALUELIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, DATATYPE_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
      //set up the attribute hashtable key with the default initial value
-    attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
-    attribHash.put("datatype", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("paramIdRef", new XMLAttribute(null, Constants.STRING_TYPE));  //double check k.z.
-    attribHash.put("paramId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put(VALUELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
+    attribHash.put(DATATYPE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));  //double check k.z.
+    attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
   };
 
@@ -399,6 +409,11 @@ public class Parameter extends BaseObject {
  /* Modification History
   *
   * $Log$
+  * Revision 1.13  2001/02/07 18:44:04  thomas
+  * Converted XML attribute decl
+  * to use constants (final static fields within the object). These
+  * are private decl for now. -b.t.
+  *
   * Revision 1.12  2000/11/27 16:57:45  thomas
   * Made init method protected so that extending
   * Dataformats may make use of them. -b.t.

@@ -38,6 +38,13 @@ public class Note extends BaseObject implements Cloneable {
    // Fields
    //
 
+   /* XML attribute names */
+   private static final String MARK_XML_ATTRIBUTE_NAME = new String("mark");
+   private static final String ID_XML_ATTRIBUTE_NAME = new String("noteId");
+   private static final String IDREF_XML_ATTRIBUTE_NAME = new String("noteIdRef");
+   private static final String LOCATION_XML_ATTRIBUTE_NAME = new String("location");
+   private static final String VALUE_XML_ATTRIBUTE_NAME = new String("value");
+
    //
    // Constructors
    //
@@ -82,69 +89,69 @@ public class Note extends BaseObject implements Cloneable {
       @return the current *location* attribute.
     */
    public String getLocation() {
-      return (String) ((XMLAttribute) attribHash.get("location")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(LOCATION_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *location* attribute.
    */
    public void setLocation(String strValue)
    {
-      ((XMLAttribute) attribHash.get("location")).setAttribValue(strValue);
+      ((XMLAttribute) attribHash.get(LOCATION_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
   /** get the *mark* attribute.
       @return the current *mark* attribute.
     */
    public String getMark() {
-      return (String) ((XMLAttribute) attribHash.get("mark")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(MARK_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *mark* attribute.
    */
    public void setMark (String strValue)
    {
-      ((XMLAttribute) attribHash.get("mark")).setAttribValue(strValue);
+      ((XMLAttribute) attribHash.get(MARK_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
    /** get the *noteId* attribute.
       @return the current *noteId* attribute.
     */
    public String getNoteId() {
-      return (String) ((XMLAttribute) attribHash.get("noteId")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *noteId* attribute.
    */
    public void setNoteId (String strValue)
    {
-      ((XMLAttribute) attribHash.get("noteId")).setAttribValue(strValue);
+      ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
    /** get the *noteIdRef* attribute.
       @return the current *noteIdRef* attribute.
     */
    public String getNoteIdRef() {
-      return (String) ((XMLAttribute) attribHash.get("noteIdRef")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *noteIdRef* attribute.
    */
    public void setNoteIdRef (String strValue)
    {
-      ((XMLAttribute) attribHash.get("noteIdRef")).setAttribValue(strValue);
+      ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
    /** get the *value* (PCDATA) attribute.
     */
    public String getValue() {
-      return (String) ((XMLAttribute) attribHash.get("value")).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *value* attribute (PCDATA).
    */
    public void setValue (String strValue)
    {
-      ((XMLAttribute) attribHash.get("value")).setAttribValue(strValue);
+      ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
    //
@@ -202,17 +209,17 @@ public class Note extends BaseObject implements Cloneable {
 
       // order matters! these are in *reverse* order of their
       // occurence in the XDF DTD
-      attribOrder.add(0,"value");
-      attribOrder.add(0,"location");
-      attribOrder.add(0,"noteIdRef");
-      attribOrder.add(0,"noteId");
-      attribOrder.add(0,"mark");
+      attribOrder.add(0, VALUE_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, LOCATION_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, MARK_XML_ATTRIBUTE_NAME);
 
-      attribHash.put("value", new XMLAttribute(null, Constants.STRING_TYPE));
-      attribHash.put("location", new XMLAttribute(null, Constants.STRING_TYPE));
-      attribHash.put("noteIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-      attribHash.put("noteId", new XMLAttribute(null, Constants.STRING_TYPE));
-      attribHash.put("mark", new XMLAttribute(null, Constants.STRING_TYPE));
+      attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+      attribHash.put(LOCATION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+      attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+      attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+      attribHash.put(MARK_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
    }
 

@@ -69,13 +69,13 @@ public class ReadCellFormattedIOCmd extends XMLDataIOStyle implements FormattedI
   }
 
   //
-  // Private Methods
+  // Protected Methods
   //
 
-  /** special private method used by constructor methods to
-      conviently build the XML attribute list for a given class.
+  /** special method used by constructor methods to
+      convienently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
     classXDFNodeName = "readCell";
   }
@@ -86,6 +86,11 @@ public class ReadCellFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/02/07 18:44:04  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.2  2000/11/16 20:04:55  kelly
  * fixed documentation.  -k.z.
  *

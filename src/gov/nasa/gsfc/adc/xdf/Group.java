@@ -37,8 +37,11 @@ public class Group extends BaseObject {
   // 
   // Fields
   //
-  private String name;
-  private String description;
+
+  /* XML attribute names */
+  private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
+  private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
+
   protected Set memberObjHash = Collections.synchronizedSet(new HashSet());
 
   //
@@ -74,7 +77,7 @@ public class Group extends BaseObject {
    */
   public void setName (String strName)
   {
-     ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+     ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
   }
 
   /**getName
@@ -82,21 +85,21 @@ public class Group extends BaseObject {
    */
   public String getName()
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /**set the *description* attribute
    */
   public void setDescription (String strDesc)
   {
-     ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+     ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
   }
 
    /**getDescription
    * @return the current *description* attribute
    */
   public String getDescription() {
-    return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   //
@@ -153,10 +156,10 @@ public class Group extends BaseObject {
 
 
   // 
-  // Protected Methods
+  // Private Methods
   //
 
-  /** Special private method used by constructor methods to
+  /** Special protected method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
   private void init()
@@ -164,12 +167,12 @@ public class Group extends BaseObject {
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
+    attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
     //set up the attribute hashtable key with the default initial value
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
   }
 
 

@@ -36,15 +36,27 @@ import org.xml.sax.AttributeList;
 
 public class StringDataFormat extends DataFormat {
 
-  //
-  // Constructors
-  //
+   //
+   // Fields
+   //
+
+   /* XML attributes */
+   protected static final String LENGTH_XML_ATTRIBUTE_NAME = new String("length");
+
+   /* default attribute values */
+   public static final int DEFAULT_LENGTH = 0;
+
+   //
+   // Constructors
+   //
+
   /** The no argument constructor.
    */
   public StringDataFormat ()  //DataFormat no-arg constructor should be been called
   {
     init();
   }
+
 
   //
   //Set Methods
@@ -53,49 +65,52 @@ public class StringDataFormat extends DataFormat {
   /**set the *lessThanValue* attribute
    */
   public void setLessThanValue(Object strLessThanValue) {
-     ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(strLessThanValue);
+     ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanValue);
   }
 
   /**set the *lessThanValueOrEqualValue* attribute
    */
   public void setLessThanOrEqualValue(Object strLessThanOrEqualValue) {
-     ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).setAttribValue(strLessThanOrEqualValue);
+     ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanOrEqualValue);
   }
 
   /**set the *greaterThanValue* attribute
    */
   public void setGreaterThanValue(Object strGreaterThanValue) {
-    ((XMLAttribute) attribHash.get("greaterThanValue")).setAttribValue(strGreaterThanValue);
+    ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanValue);
   }
 
   /**set the *greaterThanOrEqualValue* attribute
    */
   public void setGreaterThanOrEqualValue(Object strGreaterThanOrEqualValue) {
-    ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(strGreaterThanOrEqualValue);
+    ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanOrEqualValue);
   }
 
   /** set the *infiniteValue* attribute
    */
   public void setInfiniteValue(Object strInfiniteValue) {
-    ((XMLAttribute) attribHash.get("infiniteValue")).setAttribValue(strInfiniteValue);
+    ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteValue);
   }
 
   /**set the *infiniteNegativeValue* attribute
    */
   public void setInfiniteNegativeValue(Object strInfiniteNegativeValue) {
-    ((XMLAttribute) attribHash.get("infiniteNegativeValue")).setAttribValue(strInfiniteNegativeValue);
+    ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteNegativeValue);
   }
 
   /**set the *noDataValue* attribute
    */
   public void setNoDataValue(Object strNoDataValue) {
-     ((XMLAttribute) attribHash.get("noDataValue")).setAttribValue(strNoDataValue);
+     ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strNoDataValue);
   }
 
   /**setlength: set the *length* attribute
    */
   public void setLength(Integer numLength) {
-     ((XMLAttribute) attribHash.get("length")).setAttribValue(numLength);
+     if (numLength != null) 
+        ((XMLAttribute) attribHash.get(LENGTH_XML_ATTRIBUTE_NAME)).setAttribValue(numLength);
+     else 
+        Log.warnln("StringDataFormat.setLength() cant accept null value. Ignoring request.");
   }
 
   /**getLength
@@ -103,29 +118,29 @@ public class StringDataFormat extends DataFormat {
    */
   public Integer getLength()
   {
-    return (Integer) ((XMLAttribute) attribHash.get("length")).getAttribValue();
+    return (Integer) ((XMLAttribute) attribHash.get(LENGTH_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  //
-  //Other PUBLIC Methods
-  //
+   //
+   // Other PUBLIC Methods
+   //
 
    // We need this here so that we will properly update the
-   // templateNotation of the class. -b.t. 
+   // formatPattern of the class. -b.t. 
    public void setXMLAttributes (AttributeList attrs) {
       super.setXMLAttributes(attrs);
       generateFormatPattern();
    }
 
-  /** A convenience method.
-   * @return the number of bytes this StringDataFormat holds.
-   */
-  public int numOfBytes() {
-    return getLength().intValue();
-  }
+   /** A convenience method.
+      @return the number of bytes this StringDataFormat holds.
+    */
+   public int numOfBytes() {
+     return getLength().intValue();
+   }
 
    //
-   // Private Method
+   // Private Methods 
    //
 
    // separate method to minimize the number of times we do this.
@@ -133,16 +148,20 @@ public class StringDataFormat extends DataFormat {
       formatPattern = "{0}";
    }
 
-   /** Special private method used by constructor methods to
-       conviently build the XML attribute list for a given class.
+   //
+   // Protected Methods 
+   //
+
+   /** Special method used by constructor methods to
+       convienently build the XML attribute list for a given class.
     */
-  private void init() {
+  protected void init() {
 
      specificDataFormatName = "string";
 
-     attribOrder.add(0, "length");  //add length as the first attribute;
+     attribOrder.add(0, LENGTH_XML_ATTRIBUTE_NAME);  //add length as the first attribute;
 
-     attribHash.put("length", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
+     attribHash.put(LENGTH_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_LENGTH), Constants.INTEGER_TYPE));
 
      generateFormatPattern();
 
@@ -153,6 +172,11 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/02/07 18:44:03  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.10  2000/11/22 20:42:00  thomas
  * beaucoup changes to make formatted reads work.
  * DataFormat methods now store the "template" or

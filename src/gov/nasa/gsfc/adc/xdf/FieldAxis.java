@@ -39,52 +39,64 @@ import java.util.Iterator;
 
 public class FieldAxis extends BaseObject implements AxisInterface{
 
-  //
-  //Fields
-  //
+   //
+   // Fields
+   //
 
-  /**length of the FieldAxis
-  */
-  protected int length;
+   /* XML attribute names */
+   private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
+   private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
+   private static final String ALIGN_XML_ATTRIBUTE_NAME = new String("align");
+   private static final String ID_XML_ATTRIBUTE_NAME = new String("axisId");
+   private static final String IDREF_XML_ATTRIBUTE_NAME = new String("axisIdRef");
+   private static final String FIELDLIST_XML_ATTRIBUTE_NAME = new String("fieldList");
 
-  /** This field stores object references to those field group objects
-   * to which this FieldAxis object belongs
-  */
-  protected Set fieldGroupOwnedHash = Collections.synchronizedSet(new HashSet());
-
-  /** The no argument constructor.
+   /**length of the FieldAxis
    */
-  public FieldAxis ()
-  {
-    init();
+   protected int length;
 
-  }
-
-  /**  This constructor takes a Java Hashtable as an initializer of
-       the XML attributes of the object to be constructed. The
-       Hashtable key/value pairs coorespond to the class XDF attribute
-       names and their desired values.
+   /** This field stores object references to those field group objects
+    * to which this FieldAxis object belongs
     */
-  public FieldAxis ( Hashtable InitXDFAttributeTable )
-  {
+   protected Set fieldGroupOwnedHash = Collections.synchronizedSet(new HashSet());
 
-    // init the XML attributes (to defaults)
-    init();
 
-    // init the value of selected XML attributes to HashTable values
-    hashtableInitXDFAttributes(InitXDFAttributeTable);
+   //
+   // Constructors
+   //
 
-  }
+   /** The no argument constructor.
+    */
+   public FieldAxis ()
+   {
+      init();
+   }
 
-  //
-  //Get/Set Methods
-  //
+   /**  This constructor takes a Java Hashtable as an initializer of
+        the XML attributes of the object to be constructed. The
+        Hashtable key/value pairs coorespond to the class XDF attribute
+        names and their desired values.
+     */
+   public FieldAxis ( Hashtable InitXDFAttributeTable )
+   {
+
+      // init the XML attributes (to defaults)
+      init();
+
+      // init the value of selected XML attributes to HashTable values
+      hashtableInitXDFAttributes(InitXDFAttributeTable);
+
+   }
+
+   //
+   // Get/Set Methods
+   //
 
   /** set the *name* attribute
    */
   public void setName (String strName)
   {
-     ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+     ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
   }
 
    /**
@@ -92,28 +104,43 @@ public class FieldAxis extends BaseObject implements AxisInterface{
    */
   public String getName()
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /** set the *description* attribute
    */
   public void setDescription (String strDesc)
   {
-     ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+     ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
   }
 
   /**
    * @return the current *description* attribute
    */
   public String getDescription() {
-    return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
+ /** set the *align* attribute
+   */
+  public void setAlign(String strName)
+  {
+      ((XMLAttribute) attribHash.get(ALIGN_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
+  }
+
+   /**
+   * @return the current *align* attribute
+   */
+  public String getAlign()
+  {
+     return (String) ((XMLAttribute) attribHash.get(ALIGN_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *axisId* attribute
    */
   public void setAxisId (String strAxisId)
   {
-     ((XMLAttribute) attribHash.get("axisId")).setAttribValue(strAxisId);
+     ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strAxisId);
 
   }
 
@@ -122,14 +149,14 @@ public class FieldAxis extends BaseObject implements AxisInterface{
    */
   public String getAxisId()
   {
-    return (String) ((XMLAttribute) attribHash.get("axisId")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *axisIdRef* attribute
    */
   public void setAxisIdRef (String strAxisIdRef)
   {
-     ((XMLAttribute) attribHash.get("axisIdRef")).setAttribValue(strAxisIdRef);
+     ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strAxisIdRef);
 
   }
 
@@ -138,20 +165,20 @@ public class FieldAxis extends BaseObject implements AxisInterface{
    */
   public String getAxisIdRef()
   {
-    return (String) ((XMLAttribute) attribHash.get("axisIdRef")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *fieldList* attribute
    */
   public void setFieldList(List field) {
-     ((XMLAttribute) attribHash.get("fieldList")).setAttribValue(field);
+     ((XMLAttribute) attribHash.get(FIELDLIST_XML_ATTRIBUTE_NAME)).setAttribValue(field);
   }
 
   /**
    * @return the current *fieldList* attribute
    */
   public List getFieldList() {
-    return (List) ((XMLAttribute) attribHash.get("fieldList")).getAttribValue();
+    return (List) ((XMLAttribute) attribHash.get(FIELDLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the fieldGroupOwnedHash
@@ -289,29 +316,29 @@ public class FieldAxis extends BaseObject implements AxisInterface{
   /** A special private method used by constructor methods to
    *  conveniently build the XML attribute list for a given class.
    */
-  protected void init()
+  protected void init ()
   {
 
     classXDFNodeName = "fieldAxis";
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
-    attribOrder.add(0,"fieldList");
-    attribOrder.add(0,"axisIdRef");
-    attribOrder.add(0,"axisId");
-    attribOrder.add(0,"align");  //not sure what it is???
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
+    attribOrder.add(0, FIELDLIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, ALIGN_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
      //set up the attribute hashtable key with the default initial value
 
      //set the minimum array size(essentially the size of the axis)
-    attribHash.put("fieldList", new XMLAttribute(Collections.synchronizedList(new ArrayList(Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE));
-    attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("align", new XMLAttribute(null, Constants.STRING_TYPE));  //double check??
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(FIELDLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList(Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE));
+    attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(ALIGN_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));  //double check??
+    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
     length = 0;
 
@@ -322,6 +349,11 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.14  2001/02/07 18:44:04  thomas
+  * Converted XML attribute decl
+  * to use constants (final static fields within the object). These
+  * are private decl for now. -b.t.
+  *
   * Revision 1.13  2001/01/19 17:24:07  thomas
   * *** empty log message ***
   *

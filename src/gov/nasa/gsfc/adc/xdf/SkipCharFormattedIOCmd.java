@@ -34,14 +34,21 @@ import java.util.List;
    @version $Revision$
  */
 public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedIOCmd {
+
   //
   //Fields
   //
 
-  public static final int DefaultCount = 1;
-  public static final String DefaultOutput = " ";
+  /* XML attribute names */
+  private static final String COUNT_XML_ATTRIBUTE_NAME = new String("count");
+  private static final String OUTPUT_STRING_XML_ATTRIBUTE_NAME = new String("output");
+
+  /* default attribute values */
+  public static final int DEFAULT_COUNT = 1;
+  public static final String DEFAULT_OUTPUT = " ";
+
   //
-  //constructor and related methods
+  // Constructor
   //
 
   //no-arg constructor
@@ -77,30 +84,31 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
     if(numCount.intValue() < 1) 
       Log.warnln("Cant set skipChar count value to less than 1, ignoring request.");
     else  
-      ((XMLAttribute) attribHash.get("count")).setAttribValue(numCount);
+      ((XMLAttribute) attribHash.get(COUNT_XML_ATTRIBUTE_NAME)).setAttribValue(numCount);
   }
 
   /** Get the *count* attribute. 
    */
   public Integer getCount() {
-     return ((Integer) ((XMLAttribute) attribHash.get("count")).getAttribValue());
+     return ((Integer) ((XMLAttribute) attribHash.get(COUNT_XML_ATTRIBUTE_NAME)).getAttribValue());
   }
 
   /**setOutput: set the *output* attribute
    */
   public void setOutput(String strOutput) {
-     ((XMLAttribute) attribHash.get("output")).setAttribValue(strOutput);
+     ((XMLAttribute) attribHash.get(OUTPUT_STRING_XML_ATTRIBUTE_NAME)).setAttribValue(strOutput);
   }
 
   /**getOutput: get the *output* attribute
    */
   public String getOutput() {
-    return (String)  ((XMLAttribute) attribHash.get("output")).getAttribValue();
+    return (String)  ((XMLAttribute) attribHash.get(OUTPUT_STRING_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   //
   // Protected Methods
   //
+
   protected void specificIOStyleToXDF( OutputStream outputstream, String indent) {
     synchronized (attribHash) {
       //open the node
@@ -110,14 +118,14 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
       Object attrib=null;
       if ( (attrib=getCount()) !=null) 
       { 
-         writeOut( outputstream, " count=\"");
+         writeOut( outputstream, " "+COUNT_XML_ATTRIBUTE_NAME+"=\"");
          writeOutAttribute(outputstream, ((Integer) attrib).toString());
          writeOut(outputstream, "\"");
       }
 
       if ((attrib=getOutput()) !=null)
       { 
-         writeOut(outputstream, " output=\"");
+         writeOut(outputstream, " "+OUTPUT_STRING_XML_ATTRIBUTE_NAME+"=\"");
          writeOutAttribute(outputstream, (String) attrib);
          writeOut(outputstream, "\"");
       }
@@ -128,22 +136,19 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 
   }
 
-
-  //
-  // Private Methods
-  //
-
-  /** special private method used by constructor methods to
-      conviently build the XML attribute list for a given class.
+  /** special method used by constructor methods to
+      convienently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
     classXDFNodeName = "skipChars";
-    attribOrder.add(0,"output");
-    attribOrder.add(0, "count");
 
-    attribHash.put("count", new XMLAttribute(new Integer(DefaultCount), Constants.INTEGER_TYPE));
-    attribHash.put("output", new XMLAttribute(DefaultOutput, Constants.STRING_TYPE));
+    attribOrder.add(0, OUTPUT_STRING_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, COUNT_XML_ATTRIBUTE_NAME);
+
+    attribHash.put(COUNT_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_COUNT), Constants.INTEGER_TYPE));
+    attribHash.put("output", new XMLAttribute(DEFAULT_OUTPUT, Constants.STRING_TYPE));
+
   }
 
 }
@@ -152,6 +157,11 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2001/02/07 18:44:04  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.6  2000/11/27 22:39:25  thomas
  * Fix to allow attribute text to have newline, carriage
  * returns in them (print out as entities: &#010; and

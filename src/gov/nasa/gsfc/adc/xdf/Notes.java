@@ -43,6 +43,11 @@ public class Notes extends BaseObject {
    // Fields
    //
 
+   /* XML attribute names */
+   private static final String NOTELIST_XML_ATTRIBUTE_NAME = new String("noteList");
+   private static final String LOCATION_ORDER_XML_ATTRIBUTE_NAME = new String("locationOrder");
+
+
    //
    // Constructors 
    //
@@ -79,14 +84,14 @@ public class Notes extends BaseObject {
         @return the current *noteList* attribute
      */
     public void setNoteList (List notes) {
-       ((XMLAttribute) attribHash.get("noteList")).setAttribValue(notes);
+       ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
     }
 
     /**
         @return the current *noteList* attribute
      */
     public List getNoteList() {
-       return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
+       return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
     }
 
     /**convenience method that returns the list of notes this object holds
@@ -97,7 +102,7 @@ public class Notes extends BaseObject {
      */
     public void setLocationOrderList (List axisIdList) {
        NotesLocationOrder orderObj = (NotesLocationOrder)
-               ((XMLAttribute) attribHash.get("locationOrder")).getAttribValue();
+               ((XMLAttribute) attribHash.get(LOCATION_ORDER_XML_ATTRIBUTE_NAME)).getAttribValue();
 
        orderObj.setAxisOrderList(axisIdList);
     }
@@ -122,7 +127,7 @@ public class Notes extends BaseObject {
        @return true if successful, false if not
     */
    public boolean removeNote(Note what) {
-      return removeFromList(what, getNoteList(), "noteList");
+      return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
    }
 
    /** Remove an Note object from the list of notes held in
@@ -131,7 +136,7 @@ public class Notes extends BaseObject {
        @return true if successful, false if not
     */
    public boolean removeNote(int index) {
-      return removeFromList(index, getNoteList(), "noteList");
+      return removeFromList(index, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
    }
 
    // quick little change to prevent this node from printing out
@@ -155,24 +160,24 @@ public class Notes extends BaseObject {
    }
 
    //
-   // Private Methods
+   // Protected Methods
    //
 
-   /** A special private method used by constructor methods to
-       conviently build the XML attribute list for a given class.
+   /** A special protected method used by constructor methods to
+       convienently build the XML attribute list for a given class.
     */
-   private void init()
+   protected void init()
    {
 
       classXDFNodeName = "notes";
 
       // order matters! these are in *reverse* order of their
       // occurence in the XDF DTD
-      attribOrder.add(0,"noteList");
-      attribOrder.add(0,"locationOrder");
+      attribOrder.add(0, NOTELIST_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, LOCATION_ORDER_XML_ATTRIBUTE_NAME);
 
-      attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-      attribHash.put("locationOrder", new XMLAttribute(new NotesLocationOrder(), Constants.OBJECT_TYPE));
+      attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+      attribHash.put(LOCATION_ORDER_XML_ATTRIBUTE_NAME, new XMLAttribute(new NotesLocationOrder(), Constants.OBJECT_TYPE));
 
    }
 
@@ -181,6 +186,11 @@ public class Notes extends BaseObject {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.7  2001/02/07 18:44:03  thomas
+  * Converted XML attribute decl
+  * to use constants (final static fields within the object). These
+  * are private decl for now. -b.t.
+  *
   * Revision 1.6  2000/11/16 20:02:52  kelly
   * fixed documentation.  -k.z.
   *

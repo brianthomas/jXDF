@@ -59,18 +59,28 @@ import java.util.Set;
 
 public class Structure extends BaseObject {
 
-  //
-  //Fields
-  //
+   //
+   //Fields
+   //
 
-  /** This field stores object references to those parameter group objects
-   * to which this parameter object belongs
-  */
-  protected Set paramGroupOwnedHash = Collections.synchronizedSet(new HashSet());
+   /* XML attribute names */
+   private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
+   private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
+   private static final String TYPE_XML_ATTRIBUTE_NAME = new String("type");
+   private static final String PARAMETERLIST_XML_ATTRIBUTE_NAME = new String("paramList");
+   private static final String STRUCTURELIST_XML_ATTRIBUTE_NAME = new String("structList");
+   private static final String ARRAYLIST_XML_ATTRIBUTE_NAME = new String("arrayList");
+   private static final String NOTELIST_XML_ATTRIBUTE_NAME = new String("noteList");
 
-  //
-  // Constructor and related methods
-  //
+
+   /** This field stores object references to those parameter group objects
+    * to which this parameter object belongs
+    */
+   protected Set paramGroupOwnedHash = Collections.synchronizedSet(new HashSet());
+
+   //
+   // Constructor
+   //
 
   /** The no argument constructor.
    */
@@ -95,44 +105,15 @@ public class Structure extends BaseObject {
 
   }
 
-  /** Special method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  protected void init()
-  {
-
-    classXDFNodeName = "structure";
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"noteList");
-    attribOrder.add(0,"arrayList");
-    attribOrder.add(0,"structList");
-    attribOrder.add(0,"paramList");
-    attribOrder.add(0,"type");
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
-
-    //set up the attribute hashtable key with the default initial value
-    attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("arrayList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("structList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("paramList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("type", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
-
-  };
-
   //
-  //Get/Set Methods
+  // Get/Set Methods
   //
 
   /**set the *name* attribute
    */
   public void setName (String strName)
   {
-    ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+    ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
   }
 
   /**
@@ -140,73 +121,73 @@ public class Structure extends BaseObject {
    */
   public String getName()
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /**set the *description* attribute
    */
   public void setDescription (String strDesc)
   {
-     ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+     ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
   }
 
    /**
    * @return the current *description* attribute
    */
   public String getDescription() {
-    return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *paramList* attribute
    */
   public void setParamList(List param) {
-     ((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
+     ((XMLAttribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).setAttribValue(param);
   }
 
   /**
    * @return the current *paramList* attribute
    */
   public List getParamList() {
-    return (List) ((XMLAttribute) attribHash.get("paramList")).getAttribValue();
+    return (List) ((XMLAttribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *structList* attribute
    */
-  public void setStructList(List struct) {
-    ((XMLAttribute) attribHash.get("structList")).setAttribValue(struct);
+  public void setStructList(List structList) {
+    ((XMLAttribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).setAttribValue(structList);
   }
 
   /**
    * @return the current *structList* attribute
    */
   public List getStructList() {
-    return (List) ((XMLAttribute) attribHash.get("structList")).getAttribValue();
+    return (List) ((XMLAttribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *arrayList* attribute
    */
   public void setArrayList(List array) {
-     ((XMLAttribute) attribHash.get("arrayList")).setAttribValue(array);
+     ((XMLAttribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(array);
   }
 
   /**
    * @return the current *arrayList* attribute
    */
   public List getArrayList() {
-    return (List) ((XMLAttribute) attribHash.get("arrayList")).getAttribValue();
+    return (List) ((XMLAttribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *noteList* attribute
    */
   public void setNoteList(List note) {
-    ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
+    ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(note);
   }
 
   /**getNoteList
    * @return the current *noteList* attribute
    */
   public List getNoteList() {
-    return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
+    return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
 
@@ -235,14 +216,14 @@ public class Structure extends BaseObject {
   // This should only be set by inheriting Structures (ala FITSML and
   // so on (hmm. reader may also need to set it.., more thought on this..)
   protected void setType(String strType ) {
-    ((XMLAttribute) attribHash.get("type")).setAttribValue(strType);
+    ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strType);
   }
 
   /**
    * @return the current *type* attribute
    */
   public List getType() {
-    return (List) ((XMLAttribute) attribHash.get("type")).getAttribValue();
+    return (List) ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
 
@@ -264,7 +245,7 @@ public class Structure extends BaseObject {
    * @return true on success, false on failure
    */
    public boolean removeNote(Note what) {
-     return removeFromList(what, getNoteList(), "noteList");
+     return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
 
@@ -274,7 +255,7 @@ public class Structure extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeNote(int index) {
-     return removeFromList(index, getNoteList(), "noteList");
+     return removeFromList(index, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
    /**
@@ -297,7 +278,7 @@ public class Structure extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeParameter(Parameter what) {
-    return  removeFromList(what, getParamList(), "paramList");
+    return  removeFromList(what, getParamList(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
   }
 
   /** removes an Parameter object from paramList
@@ -305,7 +286,7 @@ public class Structure extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeParameter(int index) {
-    return removeFromList(index, getParamList(), "paramList");
+    return removeFromList(index, getParamList(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
   }
 
   /**  insert an Structure object into the structList
@@ -322,7 +303,7 @@ public class Structure extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeStructure(Structure what) {
-    return  removeFromList(what, getStructList(), "structList");
+    return  removeFromList(what, getStructList(), STRUCTURELIST_XML_ATTRIBUTE_NAME);
   }
 
   /** removes an Structure object from structList
@@ -330,7 +311,7 @@ public class Structure extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeStructure(int index) {
-    return removeFromList(index, getStructList(), "structList");
+    return removeFromList(index, getStructList(), STRUCTURELIST_XML_ATTRIBUTE_NAME);
   }
 
   /** insert an Array object into the arrayList
@@ -347,7 +328,7 @@ public class Structure extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeArray(Array what) {
-    return removeFromList(what, getArrayList(), "arrayList");
+    return removeFromList(what, getArrayList(), ARRAYLIST_XML_ATTRIBUTE_NAME);
   }
 
   /** emoves an Array object from arrayList
@@ -355,7 +336,7 @@ public class Structure extends BaseObject {
    * @return true on success, false on failure
    */
   public boolean removeArray(int index) {
-    return removeFromList(index, getArrayList(), "arrayList");
+    return removeFromList(index, getArrayList(), ARRAYLIST_XML_ATTRIBUTE_NAME);
   }
 
   /** Insert an ParameterGroup object into this object.
@@ -417,11 +398,50 @@ public class Structure extends BaseObject {
     return cloneObj;
    }
 
+   // 
+   // Protected Methods
+   //
+
+   /** Special method used by constructor methods to
+     *  convienently build the XML attribute list for a given class.
+     */
+   protected void init()
+   {
+
+    classXDFNodeName = "structure";
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0, NOTELIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, ARRAYLIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, STRUCTURELIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, PARAMETERLIST_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, TYPE_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
+
+    //set up the attribute hashtable key with the default initial value
+    attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put(ARRAYLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put(STRUCTURELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put(TYPE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+
+  };
+
+
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/02/07 18:44:03  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.15  2000/11/16 20:09:19  kelly
  * fixed documentation.  -k.z.
  *

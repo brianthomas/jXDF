@@ -136,8 +136,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, "\"");
         writeOut(outputstream, " tag = \"");
         writeOutAttribute(outputstream, tag);
-        writeOut(outputstream, "\"");
-
+        writeOut(outputstream, "\"/>");
 
       }
     }
@@ -157,6 +156,11 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/02/07 18:44:03  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.9  2000/11/27 22:39:25  thomas
  * Fix to allow attribute text to have newline, carriage
  * returns in them (print out as entities: &#010; and

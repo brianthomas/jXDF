@@ -41,13 +41,17 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   //Fields
   //
 
-  int DefaultCountValue = 1;
+  /* XML attribute names */
+  private static final String COUNT_XML_ATTRIBUTE_NAME = new String("count");
+
+  /* default attribute values */
+  public static final int DEFAULT_COUNT = 1;
 
   //list to store the formatted IO commands
   private List formatCommandList = Collections.synchronizedList(new ArrayList());
 
   //
-  //constructor and related methods
+  // Constructor
   //
 
   //no-arg constructor
@@ -83,14 +87,14 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
     if (numCount.intValue() < 1) {
        Log.warnln("Cant set repeatFormattedIOCmd count to less than 1, ignoring set request.");
     } else {
-       ((XMLAttribute) attribHash.get("count")).setAttribValue(numCount);
+       ((XMLAttribute) attribHash.get(COUNT_XML_ATTRIBUTE_NAME)).setAttribValue(numCount);
     }
   }
 
   /** Get the *count* attribute. 
    */
   public Integer getCount() {
-     return (Integer) ((XMLAttribute) attribHash.get("count")).getAttribValue();
+     return (Integer) ((XMLAttribute) attribHash.get(COUNT_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** Set the formatCommandList. 
@@ -160,7 +164,7 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   {
      //open the code
      writeOut(outputstream, "<" + classXDFNodeName);
-     writeOut(outputstream, " count=\"");
+     writeOut(outputstream, " "+COUNT_XML_ATTRIBUTE_NAME+"=\"");
      writeOutAttribute(outputstream, getCount().toString());
      writeOut(outputstream, "\"");
 
@@ -189,17 +193,18 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   }
 
   //
-  // Private Methods
+  // Protected Methods
   //
 
-  /** special private method used by constructor methods to
-      conviently build the XML attribute list for a given class.
+  /** special method used by constructor methods to
+      convienently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
     classXDFNodeName = "repeat";
-    attribOrder.add(0, "count");
-    attribHash.put("count", new XMLAttribute(new Integer(DefaultCountValue), Constants.INTEGER_TYPE));
+
+    attribOrder.add(0, COUNT_XML_ATTRIBUTE_NAME);
+    attribHash.put(COUNT_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_COUNT), Constants.INTEGER_TYPE));
   }
 
 }
@@ -208,6 +213,11 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2001/02/07 18:44:03  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.5  2000/11/27 22:39:25  thomas
  * Fix to allow attribute text to have newline, carriage
  * returns in them (print out as entities: &#010; and

@@ -34,16 +34,27 @@ import java.util.Hashtable;
 
  public class Href extends BaseObject {
 
-  //
-  // Constructor and related methods
-  //
+   //
+   // Fields
+   //
 
-  /** The no argument constructor.
-   */
-  public Href ()
-  {
-    init();
-  }
+   /* XML attribute names */
+   private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
+   private static final String BASE_XML_ATTRIBUTE_NAME = new String("base");
+   private static final String SYSTEM_ID_XML_ATTRIBUTE_NAME = new String("sysId");
+   private static final String PUBLIC_ID_XML_ATTRIBUTE_NAME = new String("pubId");
+   private static final String NDATA_XML_ATTRIBUTE_NAME = new String("ndata");
+
+   //
+   // Constructor
+   //
+
+   /** The no argument constructor.
+    */
+   public Href ()
+   {
+      init();
+   }
 
   /**  This constructor takes a Java Hashtable as an initializer of
        the XML attributes of the object to be constructed. The
@@ -68,66 +79,66 @@ import java.util.Hashtable;
   /** set the *base* attribute
    */
   public void setBase(String value) {
-     ((XMLAttribute) attribHash.get("base")).setAttribValue(value);
+     ((XMLAttribute) attribHash.get(BASE_XML_ATTRIBUTE_NAME)).setAttribValue(value);
   }
 
   /**
    * @return the current *base* attribute
    */
   public String getBase() {
-    return (String) ((XMLAttribute) attribHash.get("base")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(BASE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
  /** set the *name* attribute
    */
   public void setName(String value) {
-     ((XMLAttribute) attribHash.get("name")).setAttribValue(value);
+     ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(value);
   }
 
   /**
    * @return the current *name* attribute
    */
   public String getName() {
-    return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *sysId* attribute
    */
   public void setSysId(String value) {
-     ((XMLAttribute) attribHash.get("sysId")).setAttribValue(value);
+     ((XMLAttribute) attribHash.get(SYSTEM_ID_XML_ATTRIBUTE_NAME)).setAttribValue(value);
   }
 
   /**
    * @return the current *sysId* attribute
    */
   public String getSysId() {
-    return (String) ((XMLAttribute) attribHash.get("sysId")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(SYSTEM_ID_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *pubId* attribute
    */
   public void setPubId(String value) {
-     ((XMLAttribute) attribHash.get("pubId")).setAttribValue(value);
+     ((XMLAttribute) attribHash.get(PUBLIC_ID_XML_ATTRIBUTE_NAME)).setAttribValue(value);
   }
 
   /**
    * @return the current *pubId* attribute
    */
   public String getPubId() {
-    return (String) ((XMLAttribute) attribHash.get("pubId")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(PUBLIC_ID_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *ndata* attribute
    */
   public void setNdata(String value) {
-     ((XMLAttribute) attribHash.get("ndata")).setAttribValue(value);
+     ((XMLAttribute) attribHash.get(NDATA_XML_ATTRIBUTE_NAME)).setAttribValue(value);
   }
 
   /**
    * @return the current *ndata* attribute
    */
   public String getNdata() {
-    return (String) ((XMLAttribute) attribHash.get("ndata")).getAttribValue();
+    return (String) ((XMLAttribute) attribHash.get(NDATA_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   //
@@ -143,17 +154,17 @@ import java.util.Hashtable;
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
-    attribOrder.add(0,"ndata");
-    attribOrder.add(0,"pubId");
-    attribOrder.add(0,"sysId");
-    attribOrder.add(0,"base");
-    attribOrder.add(0,"name");
+    attribOrder.add(0, NDATA_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, PUBLIC_ID_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, SYSTEM_ID_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, BASE_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
-    attribHash.put("ndata", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("pubId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("sysId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("base", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(NDATA_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(PUBLIC_ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(SYSTEM_ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(BASE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
   };
 
@@ -162,6 +173,11 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/02/07 18:44:03  thomas
+ * Converted XML attribute decl
+ * to use constants (final static fields within the object). These
+ * are private decl for now. -b.t.
+ *
  * Revision 1.1  2001/01/19 19:10:00  thomas
  * *** empty log message ***
  *
