@@ -11,7 +11,7 @@ import java.util.*;
 
 
 
-public class FieldAxis extends BaseObject{
+public class FieldAxis extends BaseObject implements AxisInterface{
 
   //
  //Fields
@@ -189,9 +189,83 @@ public class FieldAxis extends BaseObject{
     return length;
   }
 
-  public List getDataFormatList() {
+  //
+  //Other PUBLIC Methods
+  //
+
+  /**addField: adds a field to this fieldAxis.
+   * @param: field to be added
+   * @return: field object ref on success, null on failure
+   *
+   */
+  public Field AddField (Field field) {
+     if (field == null) {
+      Log.warn("in FieldAxis.addField(),Field passed in is null");
+      return null;
+    }
+    getFieldList().add(field);
+    length++;
+    return field;
+  }
+
+  /**getField: returns the field object at specified index on success, null on failure
+   *
+   */
+  public Field getField (int index) {
+    if ((index < 0) || (index > getFieldList().size()-1))  {//index out of range
+      Log.error("in Field, getField().  index out of range");
+      return null;
+    }
+    return (Field) getFieldList().get(index);
+  }
+
+  /**getFields: convience method that returns all field object held in this FieldAxis
+   * object.
+   * @return: a list of field object reference(ordered by field axis index)
+   */
+  public List getFields() {
+    return getFieldList();
+  }
+
+  /**setField: Set the field object at indicated index.
+   * @returns:  the field object on success, null on failure.
+   */
+
+  public Field setField(int index, Field field) {
+    if ((index < 0) || (index > getFieldList().size()-1))  //index out of range
+      return null;
+    if (index == getFieldList().size()-1)  { //add a field
+      getFieldList().add(field);
+      return field;
+    }
+    getFieldList().set(index, field);  //replace the old field with the new one
+    return field;
+  }
+
+  public Field removeField(int index) {
+    Log.error("in FieldAxis, removeField, method empty");
     return null;
   }
+  public Field removeField(Field field) {
+    Log.error("in FieldAxis, removeField, method empty");
+    return null;
+  }
+  public List getDataFormatList() {
+    List dataFormatList = new ArrayList();
+    List fieldList = getFieldList();
+    for (int i = 0; i < length; i++)
+      dataFormatList.add(((Field) fieldList.get(i)).getDataFormat());
+    return dataFormatList;
+  }
 }
+
+ /**
+  * Modification History:
+  * $Log$
+  * Revision 1.3  2000/10/30 18:18:20  kelly
+  * more completion  -k.z.
+  *
+  *
+  */
 
 
