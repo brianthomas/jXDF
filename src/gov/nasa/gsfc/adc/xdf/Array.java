@@ -1083,6 +1083,16 @@ import java.util.Vector;
     */
    public void setHref (Entity hrefObj) 
    {
+
+       // for shame, didnt set this?
+       // lets assume its xdf then
+       if (hrefObj.getNdata() == null)  
+          hrefObj.setNdata("xdf"); 
+       else if (hrefObj.getNdata().equals("xdf")) {
+          Log.errorln("Cant setHref() in Array:"+this.getName()+" as entity has Ndata field set to something other than 'xdf'");
+          return;
+       }
+
        getDataCube().setHref(hrefObj);
    }
 
@@ -1505,6 +1515,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.42  2001/09/27 17:19:02  thomas
+  * added test to ensure that nData attrib set on passed entities for setHref method
+  *
   * Revision 1.41  2001/09/20 15:07:30  thomas
   *  merged differences between Ping/Brian code
   *
