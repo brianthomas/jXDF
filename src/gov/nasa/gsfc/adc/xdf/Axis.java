@@ -92,7 +92,7 @@ public class Axis extends BaseObject implements Cloneable {
     attribHash.put("axisUnits", new XMLAttribute(unitsObj, Constants.OBJECT_TYPE));
     unitsObj.setXDFNodeName("axisUnits");
 
-    attribHash.put("axisDatatype",new XMLAttribute(new StringDataFormat(), Constants.OBJECT_TYPE));
+    attribHash.put("axisDatatype",new XMLAttribute(new StringDataFormat(), Constants.STRING_TYPE));
     attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
 
@@ -485,6 +485,9 @@ public class Axis extends BaseObject implements Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/10/25 21:20:29  thomas
+ * Bug fix. AxisDataType is really string. -b.t.
+ *
  * Revision 1.4  2000/10/24 21:33:29  thomas
  * Made the class Cloneable. -b.t.
  *
