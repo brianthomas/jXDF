@@ -134,7 +134,7 @@ public class Group extends BaseObject{
   /** Remove an object from membership in this group.
       @return: true if successfully removes the object from membership, false otherwise.
   */
-  public Object removeMemberObj (Object obj) {
+  public Object removeMemberObject (Object obj) {
      if (obj!=null) {
       if (memberObjHash.contains(obj))  {
         memberObjHash.remove(obj);
@@ -165,11 +165,11 @@ public class Group extends BaseObject{
 
 /* Modification History:
  *
- * $Log$
- * Revision 1.2  2000/10/10 19:14:59  cvs
- * Added log history section, commenting on methods
- * and fixed the constructor section (added init method).
- * -b.t.
+ * $Log: Group.java,v 
+ * Revision 1.2  2000/10/10 19:14:59  cvs 
+ * Added log history section, commenting on methods 
+ * and fixed the constructor section (added init method)
+ * -b.t
  *
  *
  */
