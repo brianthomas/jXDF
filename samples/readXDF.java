@@ -1,6 +1,6 @@
 
-
 import gov.nasa.gsfc.adc.xdf.Structure;
+import gov.nasa.gsfc.adc.xdf.Specification;
 import gov.nasa.gsfc.adc.xdf.Reader;
 
 import java.util.Hashtable;
@@ -22,9 +22,14 @@ public class readXDF {
     s.setName("First structure");
     s.setDescription("First descript");
 
+//    System.out.println("-----\nREAD IN STRUCTURE\n-----");
+
     // this will cause the information in existing structure
     // to be lost
 //    s.loadFromXDFFile("out.xml");
+
+    // change the parser to Xerces
+    Specification.getInstance().setXMLParser("org.apache.xerces.parsers.SAXParser");
 
     // read in with the reader, it accretes new info into
     // existing structure without overriding it.
@@ -33,10 +38,15 @@ public class readXDF {
     } catch (java.io.IOException e ) { }
 
     // output
-    s.setPrettyXDFOutput(true);
-    s.setPrettyXDFOutputIndentation("   ");
+ //   System.out.println("-----\nPRINT OUT STRUCTURE\n-----");
+
+    // set the output specification
+    Specification.getInstance().setPrettyXDFOutput(true);
+    Specification.getInstance().setPrettyXDFOutputIndentation("  ");
+
     s.toXMLOutputStream(System.out);
 
   }
 }
+
 

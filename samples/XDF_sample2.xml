@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
-<!DOCTYPE XDF SYSTEM "XDF_0.17.dtd" [
-  <!ENTITY newline "&#10;">
-]>
+<!DOCTYPE XDF SYSTEM "XDF_0.17.dtd" [ 
+   <!ENTITY ApJ "&#10;"> 
+]> 
 <XDF name="A sample XDF document" 
      description="This shows how to put any data into XDF using formatted data IO Style."
 >
@@ -50,7 +50,7 @@
          </field>
          <field fieldId="enumber" name="A Sci. Number">
             <units><unitless/></units>
-            <dataFormat><exponent width="8" precision="2" /></dataFormat>
+            <dataFormat><exponential width="8" precision="3" exponent="2" /></dataFormat>
          </field>
          <field name="Reference" >
             <units><unitless/></units>
@@ -67,21 +67,21 @@
       </axis>
 
      <!-- declare the ordering of how to read this in, assoc. of axis to data -->
-      <read encoding="UTF-8" >
+      <read encoding="UTF-8">
          <for axisIdRef="rows">
             <for axisIdRef="fields"> <!-- the "fast" axis --> 
                <repeat count="7">
-                  <readCell />
-                  <skipChars count="1" />
+                  <readCell/>
+                  <skipChars count="1" output=" "/>
                </repeat>
-               <readCell />
-               <skipChars count="1" output="&#10;" />
+               <readCell/>
+               <skipChars count="1" output="&#010;"/>
             </for>
          </for>
       </read>
 
       <data><![CDATA[M31      230.1209877 -34.3424911 12.6  0.5 0 1.000E-3 ApJ Ref 1.
-M33      130.094     +36.0000001 14.6  1.5 3  0.10E-1           
+M33      130.094     +36.0000001 14.6  1.5 3  0.100E3           
 M80      230.0442929 +74.2449499 12.8 10.5 8   3.3E33           
 ]]>
       </data>
@@ -91,7 +91,7 @@ M80      230.0442929 +74.2449499 12.8 10.5 8   3.3E33
           <index axisIdRef="fields"/>
           <index axisIdRef="rows"/>
         </locationOrder>
-        <note location="1 1">This is table 3 from the Zezajck article. Newline:[&newline;].</note>
+        <note location="1 1">This is table 3 from the Zezajck article. Newline:[&newLine;].</note>
         <note location="0 2">This is table 3 from the Zezajck article.</note>
         <note noteId="note1" location="0 1" >No data because of a cosmic ray hit</note>
         <note noteIdRef="note1" location="0 2" />

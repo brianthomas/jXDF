@@ -50,7 +50,7 @@
          </field>
          <field fieldId="enumber" name="A Sci. Number">
             <units><unitless/></units>
-            <dataFormat><exponent width="8" precision="2" /></dataFormat>
+            <dataFormat><exponential width="8" precision="2" /></dataFormat>
          </field>
          <field name="Reference" >
             <units><unitless/></units>
