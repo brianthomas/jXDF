@@ -48,7 +48,7 @@ public class Logarithm extends BaseObject implements ConversionComponentInterfac
 
    public Logarithm (Double number) {
       init();
-      setValue(number);
+      setBase(number);
    }
 
    public Logarithm (double doubleValue) {
@@ -88,7 +88,7 @@ public class Logarithm extends BaseObject implements ConversionComponentInterfac
        @return the converted value.
     */
    public double evaluate (double value) {
-       double baseValue = getValue().doubleValue();
+       double baseValue = getBase().doubleValue();
        return (Math.log(value) / Math.log(baseValue));
    }
 
