@@ -25,5 +25,8 @@
 package gov.nasa.gsfc.adc.xdf;
 import java.io.OutputStream;
 
-public interface FormattedIOCmd{
+public interface FormattedIOCmd {
+
+   public void toXMLOutputStream ( OutputStream outputstream, String indent);
+
 }

@@ -102,6 +102,10 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
     return formatCmd;
   }
 
+/*
+  public void toXMLOutputStream ( OutputStream outputstream, String indent) { } 
+*/
+
   //
   // Protected Methods
   //
@@ -132,8 +136,8 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, indent);
       }
       synchronized (formatCommandList) {
-        int stop = formatCommandList.size();
-        for (int i = 0; i < stop; i++) {
+        int stop2 = formatCommandList.size();
+        for (int i = 0; i < stop2; i++) {
           FormattedIOCmd command = (FormattedIOCmd) formatCommandList.get(i);
           command.toXMLOutputStream(outputstream, indent);
            if (sPrettyXDFOutput) {
@@ -168,6 +172,11 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/10 01:40:41  thomas
+ * Bug fix. This code was keeping the package from
+ * compiling. Kelly, please review code carefully.
+ * -b.t.
+ *
  * Revision 1.3  2000/11/09 23:25:01  kelly
  * completed specificIOStyleToXDF()
  *

@@ -33,7 +33,7 @@ import java.util.List;
 /**
    @version $Revision$
  */
-public class SkipCharFormattedIOCmd extends XMLDataIOStyle, implements FormattedIOCmd {
+public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedIOCmd {
   //
   //Fields
   //
@@ -95,24 +95,33 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle, implements Formatted
     return (String)  ((XMLAttribute) attribHash.get("output")).getAttribValue();
   }
 
-  //
-  // Protected Methods
-  //
-  protected void synchronized (attribHash) toXMLOutputStream( OutputStream outputstream, String indent) {
+  public void toXMLOutputStream( OutputStream outputstream, String indent) {
     //open the node
     writeOut(outputstream, "<" + classXDFNodeName);
 
     //writeOutAttributes
+/*
     String attrib=null;
     if ( (attrib=getCount()) !=null)
       writeOut( outputstream, " count=\"" + attrib + "\"");
     if ((attrib=getOutput()) !=null)
       writeOut(outputstream, " output=\"" + attrib + "\"");
     //close the node
+*/
 
     writeOut(outputstream, " />");
 
   }
+
+  public void specificIOStyleToXDF (OutputStream outputstream, String what) {
+
+
+  } 
+
+  //
+  // Protected Methods
+  //
+
 
 
   //
@@ -128,7 +137,7 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle, implements Formatted
     attribOrder.add(0,"output");
     attribOrder.add(0, "count");
 
-    attribHash.put("count", new XMLAttribute(DefaultCount, Constants.NUMBER_TYPE));
+    attribHash.put("count", new XMLAttribute(new Integer(DefaultCount), Constants.NUMBER_TYPE));
     attribHash.put("output", new XMLAttribute(DefaultOutput, Constants.STRING_TYPE));
   }
 
@@ -138,6 +147,11 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle, implements Formatted
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/11/10 01:40:41  thomas
+ * Bug fix. This code was keeping the package from
+ * compiling. Kelly, please review code carefully.
+ * -b.t.
+ *
  * Revision 1.1  2000/11/09 23:32:06  kelly
  * created the class to handle skipChars
  *
