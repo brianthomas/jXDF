@@ -200,7 +200,7 @@ public int[] getMaxDataIndex() {
 
   int stop = axes.size();
   for(int i = 0; i < stop; i++) {
-    maxDataIndices[i]=((Axis) axes.get(i)).getLength();
+    maxDataIndices[i]=((AxisInterface) axes.get(i)).getLength();
   }
 
   return maxDataIndices;
@@ -233,9 +233,11 @@ public int incrementDimension(Axis axis) {
   }
 
   if (dimension == 1) {  //add second dimension
-    int length = axis.getLength();
-    for (int i = 2; i < 2*length; i++)
-      data.add(i,null);
+    if (!parentArray.hasFieldAxis()) {
+      int length = axis.getLength();
+      for (int i = 2; i < 2*length; i++)
+        data.add(i,null);
+    }
   }
   else{  //dimension >= 2
     List oldData = data;
@@ -246,6 +248,23 @@ public int incrementDimension(Axis axis) {
       data.add(i,null);
   }
   return dimension++;
+}
+
+/**incrementDimension: increase the dimension by 1
+   * @return: the current dimension ( which is incremented)
+   * this is called after the Array the DataCube belongs to adds an Axis
+   */
+public int incrementDimension(FieldAxis fieldAxis) {
+  if (dimension==0) {  //add first dimension
+    int length = fieldAxis.getLength();
+    for (int i = 0; i < 2*length; i++) {
+      data.add(null);
+    }
+    return dimension++;
+  }
+  else {
+    return -1;
+  }
 }
 
   /**decrementDimension: decrease the dimension by 1
@@ -288,8 +307,19 @@ public String getStringData(Locator locator) throws NoDataException{
     }
   }
 
-  int index0 = locator.getAxisLocation((Axis) axisList.get(1));
-  int index1 = locator.getAxisLocation((Axis) axisList.get(0));
+  //special handling for the innermost two layers
+  int index0;
+  int index1;
+  if (parentArray.hasFieldAxis()) {
+    //FieldAxis is always the second to last innermost layer
+    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisLocation((Axis) axisList.get(1));
+  }
+  else {
+    index0 = locator.getAxisLocation((Axis) axisList.get(1));
+    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+  }
+
   try {
     if (java.lang.reflect.Array.getByte(current.get(2*index0), index1) !=1)
       throw new NoDataException();  //the location we try to access contains noDataValue
@@ -329,8 +359,19 @@ public int getIntData(Locator locator) throws NoDataException{
     }
   }
 
-  int index0 = locator.getAxisLocation((Axis) axisList.get(1));
-  int index1 = locator.getAxisLocation((Axis) axisList.get(0));
+  //special handling for the innermost two layers
+  int index0;
+  int index1;
+  if (parentArray.hasFieldAxis()) {
+    //FieldAxis is always the second to last innermost layer
+    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisLocation((Axis) axisList.get(1));
+  }
+  else {
+    index0 = locator.getAxisLocation((Axis) axisList.get(1));
+    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+  }
+
   try {
     if (java.lang.reflect.Array.getByte(current.get(2*index0), index1) !=1)
       throw new NoDataException();  //the location we try to access contains noDataValue
@@ -370,8 +411,19 @@ public double getDoubleData(Locator locator) throws NoDataException{
     }
   }
 
-  int index0 = locator.getAxisLocation((Axis) axisList.get(1));
-  int index1 = locator.getAxisLocation((Axis) axisList.get(0));
+ //special handling for the innermost two layers
+  int index0;
+  int index1;
+  if (parentArray.hasFieldAxis()) {
+    //FieldAxis is always the second to last innermost layer
+    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisLocation((Axis) axisList.get(1));
+  }
+  else {
+    index0 = locator.getAxisLocation((Axis) axisList.get(1));
+    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+  }
+
   try {
     if (java.lang.reflect.Array.getByte(current.get(2*index0), index1) !=1)
       throw new NoDataException();  //the location we try to access contains noDataValue
@@ -476,10 +528,16 @@ public double  setData (Locator locator, double numValue) throws SetDataExceptio
   }
 
   //special handling of the inner most two dimensions
-  Axis secondAxis = (Axis) axisList.get(1);
-  Axis firstAxis = (Axis) axisList.get(0);
-  int index0 = locator.getAxisLocation(secondAxis );
-  int index1 = locator.getAxisLocation(firstAxis );
+  int index0;
+  int index1;
+  if (parentArray.hasFieldAxis()) {
+    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisLocation((Axis) axisList.get(1) );
+  }
+  else {
+    index0 = locator.getAxisLocation((Axis) axisList.get(1) );
+    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+  }
 
   int stop = 2*(index0+1)-current.size();
   for (int i = 0; i<stop; i++) {  //expand it if current.size < 2*(index0+1)
@@ -488,9 +546,14 @@ public double  setData (Locator locator, double numValue) throws SetDataExceptio
 
   int newCoordinate = 2*index0;  //internal index  = 2*index0
   if (current.get(newCoordinate) == null) {
-    //expand array of byte and int
-    current.set(newCoordinate, new byte[firstAxis.getLength()]);
-    current.set(newCoordinate+1, new double[firstAxis.getLength()]);
+    int length;
+    //expand array of byte and String
+    if (parentArray.hasFieldAxis())
+      length= ((Axis) axisList.get(1)).getLength();
+    else
+      length = ((Axis) axisList.get(0)).getLength();
+    current.set(newCoordinate, new byte[length]);
+    current.set(newCoordinate+1, new double[length]);
   }
 
   int arrayLength = ((double[]) current.get(newCoordinate+1)).length;
@@ -603,11 +666,17 @@ public int setData(Locator locator, int numValue) throws SetDataException{
     prev = current;
   }
 
-  //special handling of the inner most two dimensions
-  Axis secondAxis = (Axis) axisList.get(1);
-  Axis firstAxis = (Axis) axisList.get(0);
-  int index0 = locator.getAxisLocation(secondAxis );
-  int index1 = locator.getAxisLocation(firstAxis );
+ //special handling for the innermost two layer
+ int index0;
+ int index1;
+ if (parentArray.hasFieldAxis()) { //fieldAxis is always the 2nd to last layer
+    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisLocation((Axis) axisList.get(1) );
+  }
+  else {
+    index0 = locator.getAxisLocation((Axis) axisList.get(1) );
+    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+  }
 
   int stop = 2*(index0+1)-current.size();
   for (int i = 0; i<stop; i++) {  //expand it if current.size < 2*(index0+1)
@@ -616,9 +685,15 @@ public int setData(Locator locator, int numValue) throws SetDataException{
 
   int newCoordinate = 2*index0;  //internal index  = 2*index0
   if (current.get(newCoordinate) == null) {
+    int length;
     //expand array of byte and int
-    current.set(newCoordinate, new byte[firstAxis.getLength()]);
-    current.set(newCoordinate+1, new int[firstAxis.getLength()]);
+    if (parentArray.hasFieldAxis())
+      length= ((Axis) axisList.get(1)).getLength();
+    else
+      length = ((Axis) axisList.get(0)).getLength();
+    current.set(newCoordinate, new byte[length]);
+    current.set(newCoordinate+1, new int[length]);
+
   }
 
   int arrayLength = ((int[]) current.get(newCoordinate+1)).length;
@@ -732,10 +807,17 @@ public String  setData (Locator locator, String strValue) throws SetDataExceptio
   }
 
   //special handling of the inner most two dimensions
-  Axis secondAxis = (Axis) axisList.get(1);
-  Axis firstAxis = (Axis) axisList.get(0);
-  int index0 = locator.getAxisLocation(secondAxis );
-  int index1 = locator.getAxisLocation(firstAxis );
+  int index0;
+  int index1;
+
+  if (parentArray.hasFieldAxis()) {
+    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisLocation((Axis) axisList.get(1) );
+  }
+  else {
+    index0 = locator.getAxisLocation((Axis) axisList.get(1) );
+    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+  }
 
   int stop = 2*(index0+1)-current.size();
   for (int i = 0; i<stop; i++) {  //expand it if current.size < 2*(index0+1)
@@ -744,9 +826,15 @@ public String  setData (Locator locator, String strValue) throws SetDataExceptio
 
   int newCoordinate = 2*index0;  //internal index  = 2*index0
   if (current.get(newCoordinate) == null) {
-    //expand array of byte and int
-    current.set(newCoordinate, new byte[firstAxis.getLength()]);
-    current.set(newCoordinate+1, new String[firstAxis.getLength()]);
+    int length;
+    //expand array of byte and String
+    if (parentArray.hasFieldAxis())
+      length= ((Axis) axisList.get(1)).getLength();
+    else
+      length = ((Axis) axisList.get(0)).getLength();
+    current.set(newCoordinate, new byte[length]);
+    current.set(newCoordinate+1, new String[length]);
+
   }
 
   int arrayLength = ((String[]) current.get(newCoordinate+1)).length;
@@ -847,17 +935,13 @@ public void toXDFOutputStream (
 	// System.out.println(tagOrder.get(i));
       }
 
-      if (!parentArray.hasFieldAxis()) {  //even with FieldAxis, it is ok, double check
-        int[] axes = getMaxDataIndex();
-	stop =axes.length;
-	int[] axisLength = new int[stop];
-	for (int i = 0; i < stop; i++) {
-	  axisLength[i] =axes[stop - 1 - i];
-
-	}
-	writeTaggedData(outputstream, currentLocator, indent, axisLength, tags, 0);
+      int[] axes = getMaxDataIndex();
+      stop =axes.length;
+      int[] axisLength = new int[stop];
+      for (int i = 0; i < stop; i++) {
+        axisLength[i] =axes[stop - 1 - i];
       }
-
+      writeTaggedData(outputstream, currentLocator, indent, axisLength, tags, 0);
 
     }  //done dealwith with TaggedXMLDataIOSytle
 
@@ -945,7 +1029,14 @@ protected void writeTaggedData(OutputStream outputstream,
   }
 }
 
-
+ /**
+  * Modification History:
+  * $Log$
+  * Revision 1.5  2000/10/30 18:16:24  kelly
+  * changed are made for relevant FieldAxis stuff.  -k.z.
+  *
+  *
+  */
 
 
 
