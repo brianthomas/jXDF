@@ -36,8 +36,8 @@ public interface BaseObjectWithXMLElementsInterface extends BaseObjectInterface 
    public List getXMLElementList ();
    public void setXMLElementList (List elements);
 
-   public void addXMLElement (XMLElement element);
-   public void removeXMLElement (XMLElement element);
+   public boolean addXMLElement (XMLElement element);
+   public boolean removeXMLElement (XMLElement element);
 
 
 }
@@ -45,6 +45,9 @@ public interface BaseObjectWithXMLElementsInterface extends BaseObjectInterface 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.1  2001/05/04 20:05:53  thomas
  * Initial version
  *

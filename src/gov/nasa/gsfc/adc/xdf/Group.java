@@ -109,25 +109,19 @@ public class Group extends BaseObject {
   /** Add an object as a member of this group.
       @return true if successfully adds this object as a member, false otherwise.
   */
-  public Object addMemberObject (Object obj) {
-    if (memberObjHash.add(obj))
-      return obj;
-    else
-      return null;
-
+  public boolean addMemberObject (Object obj) {
+     return memberObjHash.add(obj);
   }
 
   /** Remove an object from membership in this group.
       @return true if successfully removes the object from membership, false otherwise.
   */
-  public Object removeMemberObject (Object obj) {
+  public boolean removeMemberObject (Object obj) {
     if (memberObjHash.contains(obj))  {
-      memberObjHash.remove(obj);
-      return obj;
+      return memberObjHash.remove(obj);
     }
     else
-      return null;
-
+      return false;
   }
 
   /** Determine if this group has passed object as a member.

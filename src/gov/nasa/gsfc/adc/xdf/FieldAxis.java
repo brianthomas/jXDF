@@ -226,12 +226,15 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
 
   /** adds a field to this fieldAxis.
    * @param field to be added
-   * @return a field object that is added
+   * @return true on success, false on failure.
    *
    */
-  public Field addField (Field field) {
+  public boolean addField (Field field) {
 
-     getFieldList().add(field);
+     if (!getFieldList().add(field)) {
+        return false;
+     }
+
      length++;
 
      // inform parent array of the change
@@ -239,7 +242,7 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
          parentArray.needToUpdateLongArrayMult = true;
      }
 
-     return field;
+     return true;
   }
 
   /** returns the field object at specified index on success, null on failure
@@ -300,13 +303,11 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
 
   /**Insert a FieldGroup object into this object.
    * @param group - FieldGroup to be added
-   * @return an FieldGroup object reference on success, null on failure.
+   * @return true on success, false on failure.
    */
-  public FieldGroup addFieldGroup (FieldGroup group) {
+  public boolean addFieldGroup (FieldGroup group) {
     //add the group to the groupOwnedHash
-    fieldGroupOwnedHash.add(group);
-    return group;
-
+    return fieldGroupOwnedHash.add(group);
   }
 
   /** Remove a FieldGroup object from this object.
@@ -376,6 +377,9 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
  /**
   * Modification History:
   * $Log$
+  * Revision 1.18  2001/06/28 16:50:54  thomas
+  * changed add method(s) to return boolean.
+  *
   * Revision 1.17  2001/06/26 19:44:58  thomas
   * added stuff to allow updating of dataCube in situations
   * where the axis size has changed.

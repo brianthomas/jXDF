@@ -221,9 +221,12 @@ public class SaxDocumentHandler extends HandlerBase {
         the event. The class must implement the StartElementAction interface. 
         It is possible to override default XDF startElement handlers with 
         this method. 
+        @return true if merge succeeds, false otherwise (null map was passed).
      */
-    public void addStartElementHandlers (Map m) {
+    public boolean addStartElementHandlers (Map m) {
+       if (m == null) return false;
        startElementHandlerHashtable.putAll(m);
+       return true;
     }
 
     /** Merge in external Hashtable into the internal charData handler Hashtable. 
@@ -232,9 +235,12 @@ public class SaxDocumentHandler extends HandlerBase {
         to the class that will handle the event. The class must implement 
         the CharDataAction interface. It is possible to override default
         XDF cdata handlers with this method. 
+        @return true if merge succeeds, false otherwise (null map was passed).
      */
-    public void addCharDataHandlers (Map m) {
+    public boolean addCharDataHandlers (Map m) {
+       if (m == null) return false;
        charDataHandlerHashtable.putAll(m);
+       return true;
     }
 
     /** Merge in external map to the internal endElement handler Hashtable. 
@@ -243,9 +249,12 @@ public class SaxDocumentHandler extends HandlerBase {
         the event. The class must implement the StartElementAction interface. 
         It is possible to override default XDF startElement handlers with 
         this method. 
+        @return true if merge succeeds, false otherwise (null map was passed).
     */
-    public void addEndElementHandlers (Map m) {
+    public boolean addEndElementHandlers (Map m) {
+       if (m == null) return false;
        endElementHandlerHashtable.putAll(m);
+       return true;
     }
 
     /**
@@ -2675,7 +2684,7 @@ while(thisIter.hasNext()) {
           if( parentNodeName.equals(XDFNodeName.FIELDAXIS) )
           {
 
-              newfieldGroup = CurrentArray.getFieldAxis().addFieldGroup(newfieldGroup);
+              CurrentArray.getFieldAxis().addFieldGroup(newfieldGroup);
               LastFieldGroupParentObject = (Object) CurrentArray;
 
           } else if ( parentNodeName.equals(XDFNodeName.FIELDGROUP) )
@@ -2684,7 +2693,7 @@ while(thisIter.hasNext()) {
 
               FieldGroup LastFieldGroupObject = (FieldGroup)
                    CurrentFieldGroupList.get(CurrentFieldGroupList.size()-1);
-              newfieldGroup = LastFieldGroupObject.addFieldGroup(newfieldGroup);
+              LastFieldGroupObject.addFieldGroup(newfieldGroup);
 
           } else {
 
@@ -3263,9 +3272,11 @@ while(thisIter.hasNext()) {
           readCellObj.setXMLAttributes(attrs);
 
           if (formatObj instanceof FormattedXMLDataIOStyle) {
-             return ((FormattedXMLDataIOStyle) formatObj).addFormatCommand(readCellObj);
+             if (((FormattedXMLDataIOStyle) formatObj).addFormatCommand(readCellObj)) 
+                 return readCellObj;
           } else if ( formatObj instanceof RepeatFormattedIOCmd ) {
-             return ((RepeatFormattedIOCmd) formatObj).addFormatCommand(readCellObj);
+             if (((RepeatFormattedIOCmd) formatObj).addFormatCommand(readCellObj)) 
+                 return readCellObj;
           } else {
              Log.warnln("Warning: cant add ReadCellFormattedIOCmd object to parent, ignoring request ");
           }
@@ -3328,10 +3339,12 @@ while(thisIter.hasNext()) {
 
           if (formatObj instanceof FormattedXMLDataIOStyle) {
              CurrentFormatObjectList.add(repeatObj);
-             return ((FormattedXMLDataIOStyle) formatObj).addFormatCommand(repeatObj);
+             if (((FormattedXMLDataIOStyle) formatObj).addFormatCommand(repeatObj)) 
+                return repeatObj;
           } else if ( formatObj instanceof RepeatFormattedIOCmd ) {
              CurrentFormatObjectList.add(repeatObj);
-             return ((RepeatFormattedIOCmd) formatObj).addFormatCommand(repeatObj);
+             if (((RepeatFormattedIOCmd) formatObj).addFormatCommand(repeatObj)) 
+                return repeatObj;
           } else {
              Log.warnln("Warning: cant add RepeatFormattedIOCmd object to parent, ignoring request ");
           }
@@ -3408,9 +3421,11 @@ while(thisIter.hasNext()) {
           skipObj.setXMLAttributes(attrs);
 
           if (formatObj instanceof FormattedXMLDataIOStyle) {
-             return ((FormattedXMLDataIOStyle) formatObj).addFormatCommand(skipObj);
+             if (((FormattedXMLDataIOStyle) formatObj).addFormatCommand(skipObj) ) 
+                return skipObj;
           } else if ( formatObj instanceof RepeatFormattedIOCmd ) {
-             return ((RepeatFormattedIOCmd) formatObj).addFormatCommand(skipObj);
+             if (((RepeatFormattedIOCmd) formatObj).addFormatCommand(skipObj)) 
+                return skipObj;
           } else {
              Log.warnln("Warning: cant add SkipCharFormattedIOCmd object to parent, ignoring request ");
           }
@@ -4031,7 +4046,8 @@ while(thisIter.hasNext()) {
                     while (iter.hasNext()) {
                         String valuePCDATA = (String) iter.next();
                         Value value = new Value (valuePCDATA);
-                        valueObjList.add(lastAxisObject.addAxisValue(value));
+                        if(lastAxisObject.addAxisValue(value)) 
+                           valueObjList.add(value);
                     }
 
              } 
@@ -4061,7 +4077,8 @@ while(thisIter.hasNext()) {
                     while (iter.hasNext()) {
                         String valuePCDATA = (String) iter.next();
                         Value value = new Value (valuePCDATA);
-                        valueObjList.add(myAxisObject.addAxisValue(value));
+                        if (myAxisObject.addAxisValue(value))
+                           valueObjList.add(value); 
                     }
 
                 } else {
@@ -4111,6 +4128,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.37  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.36  2001/06/27 21:19:01  thomas
  * Better buffered reading of href data implimented
  * (still not as good as it could be).

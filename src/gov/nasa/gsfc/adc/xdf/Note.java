@@ -159,11 +159,12 @@ public class Note extends BaseObject implements Cloneable,NoteInterface {
    //
 
    /** append text into this Note instance.
+     * @return true on success, false on failure.
     */
 
   // wish I could use String.concat(String) here, but it doesnt seem
   // to work. Ho hum, perhaps investigate why later on. -b.t.
-   public void addText (String text) {
+   public boolean addText (String text) {
 
       StringBuffer newValue = new StringBuffer ();
 
@@ -174,7 +175,7 @@ public class Note extends BaseObject implements Cloneable,NoteInterface {
       newValue.append(text); // append in new text
 
       setValue(newValue.toString()); // (re)set the PCDATA string
-
+      return true;
    }
 
    /** Indicate the datacell that this note applies to within an array.

@@ -91,12 +91,13 @@ public class XMLElement extends BaseObjectWithXMLElements {
       myCDATA.append(text);
    }
 
-   public void addAttribute (String name, String value) {
+   public boolean addAttribute (String name, String value) {
       attribHash.put(name, value);
+      return true;
    }
 
-   public void removeAttribute ( String name ) {
-      attribHash.remove(name);
+   public boolean removeAttribute ( String name ) {
+      return attribHash.remove(name) == null ? false : true;
    }
 
    public void setXMLAttributes (AttributeList attribs) { 
@@ -153,6 +154,9 @@ public class XMLElement extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.2  2001/05/10 21:46:20  thomas
  * more code, but this class still unfinished.
  * It looks like it will be a pain to get this

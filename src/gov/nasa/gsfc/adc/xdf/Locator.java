@@ -302,12 +302,16 @@ import java.util.List;
 
     /** Add an axis object to the list of axes within this Locator.
         This is used to adjust its axisOrderList and hashtable locations according
-     * to parentArray's axes change. 
+     *  to parentArray's axes change. 
+     *  @return true on success, false otherwise.
      */
-    protected void addAxis(AxisInterface addAxisObj) {
+    protected boolean addAxis(AxisInterface addAxisObj) {
 
-      axisOrderList.add(addAxisObj);
-      locations.put(addAxisObj, new Integer(0));
+       if (!axisOrderList.add(addAxisObj)) {
+          return false;
+       }
+       locations.put(addAxisObj, new Integer(0));
+       return true;
 
     }
 
@@ -374,6 +378,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.23  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.22  2001/05/04 20:32:41  thomas
  * Implement Interface stuff.
  *

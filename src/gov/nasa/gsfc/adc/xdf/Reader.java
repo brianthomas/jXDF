@@ -87,9 +87,10 @@ public class Reader
         the event. The class must implement the StartElementAction interface. 
         It is possible to override default XDF startElement handlers with 
         this method. 
+        @return true if merged in handlers to existing table, false otherwise.
      */
-    public void addStartElementHandlers (Map m) {
-       myDocumentHandler.addStartElementHandlers(m);
+    public boolean addStartElementHandlers (Map m) {
+       return myDocumentHandler.addStartElementHandlers(m);
     }
 
     /** Merge in external Hashtable into the internal charData handler Hashtable. 
@@ -98,9 +99,10 @@ public class Reader
         to the class that will handle the event. The class must implement 
         the CharDataAction interface. It is possible to override default
         XDF cdata handlers with this method. 
+        @return true if merged in handlers to existing table, false otherwise.
      */
-    public void addCharDataHandlers (Map m) {
-       myDocumentHandler.addCharDataHandlers(m);
+    public boolean addCharDataHandlers (Map m) {
+       return myDocumentHandler.addCharDataHandlers(m);
     }
 
     /** Merge in external map to the internal endElement handler Hashtable. 
@@ -109,9 +111,10 @@ public class Reader
         the event. The class must implement the StartElementAction interface. 
         It is possible to override default XDF startElement handlers with 
         this method. 
+        @return true if merged in handlers to existing table, false otherwise.
     */
-    public void addEndElementHandlers (Map m) {
-       myDocumentHandler.addEndElementHandlers(m);
+    public boolean addEndElementHandlers (Map m) {
+       return myDocumentHandler.addEndElementHandlers(m);
     }
 
     /** set the default handler for the start elements in the document handler.  
@@ -289,6 +292,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.13  2001/05/10 21:37:38  thomas
  * added start/end set methods for handlers in sax document.
  *

@@ -111,11 +111,10 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   //
 
   /** add a command to the formatCommandList
-    * @return the command that is added
+    * @return true on success, false on failure.
     */
-  public FormattedIOCmd addFormatCommand(FormattedIOCmd formatCmd) {
-    formatCommandList.add(formatCmd);
-    return formatCmd;
+  public boolean addFormatCommand(FormattedIOCmd formatCmd) {
+    return formatCommandList.add(formatCmd);
   }
 
 
@@ -245,6 +244,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.16  2001/06/19 19:29:22  thomas
  * *** empty log message ***
  *

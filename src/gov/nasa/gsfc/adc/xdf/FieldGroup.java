@@ -59,23 +59,18 @@ import java.util.Hashtable;
     //
 
     /**Insert a FieldGroup object into this object.
-       @returna FieldGroup object reference on success, null on failure.
+       @return true on success, false on failure. 
     */
-    public FieldGroup addFieldGroup (FieldGroup group) {
+    public boolean addFieldGroup (FieldGroup group) {
        //add the group to the groupOwnedHash
-       addMemberObject((Object) group);
-       return group;
+       return addMemberObject((Object) group);
     }
 
     /** Remove a FieldGroup object from this object.
         @return true on success, false on failure
      */
     public boolean removeFieldGroup(FieldGroup group) {
-
-       if( removeMemberObject((Object) group) != null)
-          return true;
-       return false; 
-
+       return removeMemberObject((Object) group);
     }
 
     //
@@ -95,6 +90,9 @@ import java.util.Hashtable;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.4  2001/05/04 20:25:37  thomas
  * added super.init() to init().
  *

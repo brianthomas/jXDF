@@ -92,15 +92,16 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
    //
 
    /** append an XMLElement into the list of internal elements held by this object.
+     * @return true on success, false on failure.
     */
-   public void addXMLElement (XMLElement element) {
-      getXMLElementList().add(element);
+   public boolean addXMLElement (XMLElement element) {
+      return getXMLElementList().add(element);
    }
 
    /** Indicate the datacell that this note applies to within an array.
     */
-   public void removeXMLElement (XMLElement element) {
-      getXMLElementList().remove(element);
+   public boolean removeXMLElement (XMLElement element) {
+      return getXMLElementList().remove(element);
    }
 
    /** Write this object and all the objects it owns to the supplied

@@ -73,11 +73,7 @@ public class ValueGroup extends Group {
         @return true on success, false on failure
      */
     public boolean removeValueGroup(ValueGroup group) {
-
-       if( removeMemberObject((Object) group) != null)
-          return true;
-       return false;
-
+       return removeMemberObject((Object) group);
     }
 
     //
@@ -98,6 +94,9 @@ public class ValueGroup extends Group {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.7  2001/06/26 21:22:26  huang
  * changed return type to boolean for all addObject()
  *

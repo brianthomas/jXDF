@@ -263,14 +263,14 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
   /** Add a Value object to this axis.
    * @param valueObj - Value object to be added
-   * @return ref to Value object if successful, null if not
+   * @return true on success, false on failure
    */
 
-   public Value addAxisValue(Value valueObj) {
+   public boolean addAxisValue(Value valueObj) {
 
       if (valueObj == null) {
          Log.warn("in Axis, addAxisValue(), the Value passed in is null");
-         return null;
+         return false;
       }
 
       // ok to add
@@ -282,7 +282,7 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
          parentArray.needToUpdateLongArrayMult = true;
       }
 
-      return valueObj;
+      return true;
 
    }
 
@@ -347,14 +347,14 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
   /**Add an UnitDirection object to this axis.
    * @param unitDirectionObj - UnitDirection to be added
-   * @return ref to UnitDirection object if successful, null if not
+   * @return true on success, false on failure
    */
 
-   public UnitDirection addAxisUnitDirection(UnitDirection unitDirectionObj) {
+   public boolean addAxisUnitDirection(UnitDirection unitDirectionObj) {
 
       if (unitDirectionObj == null) {
          Log.warn("in Axis, addAxisUnitDirection(), the UnitDirection object passed in is null");
-         return null;
+         return false;
       }
 
       getValueList().add(unitDirectionObj);
@@ -365,7 +365,7 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
          parentArray.needToUpdateLongArrayMult = true;
       }
 
-      return unitDirectionObj;
+      return true;
    }
 
    /**removes a Value object from the list of values in this Axis object
@@ -564,6 +564,9 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.24  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.23  2001/06/26 21:22:25  huang
  * changed return type to boolean for all addObject()
  *

@@ -58,12 +58,11 @@ import java.util.Hashtable;
     //
 
     /**Insert an ParameterGroup object into this object.
-       @returna ParameterGroup object reference on success, null on failure.
+       @return true on success, false on failure.
     */
-    public ParameterGroup addParamGroup (ParameterGroup group) {
+    public boolean addParamGroup (ParameterGroup group) {
        //add the group to the groupOwnedHash
-       addMemberObject((Object) group); 
-       return group;
+       return addMemberObject((Object) group); 
     }
 
     /** Remove a ParameterGroup object from this object.
@@ -71,7 +70,7 @@ import java.util.Hashtable;
      */
     public boolean removeParamGroup(ParameterGroup group) {
 
-       if( removeMemberObject((Object) group) != null) 
+       if( removeMemberObject((Object) group)) 
           return true;
        return false; 
 
@@ -94,6 +93,9 @@ import java.util.Hashtable;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.9  2001/05/04 20:26:07  thomas
  * added super.init() to init().
  *

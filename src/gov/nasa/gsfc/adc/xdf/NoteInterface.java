@@ -49,13 +49,16 @@ public interface NoteInterface extends BaseObjectInterface {
    // public void setLocator (Locator noteLocation);
    // public Locator getLocator ();
 
-   public void addText (String text);
+   public boolean addText (String text);
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.1  2001/05/04 20:05:53  thomas
  * Initial version
  *

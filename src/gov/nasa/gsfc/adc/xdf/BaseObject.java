@@ -182,15 +182,15 @@ public abstract class BaseObject implements Serializable, Cloneable {
 */
 
   /** Add this object to the indicated Group object.
-      @return Group added to on success, null (Group Object) on failure.
+      @return true on success, false on failure.
   */
-  public Group addToGroup(Group groupObject) {
+  public boolean addToGroup(Group groupObject) {
     if (groupMemberHash.add(groupObject)) {  //add in successful
-      groupObject.addMemberObject(this);
-      return groupObject; // bad, should return based on success of adding
+       groupObject.addMemberObject(this);
+       return true; // bad, should return based on success of adding
     } else {
-      Log.errorln("Can't add to group.  already a member of the group" + groupObject.getName());
-        return null;
+       Log.warnln("Can't add to group.  already a member of the group" + groupObject.getName());
+       return false;
     }
   }
 
@@ -852,6 +852,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.46  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.45  2001/06/12 20:17:55  huang
  * do not write out brackets if nodeName is null
  *

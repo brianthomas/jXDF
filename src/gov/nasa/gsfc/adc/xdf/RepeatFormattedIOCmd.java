@@ -109,11 +109,10 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
   }
 
   /** Add a command to the formatCommandList
-    * @return the command that is added
+    * @return true on success, false on failure.
     */
-  public FormattedIOCmd addFormatCommand(FormattedIOCmd formatCmd) {
-    formatCommandList.add(formatCmd);
-    return formatCmd;
+  public boolean addFormatCommand(FormattedIOCmd formatCmd) {
+    return formatCommandList.add(formatCmd);
   }
 
   /** Convenience method that returns the command list. Repeat
@@ -225,6 +224,9 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/06/28 16:50:54  thomas
+ * changed add method(s) to return boolean.
+ *
  * Revision 1.8  2001/05/10 21:38:04  thomas
  * added resetXMLAttributes to init().
  * replaced specificIOStyleToXDF w/ appropriate
