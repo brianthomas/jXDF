@@ -222,7 +222,7 @@ import java.util.Hashtable;
    /** Special private method used by constructor methods to
     *  convienently build XML attribute Order list
     */
-   private void init()
+   protected void init()
    {
  
      classXDFNodeName = "dataFormat";
@@ -258,6 +258,9 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/05/04 20:22:25  thomas
+ * changed init() to protected.
+ *
  * Revision 1.13  2001/04/27 21:28:57  thomas
  * No longer has get/set methods for lessthan, etc.
  * These are in Array and Field classes as per the DTD
