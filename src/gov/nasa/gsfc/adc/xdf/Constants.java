@@ -58,6 +58,12 @@ public abstract class Constants {
   */
   public static final String PCDATA_ATTRIBUTE = "value";
 
+
+  /** Due to the limitations of DTD's only a limited number of dimensions are supported 
+      for tagged data.
+   */
+  public static final int MAX_TAGGED_DIMENSIONS = 10;
+
   // done this way to minimize needed to instanciate and waste memory
   private static CoreDocumentImpl InternalDOMDocument;
   public static CoreDocumentImpl getInternalDOMDocument () { 
@@ -174,6 +180,9 @@ public abstract class Constants {
 /* Modification History
  * 
  * $Log$
+ * Revision 1.17  2001/09/18 17:42:21  thomas
+ * added MAX_TAGGED_DIMENSIONS value
+ *
  * Revision 1.16  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
