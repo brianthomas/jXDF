@@ -46,6 +46,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 //import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.ext.LexicalHandler;
 
 // Java IO stuff
 // import java.io.Reader;
@@ -67,7 +68,9 @@ import java.util.zip.ZipInputStream;
      some other handlers (that should be split off into another stand-alone
      class) needed by the XDF Reader.
  */
-public class SaxDocumentHandler extends DefaultHandler {
+public class SaxDocumentHandler extends DefaultHandler 
+implements LexicalHandler
+{
 
     // 
     // Fields
@@ -157,7 +160,7 @@ public class SaxDocumentHandler extends DefaultHandler {
     private int DataTagLevel = 0; // the level where the actual char data is
     private Locator TaggedLocatorObj;
     private StringBuffer DATABLOCK;
-    private boolean CDATAIsArrayData = false;
+//    private boolean CDATAIsArrayData = false;
     private int MaxDataFormatIndex = 0;     // max allowed index in the DataFormatList[]
     private int CurrentIOCmdIndex = 0;      // For formatted reads, which formattedIOCmd we are currently reading 
     private int CurrentDataFormatIndex = 0; // which dataformat index (in DatFormatList[]) we currently are reading
@@ -172,6 +175,8 @@ public class SaxDocumentHandler extends DefaultHandler {
     private ArrayList AxisReadOrder;
 
     private String currentValueString;
+
+    private boolean readingCDATASection = false; 
 
     // lookup tables holding objects that have id/idref stuff
     public Hashtable ArrayObj = new Hashtable();
@@ -247,7 +252,7 @@ public class SaxDocumentHandler extends DefaultHandler {
 
     /** Merge in external Hashtable into the internal charData handler Hashtable. 
         Keys in the Hashtable are strings describing the node name in
-        the XML document that has CDATA and the value is a code reference
+        the XML document that has CDATA/PCDATA and the value is a code reference
         to the class that will handle the event. The class must implement 
         the CharDataAction interface. It is possible to override default
         XDF cdata handlers with this method. 
@@ -530,10 +535,48 @@ public class SaxDocumentHandler extends DefaultHandler {
     public void characters (char buf [], int offset, int len)
     throws SAXException
     {
-        // NOTE:  this doesn't escape '&' and '<', but it should
-        // do so else the output isn't well formed XML.  To do this
-        // right, scan the buffer and write '&amp;' and '&lt' as
-        // appropriate.
+
+        // Are we reading a CDATA section? IF NOT, then we should
+        // replace all whitespace chars with just spaces. 
+        if (!readingCDATASection) {
+ 
+            // *sigh* this would be easy, but its not implemented in all Java
+            // thisString = thisString.replaceAll("\\s+"," "); // Java 1.4 only!
+            // so we have to do the following instead, slow ?
+            char newBuf[] = new char[len];
+            int newIndex = 0;
+            boolean gotWhitespace = false;
+            int size = len+offset;
+            for (int i=offset; i<size; i++) {
+
+                   // || buf[i] != '\x0B'
+               if ( buf[i] == ' ' 
+                   || buf[i] == '\n'
+                   || buf[i] == '\r'
+                   || buf[i] == '\t'
+                   || buf[i] == '\f'
+                  )
+               {
+                  gotWhitespace = true;
+               } else { 
+                  // add back in ONE space character 
+                  if (gotWhitespace) {
+                     newBuf[newIndex++] = ' ';
+                     gotWhitespace = false;
+                  }
+                  newBuf[newIndex++] = buf[i];
+               }
+            }
+
+            if (gotWhitespace) {
+                 newBuf[newIndex++] = ' ';
+            }
+
+            buf = newBuf;
+            offset = 0;
+            len = newIndex;
+        }
+
         Log.debugln("H_CharData:["+new String(buf,offset,len)+"]");
 
         /* we need to know what the current node is in order to 
@@ -710,8 +753,10 @@ public class SaxDocumentHandler extends DefaultHandler {
 
         DoctypeObjectAttributes = new Hashtable();
         DoctypeObjectAttributes.put("name", name);
-        DoctypeObjectAttributes.put("pubId", publicId);
-        DoctypeObjectAttributes.put("sysId", systemId);
+        if (publicId != null) 
+            DoctypeObjectAttributes.put("pubId", publicId);
+        if (systemId != null) 
+            DoctypeObjectAttributes.put("sysId", systemId);
     }
 
     /* Hurm, why doesnt this method treat 'base'?? */
@@ -736,6 +781,44 @@ public class SaxDocumentHandler extends DefaultHandler {
     {
         Log.debugln("H_PROCESSING_INSTRUCTION:"+"<?"+target+" "+data+"?>");
         // do nothing
+    }
+
+    // Lexical handler methods
+    public void endDTD() throws SAXException
+    {
+       Log.debugln("H_End_DTD");
+        // do nothing
+    }
+
+    public void endCDATA() throws SAXException 
+    {
+       Log.debugln("H_End_CDATASection");
+       readingCDATASection = false;
+    }
+
+    public void startCDATA() throws SAXException 
+    {
+       Log.debugln("H_Start_CDATASection");
+       readingCDATASection = true;
+    }
+
+    public void startEntity(String name)
+    throws SAXException
+    {
+       Log.debugln("H_Start_Entity["+name+"]");
+    }
+
+    public void endEntity(String name)
+    throws SAXException
+    {
+       Log.debugln("H_End_Entity["+name+"]");
+    }
+
+    public void comment(char[] ch, int start, int length)
+    throws SAXException
+    {
+       Log.debugln("H_Comment");
+       // do nothing.. throw it away
     }
 
     //
@@ -785,7 +868,6 @@ public class SaxDocumentHandler extends DefaultHandler {
        return readObj;
 
     }
-
 
     private Value createValueListValueObj (ValueList thisValueList, String valueString) {
 
@@ -1593,7 +1675,6 @@ Log.errorln("");
        startElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VECTOR, new vectorStartElementHandlerFunc());
-
 
     }
 
@@ -5129,5 +5210,4 @@ while (iter.hasNext()) {
 
 
 } // End of SaxDocumentHandler class 
-
 
