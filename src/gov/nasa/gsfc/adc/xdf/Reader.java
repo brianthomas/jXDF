@@ -31,13 +31,15 @@ package gov.nasa.gsfc.adc.xdf;
 
 // Import Java stuff
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Hashtable;
+// import java.util.Hashtable;
 import java.util.Map;
 
 // Import needed SAX stuff
-import org.w3c.dom.*; // W3c SAX standard bits
-import org.xml.sax.*;
+import org.xml.sax.HandlerBase;
+import org.xml.sax.InputSource;
+import org.xml.sax.Parser;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.ParserFactory;
 import com.sun.xml.parser.Resolver;
 
@@ -219,6 +221,9 @@ class SaxErrorHandler extends HandlerBase
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/10/25 18:06:23  thomas
+ * Trimmed down the import path to be explicit. -b.t.
+ *
  * Revision 1.6  2000/10/25 17:56:27  thomas
  * Working beta version. -b.t.
  *
