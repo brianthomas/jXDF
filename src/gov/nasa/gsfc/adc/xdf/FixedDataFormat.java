@@ -1,9 +1,6 @@
+
 // XDF FixedDataFormat Class
 // CVS $Id$
-
-package gov.nasa.gsfc.adc.xdf;
-
-import java.util.Hashtable;
 
 // FixedDataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -25,6 +22,9 @@ import java.util.Hashtable;
 
 */
 
+package gov.nasa.gsfc.adc.xdf;
+  
+import java.util.Hashtable;
 
 
 /**
@@ -204,6 +204,9 @@ public class FixedDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/08 19:48:50  thomas
+ * Rearranged header to follow package standard. -b.t.
+ *
  * Revision 1.3  2000/10/27 21:19:30  kelly
  * get rid of classXDFNodeName, added specificDataFormatName to suit its
  * supper class DataFormat *toXDF*.  -k.z.
