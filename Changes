@@ -92,3 +92,6 @@
                       - Improved error messaging. Throwing more exceptions as we should. Not optimal, but
                         better.
 
+0.17-beta1   9/24/01  ~ 2nd Beta, Patch Level 1 
+                      - bug in reading external TaggedXMLDataIOStyle formatted files fixed
+
