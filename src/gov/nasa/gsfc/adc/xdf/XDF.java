@@ -45,12 +45,13 @@ public class XDF extends Structure {
    //
    //Fields
    //
+   private XDFDocumentType documentType;
 
    /* XML attribute names */
    protected static final String TYPE_XML_ATTRIBUTE_NAME = new String("type");
 
    // stores notation entries for the XMLDeclaration
-   protected HashSet XMLNotationHash = new HashSet();
+//   protected HashSet XMLNotationHash = new HashSet();
 
    //
    // Constructors
@@ -95,13 +96,23 @@ public class XDF extends Structure {
      return (String) ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /** Set the NotationHash for this XDF object. Each entry in the passed HashSet
+  /* Set the NotationHash for this XDF object. Each entry in the passed HashSet
       will be a Hashtable containing the keys 'name' 'publicId' and 'systemId'.
       This information will be printed out with other XMLDeclarations in a 
       toXMLFileHandle call that prints the XML declaration (e.g. DOCTYPE header). 
   */
+/*
   public void setXMLNotationHash (HashSet hash) {
      XMLNotationHash = hash;
+  }
+*/
+
+  public XDFDocumentType getDocumentType() {
+     return documentType;
+  }
+
+  public void setDocumentType (XDFDocumentType docType) {
+     documentType = docType;
   }
 
   //
@@ -174,9 +185,9 @@ public class XDF extends Structure {
        //  To be valid XML, we always start an XML block with an
        //  XML declaration (e.g. somehting like "<?xml standalone="no"?>").
        //  Here we deal with  printing out XML Declaration && its attributes
-       if ((XMLDeclAttribs != null) &&(!XMLDeclAttribs.isEmpty())) {
+       if (XMLDeclAttribs != null) { //  &&(!XMLDeclAttribs.isEmpty())) {
           indent = "";
-          writeXMLDeclToOutputWriter(outputWriter, XMLDeclAttribs);
+          writeXMLHeader(outputWriter, XMLDeclAttribs, true);
        }
  
        toXMLWriter ( outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
@@ -211,6 +222,8 @@ public class XDF extends Structure {
    {
        super.init();
 
+       documentType = new XDFDocumentType(this);
+
        classXDFNodeName = "XDF";
 
        attribOrder.add(TYPE_XML_ATTRIBUTE_NAME);
@@ -227,22 +240,18 @@ public class XDF extends Structure {
    }
 
 
-   // 
-   // Private Methods
-   //
-
-
- /** Write the XML Declaration to the indicated OutputStream.
+  /** Write the XML Declaration/Doctype to the indicated OutputStream.
    */
-  protected void writeXMLDeclToOutputWriter ( Writer outputWriter,
-                                            Hashtable XMLDeclAttribs
-                                          )
+  protected void writeXMLHeader( Writer outputWriter,
+                                 Hashtable XMLDeclAttribs,
+                                 boolean writeDoctype
+                               )
   throws java.io.IOException
   {
 
     // initial statement
     outputWriter.write("<?xml");
-    outputWriter.write(" version=\"" + Specification.getInstance().getXMLSpecVersion() + "\"");
+    outputWriter.write(" version=\"" + Constants.XML_SPEC_VERSION + "\"");
 
     // print attributes
     Enumeration keys = XMLDeclAttribs.keys();
@@ -251,118 +260,17 @@ public class XDF extends Structure {
       String attribName = (String) keys.nextElement();
       if (attribName.equals("version") ) {
          Log.errorln("XMLDeclAttrib hash has version attribute, not allowed and ignoring.");
-      } else if ( attribName.equals("dtdName") || attribName.equals("rootName") ) {
-         // skip over it
       } else
          outputWriter.write(" " + attribName + "=\"" + XMLDeclAttribs.get(attribName) + "\"");
     }
-    outputWriter.write(" ?>");
+    outputWriter.write("?>");
 
     if (Specification.getInstance().isPrettyXDFOutput())
         outputWriter.write(Constants.NEW_LINE); 
 
-    // Print the DOCTYPE DECL only if right info exists
-    if (XMLDeclAttribs.containsKey("rootName")
-        && XMLDeclAttribs.containsKey("dtdName"))
-    {
-        //Nope always print the DOCTYPE DECL 
-/*
-        //print the DOCTYPE DECL IF its a structure node
-        if(classXDFNodeName != null && 
-            classXDFNodeName.equals(Specification.getInstance().getXDFStructureNodeName()) )
-        {
-*/
-            outputWriter.write("<!DOCTYPE " + XMLDeclAttribs.get("rootName") + " SYSTEM \""
-                                   + XMLDeclAttribs.get("dtdName") +"\"");
-            // any entities need to now be written.
-            // check for entities in href's
-            ArrayList hrefObjList = findAllChildHrefObjects();
-
-            StringBuffer entityString = new StringBuffer ();
-            StringBuffer notationString = new StringBuffer ();
-
-           // if we have any, then we must print out
-            if (hrefObjList.size() > 0) {
-
-               if (Specification.getInstance().isPrettyXDFOutput())
-                  entityString.append(Constants.NEW_LINE);
-
-               // whip thru the list of href objects to get entities
-               synchronized (hrefObjList) {
-                  Iterator iter = hrefObjList.iterator(); // Must be in synchronized block
-                  while (iter.hasNext()) {
-                     Href hrefObj = (Href) iter.next();
-                     if (Specification.getInstance().isPrettyXDFOutput())
-                        entityString.append(Specification.getInstance().getPrettyXDFOutputIndentation());
-
-                     entityString.append("<!ENTITY " + hrefObj.getName());
-                     if (hrefObj.getPubId() != null)
-                        entityString.append(" PUBLIC \"" + hrefObj.getPubId() + "\"");
-                     if (hrefObj.getSysId() != null)
-                        entityString.append(" SYSTEM \"" + hrefObj.getSysId() + "\"");
-                     if (hrefObj.getNdata() != null)
-                        entityString.append(" NDATA " + hrefObj.getNdata());
-                     entityString.append(">");
-
-                     if (Specification.getInstance().isPrettyXDFOutput())
-                        entityString.append(Constants.NEW_LINE);
-                  }
-               }
-
-            }
-
-            // Now do notation stuff 
-            synchronized (XMLNotationHash) { // argh, needed?  
-               Iterator iter = XMLNotationHash.iterator(); // Must be in synchronized block
-
-               while (iter.hasNext()) {
-                  Hashtable notationHash = (Hashtable) iter.next();
-                  if (notationHash.containsKey("name"))
-                  {
-
-                     if (Specification.getInstance().isPrettyXDFOutput())
-                         notationString.append(Specification.getInstance().getPrettyXDFOutputIndentation());
-
-                     notationString.append("<!NOTATION " + notationHash.get("name"));
-
-                     if (notationHash.containsKey("publicId"))
-                        notationString.append(" PUBLIC \"" + notationHash.get("publicId") + "\"");
-
-                     if (notationHash.containsKey("systemId"))
-                        notationString.append(" SYSTEM \"" + notationHash.get("systemId") + "\"");
-
-                     notationString.append(">");
-
-                     if (Specification.getInstance().isPrettyXDFOutput())
-                        notationString.append(Constants.NEW_LINE);
-
-                  }
-                   else
-                  {
-                     Log.warnln("Notation entry lacks name, ignoring entry\n");
-                  }
-               }
-            }
-
-            if(entityString.length() > 0 || notationString.length() > 0 ) {
-               outputWriter.write(" [");
-               if(entityString.length() > 0)
-                  outputWriter.write(entityString.toString());
-               if (notationString.length() > 0 )
-                  outputWriter.write(notationString.toString());
-               outputWriter.write("]");
-            }
-
-            outputWriter.write(">");
-/*
-        } // end of DOCTYPE decl 
-*/
-
-        if (Specification.getInstance().isPrettyXDFOutput())
-            outputWriter.write(Constants.NEW_LINE);
-
-    } else
-      Log.errorln("Passed XMLDeclAttributes table lacks either dtdName or rootName entries, ignoring DOCTYPE line printout");
+    if ( writeDoctype ) {
+       this.getDocumentType().toXMLWriter(outputWriter, "");
+    }
 
   }
 
@@ -371,6 +279,9 @@ public class XDF extends Structure {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2001/09/05 21:58:18  thomas
+ *  moved XMLNotation/Decl stuff out to new classes
+ *
  * Revision 1.6  2001/07/26 15:55:42  thomas
  * added flush()/close() statement to outputWriter object as
  * needed to get toXMLOutputStream to work properly.
