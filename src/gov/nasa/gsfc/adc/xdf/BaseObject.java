@@ -814,8 +814,12 @@ public abstract class BaseObject implements Serializable, Cloneable {
         for (int i = 0; i < size; i++) {
            String name = attrs.getName(i);
            String value = attrs.getValue(i);
-           if (name != null && value != null)
-              ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
+           if (this.attribHash.containsKey(name)) 
+           {  
+               ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
+           } else 
+             Log.errorln("Error: cant set XMLAttribute:["+name+"], doesnt exist in object:"+this);
+
         }
      }
   }
@@ -934,6 +938,12 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.31  2000/11/10 05:48:42  thomas
+ * Bug fix to setXMLAttributes, allow setting to
+ * null value in an attribute, enhanced error reporting
+ * when a class doesnt contain XMLAttribute to set.
+ * -b.t.
+ *
  * Revision 1.30  2000/11/09 23:04:56  thomas
  * Updated version, made changes to allow extension
  * to other dataformats (e.g. FITSML). -b.t.
