@@ -119,6 +119,8 @@ public class  ErroredValue extends Value {
    protected void init ()
    {
 
+       super.init();
+
        // append more attributes
        attribOrder.add(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME);
        attribOrder.add(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME);
@@ -132,6 +134,9 @@ public class  ErroredValue extends Value {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2001/05/04 20:24:13  thomas
+ * added super.init() to init() method.
+ *
  * Revision 1.6  2001/02/07 18:08:55  thomas
  * removed duplicitous setErrorValue method.
  *
