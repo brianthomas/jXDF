@@ -40,7 +40,7 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/DataFormat.java \
 	$(XDF_SOURCE_PATH)/DataCube.java \
 	$(XDF_SOURCE_PATH)/DelimitedXMLDataIOStyle.java \
-	$(XDF_SOURCE_PATH)/ExponentDataFormat.java \
+	$(XDF_SOURCE_PATH)/ExponentialDataFormat.java \
 	$(XDF_SOURCE_PATH)/Field.java \
 	$(XDF_SOURCE_PATH)/FieldAxis.java \
 	$(XDF_SOURCE_PATH)/FixedDataFormat.java \
