@@ -46,7 +46,7 @@
   <target name="initTest">
      <!-- build software -->
      <javac debug="on" srcdir="test"/>
-     <taskdef name="createTest" classname="test.CreateXdfTest" classpath="test"/>
+     <taskdef name="createXDFTest" classname="test.CreateXdfTest" classpath="test"/>
      <taskdef name="loadXDFTest" classname="test.loadXDFTest" classpath="test"/>
      <taskdef name="validateTest" classname="test.ValidateTest" classpath="test"/>
   </target>
@@ -60,37 +60,31 @@
     <copy file="samples/XDF_${DTD_VERSION}.dtd" todir="."/>
     <echo message="Running tests..." />
 
-    <!-- create tagged data, internal -->
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
          <param name="dataiostyle" value="tagged"/>
     </antcall>
 
-    <!-- create tagged data, external -->
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
          <param name="dataiostyle" value="tagged"/>
     </antcall>
 
-    <!-- create delimited data, internal -->
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
          <param name="dataiostyle" value="delimited"/>
     </antcall>
 
-    <!-- create delimited data, external -->
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
          <param name="dataiostyle" value="delimited"/>
     </antcall>
 
-    <!-- create formatted data, internal -->
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
          <param name="dataiostyle" value="formatted"/>
     </antcall>
 
-    <!-- create formatted data, external -->
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
          <param name="dataiostyle" value="formatted"/>
@@ -103,15 +97,14 @@
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample3.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample4.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample5.xml"/></antcall>
-
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample6.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample7.xml"/></antcall>
-
-    <antcall target="loadXDFTest"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample9.xml"/></antcall>
 
-    <!-- no bzip in Java (yet) -->
+    <!-- no bzip in Java (yet) :P -->
     <!-- <antcall target="loadingTests"><param name="file" value="samples/XDF_sample10.xml"/></antcall> -->
+
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample11.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample12.xml"/></antcall>
 
@@ -121,12 +114,12 @@
 
   <target name="creationTest" >
     <echo message="Checking creation of file XMLDataIOStyle=${dataiostyle} internalData=${internalFile} ..." />
-    <createTest writedatatoseparatefile="${internalFile}" 
-                dataiostyle="${dataiostyle}" 
-                outputfile="test1.xml" 
-                entityfilename="test1.dat" 
-                entityname="table1" 
-                showsuccess="true"/>
+    <createXDFTest writedatatoseparatefile="${internalFile}" 
+                   dataiostyle="${dataiostyle}" 
+                   outputfile="test1.xml" 
+                   entityfilename="test1.dat" 
+                   entityname="table1" 
+                   showsuccess="true"/>
     <validateTest inputfile="test1.xml" showsuccess="true"/>
   </target>
 
@@ -145,6 +138,7 @@
   <target name="cleanRunTests" >
     <echo message="Cleaning up test files.." />
     <delete file="test1.xml"/>
+    <delete file="test0.dat"/>
     <delete file="test1.dat"/>
     <delete file="test2.xml"/>
     <delete file="XDF_${DTD_VERSION}.dtd"/>
