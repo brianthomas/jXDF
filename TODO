@@ -2,38 +2,24 @@
 
 	Here is our list of "issues" that need to be solved..
 
-
-	A list of things that have to be done before we can consider
-	this package "BETA"
+	A list of things that have to be done before we could consider
+	this package "FINAL". (Note however that development/coding of the 
+	0.17 version of the package is now frozen. All effort is now
+        being made on the 0.20 version. These issues will be resolved with
+        that code.) 
         ------------------------------------------------------------
 
-        - append array/arrayId functionality. 
+        - UTF16 not implemented (at least not checked, reading *may* work).
 
-	- Impliment ASCII octal/hex data read/write in SaxDocHandler.
+        - Clean up debugging messages. Improve and make consistent error messaging
+          within the package. Missing any Exception classes?
 
-	- Impliment binary data writing in DataCube.
+        - Interface for setting relation roles in FIeld is cumbersome. Is a 
+          separate FIeldRelationship object needed? Do we really need to set
+          it?
 
-	- always use constants (sPCDATAAttribute = "value") 
-          check that all Constants in CONSTANTS class are used. Make attribute names
-          wired in constants class (?).
-
-	- if the attribute is primitive number, *get* function overloading, two
- 	 *set* functions--one returning primitive number, one returning Number object
-         (not really needed. What we do *need* to do is make sure its always an
-          object that is returned by get method). 
-
-
-	A list of things that have to be done before we can consider
-	this package "FINAL" 
-        ------------------------------------------------------------
-
-        - handle Href's other than to files (URL's, socket?)
-
-        - Need to examine bufferedIO. In particular, check for buffered reading of 
-          files (incl. href case where data is stored in a file separate from XML 
-          metadata).
- 
-        - check treatment of other types of hrefs, such as pointing to 
+        - Handle Href's other than to files (URL's, socket?)
+          check treatment of other types of hrefs, such as pointing to 
           http (rather than a file) resource.
 
         - for all classes on all non-String Set attribute methods, do check 
@@ -91,7 +77,7 @@
 	- Version control for the Reader. Check that we have right DTD for software.
 
 
-        Things for the next big version upgrade to XDF version 0.19
+        Things for the next big version upgrade to XDF version 0.20
         ============================================================
 
 	- Allow for uneven precision in data. 
@@ -99,6 +85,8 @@
         - Append functionality on Arrays needs to be implemented.
 
 	- MathML units.
+
+        - implement buffered IO of data for better performance.
 
         - placement of parameter objects under more classes (e.x. axis, field)
 
@@ -114,8 +102,9 @@
 
         - Making the package compile on W32 machines using nmake.
 
-        - Clean up debugging messages. Improve and make consistent error messaging 
-          within the package. Missing any Exception classes? 
+        - Have consistent erroring. Should throw errors wherever reasonable rather 
+          than print warning messages. Also, Clean up debugging messages. 
+          Are we missing any Exception classes? 
 
         - Large datasets. When to automatically switch to persistent dataCube 
           How much memory to use, efficiency issues. Native code alternative to

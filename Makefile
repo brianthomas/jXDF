@@ -16,7 +16,7 @@
 # JCFLAGS == javac flags
 JCFLAGS = -g 
 # CLASSPATH
-CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip:/usr/local/xml-tr2/xml.jar
+CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip:/usr/local/jaxp-1.1ea2/jaxp.jar
 #CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip
 
 # archive w/jar flags

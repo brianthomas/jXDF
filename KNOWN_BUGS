@@ -2,13 +2,8 @@
    Here is a short list (with some description) of the known bugs 
    within this package:
 
-        - binary data not implemented (!!).
-
         - Makefile is NOT nmake (the W32 make utility) ready. Must currently compile
           each class "by hand" ugh. 
-
-        - Dropping relationship node/object after output fed thru parser a second time.
-          (relationship node not implemented yet??).
 
         - Log configuration doesnt appear to allow writing to System.err.
 
@@ -31,25 +26,17 @@
           may happen: negative exponents in the exponential format. We need to implement
           by hand our own exponential formatter code to fix this. 
 
+        - problem carrying over some parameter entities from the DTD.
+
         - Automatic Unique Id generation may fail when a later node has an id that matches
           a machine generated one on an earlier node. We need a final pass thru the Id 
           stacks to enforce uniqueness in objects (or better yet internal checking of ids to
           enforce unique id's between like nodes).
 
         - In part because there is no such animal as a ValueList object, the Reader cant
-          resolve local attributes in id/idRef situations as per other objects w/ id's. This
-          means that only whole drop-in replacement of ValueList is possible via id/idRef.
-          Need to Fix? or remove Id/idref from valueList.
-
-        - show we not allow repeatable attribute to apply to the recordterminator
-          on string parsing (it only applies to delimiting characters right now;
-          Question: how does the Perl package handle this?) 
-   
-        - Exponential formatting is *less than optimal* in Java. Using DecimalFormat
-          results in rounding errors, for example, the following numbers:
-          double data[] = { 1.01E-1, 3.001E5, -13.E-8, 1.021E3 };
-	  using the following decimalFormat pattern: "#0.0E0;-0.0E0" 
-	  print out as: .101E0, 30.0E4, -13E-8, 10.2E2
+          resolve local attributes in id/idRef situations with ValueList as per other 
+          objects w/ id's. This means that only whole drop-in replacement of ValueList is 
+          possible via id/idRef. Need to Fix? or remove Id/idref from valueList.
 
         - Treatment of XML comments (the stuff in an XML file that occurs between 
           the "<--" "-->").
@@ -57,9 +44,6 @@
           This would seem to be the correct thing to do; machine readable comments ought
           to be placed in an appropriate node, e.g. parameter, note or attribute
           (such as "description").
-
-        - Clean up debugging messages. Improve and make consistent error messaging 
-          within the package. Missing any Exception classes? 
 
         - If the user improperly specifies Axis sizes/values, the Reader will overwrite
           prior cells without warning. Better warning messages are needed.
@@ -69,13 +53,7 @@
           several archetectures, Intel, Sparc, Alpha and SGI, however, I dont know
           for a fact that this is uniformly true for ALL computer archetechures. 
           I list this as a bug simply to warn the user that this could be a major
-          problem in the portability of binary data.
-         
-        - Another binary data issue: byte swapping can get you pretty far in terms 
-          of portability, but even on the above machines the user should beware 
-          contamination of data. One important issue: the interpreted value for underflow
-          varies between archectures. Portability of your binary data is improved
-          by avoiding such very small numbers (with magnitude < 1e-36 or so). 
+          problem in the portability and fidelity of binary data.
           I am unaware of other constraints on portability of binary data, however,
           Im sure they exist. At this time, my recomendation is to _avoid the binary 
           data format_ if you worry at all about contaminated data (-b.t.).
