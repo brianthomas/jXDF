@@ -98,6 +98,17 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
 
    }
 
+   /** Return the list of objects which describe the compact
+     * description(s) of the value list. Each object in this list
+     * conforms to the ValueListInterface format. 
+     */
+   public List getValueListObjects () 
+   {
+      return valueListObjects;
+   }
+
+   /** reset the list of valueList objects held within this object.
+    */
    protected void resetValueListObjects () {
 
       valueListObjects = new ArrayList();

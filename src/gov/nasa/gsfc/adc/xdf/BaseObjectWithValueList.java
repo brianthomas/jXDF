@@ -111,7 +111,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
      * description(s) of the value list. Each object in this list
      * conforms to the ValueListInterface format. 
      */
-   protected List getValueListObjects () {
+   public List getValueListObjects () {
       return valueListObjects;
    }
 
