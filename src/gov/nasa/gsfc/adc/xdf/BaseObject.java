@@ -26,6 +26,7 @@ package gov.nasa.gsfc.adc.xdf;
 
 import java.util.*;
 import java.io.*;
+import org.xml.sax.AttributeList;
 
 /** The base class for most XDF objects.
     XDF is the eXtensible Data Structure, which is an XML format designed
@@ -830,7 +831,6 @@ public abstract class BaseObject implements Serializable {
   }
 
 
-
  /** Write the XML Declaration to the indicated OutputStream.
   */
   private void writeXMLDeclToOutputStream ( OutputStream outputstream,
@@ -859,7 +859,21 @@ public abstract class BaseObject implements Serializable {
 
   }
 
+  //
+  // Protected methods
+  //
 
+  /** Set the XMLattributes of this object using the passed AttributeList
+   */
+  // NOTE: this is essentially the Perl update method
+  protected void setXMLAttributes (AttributeList attrs) {
+     // set object attributes from an AttributeList 
+     if (attrs != null) {
+        // whip thru the list, setting each value
+        for (int i = 0; i < attrs.getLength (); i++) 
+          ((XMLAttribute) this.attribHash.get(attrs.getName(i))).setAttribValue(attrs.getValue(i));
+     }
+  }
 
 
   //
@@ -924,6 +938,11 @@ public abstract class BaseObject implements Serializable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2000/10/23 21:32:16  thomas
+ * added setXMLAttributes method to BaseObject. This
+ * method is functionally similar to Perl BaseObject
+ * update method. -b.t.
+ *
  * Revision 1.12  2000/10/18 15:06:53  kelly
  * fixed the bug.  now, there is no space between PCDATA and its closing node.  -k.z.
  *
