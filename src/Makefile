@@ -12,7 +12,7 @@
 
 
 # JCFLAGS == javac flags
-JCFLAGS = -g # -deprecation
+JCFLAGS = #-g # -deprecation
 
 # archive w/jar flags
 ARCHIVE_BUILD_ARGS=cvf

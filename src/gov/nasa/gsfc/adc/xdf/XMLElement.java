@@ -32,7 +32,7 @@ import java.io.OutputStream;
 import java.io.IOException;
 
 //import org.apache.crimson.tree.ElementNode;
-import org.xml.sax.AttributeList;
+import org.xml.sax.Attributes;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -101,7 +101,9 @@ public class XMLElement extends BaseObjectWithXMLElements {
       return attribHash.remove(name) == null ? false : true;
    }
 
-   public void setXMLAttributes (AttributeList attribs) { 
+   public void setXMLAttributes (Attributes attribs) { 
+
+// TBD 
 
    }
 
@@ -156,6 +158,10 @@ public class XMLElement extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/07/17 19:06:23  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.4  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).

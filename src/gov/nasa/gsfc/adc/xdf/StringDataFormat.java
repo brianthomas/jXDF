@@ -26,7 +26,7 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import org.xml.sax.AttributeList;
+import org.xml.sax.Attributes;
 
 /**
    This class describes string data.
@@ -134,7 +134,7 @@ public class StringDataFormat extends DataFormat {
 
    // We need this here so that we will properly update the
    // formatPattern of the class. -b.t. 
-   public void setXMLAttributes (AttributeList attrs) {
+   public void setXMLAttributes (Attributes attrs) {
       super.setXMLAttributes(attrs);
       generateFormatPattern();
    }
@@ -181,6 +181,10 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/07/17 19:06:23  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.13  2001/05/04 20:20:09  thomas
  * added super.init() in init() method. This may have to be undone
  * in the future.  Consider this to be a 'side-ways' change.

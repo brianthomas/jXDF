@@ -67,3 +67,5 @@
                         and Xmill still missing)
                       - bug fix to valueGroup printing in toXMLOutputStream.
                       - added convience methods for populating axis, fieldAxis at construction time.
+                      - further cleanup of deprecated classes from old xml-tr2 package. It should NOT
+                        be needed at all now. Note that we are not making full use of namespaces (yet).

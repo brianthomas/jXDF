@@ -25,7 +25,7 @@
 
 package gov.nasa.gsfc.adc.xdf;
   
-import org.xml.sax.AttributeList;
+import org.xml.sax.Attributes;
 
 
 /**
@@ -186,7 +186,7 @@ public class FloatDataFormat extends NumberDataFormat {
 
    // We need this here so that we will properly update the
    // formatPattern of the class. -b.t. 
-   public void setXMLAttributes (AttributeList attrs) {
+   public void setXMLAttributes (Attributes attrs) {
       super.setXMLAttributes(attrs);
       generateFormatPattern();
    }
@@ -293,6 +293,10 @@ public class FloatDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/07/17 19:06:23  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.4  2001/06/25 15:14:34  thomas
  * added negativeExponentPattern for N <0 && N > -1
  * and an exponent specified.

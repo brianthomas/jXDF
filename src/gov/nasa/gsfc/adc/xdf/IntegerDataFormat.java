@@ -26,7 +26,7 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import org.xml.sax.AttributeList;
+import org.xml.sax.Attributes;
 
 /**
  * IntegerDataFormat.java:IntegerDataFormat class describes the data format
@@ -126,7 +126,7 @@ public class IntegerDataFormat extends NumberDataFormat {
 
    // We need this here so that we will properly update the
    // formatPattern of the class. -b.t. 
-   public void setXMLAttributes (AttributeList attrs) {
+   public void setXMLAttributes (Attributes attrs) {
       super.setXMLAttributes(attrs);
       generateFormatPattern();
    }
@@ -191,6 +191,10 @@ public class IntegerDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/07/17 19:06:23  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.11  2001/06/19 19:29:22  thomas
  * *** empty log message ***
  *

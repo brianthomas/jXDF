@@ -43,7 +43,7 @@ import java.io.Serializable;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 
-import org.xml.sax.AttributeList;
+import org.xml.sax.Attributes;
 
 /** The base class for most XDF objects.
     XDF is the eXtensible Data Structure, which is an XML format designed
@@ -474,19 +474,19 @@ public abstract class BaseObject implements Serializable, Cloneable {
   // PROTECTED Methods
   //
 
-  /** Set the XMLattributes of this object using the passed AttributeList.
+  /** Set the XMLattributes of this object using the passed Attributes.
    */
   // NOTE: this is essentially the Perl update method
-  public void setXMLAttributes (AttributeList attrs) {
+  public void setXMLAttributes (Attributes attrs) {
 
      synchronized (attribHash) {
-      // set object attributes from an AttributeList
+      // set object attributes from an Attributes Object
       if (attrs != null) {
           // whip thru the list, setting each value
           int size = attrs.getLength();
           for (int i = 0; i < size; i++) {
-             String name = attrs.getName(i);
-             String value = attrs.getValue(i); // yes, AttributeList can only return strings 
+             String name = attrs.getQName(i);
+             String value = attrs.getValue(i); // yes, Attributes can only return strings 
 
              // set it as appropriate to the type
              if (name != null && value != null) {
@@ -861,6 +861,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.50  2001/07/17 19:05:51  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.49  2001/07/11 22:35:20  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *

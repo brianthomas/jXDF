@@ -137,7 +137,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
    // Note: we never have a need for ASCII formatting of these numbers
    // so this isnt needed.
 /*
-   public void setXMLAttributes (AttributeList attrs) {
+   public void setXMLAttributes (Attributes attrs) {
       super.setXMLAttributes(attrs);
       generateFormatPattern();
    }
@@ -172,6 +172,10 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/07/17 19:06:23  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.10  2001/05/04 20:20:09  thomas
  * added super.init() in init() method. This may have to be undone
  * in the future.  Consider this to be a 'side-ways' change.

@@ -36,14 +36,17 @@ import java.io.File;
 import java.util.Map;
 
 // Import needed SAX stuff
-import org.xml.sax.HandlerBase;
+// import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.Parser;
+// import org.xml.sax.helpers.ParserFactory;
+//import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.ParserFactory;
 import org.xml.sax.EntityResolver;
+
+import org.xml.sax.helpers.XMLReaderFactory;
+import org.xml.sax.XMLReader;
 
 /** This class is used to create Java (structure) objects from XDF files/streams.
  */
@@ -172,6 +175,7 @@ public class Reader
 
         try {
 
+/*
             Parser parser;
 
             // create an instance of the parser
@@ -182,6 +186,18 @@ public class Reader
             parser.setDTDHandler(myDocumentHandler);
             parser.setEntityResolver(new myEntityResolver());
             parser.setErrorHandler(new myErrorHandler());
+
+            // ok, now we are ready to parse the inputsource 
+            parser.parse(inputsource);
+*/
+
+            XMLReader parser = XMLReaderFactory.createXMLReader(parsername);
+
+            // set parser handlers to XDF standard ones
+            parser.setDTDHandler(myDocumentHandler);
+            parser.setContentHandler(myDocumentHandler);
+            parser.setErrorHandler (new myErrorHandler());
+            parser.setEntityResolver(new myEntityResolver());
 
             // ok, now we are ready to parse the inputsource 
             parser.parse(inputsource);
@@ -285,6 +301,10 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/07/17 19:06:23  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.15  2001/07/11 22:35:21  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *

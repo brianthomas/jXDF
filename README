@@ -3,34 +3,37 @@
    About this package.
    ------------------
 
-	This is an alpha release. This means that not all forseen
-	functionality has yet been implemented and that we reserve
-	the right to significantly revise the API.
+	This is a beta release. This means that all forseen
+	functionality has been implemented, but many bugs may remain. Note
+        that we reserve the right to significantly revise the API as
+        need suits us.
 
 	This code is released under the GNU GENERAL PUBLIC LICENSE
  	and is freeware. Please refer to the GPL.TXT file included
 	in this distribution for more information on the terms of 
 	this license.
 
-        To use the XDF package you will need to acquire the org.xml.sax 
-        package. The SAX package ships with a simple non-validating
-	(and fast) parser from SUN, however, you may use other XML
- 	parsers with XDF if you so choose (we use Xerces from the 
-        apache project). 
+        To use the XDF package you will need to acquire the Java API 
+        for XML Processing (JAXP) Package (version 1.1) which provides 
+        the functionality for reading, manipulating, and generating 
+        XML documents that are the basis of XDF.
+        The JAXP package is available from SUN (http://developer.java.sun.com
+        or http://developer.java.sun.com/developer/earlyAccess/xml/ if you
+        can login already as Java Sun developer) which includes the crimson parser
+        which is the default XML parser for XDF. Note that XDF allows
+        you to use any other SAX2 compliant XML parser (such as Xerces
+        from the Apache project; http://xml.apache.org/xerces-j/index.html)
+        which do not ship with JAXP.
 
-	As you might guess, this package is currently under heavy 
-	construction. That said, a subset of the final forseen 
-	functionality of the package is fairly well implemented. 
+	As you might guess from its name this package is currently somewhat
+        stable, with only infreqent modification to the interface of
+        available classes. Nevertheless, this package is NOT mature (yet),
+        and we are still chasing down bugs. Please keep this in mind if you are 
+        considering the adoption of this software for production enviroments.
 
-	The stability and features of the java objects is good, the 
-	main lack remains in the IO portion of the package. At this 
-	time it is possible to create java XDF structure objects from
-	all supported types of ASCII data (of any dimensionality).
-	Binary data is not currently implemented.
-
-	This package supports SAX1 parsers. SAX2 and schema will be 
-	supported as soon as these become comfortably mature W3C
-        recogmendations. 
+	This package supports SAX1 parsering (e.g. no namespaces). SAX2 
+        and schema will be supported as soon as these become comfortably 
+        mature W3C recogmendations. 
 
 	For more details on missing features/problems that remain in 
 	the package please refer to the TODO file.

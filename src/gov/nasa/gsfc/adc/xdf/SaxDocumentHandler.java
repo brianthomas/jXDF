@@ -41,8 +41,8 @@ import java.util.Iterator;
 import java.lang.Character;
 
 // Import needed SAX stuff
-import org.xml.sax.AttributeList;
-import org.xml.sax.HandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 
@@ -63,7 +63,7 @@ import java.util.zip.ZipInputStream;
      some other handlers (that should be split off into another stand-alone
      class) needed by the XDF Reader.
  */
-public class SaxDocumentHandler extends HandlerBase {
+public class SaxDocumentHandler extends DefaultHandler {
 
     // 
     // Fields
@@ -113,7 +113,7 @@ public class SaxDocumentHandler extends HandlerBase {
     // know what kind of DataFormat/DataIOStyle object we really have
     private Hashtable ValueAttribs = new Hashtable();
     private Hashtable DataIOStyleAttribs = new Hashtable();
-    private AttributeList DataFormatAttribs;
+    private Attributes DataFormatAttribs;
 
     // for tagged reads only. Keeps track of which data tags are open
     // so we know which datacell in the current datacube to shunt the 
@@ -364,12 +364,12 @@ public class SaxDocumentHandler extends HandlerBase {
 
     }
 
-    public String getAttributeListValueByName (AttributeList attrs, String name) {
+    public String getAttributesValueByName (Attributes attrs, String name) {
        if (attrs != null) {
           // whip thru the list, checking each value
           int size = attrs.getLength();
           for (int i = 0; i < size; i++) {
-             String attribName = attrs.getName(i);
+             String attribName = attrs.getQName(i);
              if (attribName.equals(name)) return attrs.getValue(i);
           }
        }
@@ -400,7 +400,7 @@ public class SaxDocumentHandler extends HandlerBase {
        return CurrentStructure;
     }
 
-    private XMLElement createNewXMLElement (String elementNodeName, AttributeList attrs) {
+    private XMLElement createNewXMLElement (String elementNodeName, Attributes attrs) {
        XMLElement myElement = new XMLElement(elementNodeName);
        myElement.setXMLAttributes(attrs);
        return myElement;
@@ -412,11 +412,13 @@ public class SaxDocumentHandler extends HandlerBase {
 
     /** startElement handler.
      */
-    public void startElement (String element, AttributeList attrs)
+//    public void startElement (String element, Attributes attrs)
+    public void startElement (String namespaceURI, String localName, String qName, Attributes attrs)
     throws SAXException
     {
 
-        Log.debugln("H_START:["+element+"]");
+        String element = qName;
+        Log.debugln("H_START:["+namespaceURI+","+localName+","+qName+"]");
         
         Object thisObject = (Object) null;
 
@@ -445,11 +447,13 @@ public class SaxDocumentHandler extends HandlerBase {
 
     }
 
-    public void endElement (String element)
+//    public void endElement (String element)
+    public void endElement (String namespaceURI, String localName, String qName )
     throws SAXException
     {
-
-        Log.debugln("H_END:["+element+"]");
+ 
+        String element = qName;
+        Log.debugln("H_END:["+namespaceURI+","+localName+","+qName+"]");
 
         // peel off the last element in the current path
         CurrentNodePath.remove(CurrentNodePath.size()-1); 
@@ -514,6 +518,14 @@ public class SaxDocumentHandler extends HandlerBase {
 
     }
 
+    public void startPrefixMapping(String prefix, String uri) {
+        Log.debugln("H_StartPrefixMapping:["+prefix+","+uri+"]");
+    } 
+
+    public void endPrefixMapping(String prefix) {
+        Log.debugln("H_EndPrefixMapping:["+prefix+"]");
+    } 
+ 
     // 
     // Public SAX methods we dont use
     //
@@ -1627,12 +1639,12 @@ Log.errorln(" TValue:"+valueString);
        return true;
     } 
 
-    private Hashtable attribListToHashtable ( AttributeList attrs ) {
+    private Hashtable attribListToHashtable ( Attributes attrs ) {
 
        Hashtable hash = new Hashtable();
        int size = attrs.getLength();
        for (int i = 0; i < size; i++) {
-          String name = attrs.getName(i);
+          String name = attrs.getQName(i);
           String value; 
           if ((value = attrs.getValue(i)) != null) 
              hash.put(name, value);
@@ -1952,7 +1964,7 @@ Log.errorln(" TValue:"+valueString);
 
     // default start handler
     class defaultStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
            String parentNodeName = getParentNodeName();
            String elementNodeName = getCurrentNodeName();
@@ -2048,7 +2060,7 @@ Log.errorln(" TValue:"+valueString);
 
     // asciiDelimiter node start
     class asciiDelimiterStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
            DelimitedXMLDataIOStyle readObj = new DelimitedXMLDataIOStyle(CurrentArray);
            readObj.setXMLAttributes(attrs);
@@ -2102,7 +2114,7 @@ Log.errorln(" TValue:"+valueString);
 
     // Array node start 
     class arrayStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
           // create new object appropriately 
           Array newarray = new Array();
@@ -2126,7 +2138,7 @@ Log.errorln(" TValue:"+valueString);
     //
 
     class axisStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
           // create new object appropriately 
           Axis newaxis = new Axis();
@@ -2202,7 +2214,7 @@ Log.errorln(" TValue:"+valueString);
     //
 
     class binaryFloatFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
         // create the object
           BinaryFloatDataFormat bfFormat = new BinaryFloatDataFormat();
@@ -2227,7 +2239,7 @@ Log.errorln(" TValue:"+valueString);
     //
 
     class binaryIntegerFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
          // create the object
           BinaryIntegerDataFormat biFormat = new BinaryIntegerDataFormat();
@@ -2254,7 +2266,7 @@ Log.errorln(" TValue:"+valueString);
     // REMINDER: these functions only get called when tagged data is being read..
 
     class dataTagStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
           CurrentDataTagLevel++;
           return (Object) null;
        }
@@ -2517,7 +2529,7 @@ while(thisIter.hasNext()) {
     }
 
     class dataStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
           // we only need to do these things for the first time we enter
           // a data node
@@ -2526,7 +2538,7 @@ while(thisIter.hasNext()) {
              // A little 'pre-handling' as href is a specialattribute
              // that will hold an (Href) object rather than string value 
              Href hrefObj = null;
-             String hrefValue = getAttributeListValueByName(attrs,"href");
+             String hrefValue = getAttributesValueByName(attrs,"href");
              if (hrefValue != null ) 
              {
 
@@ -2636,7 +2648,7 @@ while(thisIter.hasNext()) {
     //
 
     class dataFormatStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
            // save attribs for latter
            DataFormatAttribs = attrs;
@@ -2650,7 +2662,7 @@ while(thisIter.hasNext()) {
     //
 
     class fieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // create new object appropriately 
           Field newfield = new Field();
@@ -2727,7 +2739,7 @@ while(thisIter.hasNext()) {
     //
 
     class fieldAxisStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // create new object appropriately 
           FieldAxis newfieldaxis = new FieldAxis();
@@ -2807,7 +2819,7 @@ while(thisIter.hasNext()) {
     }
 
     class fieldGroupStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // grab parent node name
           String parentNodeName = getParentNodeName();
@@ -2856,7 +2868,7 @@ while(thisIter.hasNext()) {
     //
 
     class fieldRelationshipStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // create the object
           FieldRelationship newfieldrelation = new FieldRelationship();
@@ -2879,7 +2891,7 @@ while(thisIter.hasNext()) {
     //
 
     class floatFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // create the object
           FloatDataFormat fixedFormat = new FloatDataFormat();
@@ -2902,7 +2914,7 @@ while(thisIter.hasNext()) {
     //
 
     class forStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // for node sets the iteration order for how we will setData
           // in the datacube (important for delimited and formatted reads).
@@ -2910,7 +2922,7 @@ while(thisIter.hasNext()) {
           int size = attrs.getLength();
           for (int i = 0; i < size; i++)
           {
-             String name = attrs.getName(i);
+             String name = attrs.getQName(i);
              if (name.equals("axisIdRef") ) {
                 //int lastindex = AxisReadOrder.size();
                 //AxisReadOrder.add(lastindex, AxisObj.get(attrs.getValue(i)));
@@ -2928,7 +2940,7 @@ while(thisIter.hasNext()) {
     //
 
     class integerFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
          // create the object
           IntegerDataFormat integerFormat = new IntegerDataFormat();
@@ -2961,7 +2973,7 @@ while(thisIter.hasNext()) {
     }
 
     class noteStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
            String parentNodeName = getParentNodeName(); 
 
@@ -3043,12 +3055,12 @@ while(thisIter.hasNext()) {
     //
     
     class noteIndexStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           String axisIdRef = (String) null;
           int size = attrs.getLength(); 
           for (int i = 0 ; i < size; i++) {
-              if (attrs.getName(i).equals("axisIdRef")) { // bad. hardwired axisIdRef name
+              if (attrs.getQName(i).equals("axisIdRef")) { // bad. hardwired axisIdRef name
                  axisIdRef = attrs.getValue(i);
                  break;
               }
@@ -3076,7 +3088,7 @@ while(thisIter.hasNext()) {
     }
 
     class notesStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // do nothing .. this node doenst have any attributes
           // only child nodes. 
@@ -3090,7 +3102,7 @@ while(thisIter.hasNext()) {
     //
 
     class nullStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
           // null means do nothing!!
           return (Object) null;
        }
@@ -3101,7 +3113,7 @@ while(thisIter.hasNext()) {
     //
     
     class parameterStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // grab parent node name
           String parentNodeName = getParentNodeName();
@@ -3207,7 +3219,7 @@ while(thisIter.hasNext()) {
     }
 
     class parameterGroupStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
          // grab parent node name
           String parentNodeName = getParentNodeName();
@@ -3297,10 +3309,10 @@ while(thisIter.hasNext()) {
     }
 
     class readStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // save these for later, when we know what kind of dataIOstyle we got
-          // Argh we really need a clone on AttributeList. Just dumb copy for now.
+          // Argh we really need a clone on Attributes. Just dumb copy for now.
           DataIOStyleAttribs.clear(); // all old values cleared
           DataIOStyleAttribs = attribListToHashtable(attrs);
 
@@ -3365,7 +3377,7 @@ while(thisIter.hasNext()) {
     //
 
     class readCellStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // if this is still defined, we havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
@@ -3432,7 +3444,7 @@ while(thisIter.hasNext()) {
     }
 
     class repeatStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // if this is still defined, we havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
@@ -3495,7 +3507,7 @@ while(thisIter.hasNext()) {
 
     // Root node start 
     class rootStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
           // The root node is just a "structure" node,
           // but is always the first one.
           XDF.setXMLAttributes(attrs); // set XML attributes from passed list 
@@ -3516,7 +3528,7 @@ while(thisIter.hasNext()) {
     //
 
     class skipCharStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
           // if this is still defined, we havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
@@ -3575,7 +3587,7 @@ while(thisIter.hasNext()) {
     //
 
     class stringFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
          // create the object
           StringDataFormat stringFormat = new StringDataFormat();
@@ -3600,7 +3612,7 @@ while(thisIter.hasNext()) {
     //
 
     class structureStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
           Structure structObj = new Structure();
           structObj.setXMLAttributes(attrs); // set XML attributes from passed list 
@@ -3618,7 +3630,7 @@ while(thisIter.hasNext()) {
 
     // Our purpose here: configure the TaggedXMLDataIOStyle with axis/tag associations.
     class tagToAxisStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
           // well, if we see tagToAxis nodes, must have tagged data, the 
           // default style. No need for initing further. 
@@ -3637,7 +3649,7 @@ while(thisIter.hasNext()) {
           int size = attrs.getLength(); 
           for (int i = 0; i < size; i++)
           {
-              String name = attrs.getName(i);
+              String name = attrs.getQName(i);
               if ( name.equals("tag") ) {
                  tagname = attrs.getValue(i);
               } else if ( name.equals("axisIdRef")) {
@@ -3665,7 +3677,7 @@ while(thisIter.hasNext()) {
     }
 
     class unitStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
           //  grab parent node name
           String gParentNodeName = getGrandParentNodeName();
@@ -3718,11 +3730,11 @@ while(thisIter.hasNext()) {
     //
 
    class valueStartElementHandlerFunc implements StartElementHandlerAction {
-      public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+      public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           ValueAttribs.clear(); // clear out old values, if any
           // save these for later, when we know what kind of dataIOstyle we got
-          // Argh we really need a clone on AttributeList. Just dumb copy for now.
+          // Argh we really need a clone on Attributes. Just dumb copy for now.
           ValueAttribs = attribListToHashtable(attrs);
 
           //  If there is a reference object, clone it to get
@@ -3896,7 +3908,7 @@ while(thisIter.hasNext()) {
     }
 
     class valueGroupStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
           // 1. grab parent node name
           String parentNodeName = getParentNodeName();
@@ -4076,7 +4088,7 @@ while(thisIter.hasNext()) {
     // there is undoubtably some code-reuse spots missed in this function.
     // get it later when Im not being lazy. -b.t.
     class valueListStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
  
            // 1. re-init
            CurrentValueList = new ValueList();
@@ -4233,7 +4245,7 @@ while(thisIter.hasNext()) {
     //
 
     class vectorStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) {
           Log.errorln("VECTOR Start handler not implemented yet.");
           return (Object) null;
        }
@@ -4245,6 +4257,10 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.40  2001/07/17 19:06:23  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.39  2001/07/11 22:38:37  thomas
  * Changes related to ValueList objects
  *

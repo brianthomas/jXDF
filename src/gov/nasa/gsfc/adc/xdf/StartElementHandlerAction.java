@@ -27,18 +27,22 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import org.xml.sax.AttributeList;
+import org.xml.sax.Attributes;
 
 /** Interface for all start element actions in the Reader start
     element dispatch table. 
 */
 public interface StartElementHandlerAction {
-  public Object action (SaxDocumentHandler handler, AttributeList attrs);
+  public Object action (SaxDocumentHandler handler, Attributes attrs);
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/07/17 19:06:23  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.2  2000/11/09 23:04:56  thomas
  * Updated version, made changes to allow extension
  * to other dataformats (e.g. FITSML). -b.t.

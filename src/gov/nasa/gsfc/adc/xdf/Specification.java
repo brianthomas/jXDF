@@ -69,9 +69,9 @@ public class Specification {
   */
 
   /* this is the XML parser to use by the reader. The default is to use the
-     non-validating parser that ships in xml.jar (the Sun parser).
+     crimson parser that ships in jaxp.jar 
   */
-  private String XMLParserClass = "com.sun.xml.parser.Parser";
+  private String XMLParserClass = "org.apache.crimson.parser.XMLReaderImpl";
 
   //brian, do we need this? double check
   private int defaultDataArraySize = 1000;
@@ -80,15 +80,10 @@ public class Specification {
   */
   private String XMLSpecVersion = "1.0";
 
-  /** The root node name for any XDF document. The root node is a structure
-      node with a different name as specified here.
+  /** The root node name for any XDF document. The root node is an XDF
+      node.
   */
   private String XDFRootNodeName = "XDF";
-
-  /** The XDF node name for the structure class.
-  */
-  private String XDFStructureNodeName = "structure"; // bad. we should call the
-                                                     // class to find this out. -b.t.
 
   /** The name of the relevant version of XDF DTD file for this package.
   */
@@ -234,17 +229,15 @@ public class Specification {
     return PCDATAAttribute;
   }
 
-  /** Get the XDF node name for the structure class.
-   */
-  public String getXDFStructureNodeName() {
-    return XDFStructureNodeName;
-  }
-
 }
 
 /* Modification history
  *
  * $Log$
+ * Revision 1.6  2001/07/17 19:06:23  thomas
+ * upgrade to use JAXP (SAX2) only. Namespaces NOT
+ * implemented (yet).
+ *
  * Revision 1.5  2001/06/19 15:07:14  thomas
  * updated DTD name to remove the extraneous '.'
  *
