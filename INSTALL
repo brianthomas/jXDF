@@ -40,21 +40,39 @@
 
 	2. Patch and re-compile the Xerces-J distro.
 
-	3. Adjust your CLASSPATH to contain the JAXP and Xerces-J distros and the xdf.jar
-           file.
+	3. Adjust your CLASSPATH to contain the JAXP and Xerces-J distros.
 
-	4. Run some XDF programs in the samples/ directory to test your functionality. 
+        4. Compile the code using "ant" ( a free java/xml make utility from the good people
+           at Apache. Note that the old Makefiles are still included in the distro, but 
+           not guarrenteed to work. This functionality will be dropped in the next version of XDF).
+           To use ant, acquire the jarkarta-ant distribution from 
 
-	Some people love to monkey with the source code. If you are one of these, then
-	To compile the code (UNIX) type :
+                http://jakarta.apache.org/ant/index.html
 
-	> make jar 
+           After installing, I set up an alias script to save me typing. You can do this as 
+	   appropriate on your platform, or put the "ant" program, which lies in the 
+           jakarta-ant-1.4/dist/bin/ directory in your account path. Now, you just invoke ant
+           like "make" or "nmake" using the "all" directive, e.g.
 
-	This will create the xdf.jar file. To create the HTML API documentation
-	(in the doc directory).
+           > ant all
 
-        > make doc
+           This should make the jar file, documentation and run some diagnostic tests to check
+           if everything is working ok. 
 
-	Note: There is currently no makefile support for XDF under non-UNIX platforms (sorry)
+           ADDITIONAL "make" info:
+
+  	   Some people love to monkey with the source code. If you are one of these, then
+	   To compile the code (UNIX) type :
+
+	   > ant jar 
+
+           This will create the xdf.jar file. To create the HTML API documentation
+	   (in the doc directory).
+
+           > ant doc
+
+           At any time you can get help on all available directives by just typing 
+    
+           > ant help
 
 
