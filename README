@@ -15,12 +15,13 @@
 	main lack remains in the IO portion of the package. At this 
 	time it is possible to create java XDF structure objects from
 	both delimited and tagged ASCII data (of any dimensionality).
-	Binary data is not currently implemented, nor are formatted
+	Binary data is not currently implemented, nor is the formatted
        	read/write functionality. Delimited writes work unless newline
 	returns are used as either a delimiter or recordTerminator
 	character.
 
-	Please report bugs, comments to xdf-dev@xdf.gsfc.nasa.gov.
+	Please report bugs, comments and feature requests to 
+        xdf-dev@xdf.gsfc.nasa.gov.
 
 	See the samples directory for sample code, a DTD and xml files.
 
@@ -31,7 +32,7 @@
    The Java XDF Package was developed by programmers at: 
    -----------------------------------------------------
 
-           the Astronomical Data Center, Code 631, NASA/GSFC;
+           The Astronomical Data Center, Code 631, NASA/GSFC,
 
            Raytheon Technical Services Company, Lanham Md
 
