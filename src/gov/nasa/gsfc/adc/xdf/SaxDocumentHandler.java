@@ -86,34 +86,35 @@ public class SaxDocumentHandler extends DefaultHandler {
     private Hashtable Options;
 
     // dispatch table action handler hashtables
-    private Hashtable startElementHandlerHashtable; // start node handler
-    private Hashtable charDataHandlerHashtable;     // charData handler
-    private Hashtable endElementHandlerHashtable;   // end node handler
-    private Hashtable defaultHandlerHashtable;      // default handlers 
+    protected Hashtable startElementHandlerHashtable; // start node handler
+    protected Hashtable charDataHandlerHashtable;     // charData handler
+    protected Hashtable endElementHandlerHashtable;   // end node handler
+    protected Hashtable defaultHandlerHashtable;      // default handlers 
 
     private boolean ForceSetXMLHeaderStuff = false;
 
     // References to the current working structure/array
-    private Structure CurrentStructure;   
-    private Array CurrentArray;   
-    private Object    CurrentDatatypeObject;
-    private ArrayList CurrentNodePath = new ArrayList();
-    private ArrayList CurrentFormatObjectList = new ArrayList ();
+    protected Structure CurrentStructure;   
+    protected Array CurrentArray;   
+    protected Object    CurrentDatatypeObject;
+    protected ArrayList CurrentNodePath = new ArrayList();
+    protected ArrayList CurrentFormatObjectList = new ArrayList ();
+
     // group objects
     private ArrayList CurrentParameterGroupList = new ArrayList();
     private ArrayList CurrentFieldGroupList = new ArrayList();
     private ArrayList CurrentValueGroupList = new ArrayList();
 
     // the last object created by a startElementNodeActionHandler
-    private Object ParentObject; 
-    private Object CurrentObject; 
-    private ArrayList CurrentObjectList = new ArrayList(); 
+    protected Object ParentObject; 
+    protected Object CurrentObject; 
+    protected ArrayList CurrentObjectList = new ArrayList(); 
 //    private boolean UpdateCurrentObject = false; 
 
     // needed to capture internal entities.
-    private HashSet Notation = new HashSet();
-//    private Hashtable Entity = new Hashtable();
-    private Hashtable UnParsedEntity = new Hashtable();
+    protected HashSet Notation = new HashSet();
+    protected Hashtable UnParsedEntity = new Hashtable();
+//    protected Hashtable Entity = new Hashtable();
 
     // GLOBALs for saving these between dataFormat/read node and later when we 
     // know what kind of DataFormat/DataIOStyle object we really have
@@ -128,21 +129,21 @@ public class SaxDocumentHandler extends DefaultHandler {
 
     private Hashtable DoctypeObjectAttributes;
 
-    private int BASEINPUTREADSIZE =     4096; // base byte buffer for reads 
-    private int MAXINPUTREADSIZE  = 16777216; // maximum byte buffer for reads
+    protected int BASEINPUTREADSIZE =     4096; // base byte buffer for reads 
+    protected int MAXINPUTREADSIZE  = 16777216; // maximum byte buffer for reads
 
     // References recording the last object of these types created while
     // parsing the document
-    private Parameter LastParameterObject;
-    private Field     LastFieldObject;
-    private Note      LastNoteObject;
-    private Unit      LastUnitObject;
-    private Units     LastUnitsObject;
+    public Parameter LastParameterObject;
+    public Field     LastFieldObject;
+    public Note      LastNoteObject;
+    public Unit      LastUnitObject;
+    public Units     LastUnitsObject;
 
     // store some of the parent objects for various nodes
-    private Object LastParameterGroupParentObject;
-    private Object LastFieldGroupParentObject;
-    private Object LastValueGroupParentObject;
+    public Object LastParameterGroupParentObject;
+    public Object LastFieldGroupParentObject;
+    public Object LastValueGroupParentObject;
 
     // Notes stuff
     private ArrayList NoteLocatorOrder = new ArrayList();
@@ -4840,6 +4841,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.66  2001/10/02 20:57:54  thomas
+ * made some fields public/protected from private
+ *
  * Revision 1.65  2001/10/02 20:17:36  thomas
  * merged from ver017 branch
  *
