@@ -1,64 +1,27 @@
       
       Package Version History
-      
- 0.01       9/15/00  Initial code/directory structure laid down and
-                     Java project started. 
-      
-0.17a      11/11/00  First alpha version. Delimited and Tagged ASCII
-                     IO implemented. Formatted and Binary data IO 
-      		     missing. Deep cloning *is* implemented. 
-      
-0.17b      11/??/00  2nd alpha version.
-      
-0.17c      12/??/00  3rd alpha version.
-      
-0.17d       1/23/01  4th alpha version.
-                     - Fixed Errored Value to DTD standard.
-                     - Fixed some of ExponentialDataFormat. Exponents max
-                       size cant be specified in Java, so some problems remain.
-                     - Added ability to set the XML parser.
-                     - Href attribute implemented properly in DataCube.
-                     - Read id/idref fixed. Added id/idref stuff for value,
-                       parameter and valueList as per DTD.
-                     - fixed value valueIdRef attribute misspelling.
-                     - valueList now may be used under parameter node.
-                     - Array now directs child Locators to properly remove an axis 
-                       when it itself removes an axis.
-      
-0.17e       1/29/01  revision to 4th alpha version. 
-                     - Binary reading enabled
-                     - Finally fess'd up to the fact that nobody uses Java-X package.
-                       Code is now compliant with org.xml.sax.* classes. Download
-                       jaxp (or other package) to get this functionality. 
-      
-0.17-beta0  2/06/01  1st Beta. 
-                     - Changed name of FixedDataFormat to FloatDataFormat.
-                     - Removed ExponentialDataFormat, functionality now in FloatDataFormat.
-                     - Binary write data enabled.
-                     - Octal/hex data read/write enabled.
-                     - Changed internal code to more consistent use of constants. This 
-                       should make us more able to meet changed in the DTD in the future and
-                       lower errors.
-                     - Jaxp compatiblity. SAX1 remains in use however.
-                     - added setData methods for Double, Integer objects to DataCube and Array. 
-                       Fixed some of the internal logic (but still needs more work).
-                     - Fixed bug in locator.hasNext method. Was droping last value in dataCube
-                       from consideration.
-                     - Added append array functionality.
-      
-0.17-beta0_1 3/28/01  1st Beta, Patch level 1
-                      - bug in BaseObject class that caused crash for certain toXMLOutputStream 
-                        calls (private field XMLNotationHash not properly declared). FIXED. 
 
-0.17-beta1   9/24/01  ~ 2nd Beta 
+0.18-alpha  12/12/01  - 1st Alpha, 
+                      - added byte offset reading
+                      - fixed bug where various types of FTP/HTTP transfer could screw up metadata
+                        for reading some kinds of Delimited/Formatted IOStyles.
+
+0.17-beta1  10/15/01  ~ 2nd Beta, Patch Level 2
+                      - small fixes needed by FITSML
+
+0.17-beta1  10/01/01  ~ 2nd Beta, Patch Level 1
+                      - bug in reading external TaggedXMLDataIOStyle, DelimitedXMLDataIOStyle formatted files fixed
+                      - added create tests for external data files to build.xml
+
+0.17-beta1   9/24/01  ~ 2nd Beta
                       - Added BaseObjectWithXMLElements class. Array, Field, Structure, Axis
                         classes may now hold new XMLElements.
-                      - Added ability to add an arbitary XML attribute (e.g. previously undeclared 
-                        attribute that isnt a part of the class in the DTD) to any class that 
+                      - Added ability to add an arbitary XML attribute (e.g. previously undeclared
+                        attribute that isnt a part of the class in the DTD) to any class that
                         inherits from BaseObject.
-                      - Re-added writeAxisOrder stuff to XMLDataIOStyle classes. Fixed write bug. 
+                      - Re-added writeAxisOrder stuff to XMLDataIOStyle classes. Fixed write bug.
                       - Added XDF base object structure class. This class represents the top
-                        level structure in an XDF object and (hopefully) clarifies some 
+                        level structure in an XDF object and (hopefully) clarifies some
                         confusion over the nature of structure objects in general.
                         As part of this change I did away with XMLNotationHash garbage and implemented
                         several new child classes for the XDF class: DocumentType, XMLDeclaration.
@@ -67,7 +30,7 @@
                       - Higher dimesional arrays not implemented correctly (!! in 3+ dimensions). Fixed.
                       - Added get/setIOAxesOrder in XMLDataIOStyle.
                       - Public add methods now uniformly return "boolean" rather than an object.
-                      - Added compression/decompression support for GZIP, Zip (bzip2, UNIX "compress" 
+                      - Added compression/decompression support for GZIP, Zip (bzip2, UNIX "compress"
                         and Xmill still missing)
                       - Bug fix to valueGroup printing in toXMLOutputStream.
                       - Re-wrote toXMLOutputStream. Now using buffered writing. Faster.
@@ -82,26 +45,64 @@
                       - Bug fix to allow integer data starting with "+" sign.
                       - Added ValueListAlgorithm, ValueListDelimitedList and ValueList(internal reader class)
                         to treat <valueList> nodes.
-                      - Added XDF::DOM functionality. Any XML document may be read into this DOM which 
+                      - Added XDF::DOM functionality. Any XML document may be read into this DOM which
                         contains convience methods for accessing/manipulation of the XDF element nodes.
                       - Support for correct output formatting under delimited and tagged data added.
                       - Better support for reading file href Entities that reside in different locations
                         from the metadata.
-                      - Added CreateXdf.java program. 
+                      - Added CreateXdf.java program.
                       - Added More sample data incl. the currently unreadable bzip2 data style (XDF_sample10.xml).
                       - Improved error messaging. Throwing more exceptions as we should. Not optimal, but
                         better.
+      
+0.17-beta0_1 3/28/01  1st Beta, Patch level 1
+                      - bug in BaseObject class that caused crash for certain toXMLOutputStream
+                        calls (private field XMLNotationHash not properly declared). FIXED.
 
-0.17-beta1  10/01/01  ~ 2nd Beta, Patch Level 1 
-                      - bug in reading external TaggedXMLDataIOStyle, DelimitedXMLDataIOStyle formatted files fixed
-                      - added create tests for external data files to build.xml
+0.17-beta0  2/06/01  1st Beta. 
+                     - Changed name of FixedDataFormat to FloatDataFormat. 
+                     - Removed ExponentialDataFormat, functionality now in FloatDataFormat.
+                     - Binary write data enabled.
+                     - Octal/hex data read/write enabled.
+                     - Changed internal code to more consistent use of constants. This 
+                       should make us more able to meet changed in the DTD in the future and
+                       lower errors.
+                     - Jaxp compatiblity. SAX1 remains in use however.
+                     - added setData methods for Double, Integer objects to DataCube and Array.
+                       Fixed some of the internal logic (but still needs more work).
+                     - Fixed bug in locator.hasNext method. Was droping last value in dataCube
+                       from consideration.
+                     - Added append array functionality.
 
 
-0.17-beta1  10/15/01  ~ 2nd Beta, Patch Level 2 
-                      - small fixes needed by FITSML
+0.17e       1/29/01  revision to 4th alpha version.
+                     - Binary reading enabled
+                     - Finally fess'd up to the fact that nobody uses Java-X package.
+                       Code is now compliant with org.xml.sax.* classes. Download
+                       jaxp (or other package) to get this functionality.
+      
 
+0.17d       1/23/01  4th alpha version.
+                     - Fixed Errored Value to DTD standard. 
+                     - Fixed some of ExponentialDataFormat. Exponents max
+                       size cant be specified in Java, so some problems remain.
+                     - Added ability to set the XML parser.
+                     - Href attribute implemented properly in DataCube.
+                     - Read id/idref fixed. Added id/idref stuff for value,
+                       parameter and valueList as per DTD.
+                     - fixed value valueIdRef attribute misspelling.
+                     - valueList now may be used under parameter node.
+                     - Array now directs child Locators to properly remove an axis
+                       when it itself removes an axis.
 
-0.18-alpha  12/12/01  - added byte offset reading
-                      - fixed bug where various types of FTP/HTTP transfer could screw up metadata
-                        for reading some kinds of Delimited/Formatted IOStyles.
+0.17c      12/??/00  3rd alpha version.
+
+0.17b      11/??/00  2nd alpha version.
+
+0.17a      11/11/00  First alpha version. Delimited and Tagged ASCII
+                     IO implemented. Formatted and Binary data IO 
+      		     missing. Deep cloning *is* implemented. 
+
+ 0.01       9/15/00  Initial code/directory structure laid down and
+                     Java project started.
 
