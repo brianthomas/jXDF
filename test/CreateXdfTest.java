@@ -174,7 +174,9 @@ public class CreateXdfTest extends org.apache.tools.ant.Task
                array.setXMLDataIOStyle(xmlIOStyle);
             } else if (myXMLDataIOStyle.equals("delimited")) {
                DelimitedXMLDataIOStyle xmlIOStyle = new DelimitedXMLDataIOStyle(array);
-               xmlIOStyle.setRepeatable("no");
+               Delimiter delimiter = new Delimiter();
+               delimiter.setRepeatable("no");
+               xmlIOStyle.setDelimiter(delimiter);
                array.setXMLDataIOStyle(xmlIOStyle);
             }
          
