@@ -3499,9 +3499,17 @@ while (iter.hasNext()) {
            // add this object to parent object
            if( parentNodeName.equals(XDFNodeName.NOTES) )
            {
+
               // only NOTES objects appear in arrays, so we can 
               // just add to the current array
-              CurrentArray.addNote(newnote);
+		   getCurrentArray().addNote(newnote);
+
+           } else if( parentNodeName.equals(XDFNodeName.STRUCTURE) 
+                      || parentNodeName.equals(XDFNodeName.ROOT)
+                    )
+           {
+		   getCurrentStructure().addNote(newnote);
+
            } else if ( parentNodeName.equals(XDFNodeName.FIELD) )
            {
               LastFieldObject.addNote(newnote);
@@ -4841,6 +4849,10 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.67  2001/10/03 16:12:27  thomas
+ * added fix for adding notes to Structure/XDF objects
+ *
+ *
  * Revision 1.66  2001/10/02 20:57:54  thomas
  * made some fields public/protected from private
  *
