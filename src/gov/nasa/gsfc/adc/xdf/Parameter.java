@@ -94,6 +94,18 @@ public class Parameter extends BaseObject implements ParameterInterface {
     init();
   }
 
+
+  public Parameter (String nodeName, String value, String description) {
+      init();
+      if (nodeName != null)
+	  setName (nodeName);
+      if (value != null)
+	  addValue (new Value (value));
+      if (description != null)
+	  setDescription (description);
+
+  }
+
   /**  This constructor takes a Java Hashtable as an initializer of
        the XML attributes of the object to be constructed. The
        Hashtable key/value pairs coorespond to the class XDF attribute
@@ -410,6 +422,9 @@ public class Parameter extends BaseObject implements ParameterInterface {
  /* Modification History
   *
   * $Log$
+  * Revision 1.16  2001/06/13 18:55:24  huang
+  * added a contructor
+  *
   * Revision 1.15  2001/05/04 20:30:30  thomas
   * added Interface stuff.
   *
