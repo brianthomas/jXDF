@@ -9,7 +9,7 @@
     <parameter name="integration time">
       <!-- parameter is in units of 10 sec so we need this conversion factor -->
       <conversion>
-           <multiply>10</multiply>
+           <multiply value="10.0"/>
       </conversion>
       <units><unit>sec</unit></units>
       <dataFormat><integer width="3"/></dataFormat>
