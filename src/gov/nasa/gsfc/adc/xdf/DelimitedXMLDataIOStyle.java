@@ -1,5 +1,9 @@
+
 // XDF DelimitedXMLDataIOStyle Class
 // CVS $Id$
+
+// DelimitedXMLDataIOStyle.java Copyright (C) 2000 Brian Thomas,
+// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
 /*
     This program is free software; you can redistribute it and/or modify
@@ -20,25 +24,27 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.*;
-import java.io.*;
+import java.util.Hashtable;
+import java.io.OutputStream;
 
-// DelimitedXMLDataIOStyle.java Copyright (C) 2000 Brian Thomas,
-// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
-
-/**DelimitedXMLDataIOStyle.java: DelimitedDataIOStyle is a class that indicates
- * how delimited ASCII records are to be read in
- * @version $Revision$
+/** DelimitedDataIOStyle is a class that indicates
+   how delimited ASCII records are to be read in
+   @version $Revision$
  */
 
 
 public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 
- //
+  //
   //Fields
   //
 
-
+  // these things are defined in the DTD. It would be best if we 
+  // didnt have to initialize them from here, and , of course, the
+  // Reader, if used, will set the attributes to the DTD defaults. 
+  // However, a user may not use the reader, and so these are needed. 
+  //   Unfortuneately this means we have to keep updating the code whenever
+  // the DTD changes. -b.t.
   public final static String DefaultDelimiter =" ";
   public final static String DefaultRepeatable = "yes";
   public final static String DefaultRecordTerminator = Constants.NEW_LINE;
@@ -206,6 +212,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/08 19:42:43  thomas
+ * Trimmed import path to just needed classes. -b.t.
+ *
  * Revision 1.5  2000/11/06 21:14:59  kelly
  * minor fix in *toXDF*
  *
