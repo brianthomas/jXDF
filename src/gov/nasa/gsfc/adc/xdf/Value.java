@@ -53,10 +53,37 @@ public class Value extends BaseObject {
    /** Passed string sets the *value* attribute (PCDATA)
        of this object.
     */
-
    public Value (String strValue) {
       init();
       setValue(strValue); // set value attribute from passed argument
+   }
+
+   /** Passed integer sets the *value* attribute (PCDATA)
+       of this object.
+    */
+   public Value (Integer intValue) {
+      this(intValue.toString());
+   }
+
+   /** Passed integer sets the *value* attribute (PCDATA)
+       of this object.
+    */
+   public Value (int intValue) {
+      this(Integer.toString(intValue));
+   }
+
+   /** Passed float sets the *value* attribute (PCDATA)
+       of this object.
+    */
+   public Value (Double doubleValue) {
+      this(doubleValue.toString());
+   }
+
+   /** Passed integer sets the *value* attribute (PCDATA)
+       of this object.
+    */
+   public Value (double doubleValue) {
+      this(Double.toString(doubleValue));
    }
 
    //
@@ -173,6 +200,9 @@ public class Value extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/06/19 15:38:01  thomas
+ * added convience constructor methods
+ *
  * Revision 1.11  2001/05/10 21:43:06  thomas
  * added resetXMLAttributes to init().
  *
