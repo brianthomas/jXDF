@@ -384,23 +384,39 @@ public class Structure extends BaseObject {
    */
 
    // This will make a call to the XDF::Reader class one day.
-   public void loadFromXDFFile (String filename) 
+   public void loadFromXDFFile (String filename)
    {
 
       // clear out existing settings in our structure
       // with a quick init. Trust java to garbage collect
       // freed objects(!!)
-      this.init(); 
-      
+      this.init();
+
       // create an XDFreader, declare this structure object
-      // to be the one it should read into. 
+      // to be the one it should read into.
       gov.nasa.gsfc.adc.xdf.Reader reader = new gov.nasa.gsfc.adc.xdf.Reader(this);
       try {
         reader.parsefile(filename);
       } catch (java.io.IOException e) {
         Log.printStackTrace(e);
-      } 
+      }
 
+   }
+
+   public Object clone() throws CloneNotSupportedException{
+    Structure cloneObj = (Structure) super.clone();
+
+    //deep copy of the paramGroupOwnedHash
+     synchronized (this.paramGroupOwnedHash) {
+      synchronized(cloneObj.paramGroupOwnedHash) {
+        cloneObj.paramGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.paramGroupOwnedHash.size()));
+        Iterator iter = this.paramGroupOwnedHash.iterator();
+        while (iter.hasNext()) {
+          cloneObj.paramGroupOwnedHash.add(iter.next());
+        }
+      }
+    }
+    return cloneObj;
    }
 
 }
@@ -408,6 +424,9 @@ public class Structure extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/06 21:17:10  kelly
+ * added clone()  -k.z.
+ *
  * Revision 1.9  2000/10/23 18:32:39  thomas
  * Changed to allow reading in of XDF files. loadfromXDFfile
  * method implemented. -b.t.

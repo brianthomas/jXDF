@@ -483,11 +483,31 @@ public class Axis extends BaseObject implements AxisInterface {
 
     }
 
+  public Object clone() throws CloneNotSupportedException {
+    Axis cloneObj = (Axis) super.clone();
+
+    //deep copy of the valueGroupOwnedHash
+     synchronized (this.valueGroupOwnedHash) {
+      synchronized(cloneObj.valueGroupOwnedHash) {
+        cloneObj.valueGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.valueGroupOwnedHash.size()));
+        Iterator iter = this.valueGroupOwnedHash.iterator();
+        while (iter.hasNext()) {
+          cloneObj.valueGroupOwnedHash.add(iter.next());
+        }
+      }
+    }
+
+    return cloneObj;
+  }
+
 }  //end of Axis class
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/06 21:17:42  kelly
+ * added clone()  -k.z.
+ *
  * Revision 1.9  2000/11/02 17:56:18  kelly
  * minor fix
  *

@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 // FieldAxis.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -236,15 +237,10 @@ public class FieldAxis extends BaseObject implements AxisInterface{
    * @return:an FieldGroup object reference on success, null on failure.
    */
   public FieldGroup addFieldGroup (FieldGroup group) {
-     if (group !=null) {
-         //add the group to the groupOwnedHash
-         fieldGroupOwnedHash.add(group);
-         return group;
-      }
-      else {
-          Log.warn("in FieldAxis.addParamGroup(). FieldGroup passed in is null");
-          return null;
-      }
+    //add the group to the groupOwnedHash
+    fieldGroupOwnedHash.add(group);
+    return group;
+
   }
 
   /** Remove a FieldGroup object from this object.
@@ -252,11 +248,23 @@ public class FieldAxis extends BaseObject implements AxisInterface{
    * @return: true on success, false on failure
    */
   public boolean removeFieldGroup(FieldGroup group) {
-    if (group == null) {
-      Log.warn("in Structure.removeFieldGroup(). FieldGroup passed in is null");
-      return false;
-    }
     return fieldGroupOwnedHash.remove(group);
+  }
+
+  public Object clone() throws CloneNotSupportedException {
+    FieldAxis cloneObj = (FieldAxis) super.clone();
+
+     synchronized (this.fieldGroupOwnedHash) {
+      synchronized(cloneObj.fieldGroupOwnedHash) {
+        cloneObj.fieldGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.fieldGroupOwnedHash.size()));
+        Iterator iter = this.fieldGroupOwnedHash.iterator();
+        while (iter.hasNext()) {
+          cloneObj.fieldGroupOwnedHash.add(iter.next());
+        }
+      }
+    }
+
+    return cloneObj;
   }
 
   //
@@ -299,6 +307,9 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.8  2000/11/06 21:16:34  kelly
+  * added clone()  -k.z.
+  *
   * Revision 1.7  2000/11/02 17:52:20  kelly
   * minor mix
   *
