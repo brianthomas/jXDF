@@ -59,4 +59,5 @@
                       - Added XDF base object structure class. This class represents the top
                         level structure in an XDF object and (hopefully) clarifies some 
                         confusion over the nature of structure objects in general.
+                      = Added get/set Long/Short Data methods in DataCube.
 
