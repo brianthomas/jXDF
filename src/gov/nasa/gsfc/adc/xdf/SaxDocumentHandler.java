@@ -894,7 +894,9 @@ Log.errorln(" TValue:"+valueString);
              if (thisCommand instanceof ReadCellFormattedIOCmd) // ReadCell ==> read some data
              {
 
+Log.error("currentDataFormat: "+currentDataFormat + " ");
                  DataFormat formatObj = dataFormat[currentDataFormat];
+Log.errorln("FormatObject: "+formatObj.getClass());
                  int endDataPosition = dataPosition + formatObj.numOfBytes();
 
                  // add in our object
@@ -1001,7 +1003,7 @@ Log.errorln(" TValue:"+valueString);
        public static final String BINARYINTEGER = "binaryInteger";
        public static final String DATA = "data";
        public static final String DATAFORMAT = "dataFormat";
-       public static final String EXPONENT = "exponent";
+       public static final String EXPONENT = "exponential";
        public static final String FIELD = "field";
        public static final String FIELDAXIS = "fieldAxis";
        public static final String FIELDRELATIONSHIP = "relation";
@@ -2785,6 +2787,10 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.22  2001/01/17 18:08:25  thomas
+ * Minor bug, changed exponential node name
+ * from "exponent" to "exponential". -b.t.
+ *
  * Revision 1.21  2000/11/27 22:40:44  thomas
  * Fix to allow attribute text to have newline, carriage
  * returns in them (print out as entities: &#010; and
