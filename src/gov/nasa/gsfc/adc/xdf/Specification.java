@@ -50,7 +50,7 @@ public class Specification {
       You can be creative with the indentation: any sequence of characters is valid
       (no need to just use spaces!).
   */
-  private String prettyXDFOutputIndentation = "  ";
+  private static String prettyXDFOutputIndentation = "  ";
 
   /** The default allocation size for each dimension within all XDF arrays.
       The practical meaning of this field is that it indicates the initial
@@ -172,6 +172,15 @@ public class Specification {
     return prettyXDFOutputIndentation;
   }
 
+
+  /** 
+   *  get indentation length
+   */
+  public static int getPrettyXDFOutputIndentationLength() {
+    return prettyXDFOutputIndentation.length();
+  }
+
+
   /** Set the indentation string for PrettyXDFOutput. You aren't limited to just spaces
      here, ANY sequence of characters may be used to indent your XDF documents.
   */
@@ -236,6 +245,9 @@ public class Specification {
 /* Modification history
  *
  * $Log$
+ * Revision 1.4  2001/06/12 17:15:55  huang
+ * added a static method
+ *
  * Revision 1.3  2001/01/19 17:20:19  thomas
  * Added XMLParserClass attribute. -b.t.
  *
