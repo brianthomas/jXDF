@@ -1,26 +1,32 @@
 
-/*
- * Locator
- *
- * $Id$
- *
- * (See bottom of file for modification history.)
- *
- * Written by members of the Astronomical Data Center (ADC) at NASA's Goddard 
- * Space Flight Center in Greenbelt, Maryland.  (http://adc.gsfc.nasa.gov)
- */
-
+// XDF Locator class
 // CVS $Id$
+
+/*
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.*;
 
 /**
- * Identifies a specific datum location within the n-dimensional data space.
- * An instance of Locator is always tied to a particular instance of 
- * DataModel, which determines the range of the valid axis indexes and
- * the range of valid datum indexes.
+   Identifies a specific datum location within the n-dimensional data space.
+   An instance of Locator is always tied to a particular instance of 
+   DataModel, which determines the range of the valid axis indexes and
+   the range of valid datum indexes.
  */
 public class Locator {
     private org.log4j.Category    log;      //error and debug logging facility
@@ -44,7 +50,7 @@ public class Locator {
     }
 
     /** 
-     * Set one coordinate of a location in n dimensions, by Axis and a Tickmark
+     * Set one coordinate of a location in n dimensions, by Axis and an
      * index.
      * For a location to be fully specified, you must call setCoordinate()
      * for every Axis in the DataModel.
@@ -62,12 +68,12 @@ public class Locator {
     }
 
     /** 
-     * Set one coordinate of a location in n dimensions, with a Tickmark
+     * Set one coordinate of a location in n dimensions, with an index 
      * reference (which includes information about the relevent Axis).
      * For a location to be fully specified, you must call setCoordinate()
      * for every Axis in the DataModel.
      */
-    public void setCoordinate(Tickmark tickmark) {
+    public void setCoordinate() {
         log.warn("Not implemented yet.");
         //fixme
     }
@@ -86,6 +92,10 @@ public class Locator {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/10/10 17:59:10  cvs
+ * Updated documentation. Removed Tickmark variable
+ * from setCoordinate method (not a valid class anymore!)
+ *
  * Revision 1.1.1.1  2000/09/21 17:53:28  thomas
  * Imported Java Source
  *
