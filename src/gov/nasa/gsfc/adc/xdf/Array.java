@@ -713,7 +713,7 @@ import java.util.Vector;
   */
   private boolean canAddAxisObjToArray(AxisInterface axisToAdd) {
     if (axisToAdd.getAxisId() == null) {
-      Log.error("Can't add Axis Object without axisId attribute defined");
+      Log.warnln("Warning: Can't add Axis Object without axisId attribute defined");
       return false;
     }
     return true;
@@ -772,6 +772,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.18  2000/11/17 19:01:27  thomas
+  * Small fix to addAxis warning message. -b.t.
+  *
   * Revision 1.17  2000/11/16 19:43:51  kelly
   * *** empty log message ***
   *
