@@ -26,7 +26,7 @@ import java.util.Iterator;
    @version $Revision$
 */
 
-public class Axis extends BaseObject implements AxisInterface {
+public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
    //
    // Fields
@@ -482,6 +482,8 @@ public class Axis extends BaseObject implements AxisInterface {
   protected void init()
   {
 
+    super.init();
+
     classXDFNodeName = "axis";
 
     // order matters! these are in *reverse* order of their
@@ -524,6 +526,9 @@ public class Axis extends BaseObject implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2001/05/04 20:16:48  thomas
+ * changed BaseObject superclass to BaseObjectWithXMLElements.
+ *
  * Revision 1.18  2001/05/02 18:15:53  thomas
  * Minor changes related to API standardization
  * effort.
