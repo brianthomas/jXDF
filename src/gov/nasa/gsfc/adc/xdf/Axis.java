@@ -71,7 +71,7 @@ public class Axis extends BaseObject implements AxisInterface {
  /** init -- special private method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
 
     classXDFNodeName = "axis";
@@ -501,6 +501,10 @@ public class Axis extends BaseObject implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2000/11/10 06:23:15  thomas
+ * Updated init() method to be protected so inheriting
+ * classes may use. -b.t.
+ *
  * Revision 1.13  2000/11/09 04:24:11  thomas
  * Implimented small efficiency improvements to traversal
  * loops. -b.t.
