@@ -34,23 +34,33 @@ import java.io.OutputStream;
 import java.io.IOException;
 
 /*
+// crimson DOM
 import org.apache.crimson.tree.ElementNode;
 import org.apache.crimson.tree.TextNode;
 import org.apache.crimson.tree.CDataNode;
 */
+/*
+// dom4j DOM 
 import org.dom4j.dom.DOMElement;
 import org.dom4j.dom.DOMCDATA;
 import org.dom4j.dom.DOMText;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
+*/
+
+// Xerces DOM 
+import org.apache.xerces.dom.CoreDocumentImpl;
+import org.apache.xerces.dom.ElementNSImpl;
+import org.apache.xerces.dom.TextImpl;
+import org.apache.xerces.dom.CDATASectionImpl;
 
 import org.xml.sax.Attributes;
 
 import org.w3c.dom.Attr;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
-
-import org.dom4j.Namespace;
-import org.dom4j.QName;
 
 /** 
      This class is used to hold XML element node information *inside* XDF (and child) objects.
@@ -58,7 +68,7 @@ import org.dom4j.QName;
      the node name, node attributes AND PCData as well as child Elements.
  */
 
-public class XMLElementNode extends DOMElement implements Cloneable {
+public class XMLElementNode extends ElementNSImpl implements Cloneable {
 
    // 
    // Fields
@@ -68,6 +78,27 @@ public class XMLElementNode extends DOMElement implements Cloneable {
    // Constructors
    //
 
+   public XMLElementNode (CoreDocumentImpl ownerDocument,
+                          String namespaceURI,
+                          String qualifiedName)
+   throws DOMException
+   {
+      super(ownerDocument, namespaceURI, qualifiedName);
+   }
+
+   public XMLElementNode (String name) 
+   throws DOMException
+   {
+      super (Constants.getInternalDOMDocument(), name);
+   }
+
+   public XMLElementNode (CoreDocumentImpl ownerDocument, String name) 
+   {
+      super(ownerDocument, name);
+   }
+
+/*
+  // next 4 constructors are for DOM4J
    public XMLElementNode(String name) {
       super(name);
    }
@@ -83,6 +114,7 @@ public class XMLElementNode extends DOMElement implements Cloneable {
    public XMLElementNode(String name, Namespace namespace) {
       super(name, namespace);
    }
+*/
 
 
    //
@@ -93,15 +125,16 @@ public class XMLElementNode extends DOMElement implements Cloneable {
     */
    public void setPCData (String text) {
       removeAllTextChildNodes();
-      DOMText newTextNode = new DOMText(text); // CDataNode is a special Text node 
+      CoreDocumentImpl owner = (CoreDocumentImpl) this.getOwnerDocument();
+      TextImpl newTextNode = new TextImpl(owner, text); // CDataNode is a special Text node 
       appendChild(newTextNode);
-  }
+   }
 
    /** Set the value of the PCDATA held by this XMLElementNode.
        By using CDataNode here, the user may insure special characters like the
        lessthan sign are preserved without resorting to entities.
    */
-  public void setPCData (DOMCDATA textNode) {
+  public void setPCData (CDATASectionImpl textNode) {
       removeAllTextChildNodes();
       appendChild(textNode);
   }
@@ -112,7 +145,7 @@ public class XMLElementNode extends DOMElement implements Cloneable {
       int size = childNodes.getLength();
       for (int i = 0; i < size; i++) {
           Node thisNode = childNodes.item(i);
-          if (thisNode instanceof DOMText) {
+          if (thisNode instanceof TextImpl) {
              removeChild(thisNode);
           }
       }
@@ -120,26 +153,28 @@ public class XMLElementNode extends DOMElement implements Cloneable {
    }
 
    /** Get any PCDATA held within this XMLElementNode.
-       This amounts to a convience method which appends all of 
+       This amounts to a convenience method which appends all of 
        the child Textnodes into a String object.
    */
    public String getPCData() {
 
       StringBuffer myCDATA = new StringBuffer();
+      boolean gotSomeTextData = false;
 
       NodeList childNodes = this.getChildNodes();
       int size = childNodes.getLength();
       for (int i = 0; i < size; i++) {
           Node thisNode = childNodes.item(i);
-          if (thisNode instanceof DOMText) {
-             myCDATA.append(thisNode.toString());
+          if (thisNode instanceof TextImpl) {
+             myCDATA.append(thisNode.getNodeValue());
+             gotSomeTextData = true;
           }
       }
 
-      return myCDATA.toString();
+      return gotSomeTextData ? myCDATA.toString() : null;
    }
 
-   /** A convience method to get all XMLElementNode children.
+   /** A convenience method to get all XMLElementNode children.
        Vanilla ElementNode children will NOT be returned.
     */
    public List getXMLElementNodeList () { 
@@ -165,13 +200,14 @@ public class XMLElementNode extends DOMElement implements Cloneable {
    /** appends more PCDATA into this XMLElementNode. 
     */
    public void appendPCData (String text) {
-      DOMText newTextNode = new DOMText(text);
+      CoreDocumentImpl owner = (CoreDocumentImpl) this.getOwnerDocument();
+      TextImpl newTextNode = new TextImpl(owner, text);
       appendChild(newTextNode);
    }
 
    /** appends more PCDATA into this XMLElementNode. 
     */
-   public void appendPCData (DOMCDATA textNode) {
+   public void appendPCData (CDATASectionImpl textNode) {
       appendChild(textNode);
    }
 
@@ -227,7 +263,7 @@ public class XMLElementNode extends DOMElement implements Cloneable {
 
    }
 
-   /** just a convience method for setAttribute
+   /** just a convenience method for setAttribute
     */
    public void setXMLAttribute (String name, String value) { 
       this.setAttribute(name, value);
@@ -237,7 +273,7 @@ public class XMLElementNode extends DOMElement implements Cloneable {
 
    }
 
-   /** just a convience method for getAttribute
+   /** just a convenience method for getAttribute
     */
    public void addXMLAttribute (String name, String value) { 
       this.setAttribute(name, value);
@@ -314,7 +350,7 @@ public class XMLElementNode extends DOMElement implements Cloneable {
 
       // Setup. Sometimes the name of the node we are opening is different from
       // that specified in the class getName method.
-      String nodeNameString = this.getName();
+      String nodeNameString = this.getTagName();
       if (newNodeNameString != null) nodeNameString = newNodeNameString;
 
       // 1. open this node, print its simple XML attributes
@@ -327,52 +363,57 @@ public class XMLElementNode extends DOMElement implements Cloneable {
 
       }
 
-      outputWriter.write(">"); //close node
-
-/*
       // 2. Print out string object XML attributes 
-      ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
-      // is synchronized here correct?
       NamedNodeMap attribs = this.getAttributes();
+      // is synchronized here correct?
       synchronized(attribs) {
 
           int size = attribs.getLength();
           for (int i = 0; i < size; i++) {
              Attr attrib = (Attr) attribs.item(i);
-             writeOut(outputstream, " "+attrib.getName()+"=\""+attrib.getValue()+"\"");
+             outputWriter.write(" "+attrib.getName()+"=\""+attrib.getValue()+"\"");
           }
 
       }
 
       //3. print child nodes OR CDATA 
       int nrofChildXMLElements = getXMLElementNodeList().size();
-      String pcdata = getCData();
+      String pcdata = getPCData();
       if (pcdata != null || nrofChildXMLElements > 0 )
       {
 
           // close opening node
-          writeOut(outputstream, ">");
+          outputWriter.write(">");
 
           if (pcdata != null) {
-             writeOut(outputstream, pcdata);
+             outputWriter.write(pcdata);
           }
   
 
-          if (pcdata != null || nrofChildXMLElements > 0 )
+          if (nrofChildXMLElements > 0 )
           {
+             String moreIndent = Specification.getInstance().getPrettyXDFOutputIndentation();
+             if (isPrettyOutput && pcdata == null) 
+                outputWriter.write(Constants.NEW_LINE);
              List childXMLElements = getXMLElementNodeList();
+             for (int i = 0; i < nrofChildXMLElements ; i++) {
+                if (isPrettyOutput && pcdata == null) 
+                  outputWriter.write(indent); // indent node if desired
+                XMLElementNode node = (XMLElementNode) childXMLElements.get(i);
+                node.toXMLWriter (outputWriter, indent+moreIndent);
+             }
           }
 
           // print closing element
-          writeOut(outputstream, "</"+nodeNameString+">");
+          outputWriter.write("</"+nodeNameString+">");
 
       } else {
 
           // close opening node
-          writeOut(outputstream, "/>");
+          outputWriter.write("/>");
 
       }
-*/
+
       if (isPrettyOutput) 
           outputWriter.write(Constants.NEW_LINE);
 
@@ -399,11 +440,9 @@ public class XMLElementNode extends DOMElement implements Cloneable {
 
    /**
     */
-/*
    public Object clone() throws CloneNotSupportedException {
      return super.clone(); 
    }
-*/
 
    //
    // Protected Methods
@@ -413,19 +452,14 @@ public class XMLElementNode extends DOMElement implements Cloneable {
    // Private Methods
    //
 
-/*
-   private void writeOut ( OutputStream outputstream, String msg )
-   throws java.io.IOException
-   {
-       outputstream.write(msg.getBytes());
-   }
-*/
-
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/08/23 18:01:52  thomas
+ * Switched to Xerces implementation
+ *
  * Revision 1.2  2001/08/01 18:08:12  thomas
  * new version using dom4j
  *
