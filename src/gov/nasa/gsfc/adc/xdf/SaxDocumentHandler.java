@@ -72,9 +72,11 @@ class SaxDocumentHandler implements DocumentHandler {
     private Array     CurrentArray;   
     private Object    CurrentDatatypeObject;
     private ArrayList CurrentNodePath = new ArrayList();
-    private ArrayList CurrentParameterGroupList = new ArrayList();
-    private ArrayList CurrentValueGroupList = new ArrayList();
     private ArrayList CurrentFormatObjectList = new ArrayList ();
+    // group objects
+    private ArrayList CurrentParameterGroupList = new ArrayList();
+    private ArrayList CurrentFieldGroupList = new ArrayList();
+    private ArrayList CurrentValueGroupList = new ArrayList();
 
 
     // GLOBALs for saving these between dataFormat/read node and later when we 
@@ -96,7 +98,9 @@ class SaxDocumentHandler implements DocumentHandler {
     private Units     LastUnitsObject;
 
     private Object LastParameterGroupParentObject;
-    private String LastValueGroupParentObject;
+    private Object LastFieldGroupParentObject;
+    private Object LastValueGroupParentObject;
+
     private String LastNotesParentObjectName;
 
     private ArrayList NoteLocatorOrder = new ArrayList();
@@ -458,6 +462,7 @@ class SaxDocumentHandler implements DocumentHandler {
        endElementHandlerHashtable.put(XDFNodeName.DATA, new dataEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.FIELDGROUP, new fieldGroupEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.NOTES, new notesEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.PARAMETERGROUP, new parameterGroupEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.READ, new readEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.REPEAT, new repeatEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.TD0, new dataTagEndElementHandlerFunc());
@@ -949,6 +954,15 @@ class SaxDocumentHandler implements DocumentHandler {
           FieldAxis fieldAxis = CurrentArray.getFieldAxis();
           fieldAxis.addField(newfield);
 
+/* ID REF cloning STUFF MISSING@!!! -b.t. */
+
+          // add this object to all open field groups
+          Iterator iter = CurrentFieldGroupList.iterator();
+          while (iter.hasNext()) {
+             FieldGroup nextFieldGroupObj = (FieldGroup) iter.next();
+             newfield.addToGroup(nextFieldGroupObj);
+          }
+
           CurrentDatatypeObject = newfield;
 
           LastFieldObject = newfield;
@@ -1021,13 +1035,53 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class fieldGroupEndElementHandlerFunc implements EndElementHandlerAction {
        public void action () {
-          Log.errorln("FIELDGROUP End handler not implemented yet.");
+          // peel off the last object in the field group list
+          CurrentFieldGroupList.remove(CurrentFieldGroupList.size()-1);
        }
     }
 
     class fieldGroupStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("FIELDGROUP Start handler not implemented yet.");
+
+         // grab parent node name
+          String parentNodeName = getParentNodeName();
+
+          // create new object appropriately 
+          FieldGroup newfieldGroup = new FieldGroup();
+          newfieldGroup.setXMLAttributes(attrs); // set XML attributes from passed list 
+
+          // determine where this goes and then insert it 
+          if( parentNodeName.equals(XDFNodeName.FIELDAXIS) )
+          {
+
+              newfieldGroup = CurrentArray.getFieldAxis().addFieldGroup(newfieldGroup);
+              LastFieldGroupParentObject = (Object) CurrentArray;
+
+          } else if ( parentNodeName.equals(XDFNodeName.FIELDGROUP) )
+
+          {
+
+              FieldGroup LastFieldGroupObject = (FieldGroup)
+                   CurrentFieldGroupList.get(CurrentFieldGroupList.size()-1);
+              newfieldGroup = LastFieldGroupObject.addFieldGroup(newfieldGroup);
+
+          } else {
+
+              Log.errorln(" weird parent node $parent_node_name for fieldGroup");
+              System.exit(-1); // dump core :)
+
+          }
+
+          // add this object to all open groups
+          Iterator iter = CurrentFieldGroupList.iterator();
+          while (iter.hasNext()) {
+             FieldGroup nextFieldGroupObj = (FieldGroup) iter.next();
+             newfieldGroup.addToGroup(nextFieldGroupObj);
+          }
+
+          // now add it to the list
+          CurrentFieldGroupList.add(newfieldGroup);
+
        }
     }
 
@@ -1101,7 +1155,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
           // add cdata as text to the last note object 
           String newText = new String(buf,offset,len);
-          LastNoteObject.setValue(newText);
+          LastNoteObject.addText(newText);
 
        }
     }
@@ -1652,13 +1706,13 @@ class SaxDocumentHandler implements DocumentHandler {
               Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
               newvalueGroup = lastAxisObject.addValueGroup(newvalueGroup);
 
-              LastValueGroupParentObject = XDFNodeName.AXIS;
+              LastValueGroupParentObject = lastAxisObject;
 
           } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
           {
 
               newvalueGroup = LastParameterObject.addValueGroup(newvalueGroup);
-              LastValueGroupParentObject = XDFNodeName.PARAMETER;
+              LastValueGroupParentObject = LastParameterObject;
 
           } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
 
@@ -1673,7 +1727,7 @@ class SaxDocumentHandler implements DocumentHandler {
              System.exit(-1); // fatal error, shut down 
           }
 
-          // 4. add this object to all open groups
+          // 4. add this object to all open value groups
           Iterator iter = CurrentValueGroupList.iterator();
           while (iter.hasNext()) {
              ValueGroup nextValueGroupObj = (ValueGroup) iter.next();
@@ -1733,7 +1787,15 @@ class SaxDocumentHandler implements DocumentHandler {
 
                // add the value to the axis
                String valueString = valueListString.substring(start, end);
-               lastAxisObject.addAxisValue(new Value(valueString));
+               Value newvalue = new Value(valueString);
+               lastAxisObject.addAxisValue(newvalue);
+
+               // add this object to all open value groups
+               Iterator iter = CurrentValueGroupList.iterator();
+               while (iter.hasNext()) {
+                  ValueGroup nextValueGroupObj = (ValueGroup) iter.next();
+                  newvalue.addToGroup(nextValueGroupObj);
+               }
 
                // this is the last value so terminate the while loop 
                if ((end+delimiterSize) >= valueListString.length()) 
@@ -1743,6 +1805,7 @@ class SaxDocumentHandler implements DocumentHandler {
             }
 
           }
+
        }
     }
 
@@ -1788,28 +1851,29 @@ class SaxDocumentHandler implements DocumentHandler {
                      newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
                    */
 
-                if ( LastValueGroupParentObject.equals(XDFNodeName.PARAMETER) ) 
+                if ( LastValueGroupParentObject instanceof Parameter )
                 {
+
+                    Parameter myParamObject = (Parameter) LastValueGroupParentObject;
 
                     Iterator iter = values.iterator();
                     while (iter.hasNext()) {
                         String valuePCDATA = (String) iter.next();
                         Value value = new Value (valuePCDATA);
-                        valueObjList.add(LastParameterObject.addValue(value));
+                        valueObjList.add(myParamObject.addValue(value));
                     }
 
-                } else if ( LastValueGroupParentObject.equals(XDFNodeName.AXIS) ) 
+                } else if ( LastValueGroupParentObject instanceof Axis )
                 {
 
                     // get the last axis
-                    List axisList = (List) CurrentArray.getAxisList();
-                    Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+                    Axis myAxisObject = (Axis) LastValueGroupParentObject;
 
                     Iterator iter = values.iterator();
                     while (iter.hasNext()) { 
                         String valuePCDATA = (String) iter.next();
                         Value value = new Value (valuePCDATA);
-                        valueObjList.add(lastAxisObject.addAxisValue(value));
+                        valueObjList.add(myAxisObject.addAxisValue(value));
                     }
 
                 } else {
@@ -1893,6 +1957,9 @@ class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/01 21:59:31  thomas
+ * Implimented ValueGroup, FieldGroup fully. -b.t.
+ *
  * Revision 1.3  2000/10/31 20:38:00  thomas
  * This version is ALMOST capable of full ascii tagged
  * read. Problems that remain are grouping, notes location
