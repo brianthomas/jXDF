@@ -10,6 +10,7 @@ import java.util.Hashtable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,6 +62,22 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
     init();
 
   }
+
+  /** 
+   *  Create an Axis with a desired dimension
+   *  with a list of null values
+   */
+  public Axis (int dimension)
+  {
+    init();
+    List valueList = new Vector(dimension);
+    for (int i=0; i<dimension; i++) {
+	Value value = new Value();
+	valueList.add(value);
+    }
+    this.setValueList(valueList);
+  }
+
 
   /**  This constructor takes a Java Hashtable as an initializer of
        the XML attributes of the object to be constructed. The
@@ -195,8 +212,8 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
   /** set the *valueList* attribute
    */
-  public void setValueList(List value) {
-     ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).setAttribValue(value);
+  public void setValueList(List valueList) {
+     ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).setAttribValue(valueList);
   }
 
   /**
@@ -526,6 +543,9 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/05/15 23:20:58  huang
+ * added a few convenience methods
+ *
  * Revision 1.19  2001/05/04 20:16:48  thomas
  * changed BaseObject superclass to BaseObjectWithXMLElements.
  *

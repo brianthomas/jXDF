@@ -699,6 +699,80 @@ import java.util.Vector;
         getDataCube().appendData(locator, strValue);
    }
    
+
+   /**
+    *  set data for a general object
+    *  which can be an array of primitive object; or wrapped data
+    */
+   public void setData (Locator locator, Object dataObj) 
+       throws SetDataException {
+       if (dataObj instanceof Double )
+	   this.setData (locator, (Double) dataObj);
+       else if (dataObj instanceof Integer )
+	   this.setData (locator, (Integer) dataObj);
+       else if (dataObj instanceof int[])
+	   this.setData (locator, (int[])dataObj);
+       else if (dataObj instanceof float[])
+	   this.setData (locator, (float[])dataObj);
+       else if (dataObj instanceof double[])
+	   this.setData (locator, (double[])dataObj);
+       else if (dataObj instanceof String[])
+	   this.setData (locator, (String[])dataObj);
+       else {
+	   String msg = "Data type " + dataObj.getClass().getName() + " is not implemented";
+	   Log.errorln(msg);
+	   throw new SetDataException (msg);
+       }
+   }
+
+
+   /** 
+    *  set Data from adouble data array
+    */
+   public void setData (Locator locator, double [] numValue) 
+       throws SetDataException {
+       for (int i = 0; i < numValue.length; i++) {
+	   this.setData(locator, numValue[i]);
+	   locator.next();
+       }
+   }
+
+   /** 
+    *  set Data from an integer data array 
+    */
+   public void setData (Locator locator, int [] numValue) 
+       throws SetDataException {
+       for (int i = 0; i < numValue.length; i++) {
+	   this.setData(locator, numValue[i]);
+	   locator.next();
+       }
+   }
+
+
+   /** 
+    *  set Data from a float data array 
+    */
+   public void setData (Locator locator, float [] numValue) 
+       throws SetDataException {
+       for (int i = 0; i < numValue.length; i++) {
+	   this.setData(locator, (double) numValue[i]);
+	   locator.next();
+       }
+   }
+
+
+   /** 
+    *  set Data from a data array -- String
+    */
+   public void setData (Locator locator, String [] numValue) 
+       throws SetDataException {
+       for (int i = 0; i < numValue.length; i++) {
+	   this.setData(locator, numValue[i]);
+	   locator.next();
+       }
+   }
+
+
    /** Set the value of the requested datacell. 
     * Overwrites existing datacell value if any.
     */
@@ -1030,6 +1104,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.25  2001/05/15 23:20:49  huang
+  * added a few convenience methods
+  *
   * Revision 1.24  2001/05/04 20:15:59  thomas
   * setNotesObject method is now setArrayNotes
   * Implement Interface stuff in Array.
