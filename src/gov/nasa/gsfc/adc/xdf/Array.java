@@ -109,19 +109,6 @@ import java.util.Vector;
      private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
      private static final String ID_XML_ATTRIBUTE_NAME = new String("arrayId");
      private static final String APPENDTO_XML_ATTRIBUTE_NAME = new String("appendTo");
-/*
-     private static final String LESSTHANVALUE_XML_ATTRIBUTE_NAME = new String("lessThanValue");
-     private static final String LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME = new String("lessThanOrEqualValue");
-     private static final String GREATERTHANVALUE_XML_ATTRIBUTE_NAME = new String("greaterThanValue");
-     private static final String GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME = new String("greaterThanOrEqualValue");
-     private static final String INFINITEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteValue");
-     private static final String INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteNegativeValue");
-     private static final String NODATAVALUE_XML_ATTRIBUTE_NAME = new String("noDataValue");
-     private static final String NOTANUMBERVALUE_XML_ATTRIBUTE_NAME = new String("notANumberValue");
-     private static final String OVERFLOWVALUE_XML_ATTRIBUTE_NAME = new String("overflowValue");
-     private static final String UNDERFLOWVALUE_XML_ATTRIBUTE_NAME = new String("underflowValue");
-     private static final String DISABLEDVALUE_XML_ATTRIBUTE_NAME = new String("disabledValue");
-*/
      private static final String PARAMETERLIST_XML_ATTRIBUTE_NAME = new String("paramList");
      private static final String UNITS_XML_ATTRIBUTE_NAME = new String("units");
      private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = new String("dataFormat");
@@ -1276,19 +1263,6 @@ import java.util.Vector;
        attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, PARAMETERLIST_XML_ATTRIBUTE_NAME);
-/*
-       attribOrder.add(0, DISABLEDVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, UNDERFLOWVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, OVERFLOWVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, NOTANUMBERVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, NODATAVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, INFINITEVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, GREATERTHANVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME);
-       attribOrder.add(0, LESSTHANVALUE_XML_ATTRIBUTE_NAME);
-*/
        attribOrder.add(0, APPENDTO_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
@@ -1298,24 +1272,12 @@ import java.util.Vector;
        attribHash.put(NOTES_XML_ATTRIBUTE_NAME, new Attribute(new Notes(), Constants.OBJECT_TYPE));
        attribHash.put(DATACUBE_XML_ATTRIBUTE_NAME, new Attribute(new DataCube(this), Constants.OBJECT_TYPE));
        attribHash.put(AXISLIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-       //default is TaggedXMLDataIOStyle
-       attribHash.put(XMLDATAIOSTYLE_XML_ATTRIBUTE_NAME, new Attribute(new TaggedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
+       //default is DelimitedXMLDataIOStyle
+       attribHash.put(XMLDATAIOSTYLE_XML_ATTRIBUTE_NAME, 
+               new Attribute(new DelimitedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
        attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
        attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
        attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-/*
-       attribHash.put(DISABLEDVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(OVERFLOWVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(NODATAVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(INFINITEVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(GREATERTHANVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-       attribHash.put(LESSTHANVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-*/
        attribHash.put(APPENDTO_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
        attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
        attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
