@@ -31,6 +31,16 @@
           may happen: negative exponents in the exponential format. We need to implement
           by hand our own exponential formatter code to fix this. 
 
+        - Automatic Unique Id generation may fail when a later node has an id that matches
+          a machine generated one on an earlier node. We need a final pass thru the Id 
+          stacks to enforce uniqueness in objects (or better yet internal checking of ids to
+          enforce unique id's between like nodes).
+
+        - In part because there is no such animal as a ValueList object, the Reader cant
+          resolve local attributes in id/idRef situations as per other objects w/ id's. This
+          means that only whole drop-in replacement of ValueList is possible via id/idRef.
+          Need to Fix? or remove Id/idref from valueList.
+
         - show we not allow repeatable attribute to apply to the recordterminator
           on string parsing (it only applies to delimiting characters right now;
           Question: how does the Perl package handle this?) 
@@ -50,4 +60,6 @@
         - Clean up debugging messages. Improve and make consistent error messaging 
           within the package. Missing any Exception classes? 
 
+        - If the user improperly specifies Axis sizes/values, the Reader will overwrite
+          prior cells without warning. Better warning messages needed.
 

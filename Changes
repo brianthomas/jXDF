@@ -8,3 +8,19 @@ Package Version History
                 IO implemented. Formatted and Binary data IO 
 		missing. Deep cloning *is* implemented. 
 
+0.17b 11/??/00  2nd alpha version.
+
+0.17c 12/??/00  3rd alpha version.
+
+0.17d  1/23/01  4th alpha version.
+               - Fixed Errored Value to DTD standard.
+               - Fixed some of ExponentialDataFormat. Exponents max
+                 size cant be specified in Java, so some problems remain.
+               - Added ability to set the XML parser.
+               - Href attribute implemented properly in DataCube.
+               - Read id/idref fixed. Added id/idref stuff for value,
+                 parameter and valueList as per DTD.
+               - fixed value valueIdRef attribute misspelling.
+               - valueList now may be used under parameter node.
+               - Array now directs child Locators to properly remove an axis 
+                 when it itself removes an axis.
