@@ -41,12 +41,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 
   public final static String DefaultDelimiter =" ";
   public final static String DefaultRepeatable = "yes";
-  //double check
   public final static String DefaultRecordTerminator = Constants.NEW_LINE;
-
-  protected String delimiter =  DefaultDelimiter;
-  protected String repeatable = DefaultRepeatable;
-  protected String recordTerminator = DefaultRecordTerminator;
 
    //
    // Constructors 
@@ -82,10 +77,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
   /**setDelimiter: set the *delimiter* attribute
    * @return: the current *delimiter* attribute
    */
-  public String setDelimiter (String strDelimiter)
+  public void setDelimiter (String strDelimiter)
   {
-     delimiter=strDelimiter;
-     return delimiter;
+      ((XMLAttribute) attribHash.get("delimiter")).setAttribValue(strDelimiter);
   }
 
   /**getDelimiter
@@ -93,22 +87,21 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String getDelimiter()
   {
-    return delimiter;
+     return (String) ((XMLAttribute) attribHash.get("delimiter")).getAttribValue();
   }
 
   /**setRepeatable: set the *repeatable* attribute
    * @return: the current *repeatable* attribute
    */
-  public String setRepeatable (String strIsRepeatable)
+  public void setRepeatable (String strIsRepeatable)
   {
-    if (!strIsRepeatable.equals("yes")  && !strIsRepeatable.equals("no") ) {
-      Log.error("*repeatable* attribute can only be set to yes or no");
-      Log.error("tend to set as" + strIsRepeatable);
-      Log.error("invalid. ignoring request");
-      return null;
-    }
-    repeatable=strIsRepeatable;
-    return repeatable;
+     if (!strIsRepeatable.equals("yes")  && !strIsRepeatable.equals("no") ) {
+        Log.error("*repeatable* attribute can only be set to yes|no");
+        Log.error("tend to set as" + strIsRepeatable);
+        Log.error("invalid. ignoring request");
+        return;
+     }
+     ((XMLAttribute) attribHash.get("repeatable")).setAttribValue(strIsRepeatable);
   }
 
   /**getRepeatable
@@ -116,18 +109,16 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String getRepeatable()
   {
-    return repeatable;
+     return (String) ((XMLAttribute) attribHash.get("repeatable")).getAttribValue();
   }
 
 
    /**setRecordTerminator: set the *recordTerminator* attribute
    * @return: the current *recordTerminator* attribute
    */
-  public String setRecordTerminator (String strRecordTerminator)
+  public void setRecordTerminator (String strRecordTerminator)
   {
-    recordTerminator = strRecordTerminator;
-    return recordTerminator;
-
+     ((XMLAttribute) attribHash.get("recordTerminator")).setAttribValue(strRecordTerminator);
   }
 
   /**getRecordTerminator
@@ -135,7 +126,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String getRecordTerminator()
   {
-    return recordTerminator;
+     return (String) ((XMLAttribute) attribHash.get("recordTerminator")).getAttribValue();
   }
 
   //
@@ -153,6 +144,11 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    //
 
    private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) {
+
+     String delimiter = getDelimiter();
+     String repeatable = getRepeatable();
+     String recordTerminator = getRecordTerminator();
+
     if (which > stop) {
       if (sPrettyXDFOutput) {
         writeOut(outputstream, Constants.NEW_LINE);
@@ -194,9 +190,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
       attribOrder.add(0,"repeatable");
       attribOrder.add(0,"recordTerminator");
 
-      attribHash.put("delimiter", new XMLAttribute(new String(" "), Constants.STRING_TYPE));
-      attribHash.put("repeatable", new XMLAttribute(new String("yes"), Constants.STRING_TYPE));
-      attribHash.put("recordTerminator", new XMLAttribute(Constants.NEW_LINE, Constants.STRING_TYPE));
+      attribHash.put("delimiter", new XMLAttribute(DefaultDelimiter, Constants.STRING_TYPE));
+      attribHash.put("repeatable", new XMLAttribute(DefaultRepeatable, Constants.STRING_TYPE));
+      attribHash.put("recordTerminator", new XMLAttribute(DefaultRecordTerminator, Constants.STRING_TYPE));
 
    }
 
@@ -208,6 +204,13 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/03 21:37:58  thomas
+ * Opps, another fix needed. delimiter, repeatable and
+ * recordTerminator werent being stored as XMLattributes.
+ * Also, changed set mthods so void is returned. Set
+ * inital values of XMLAttributes to defined defaults.
+ * -b.t.
+ *
  * Revision 1.3  2000/11/03 21:22:23  thomas
  * Had to add in XMLAttributes to init method. Added
  * Hashtable init constructor also. -b.t.
