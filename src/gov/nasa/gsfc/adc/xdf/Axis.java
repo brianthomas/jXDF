@@ -18,7 +18,7 @@ import java.util.*;
      @version $Revision$
 */
 
-public class Axis extends BaseObject implements Cloneable, AxisInterface {
+public class Axis extends BaseObject implements AxisInterface {
 
  //
  //Fields
@@ -71,11 +71,11 @@ public class Axis extends BaseObject implements Cloneable, AxisInterface {
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
     attribOrder.add(0,"valueList");
-    attribOrder.add(0,"axisIdRef");
-    attribOrder.add(0,"axisId");
-    attribOrder.add(0,"align");  //not sure what it is???
     attribOrder.add(0,"axisUnits");
     attribOrder.add(0,"axisDatatype");
+    attribOrder.add(0,"align");  //not sure what it is???
+    attribOrder.add(0,"axisIdRef");
+    attribOrder.add(0,"axisId");
     attribOrder.add(0,"description");
     attribOrder.add(0,"name");
 
@@ -85,7 +85,7 @@ public class Axis extends BaseObject implements Cloneable, AxisInterface {
     attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList(super.sDefaultDataArraySize)), Constants.LIST_TYPE));
     attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("aligh", new XMLAttribute(null, Constants.STRING_TYPE));  //double check???
+    attribHash.put("align", new XMLAttribute(null, Constants.STRING_TYPE));  //double check???
 
     //set up the axisUnits attribute
     Units unitsObj = new Units();
@@ -488,6 +488,9 @@ public class Axis extends BaseObject implements Cloneable, AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/02 17:56:18  kelly
+ * minor fix
+ *
  * Revision 1.8  2000/10/31 21:48:46  kelly
  * minor fix
  *
