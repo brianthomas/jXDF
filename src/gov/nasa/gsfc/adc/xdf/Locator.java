@@ -94,7 +94,7 @@ import java.util.*;
    * @param: Axis
    * @return: index if successful, -1 if not
    */
-  public int getAxisLocation (Axis axisObj) {
+  public int getAxisLocation (AxisInterface axisObj) {
      if ((!parentArray.getAxisList().contains(axisObj)) ) {
         Log.error("axisObj is not an Axis ref contained in Locator's parentArray");
         Log.error("regnore request");
@@ -251,6 +251,9 @@ import java.util.*;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/10/31 21:40:15  kelly
+ * minor fix
+ *
  * Revision 1.7  2000/10/30 18:14:44  kelly
  * conform to the common interface "AxisInterface" for Axis & FieldAxis -k.z.
  *
