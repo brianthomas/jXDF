@@ -127,6 +127,11 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
       return (String) tagHash.get(axisId);
    }
 
+   public String getAxisIdByTag (String tag)
+   {
+      return (String) axisIdHash.get(tag);
+   }
+
    public void setIOAxesOrder(List axisOrderList) {
       Log.errorln("Cant setIOAxesOrder for TaggedXMLDataIOStyle");
    }
@@ -157,9 +162,9 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
      // String tag;
 
      for (int i = 0; i < size; i++) {
-       // String axisId = ((AxisInterface) axisList.get(i)).getAxisId();
-       // tags[i] = (String) tagHash.get(axisId);
-       tags[i] = "d" + i;
+        // String axisId = ((AxisInterface) axisList.get(i)).getAxisId();
+        // tags[i] = (String) tagHash.get(axisId);
+        tags[i] = "d" + i;
      }
 
 /*
@@ -183,6 +188,32 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
      return tags;
    }
 
+   private void updateAxisIdHashFromAxisTags() 
+   {
+
+      // these two are not necessarily in order
+      // but we work on the theory that if one tag fails to find
+      // an axis, all will. 
+      String[] tags = getAxisTags();
+      List axisList = parentArray.getAxes();
+      for (int i = 0, size = tags.length; i < size; i++) 
+      {
+          // we only set this if doesnt already exist
+          if (getAxisIdByTag(tags[i]) == null)
+          {
+             AxisInterface axisObj = (AxisInterface) axisList.get(i);
+             if (axisObj != null) 
+                setAxisTag(tags[i], axisObj.getAxisId());
+             else 
+             {
+                Log.errorln("Error:"+this.getClass().toString()+" lacks an axis for the tag:"+tags[i]+" were the number of axes improperly changed within the array?");
+                System.exit(-1); // should throw an error
+             }
+          }
+      }
+   }
+
+
    //
    //Other PUBLIC Methods
    //
@@ -196,6 +227,8 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
    throws java.io.IOException
    {
 
+      updateAxisIdHashFromAxisTags();
+
       boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
 
       //write out the tags info
@@ -207,6 +240,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
                                         // in the least, its tagToAxis that is important.
       int numberOfAxes = axisList.size();   
 */
+
       for (int i = 0, size = tags.length; i < size; i++) {
          String tag = tags[i];
          String axisId = (String) axisIdHash.get(tag); // ((AxisInterface) axisList.get(i)).getAxisId();
@@ -294,6 +328,9 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/09/27 17:21:48  thomas
+ * added method getAxisIdByTag; fix to writing out tagged data
+ *
  * Revision 1.19  2001/09/20 21:00:33  thomas
  * clean up plus bug fix: tag to axis could be reversed!
  *
