@@ -157,7 +157,7 @@ import java.util.*;
     //default is TaggedXMLDataIOStyle, xmlDataOStyle.parentArray = this
     attribHash.put("xmlDataIOStyle", new XMLAttribute(new TaggedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
     attribHash.put("dataFormat", new XMLAttribute(new StringDataFormat(), Constants.OBJECT_TYPE));
-    attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
+    attribHash.put("units", new XMLAttribute(null, Constants.OBJECT_TYPE));
     attribHash.put("axisList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("paramList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
@@ -343,7 +343,7 @@ import java.util.*;
 
    /**getDimension: set the dimension of the L<XDF::DataCube> held within this Array.
    */
-   public Number getDimension() {
+   public int getDimension() {
      return getDataCube().getDimension();
    }
 
@@ -435,10 +435,15 @@ import java.util.*;
    */
   public Unit addUnit(Unit unit) {
     if (unit == null) {
-      Log.warn("in Parameter.addUnit(), the Unit passed in is null");
+      Log.warn("in Array.addUnit(), the Unit passed in is null");
       return null;
     }
-    return  getUnits().addUnit(unit);
+    Units u = getUnits();
+    if (u == null) {
+      u = new Units();
+      setUnits(u);
+    }
+    return  u.addUnit(unit);
   }
 
   /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
@@ -447,7 +452,14 @@ import java.util.*;
    * @return: true if successful, false if not
    */
   public boolean removeUnit(Unit what) {
-    return getUnits().removeUnit(what);
+    Units u = getUnits();
+    if (u !=null) {
+      if (u.getUnitList().size()==0)
+        setUnits(null);
+      return u.removeUnit(what);
+    }
+    else
+      return false;
   }
 
   /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
@@ -456,7 +468,14 @@ import java.util.*;
    * @return: true if successful, false if not
    */
   public boolean removeUnit(int index) {
-    return getUnits().removeUnit(index);
+   Units u = getUnits();
+    if (u !=null) {
+      if (u.getUnitList().size()==0)
+        setUnits(null);
+      return u.removeUnit(index);
+    }
+    else
+      return false;
   }
 
   /** addParameter: insert an XDF::Parameter object into the paramList
@@ -721,6 +740,15 @@ import java.util.*;
     return true;
   }
 
-
  }
+ /**
+  * Modification History:
+  * $Log$
+  * Revision 1.8  2000/10/27 21:05:37  kelly
+  * --Units are initialized as null now.
+  * --added exception for get/set data.
+  * --created modification history.  --k.z.
+  *
+  *
+  */
 
