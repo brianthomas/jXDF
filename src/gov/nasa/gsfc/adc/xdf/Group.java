@@ -165,6 +165,8 @@ public class Group extends BaseObject {
   protected void init()
   {
 
+    resetXMLAttributes();
+
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
     attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);

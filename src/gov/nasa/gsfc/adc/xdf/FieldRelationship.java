@@ -131,6 +131,8 @@ public class FieldRelationship extends BaseObject {
    protected void init()
    {
 
+       resetXMLAttributes();
+
        classXDFNodeName = "relation";
 
        // order matters! these are in *reverse* order of their
@@ -152,6 +154,9 @@ public class FieldRelationship extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/05/10 21:17:17  thomas
+ * added resetXMLAttributes to init().
+ *
  * Revision 1.3  2001/02/07 18:44:04  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These

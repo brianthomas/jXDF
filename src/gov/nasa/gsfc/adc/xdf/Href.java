@@ -150,6 +150,8 @@ import java.util.Hashtable;
   protected void init()
   {
 
+    resetXMLAttributes();
+
     classXDFNodeName = "";  //XDF node name (none)
 
     // order matters! these are in *reverse* order of their
@@ -173,6 +175,9 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/05/10 21:18:50  thomas
+ * added resetXMLAttributes to init().
+ *
  * Revision 1.2  2001/02/07 18:44:03  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These

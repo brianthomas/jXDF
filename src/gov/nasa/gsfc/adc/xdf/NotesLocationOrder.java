@@ -130,12 +130,16 @@ public class NotesLocationOrder extends BaseObject {
    // Protected Methods
    //
 
-   /** A special private method used by constructor methods to
+   /** A special method used by constructor methods to
        conviently build the XML attribute list for a given class.
     */
    protected void init()
    {
+
+       resetXMLAttributes();
+
        classXDFNodeName = "locationOrder";
+
    };
 
 
@@ -144,6 +148,9 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2001/05/10 21:19:44  thomas
+ * added resetXMLAttributes to init().
+ *
  * Revision 1.6  2001/02/07 18:44:03  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These
