@@ -1842,19 +1842,35 @@ Log.errorln(" TValue:"+valueString);
        private String parentNode = null;
        private boolean isDelimitedCase;
 
+       public ValueList () {
+            
+          // set the defaults
+          this.setStart(Constants.VALUELIST_START); 
+          this.setSize(Constants.VALUELIST_SIZE); 
+          this.setStep(Constants.VALUELIST_STEP); 
+          this.setDelimiter(Constants.VALUELIST_DELIMITER); 
+          this.setRepeatable(Constants.VALUELIST_REPEATABLE); 
+
+       }
+
+       // accessor methods
        public String getValueListId() { return (String) attribs.get("valueListId"); }
        public void setValueListId(String value) { attribs.put("valueListId", value); }
 
        public String getValueListIdRef() { return (String) attribs.get("valueListIdRef"); }
        public void setValueListIdRef(String value) { attribs.put("valueListIdRef", value); }
 
+
        public int getStart () { return Integer.valueOf((String) attribs.get("start")).intValue(); } 
        public void setStart (String value) { attribs.put("start", value); }
+       public void setStart (int value) { attribs.put("start", Integer.toString(value)); }
 
        public int getStep() { return Integer.valueOf((String) attribs.get("step")).intValue(); } 
+       public void setStep (int value) { attribs.put("step", Integer.toString(value)); }
        public void setStep (String value) { attribs.put("step", value); }
 
        public int getSize() { return Integer.valueOf((String) attribs.get("size")).intValue(); } 
+       public void setSize(int value) { attribs.put("size", Integer.toString(value)); }
        public void setSize(String value) { attribs.put("size", value); }
 
        public String getDelimiter() { return (String) attribs.get("delimiter"); }
@@ -1879,8 +1895,15 @@ Log.errorln(" TValue:"+valueString);
        public Hashtable getAttribs() { return attribs; }
 
        public void init (Hashtable attribtable) {
-          attribs = attribtable; 
-          isDelimitedCase = false;
+
+          Enumeration keys = attribtable.keys();
+          while (keys.hasMoreElements()) {
+             String key = (String) keys.nextElement();
+             Object value = attribtable.get(key);
+             attribs.put(key,value);
+          }
+          //attribs = attribtable; 
+          this.isDelimitedCase = false;
        }
 
        protected Object clone () throws CloneNotSupportedException {
@@ -4257,6 +4280,10 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.41  2001/07/19 22:04:08  thomas
+ * fixed bug in ValueList (algorithm) stuff. Start, size, step
+ * not being correctly stored as String, fixed.
+ *
  * Revision 1.40  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
