@@ -680,14 +680,14 @@ public abstract class BaseObject implements Serializable {
         Iterator iter = obj.groupMemberHash.iterator(); // Must be in synchronized block
         while (iter.hasNext()) {
           Group memberGroup = (Group) iter.next();
-          // determine if this group that we belong to is already 
+          // determine if this group that we belong to is already
           // open or not.
           if(!obj.openGroupNodeHash.contains(memberGroup)) {
             // its *not* already open, so we bump up the indentation,
             // open it and add it to the open group node list.
-            indent.concat(sPrettyXDFOutputIndentation); 
+            indent.concat(sPrettyXDFOutputIndentation);
             memberGroup.toXDFOutputStream(outputstream, indent);
-            obj.openGroupNodeHash.add(memberGroup); 
+            obj.openGroupNodeHash.add(memberGroup);
           }
         }
       }
@@ -696,7 +696,7 @@ public abstract class BaseObject implements Serializable {
     return indent;
   }
 
-  /** Method determines if any of the currently open group objects 
+  /** Method determines if any of the currently open group objects
       belong to the current object and closes them if they arent.
   */
   private String dealWithClosingGroupNodes (BaseObject obj, OutputStream outputstream, String indent) {
@@ -708,10 +708,10 @@ public abstract class BaseObject implements Serializable {
         Iterator iter = obj.openGroupNodeHash.iterator(); // Must be in synchronized block
         while (iter.hasNext()) {
           Group openGroup = (Group) iter.next();
-          // determine if this group that we belong to is already 
+          // determine if this group that we belong to is already
           // open or not.
           if(!obj.groupMemberHash.contains(openGroup)) {
-            // its *not* a member of this group and its still open, 
+            // its *not* a member of this group and its still open,
             // so we need to close it.
 
             if (sPrettyXDFOutput) writeOut(outputstream, indent);
@@ -842,12 +842,7 @@ public abstract class BaseObject implements Serializable {
     /** Set the type of value held by this XMLAttribute.
     */
     public String setAttribType(String strType) {
-      if (
-           !strType.equals(Constants.STRING_TYPE) ||
-           !strType.equals(Constants.OBJECT_TYPE) ||
-           !strType.equals(Constants.NUMBER_TYPE) ||
-           !strType.equals(Constants.LIST_TYPE) 
-         )
+      if ( !Utility.isValidXMLAttributeType(strType))
       {
         Log.error("Type not a defined constant for XMLAttribute");
         return null;
@@ -877,6 +872,9 @@ public abstract class BaseObject implements Serializable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/10/16 14:47:24  kelly
+ * use enum list to  check valid XMLAttribute type. --k.z.
+ *
  * Revision 1.9  2000/10/10 19:12:05  cvs
  * First Feature complete version of the base class.
  * Added in dealWith(Open|Closed)Node private methods
