@@ -250,7 +250,7 @@ calls XDF.dtd by a parameter entity.
 	lessThanOrEqualValue NMTOKEN #IMPLIED
 	greaterThanValue NMTOKEN #IMPLIED
 	greaterThanOrEqualValue NMTOKEN #IMPLIED
-	infiniteValue NCDATA #IMPLIED
+	infiniteValue CDATA #IMPLIED
 	infiniteNegativeValue CDATA #IMPLIED
 	noDataValue CDATA #IMPLIED
 	notANumberValue   CDATA   #IMPLIED
