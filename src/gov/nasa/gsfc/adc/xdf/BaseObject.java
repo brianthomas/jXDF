@@ -86,6 +86,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   */
   protected List attribOrder;
 
+  private HashSet XMLNotationHash;
 
   //
   // Constructor Methods
@@ -131,6 +132,16 @@ public abstract class BaseObject implements Serializable, Cloneable {
    */
   public void setAttribHash(Hashtable hash) {
     attribHash = hash;
+  }
+
+   
+  /** Set the NotationHash for this object. Each entry in the passed HashSet
+      will be a Hashtable containing the keys 'name' 'publicId' and 'systemId'.
+      This information will be printed out with other XMLDeclarations in a 
+      toXMLFileHandle call that prints the XML declaration (e.g. DOCTYPE header). 
+  */
+  public void setXMLNotationHash (HashSet hash) {
+     XMLNotationHash = hash;
   }
 
   /** Return a list of the proper ordering of the XML attributes of this object.
@@ -509,7 +520,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   // PROTECTED Methods
   //
 
-  /** A little convience method to save coding time elsewhere.
+  /** A little convenience method to save coding time elsewhere.
       This method initializes the XDF attributes of an object from a
       passed Hashtable.
       Hashtable key/value pairs coorespond to the class XDF attribute
@@ -538,7 +549,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   }
 
-  /** A little convience method to save coding time elsewhere.
+  /** A little convenience method to save coding time elsewhere.
      Pass in an object to be removed from the indicated list.
      @param what - the object to be removed
             formList - the list to remove from
@@ -559,7 +570,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   }
 
-  /** A little convience method to save coding time elsewhere.
+  /** A little convenience method to save coding time elsewhere.
       Another way to remove an object from a list.
       @param listIndex--the index of the object to be removed
             formList--the list to remove from
@@ -744,6 +755,41 @@ public abstract class BaseObject implements Serializable, Cloneable {
     return newIndent.toString();
   }
 
+  /** Find all of the child href objects in this object.
+   */
+  protected ArrayList findAllChildHrefObjects () {
+
+     ArrayList list = new ArrayList();
+
+     if (this instanceof Structure) {
+
+        List arrayList = ((Structure) this).getArrayList();
+        synchronized (arrayList) {
+           Iterator iter = arrayList.iterator(); // Must be in synchronized block
+           while (iter.hasNext()) {
+               Array childArray = (Array) iter.next();
+               Href hrefObj = childArray.getDataCube().getHref();
+               if (hrefObj != null) 
+                  list.add(hrefObj);
+           }
+        } // sychronized arrayList 
+
+        List structList = ((Structure) this).getStructList();
+        synchronized (structList) {
+           Iterator iter = structList.iterator(); // Must be in synchronized block
+           while (iter.hasNext()) {
+               Structure childStruct = (Structure) iter.next();
+               ArrayList childList = childStruct.findAllChildHrefObjects();
+               if (childList.size() > 0) 
+                 list.add(childList);
+           }
+        } // sychronized structList 
+
+     }
+
+     return list;
+  }
+
   /** Method determines if any of the currently open group objects
       belong to the current object and closes them if they arent.
   */
@@ -802,20 +848,107 @@ public abstract class BaseObject implements Serializable, Cloneable {
          writeOut(outputstream, " " + attribName + "=\"" + XMLDeclAttribs.get(attribName) + "\"");
     }
     writeOut(outputstream, " ?>");
-    if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+
+    if (Specification.getInstance().isPrettyXDFOutput()) 
+        writeOut(outputstream, Constants.NEW_LINE);
 
     // Print the DOCTYPE DECL only if right info exists
     if (XMLDeclAttribs.containsKey("rootName")
         && XMLDeclAttribs.containsKey("dtdName"))
     {
         // print the DOCTYPE DECL IF its a structure node
-        if(classXDFNodeName != null && classXDFNodeName.equals(Specification.getInstance().getXDFStructureNodeName()) ) {
+        if(classXDFNodeName != null && 
+            classXDFNodeName.equals(Specification.getInstance().getXDFStructureNodeName()) ) 
+        {
             writeOut(outputstream, "<!DOCTYPE " + XMLDeclAttribs.get("rootName") + " SYSTEM \""
-                                   + XMLDeclAttribs.get("dtdName") + "\">");
+                                   + XMLDeclAttribs.get("dtdName") +"\"");
+            // any entities need to now be written.
+            // check for entities in href's
+            ArrayList hrefObjList = findAllChildHrefObjects();
+ 
+            StringBuffer entityString = new StringBuffer ();
+            StringBuffer notationString = new StringBuffer ();
+
+            // if we have any, then we must print out
+            if (hrefObjList.size() > 0) {
+
+               if (Specification.getInstance().isPrettyXDFOutput())
+                  entityString.append(Constants.NEW_LINE);
+           
+               // whip thru the list of href objects to get entities
+               synchronized (hrefObjList) {
+                  Iterator iter = hrefObjList.iterator(); // Must be in synchronized block
+                  while (iter.hasNext()) {
+                     Href hrefObj = (Href) iter.next();
+                     if (Specification.getInstance().isPrettyXDFOutput())
+                        entityString.append(Specification.getInstance().getPrettyXDFOutputIndentation());
+
+                     entityString.append("<!ENTITY " + hrefObj.getName());
+                     if (hrefObj.getPubId() != null)
+                        entityString.append(" PUBLIC \"" + hrefObj.getPubId() + "\""); 
+                     if (hrefObj.getSysId() != null)
+                        entityString.append(" SYSTEM \"" + hrefObj.getSysId() + "\""); 
+                     if (hrefObj.getNdata() != null)
+                        entityString.append(" NDATA " + hrefObj.getNdata()); 
+                     entityString.append(">");
+
+                     if (Specification.getInstance().isPrettyXDFOutput())
+                        entityString.append(Constants.NEW_LINE);
+                  }
+               }
+
+            }
+
+            // Now do notation stuff 
+            synchronized (XMLNotationHash) { // argh, needed?  
+               Iterator iter = XMLNotationHash.iterator(); // Must be in synchronized block
+
+               while (iter.hasNext()) {
+                  Hashtable notationHash = (Hashtable) iter.next();
+                  if (notationHash.containsKey("name")) 
+                  { 
+
+                     if (Specification.getInstance().isPrettyXDFOutput())
+                         notationString.append(Specification.getInstance().getPrettyXDFOutputIndentation());
+
+                     notationString.append("<!NOTATION " + notationHash.get("name"));
+
+                     if (notationHash.containsKey("publicId")) 
+                        notationString.append(" PUBLIC \"" + notationHash.get("publicId") + "\""); 
+
+                     if (notationHash.containsKey("systemId")) 
+                        notationString.append(" SYSTEM \"" + notationHash.get("systemId") + "\""); 
+
+                     notationString.append(">");
+
+                     if (Specification.getInstance().isPrettyXDFOutput())
+                        notationString.append(Constants.NEW_LINE);
+
+                  }
+                   else 
+                  {
+                     Log.warnln("Notation entry lacks name, ignoring entry\n");
+                  }
+               }
+            }
+               
+            if(entityString.length() > 0 || notationString.length() > 0 ) {
+               writeOut(outputstream, " [");
+               if(entityString.length() > 0)
+                  writeOut(outputstream, entityString.toString());
+               if (notationString.length() > 0 ) 
+                  writeOut(outputstream, notationString.toString());
+               writeOut(outputstream, "]");
+            }
+
+            writeOut(outputstream, ">");
         }
-      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+
+        if (Specification.getInstance().isPrettyXDFOutput()) 
+            writeOut(outputstream, Constants.NEW_LINE);
+
     } else
-      Log.errorln("Passed XMLDeclAttributes table lacks either dtdName, rootName entries, ignoring DOCTYPE line printout");
+      Log.errorln("Passed XMLDeclAttributes table lacks either dtdName or rootName entries, ignoring DOCTYPE line printout");
 
   }
 
@@ -824,6 +957,12 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.36  2001/01/19 17:25:08  thomas
+ * Added ability to set the XML parser. Added ability to
+ * save a hashtable of Notation that output XML will use.
+ * Fixed href stuff to DTD standard (using entities in DOCTYPE
+ * to indicate the filename, etc.) b.t.
+ *
  * Revision 1.35  2000/11/27 22:39:25  thomas
  * Fix to allow attribute text to have newline, carriage
  * returns in them (print out as entities: &#010; and
