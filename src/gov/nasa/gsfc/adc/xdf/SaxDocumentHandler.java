@@ -909,10 +909,11 @@ public class SaxDocumentHandler extends DefaultHandler {
         return in;
     }
 
-    // This and its sub-routines are Not currently used
     private void loadHrefDataIntoCurrentArray ( Entity hrefObj,
                                                 XMLDataIOStyle readObj,
-                                                String compressionType
+                                                String compressionType, 
+                                                int startByte,
+                                                int endByte
                                               ) 
     throws SAXException
     {
@@ -958,19 +959,19 @@ public class SaxDocumentHandler extends DefaultHandler {
                     // how we treat the rest of the array parameters
                     Locator locator = CurrentArray.createLocator();
                     String endian = readObj.getEndian();
-                    readFormattedInputStreamIntoArray(in, locator, endian);
+                    readFormattedInputStreamIntoArray(in, locator, endian, startByte, endByte);
 
                 } 
                 else if (readObj instanceof TaggedXMLDataIOStyle) 
                 {
 
-                    readTaggedInputStreamIntoArray(in);
+                    readTaggedInputStreamIntoArray(in, startByte, endByte);
 
                 } 
                 else if (readObj instanceof DelimitedXMLDataIOStyle) 
                 { 
 
-                    String data = getCharacterDataFromInputStream(in);
+                    String data = getCharacterDataFromInputStream(in, startByte, endByte);
 
                     // add it to the datablock if it isnt all whitespace ?? 
                     if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(data) )
@@ -997,7 +998,9 @@ public class SaxDocumentHandler extends DefaultHandler {
     }
 
     private void readTaggedInputStreamIntoArray (
-                                                   InputStream in
+                                                   InputStream in, 
+                                                   int startByte,
+                                                   int endByte
                                                 )
     throws IOException,SAXException 
     {
@@ -1018,15 +1021,24 @@ public class SaxDocumentHandler extends DefaultHandler {
 
         // not sure we need to reset the XDF object, could just call this in 
         // the void context I think, but do it anyways for safety sake.
-        XDF = taggedDataReader.parseString(getCharacterDataFromInputStream(in));
+        XDF = taggedDataReader.parseString(getCharacterDataFromInputStream(in, startByte, endByte));
 
         // finished reading the data, now restore the Href Entity
         CurrentArray.getDataCube().setHref(currentHref);
     }
 
-    private String getCharacterDataFromInputStream (InputStream in)
+    private String getCharacterDataFromInputStream (
+                                                     InputStream in, 
+                                                     int startByte,
+                                                     int endByte
+                                                   )
     throws IOException
     {
+
+       if (startByte > 0) 
+       {
+         // in.skip(startByte);
+       }
 
        StringBuffer buffer = new StringBuffer();
 
@@ -1044,6 +1056,10 @@ public class SaxDocumentHandler extends DefaultHandler {
              break; // short read? then thats all
           }
           offset += chars_this_read;
+
+          // stop reading if we exceed our limit of bytes to read
+          if (offset > endByte)
+             break; 
        }
 
        return buffer.toString();
@@ -1053,10 +1069,15 @@ public class SaxDocumentHandler extends DefaultHandler {
     private void readFormattedInputStreamIntoArray (
                                                       InputStream in,
                                                       Locator locator,
-                                                      String endian
+                                                      String endian, 
+                                                      int startByte,
+                                                      int endByte
                                                    )
     throws IOException,SAXException 
     {
+
+
+// Log.errorln("READ FORMATTED INPUT STREAM start:"+startByte+" readSize:"+CurrentInputReadSize);
 
        byte[] data = new byte[CurrentInputReadSize];
        int bytes_read = 0;
@@ -1065,17 +1086,12 @@ public class SaxDocumentHandler extends DefaultHandler {
 
           int readAmount = in.read(data, bytes_read, CurrentInputReadSize-bytes_read);
 
-          if ( readAmount == -1 )
+//Log.errorln("Read in "+readAmount+" bytes of data");
+
+          if ( readAmount == -1)
           {
              // pour out remaining buffer into the current array
-             try 
-             {
-                addByteDataToCurrentArray(locator, data, bytes_read, endian );
-             } 
-             catch (SetDataException e) 
-             { 
-                throw new SAXException("Failed to load external data at start byte:"+bytes_read);
-             }
+             addByteDataToCurrentArray(locator, data, startByte, endByte, bytes_read, endian );
              break; // EOF reached
           }
 
@@ -1085,13 +1101,8 @@ public class SaxDocumentHandler extends DefaultHandler {
           // if ( bytes_read == BASEINPUTREADSIZE) 
           if ( bytes_read == CurrentInputReadSize)
           {
-
               // pour out buffer into array
-              try {
-                 addByteDataToCurrentArray(locator, data, bytes_read, endian );
-              } catch (SetDataException e) {
-                 throw new SAXException("Failed to load external data at start byte:"+bytes_read);
-              }
+              addByteDataToCurrentArray(locator, data, startByte, endByte, bytes_read, endian );
               bytes_read = 0;
           }
 
@@ -1104,149 +1115,170 @@ public class SaxDocumentHandler extends DefaultHandler {
     //    String thisData = new String(byteArray,start,end);
     // stuff. Another point: we are not handling the byte encoding issues here, but
     // we should :P
-    private void addByteDataToCurrentArray (Locator location, byte[] data, int amount, String endian) 
-    throws SetDataException
+    private void addByteDataToCurrentArray ( Locator location, 
+                                             byte[] data, 
+                                             int startByte, 
+                                             int endByte, 
+                                             int amount, 
+                                             String endian
+                                           ) 
+//    throws SetDataException
+    throws SAXException
     {
 
         ArrayList commandList = (ArrayList) 
               ((FormattedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).getFormatCommands();
         int nrofIOCmd = commandList.size();
-        int bytes_added = 0;
+        int bytes_added = startByte;
 
-        while (bytes_added < amount) {
+        if (endByte > 0 && amount > endByte) 
+           amount = endByte;
 
-            FormattedIOCmd currentIOCmd = (FormattedIOCmd) commandList.get(CurrentIOCmdIndex);
+        try {
 
-            // readCell
-            if (currentIOCmd instanceof ReadCellFormattedIOCmd) {
-
-               DataFormat currentDataFormat = DataFormatList[CurrentDataFormatIndex];
-               int bytes_to_add = currentDataFormat.numOfBytes();
-
-               if ( currentDataFormat instanceof IntegerDataFormat
-                    || currentDataFormat instanceof FloatDataFormat
-                  ) {
-
-                   String thisData = new String(data,bytes_added,bytes_to_add);
-// Log.errorln("Got Href Formatted Number Data:["+thisData.trim()+ "]["+bytes_added+"]["+bytes_to_add+"]");
-
-                   try {
-                      addDataToCurrentArray(location, thisData.trim(), currentDataFormat, IntRadix[CurrentDataFormatIndex]);
-                   } catch (SetDataException e) {
-                      throw new SetDataException("Unable to setData:["+thisData+"], ignoring request"+e.getMessage());
-                   }
-
-               } else if (currentDataFormat instanceof StringDataFormat) {
-
-                   String thisData = new String(data,bytes_added,bytes_to_add);
-// Log.errorln("Got Href Formatted Character Data:["+thisData+ "]["+bytes_added+"]["+bytes_to_add+"]");
-                   try {
-                      addDataToCurrentArray(location, thisData, currentDataFormat, IntRadix[CurrentDataFormatIndex]);
-                   } catch (SetDataException e) {
-                      throw new SetDataException("Unable to setData:["+thisData+"], ignoring request"+e.getMessage());
-                   }
-
-
-               } else if (currentDataFormat instanceof BinaryFloatDataFormat) {
-
-                  if (bytes_to_add == 4) { 
-  
-                     float myValue = convert4bytesToFloat(endian, data, bytes_added);
-// Log.errorln("Got Href Data BFloatSingle:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
-                     CurrentArray.setData(location, myValue);
-
-                  } else if (bytes_to_add == 8) { 
-
-// Log.errorln("Got Href Data BFloatDouble:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
-                     double myValue = convert8bytesToDouble(endian, data, bytes_added);
-                     CurrentArray.setData(location, myValue);
-
-                  } else {
-                     Log.errorln("Error: got floating point with bit size != (32|64). Ignoring data.");
-                  }
-
-               } else if (currentDataFormat instanceof BinaryIntegerDataFormat) {
-
-//  Integer myValue = convert2bytesToInteger (endian, data, bytes_added);
-// Log.errorln("Got Href Data Integer:["+myValue.toString()+ "]["+bytes_added+"]["+bytes_to_add+"]");
-
-                  // int numOfBytes = ((BinaryIntegerDataFormat) currentDataFormat).numOfBytes();
-                  // int myValue = convertBytesToInteger (bytes_to_add, endian, data, bytes_added);
-                  // CurrentArray.setData(location, myValue);
-
-                  // is it better to use a dispatch table here?
-                  switch (bytes_to_add) 
-                  {
-
-                     case 1: { // 8-bit 
-                        short val = convert1byteToShort (data, bytes_added);
-                        CurrentArray.setData(location, val);
-                        break;
+           while (bytes_added < amount) {
+   
+               FormattedIOCmd currentIOCmd = (FormattedIOCmd) commandList.get(CurrentIOCmdIndex);
+   
+               // readCell
+               if (currentIOCmd instanceof ReadCellFormattedIOCmd) {
+   
+                  DataFormat currentDataFormat = DataFormatList[CurrentDataFormatIndex];
+                  int bytes_to_add = currentDataFormat.numOfBytes();
+   
+//   String strValue = new String(data, bytes_added, bytes_to_add);
+//   Log.errorln("AddByteData READCELL string(off:"+bytes_added+" len:"+bytes_to_add+") => ["+strValue+"]");
+   
+                  if ( currentDataFormat instanceof IntegerDataFormat
+                       || currentDataFormat instanceof FloatDataFormat
+                     ) {
+   
+                      String thisData = new String(data,bytes_added,bytes_to_add);
+//   Log.errorln("Got Href Formatted Number Data:["+thisData.trim()+ "]["+bytes_added+"]["+bytes_to_add+"]");
+   
+                      try {
+                         addDataToCurrentArray(location, thisData.trim(), currentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                      } catch (SetDataException e) {
+                         throw new SetDataException("Unable to setData:["+thisData+"], ignoring request"+e.getMessage());
+                      }
+   
+                  } else if (currentDataFormat instanceof StringDataFormat) {
+   
+                      String thisData = new String(data,bytes_added,bytes_to_add);
+//   Log.errorln("Got Href Formatted Character Data:["+thisData+ "]["+bytes_added+"]["+bytes_to_add+"]");
+   
+                      try {
+                         addDataToCurrentArray(location, thisData, currentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                      } catch (SetDataException e) {
+                         throw new SetDataException("Unable to setData:["+thisData+"], ignoring request"+e.getMessage());
+                      }
+   
+   
+                  } else if (currentDataFormat instanceof BinaryFloatDataFormat) {
+   
+                     if (bytes_to_add == 4) { 
+     
+                        float myValue = convert4bytesToFloat(endian, data, bytes_added);
+   //Log.errorln("Got Href Data BFloatSingle:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+                        CurrentArray.setData(location, myValue);
+   
+                     } else if (bytes_to_add == 8) { 
+   
+   // Log.errorln("Got Href Data BFloatDouble:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+                        double myValue = convert8bytesToDouble(endian, data, bytes_added);
+                        CurrentArray.setData(location, myValue);
+   
+                     } else {
+                        Log.errorln("Error: got floating point with bit size != (32|64). Ignoring data.");
                      }
-
-                     case 2: { // 16-bit 
-                        short val = convert2bytesToShort (endian, data, bytes_added);
-                        CurrentArray.setData(location, val);
-                        break;
+   
+                  } else if (currentDataFormat instanceof BinaryIntegerDataFormat) {
+   
+   // short myValue = convert2bytesToShort (endian, data, bytes_added);
+   // Log.errorln("Got Href Data Integer:["+myValue+ "]["+bytes_added+"]["+bytes_to_add+"]");
+   
+                     // int numOfBytes = ((BinaryIntegerDataFormat) currentDataFormat).numOfBytes();
+                     // int myValue = convertBytesToInteger (bytes_to_add, endian, data, bytes_added);
+                     // CurrentArray.setData(location, myValue);
+   
+                     // is it better to use a dispatch table here?
+                     switch (bytes_to_add) 
+                     {
+   
+                        case 1: { // 8-bit 
+                           short val = convert1byteToShort (data, bytes_added);
+                           CurrentArray.setData(location, val);
+                           break;
+                        }
+   
+                        case 2: { // 16-bit 
+                           short val = convert2bytesToShort (endian, data, bytes_added);
+                           CurrentArray.setData(location, val);
+                           break;
+                        }
+   
+                        case 3: { // 24-bit (unusual) 
+                           int val = convert3bytesToInt (endian, data, bytes_added);
+                           CurrentArray.setData(location, val);
+                           break;
+                        }
+   
+                        case 4: { // 32-bit
+                           int val = convert4bytesToInt (endian, data, bytes_added);
+                           CurrentArray.setData(location, val);
+                           break;
+                        }
+   
+                        case 8: { // 64-bit 
+                           long val = convert8bytesToLong (endian, data, bytes_added);
+                           CurrentArray.setData(location, val);
+                           break;
+                        }
+   
+                        default:
+                           Log.errorln("XDF Can't handle binary integers of byte size:"+bytes_to_add+". Aborting!");
+                           System.exit(-1);
+   
                      }
+   
+                  } 
+   
+                  // advance the data pointer to next location
+                  location.next();
+   
+                  // advance our global pointer to the current DataFormat
+                  if (NrofDataFormats > 1)
+                     if (CurrentDataFormatIndex == (NrofDataFormats - 1))
+                        CurrentDataFormatIndex = 0;
+                     else
+                        CurrentDataFormatIndex++;
+   
+                   bytes_added += bytes_to_add;
+   
+               } else if (currentIOCmd instanceof SkipCharFormattedIOCmd) {
+                  
+                   Integer bytes_to_skip = ((SkipCharFormattedIOCmd) currentIOCmd).getCount();
+                   bytes_added += bytes_to_skip.intValue();
+   
+               } else if (currentIOCmd instanceof RepeatFormattedIOCmd) {
+                  // shouldnt happen
+                  Log.errorln("Argh getFormatCommands not working right, got repeat command in addByteData!!!");
+                  System.exit(-1);
+               }
+   
+               // advance our global pointer to the current IOCmd
+               if (nrofIOCmd> 1)
+                 if (CurrentIOCmdIndex == (nrofIOCmd - 1))
+                    CurrentIOCmdIndex = 0;
+                 else
+                    CurrentIOCmdIndex++;
+   
+           }
 
-                     case 3: { // 24-bit (unusual) 
-                        int val = convert3bytesToInt (endian, data, bytes_added);
-                        CurrentArray.setData(location, val);
-                        break;
-                     }
-
-                     case 4: { // 32-bit
-                        int val = convert4bytesToInt (endian, data, bytes_added);
-                        CurrentArray.setData(location, val);
-                        break;
-                     }
-
-                     case 8: { // 64-bit 
-                        long val = convert8bytesToLong (endian, data, bytes_added);
-                        CurrentArray.setData(location, val);
-                        break;
-                     }
-
-                     default:
-                        Log.errorln("XDF Can't handle binary integers of byte size:"+bytes_to_add+". Aborting!");
-                        System.exit(-1);
-
-                  }
-
-               } 
-
-               // advance the data pointer to next location
-               location.next();
-
-               // advance our global pointer to the current DataFormat
-               if (NrofDataFormats > 1)
-                  if (CurrentDataFormatIndex == (NrofDataFormats - 1))
-                     CurrentDataFormatIndex = 0;
-                  else
-                     CurrentDataFormatIndex++;
-
-                bytes_added += bytes_to_add;
-
-            } else if (currentIOCmd instanceof SkipCharFormattedIOCmd) {
-               
-                Integer bytes_to_skip = ((SkipCharFormattedIOCmd) currentIOCmd).getCount();
-                bytes_added += bytes_to_skip.intValue();
-
-            } else if (currentIOCmd instanceof RepeatFormattedIOCmd) {
-               // shouldnt happen
-               Log.errorln("Argh getFormatCommands not working right, got repeat command in addByteData!!!");
-               System.exit(-1);
-            }
-
-            // advance our global pointer to the current IOCmd
-            if (nrofIOCmd> 1)
-              if (CurrentIOCmdIndex == (nrofIOCmd - 1))
-                 CurrentIOCmdIndex = 0;
-              else
-                 CurrentIOCmdIndex++;
-
+        } catch (SetDataException e) {
+           throw new SAXException("Failed to load external data at byte_read:"+bytes_added+" msg:"+e.getMessage());
         }
+
 
     }
 
@@ -1969,7 +2001,7 @@ Log.errorln(" TValue:"+valueString);
 
                  // add in our object
                  if(endDataPosition > dataLength) { 
-                    Log.errorln("Format specification exceeded data width, Bad format?");
+                    Log.errorln("Format specification exceeded data width, Bad format or failed to use start/endByte attribs on data element?");
                     Log.errorln("Run in debug mode to examine formatted read. Aborting.");
                     System.exit(-1); // throw IOException;
                  }
@@ -2748,6 +2780,15 @@ Log.errorln(" TValue:"+valueString);
                 // dont add this data unless it has more than just whitespace
                 if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(thisString) ) {
 
+
+                   if ( CurrentArray.getDataCube().getStartByte().intValue() > 0 ||
+                        CurrentArray.getDataCube().getEndByte() != null) {
+                       Log.warnln("Warning: Tagged data node has either/both startByte/endByte attributes set. Ignoring.");
+                       // reset them to "0" 
+                       CurrentArray.getDataCube().setStartByte(new Integer(0));
+                       CurrentArray.getDataCube().setEndByte(null);
+                   }
+
                    DataTagLevel = CurrentDataTagLevel;
 
                    DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
@@ -2781,6 +2822,31 @@ Log.errorln(" TValue:"+valueString);
           if (DataNodeLevel > 0) {
 
              XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
+
+             // use different parameters IF dataCube has them set
+             int startByte = CurrentArray.getDataCube().getStartByte().intValue();
+             if (startByte > 0) {
+                offset = offset + startByte;
+                len = len - startByte;
+
+                // Since startByte is basically a one-time deal, we must reset this 
+                // to 0 now to avoid problems in the future, should we get some other
+                // cdata to examine (usually whitespace stuff). 
+                CurrentArray.getDataCube().setStartByte(new Integer(0));
+             }
+
+             if (CurrentArray.getDataCube().getEndByte() != null) {
+                int endByte = CurrentArray.getDataCube().getEndByte().intValue();
+
+                len = endByte + 1;
+
+                if (startByte > 0) 
+                  len -= startByte;
+
+                // as per startByte, we need to 'zero' this out to prevent future problems 
+                CurrentArray.getDataCube().setEndByte(null);
+             }
+
              String thisString = new String(buf,offset,len);
 
              if ( readObj instanceof DelimitedXMLDataIOStyle ||
@@ -3100,14 +3166,24 @@ while (iter.hasNext()) {
           // This happens when the data node specifies that data lies in an external file
           // (viz the href entity mechanism)
           Entity href = CurrentArray.getDataCube().getHref();
+
           if (href != null) 
+          { 
+
+             int startByte = CurrentArray.getDataCube().getStartByte().intValue();
+             int endByte = -1; // default: -1 means read it all
+             if (CurrentArray.getDataCube().getEndByte() != null) 
+                endByte = CurrentArray.getDataCube().getEndByte().intValue();
+
               // The first method is the 'old' way.
               // If you uncomment it  be sure to uncomment line that looks like:
               //    if (CurrentArray.getDataCube().getHref() != null) return;
               // in the end dataElementHandler
               // DATABLOCK.append(getHrefData(href, CurrentArray.getDataCube().getCompression()));
-              loadHrefDataIntoCurrentArray(href, readObj, CurrentArray.getDataCube().getCompression());
+              loadHrefDataIntoCurrentArray(href, readObj, CurrentArray.getDataCube().getCompression(), 
+                                           startByte, endByte);
 
+          }
 
           return readObj;
        }
