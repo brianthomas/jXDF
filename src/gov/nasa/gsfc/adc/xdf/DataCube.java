@@ -218,11 +218,11 @@ public class DataCube extends BaseObject {
    //not right, have to write again, double check implications of dataCube
    public void reset() { 
 
-      Log.errorln("in DataCube, reset(), method is empty needs to be implemented!");
+      Log.debugln("in DataCube, called reset()");
 
       // reset the longDataArray, will free all related shortDataArrays.
       // What else needs to be done?
-      // this.longDataArray = Collections.synchronizedList(new ArrayList());
+      longDataArray = Collections.synchronizedList(new ArrayList());
 
    }
    
@@ -232,7 +232,6 @@ public class DataCube extends BaseObject {
    public Object getData (Locator locator) throws NoDataException
    {
    
-      List axisList = parentArray.getAxes();
       int longIndex = getLongArrayIndex(locator);
       int shortIndex = getShortArrayIndex(locator);
    
@@ -274,7 +273,6 @@ public class DataCube extends BaseObject {
    throws NoDataException
    {
    
-      List axisList = parentArray.getAxes();
       int longIndex = getLongArrayIndex(locator);
       int shortIndex = getShortArrayIndex(locator);
    
@@ -297,7 +295,6 @@ public class DataCube extends BaseObject {
    throws NoDataException
    {
    
-      List axisList = parentArray.getAxes();
       int longIndex = getLongArrayIndex(locator);
       int shortIndex = getShortArrayIndex(locator);
    
@@ -320,7 +317,6 @@ public class DataCube extends BaseObject {
    throws NoDataException
    {
    
-      List axisList = parentArray.getAxes();
       int longIndex = getLongArrayIndex(locator);
       int shortIndex = getShortArrayIndex(locator);
    
@@ -344,7 +340,6 @@ public class DataCube extends BaseObject {
    throws NoDataException
    {
 
-      List axisList = parentArray.getAxes();
       int longIndex = getLongArrayIndex(locator);
       int shortIndex = getShortArrayIndex(locator);
 
@@ -894,7 +889,7 @@ public class DataCube extends BaseObject {
                throw new SetDataException();
             } else {
                // add in short axis location to local short array(s) 
-               int newsize = shortIndex;
+               int newsize = shortIndex+1; // need to add one for case of 1-D 
                newsize *= expandFactor; // expand short axis by expandFactor 
                longDataArray.set(longIndex, expandArray((byte []) longDataArray.get(longIndex), newsize));
 
@@ -996,7 +991,7 @@ public class DataCube extends BaseObject {
 
      List axisList = parentArray.getAxes();
      if (axisList.size() > 1) {
-        shortAxis = (AxisInterface) parentArray.getAxes().get(1);
+        shortAxis = (AxisInterface) axisList.get(1);
      }
      return shortAxis;
    }
@@ -1029,6 +1024,7 @@ public class DataCube extends BaseObject {
      }
 
      return (longIndex*2); // double value to allow for shadow byte array 
+
    }
 
    // this is stupid, no exponential operator (**) in Java???
@@ -1052,7 +1048,7 @@ public class DataCube extends BaseObject {
       int additionalCapacity = (newsize - currentSize) * 2; // mult by 2 to allow for shadow byte array 
 
       if (additionalCapacity > 0) {
-Log.debugln("Expanding Long array size to "+newsize+" from "+currentSize +" (add capacity is "+additionalCapacity+")");
+Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)+" from "+(currentSize*2)+" (added capacity is:"+additionalCapacity+")");
          List moreArray = Collections.synchronizedList(new ArrayList(additionalCapacity));
          for (int i = 0; i < additionalCapacity; i++) {
             moreArray.add(null); // populate with nulls
@@ -1676,6 +1672,10 @@ Log.debugln("Expanding Long array size to "+newsize+" from "+currentSize +" (add
  /**
   * Modification History:
   * $Log$
+  * Revision 1.32  2001/06/18 21:42:29  thomas
+  * first implemntation of reset() method. Antipated a possible
+  * bug in getting shortArrayIndex when DataCube was 1-D.
+  *
   * Revision 1.31  2001/06/18 17:07:26  thomas
   * total re-vamp of internal data storage. Will
   * actually handle more than 2D of data now.
