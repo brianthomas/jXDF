@@ -34,8 +34,8 @@ import java.io.File;
 import java.util.Hashtable;
 import java.util.Map;
 
-// Import needed W3C stuff
-import org.w3c.dom.*;
+// Import needed SAX stuff
+import org.w3c.dom.*; // W3c SAX standard bits
 import org.xml.sax.*;
 import org.xml.sax.helpers.ParserFactory;
 import com.sun.xml.parser.Resolver;
@@ -48,20 +48,11 @@ import com.sun.xml.parser.Resolver;
     2 - allow passing of addtional start/end handlers for user-defined nodes
 
  */
-public class Reader implements DocumentHandler
+public class Reader
 {
 
-    // 
-    // Fields
-    //
-    private gov.nasa.gsfc.adc.xdf.Structure myStructure;      // XDF structure that is populated
-                                                      // by the XDF Reader
-    private Hashtable startElementHandlerHashtable = new Hashtable(); // dispatch table for the start 
-                                                      // node handler of the parser
-    private Hashtable charDataHandlerHashtable = new Hashtable(); // dispatch table for the charData
-                                                      // handler of the parser
-    private Hashtable endElementHandlerHashtable = new Hashtable(); // dispatch table for the end 
-                                                      // node handler of the parser
+    // Fields 
+    XDFSaxDocumentHandler myDocumentHandler;
 
     //
     // Constructor methods 
@@ -74,7 +65,7 @@ public class Reader implements DocumentHandler
     */
     public Reader() 
     {
-      init();
+       myDocumentHandler = new XDFSaxDocumentHandler();
     }
 
     /** Pass a structure object reference to use as the structure to load 
@@ -84,30 +75,100 @@ public class Reader implements DocumentHandler
      */
     public Reader(gov.nasa.gsfc.adc.xdf.Structure structure) 
     {
-       init();
-       setReaderStructureObj(structure); 
+       myDocumentHandler = new XDFSaxDocumentHandler(structure);
     }
 
     //
     // Public Methods
     //
 
+    /** Merge in external map to the internal startElement handler Hashtable. 
+        Keys in the Hashtable are strings describing the node name in
+        and the value is a code reference to the class that will handle 
+        the event. The class must implement the StartElementAction interface. 
+        It is possible to override default XDF startElement handlers with 
+        this method. 
+     */
+    public void addStartElementHandlers (Map m) {
+       myDocumentHandler.addStartElementHandlers(m);
+    }
+
+    /** Merge in external Hashtable into the internal charData handler Hashtable. 
+        Keys in the Hashtable are strings describing the node name in
+        the XML document that has CDATA and the value is a code reference
+        to the class that will handle the event. The class must implement 
+        the CharDataAction interface. It is possible to override default
+        XDF cdata handlers with this method. 
+     */
+    public void addCharDataHandlers (Map m) {
+       myDocumentHandler.addCharDataHandlers(m);
+    }
+
+    /** Merge in external map to the internal endElement handler Hashtable. 
+        Keys in the Hashtable are strings describing the node name in
+        and the value is a code reference to the class that will handle 
+        the event. The class must implement the StartElementAction interface. 
+        It is possible to override default XDF startElement handlers with 
+        this method. 
+    */
+    public void addEndElementHandlers (Map m) {
+       myDocumentHandler.addEndElementHandlers(m);
+    }
+
     /** Set the structure object that the Reader will parse an InputSource into. 
     */
-    public gov.nasa.gsfc.adc.xdf.Structure getReaderStructureObj 
-           (gov.nasa.gsfc.adc.xdf.Structure structure) 
-    { 
-      return myStructure;
+    public gov.nasa.gsfc.adc.xdf.Structure getReaderStructureObj () 
+    {
+      return myDocumentHandler.getReaderStructureObj();
     }
 
     /** Get the structure object that the Reader will parse an InputSource into. 
     */
-    public gov.nasa.gsfc.adc.xdf.Structure setReaderStructureObj 
-           (gov.nasa.gsfc.adc.xdf.Structure structure) 
-    { 
+    public gov.nasa.gsfc.adc.xdf.Structure setReaderStructureObj
+           (gov.nasa.gsfc.adc.xdf.Structure structure)
+    {
+      return myDocumentHandler.setReaderStructureObj(structure);
+    }
 
-       myStructure = structure; // set the structure to read into to be passed ref. 
-       return myStructure;
+    /** Parse an InputSource into an XDF Structure object.
+        @return: XDF Structure object
+     */
+    public gov.nasa.gsfc.adc.xdf.Structure parse (InputSource inputsource) 
+    throws java.io.IOException
+    {
+
+        try {
+
+            Parser parser;
+            String parsername = "org.apache.xerces.parsers.SAXParser";
+
+
+            // create an instance of the parser
+            parser = (Parser) ParserFactory.makeParser (parsername);
+
+            // set parser handlers to XDF standard ones
+            parser.setDocumentHandler(myDocumentHandler);
+            parser.setErrorHandler(new XDFSaxErrorHandler());
+
+            // ok, now we are ready to parse the inputsource 
+            parser.parse(inputsource);
+
+        } catch (SAXParseException err) {
+            Log.errorln("** Parsing error"+", line "+err.getLineNumber()
+                +", uri "+err.getSystemId()+"   " + err.getMessage());
+
+        } catch (SAXException e) {
+            Exception   x = e;
+            if (e.getException () != null)
+                x = e.getException ();
+            Log.printStackTrace(x);
+
+        } catch (Throwable e) {
+            Log.printStackTrace(e);
+        }
+
+        // return the parsed structure object
+        return myDocumentHandler.getReaderStructureObj();
 
     }
 
@@ -130,53 +191,105 @@ public class Reader implements DocumentHandler
         //
         input = Resolver.createInputSource (new File(file));
 
-        // now parse it
-        parse(input);
+        // now parse it, return whatever structure is derived 
+        return parse(input);
 
-        // return the derived structure
-        return myStructure;
     }
 
-    /** Parse an InputSource into an XDF Structure object.
-        @return: XDF Structure object
-     */
-    public gov.nasa.gsfc.adc.xdf.Structure parse (InputSource inputsource) 
-    throws java.io.IOException
+} // end Reader class
+
+//
+// External classes (put here because only Reader uses them)  
+//
+
+// The parser error Handler
+class XDFSaxErrorHandler extends HandlerBase
+{
+  // treat validation errors as fatal
+  public void error (SAXParseException e)
+  throws SAXParseException
+  {
+    throw e;
+  }
+
+  // dump warnings too
+  public void warning (SAXParseException e)
+  throws SAXParseException
+  {
+    //Log.error("** Warning"+", line "+e.getLineNumber()
+    Log.error("** Warning"+", line "+e.getLineNumber()
+               + ", uri " + e.getSystemId()+"   " + e.getMessage());
+  }
+} // End of XDFSaxErrorHandler class 
+
+
+// Document Handler class - where the real action is 
+class XDFSaxDocumentHandler implements DocumentHandler {
+
+    // 
+    // Fields
+    //
+
+    // The XDF structure that is populated by the XDF DocumentHandler
+    private gov.nasa.gsfc.adc.xdf.Structure XDF; 
+
+    // Options for the document handler
+    private Hashtable Options;
+
+    // dispatch table action handler hashtables
+    private Hashtable startElementHandlerHashtable; // start node handler
+    private Hashtable charDataHandlerHashtable;     // charData handler
+    private Hashtable endElementHandlerHashtable;   // end node handler
+
+    // References to the current working structure/array
+    private gov.nasa.gsfc.adc.xdf.Structure currentStructure;   
+    private gov.nasa.gsfc.adc.xdf.Array     currentArray;   
+    private String currentDatatypeObject;
+
+    // lookup tables holding objects that have id/idref stuff
+    private Hashtable AxisObj = new Hashtable();
+
+    //
+    // Constuctors
+    //
+
+    public XDFSaxDocumentHandler ()
+    {
+       init();
+    }
+
+    public XDFSaxDocumentHandler (gov.nasa.gsfc.adc.xdf.Structure structure)
+    {
+       init();
+       setReaderStructureObj(structure);
+    }
+
+    public XDFSaxDocumentHandler (Hashtable options)
+    {
+       init();
+       Options = options;
+    }
+
+    //
+    // Non-Sax Public Methods
+    //
+
+    /** Set the structure object that the Reader will parse an InputSource into. 
+    */
+    public gov.nasa.gsfc.adc.xdf.Structure getReaderStructureObj () 
+    {
+      return XDF;
+    }
+
+    /** Get the structure object that the Reader will parse an InputSource into. 
+    */
+    public gov.nasa.gsfc.adc.xdf.Structure setReaderStructureObj
+           (gov.nasa.gsfc.adc.xdf.Structure structure)
     {
 
-        try {
+       XDF = structure; // set the structure to read into to be passed ref. 
+       return XDF;
 
-            Parser parser;
-            String parsername = "org.apache.xerces.parsers.SAXParser";
-
-            //parser = (Parser) ParserFactory.makeParser ();
-            //parser.setDocumentHandler (this); // use the methods in this class 
-
-            // create an instance of the parser
-            XMLReader parser = XMLReaderFactory.createXMLReader(parsername);
-
-            // set parser handlers to XDF standard ones
-            parser.setContentHandler (this); //new XDFSaxContentHandler());
-            parser.setErrorHandler (new XDFSaxErrorHandler());
-
-            // ok, now we are ready to parse the inputsource 
-            parser.parse(inputsource);
-
-        } catch (SAXParseException err) {
-            Log.errorln("** Parsing error"+", line "+err.getLineNumber()
-                +", uri "+err.getSystemId()+"   " + err.getMessage());
-
-        } catch (SAXException e) {
-            Exception   x = e;
-            if (e.getException () != null)
-                x = e.getException ();
-            Log.printStackTrace(x);
-
-        } catch (Throwable e) {
-            Log.printStackTrace(e);
-        }
-
-        return myStructure; 
     }
 
     /** Merge in external map to the internal startElement handler Hashtable. 
@@ -210,7 +323,11 @@ public class Reader implements DocumentHandler
     */
     public void addEndElementHandlers (Map m) {
        endElementHandlerHashtable.putAll(m);
-    } 
+    }
+
+    //
+    // SAX methods
+    //
 
     // what is this for?? Required by the DocumentHandler interface. feh. 
     public void setDocumentLocator (org.xml.sax.Locator l)
@@ -219,10 +336,6 @@ public class Reader implements DocumentHandler
         // in content or attributes, or wanted to give diagnostics.
         // Right now, do nothing here.
     }
-
-    // 
-    // SAX methods
-    // 
 
     /** startElement handler.
      */
@@ -240,31 +353,13 @@ public class Reader implements DocumentHandler
         if ( startElementHandlerHashtable.containsKey(element) ) {
 
            // run the appropriate start handler
-           StartElementAction event = (StartElementAction) startElementHandlerHashtable.get(element); 
+           StartElementHandlerAction event = 
+              (StartElementHandlerAction) startElementHandlerHashtable.get(element); 
            event.action(attrs);
 
         } else {
            Log.warn("Warning: UNKNOWN NODE ["+element+"] encountered.\n");
         }
-
-        /*
-        // DEBUG BLOCK
-        Log.debug("<"+tag);
-        if (attrs != null) {
-            for (int i = 0; i < attrs.getLength (); i++) {
-                Log.debug(" ");
-                Log.debug(attrs.getName(i));
-                Log.debug("=\"");
-                // XXX this doesn't quote '&', '<', and '"' in the
-                // way it should ... needs to scan the value and
-                // emit '&amp;', '&lt;', and '&quot;' respectively
-                Log.debug(attrs.getValue (i));
-                Log.debug("\"");
-            }
-        }
-        Log.debugln(">");
-        */
-
     }
 
     public void endElement (String element)
@@ -280,7 +375,8 @@ public class Reader implements DocumentHandler
         if ( endElementHandlerHashtable.containsKey(element) ) {
 
            // run the appropriate start handler
-           EndElementAction event = (EndElementAction) endElementHandlerHashtable.get(element);
+           EndElementHandlerAction event = (EndElementHandlerAction) 
+                   endElementHandlerHashtable.get(element);
            event.action();
 
         } else {
@@ -340,8 +436,15 @@ public class Reader implements DocumentHandler
      */
     private void init () {
 
+      // set up logging, needed ??
       Log.configure("XDFLogConfig");
-      myStructure = new gov.nasa.gsfc.adc.xdf.Structure();
+      
+      // assign/init 'globals' (e.g. object fields)
+      XDF = new gov.nasa.gsfc.adc.xdf.Structure();
+      Options = new Hashtable();  
+      startElementHandlerHashtable = new Hashtable(); // start node handler
+      charDataHandlerHashtable = new Hashtable(); // charData handler
+      endElementHandlerHashtable = new Hashtable(); // end node handler
 
       // initialize the default XDF parser dispatch tables
       initStartHandlerHashtable();
@@ -358,12 +461,13 @@ public class Reader implements DocumentHandler
     }
 
     // required by the DocumentHandler Interface
-    private void setDocumentHandler (SaxDocHandler myHandler) { }
+    private void setDocumentHandler (DocumentHandler myHandler) { }
 
     //
     private void initStartHandlerHashtable () {
 
        startElementHandlerHashtable.put(XDFNodeName.ARRAY, new arrayStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.AXIS, new axisStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.ROOT, new rootStartElementHandlerFunc());
 
     }
@@ -376,32 +480,13 @@ public class Reader implements DocumentHandler
     //
     private void initEndHandlerHashtable () {
 
-       endElementHandlerHashtable.put(XDFNodeName.ARRAY, new arrayEndElementHandlerFunc());
-       endElementHandlerHashtable.put(XDFNodeName.ROOT, new rootEndElementHandlerFunc());
+       // endElementHandlerHashtable.put(XDFNodeName.ARRAY, new arrayEndElementHandlerFunc());
+
     }
 
-    // 
+    //
     // Internal Classes
     //
-
-    static class XDFSaxErrorHandler extends HandlerBase
-    {
-        // treat validation errors as fatal
-        public void error (SAXParseException e)
-        throws SAXParseException
-        {
-            throw e;
-        }
-
-        // dump warnings too
-        public void warning (SAXParseException e)
-        throws SAXParseException
-        {
-            //Log.error("** Warning"+", line "+e.getLineNumber()
-            Log.error("** Warning"+", line "+e.getLineNumber()
-                + ", uri " + e.getSystemId()+"   " + e.getMessage());
-        }
-    } // End of XDFSaxErrorHandler class 
 
     /*
        Now, Some defines based on XDF DTD.
@@ -459,67 +544,166 @@ public class Reader implements DocumentHandler
 
     } // End of XDFNodeName class 
 
-} // End of Reader class 
+    // 
+    // Dispatch Table Handlers 
+    //
 
-// 
-// Interfaces for parser actions 
-//
+    // ASCII DELIMITER NODE HANDLERS
+/*
+sub asciiDelimiter_node_end { pop @CURRENT_FORMAT_OBJECT; }
 
-interface StartElementAction {
-  public void action (AttributeList attrs);
+sub asciiDelimiter_node_start {
+  my (%attrib_hash) = @_;
+
+  # set the format object in the current array
+  my $formatObj = $CURRENT_ARRAY->XmlDataIOStyle(new XDF::DelimitedXMLDataIOStyle(\%attrib_hash));
+
+  push @CURRENT_FORMAT_OBJECT, $formatObj;
+
 }
+*/
+    // ARRAY NODE
+    //
 
-interface CharDataAction {
-  public void action (char buf [], int offset, int len);
+    // Array node start 
+    class arrayStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+
+          // create new object appropriately 
+          Array newarray = new Array();
+          newarray.setXMLAttributes(attrs); // set XML attributes from passed list 
+
+          // set current array and add this array to current structure 
+          currentArray = currentStructure.addArray(newarray);
+
+          currentDatatypeObject = "currentArray";
+
+       }
+    } 
+
+    // AXIS NODE 
+    //
+
+    class axisStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+
+          // create new object appropriately 
+          Axis newaxis = new Axis();
+          newaxis.setXMLAttributes(attrs); // set XML attributes from passed list 
+
+          // Every axis must have *either* axisId *or* an axisIdRef 
+          // else, its illegal!
+          String axisId = null;
+          String axisIdRef = null;
+          if ( (axisId = newaxis.getAxisId()) != null 
+                || (axisIdRef = newaxis.getAxisIdRef()) != null 
+             ) 
+          { 
+
+             // add this object to the lookup table, if it has an ID
+             if (axisId != null) {
+
+                 // a warning check, just in case 
+                 if (AxisObj.contains(axisId)) 
+                    Log.warnln("More than one axis node with axisId=\""+axisId+"\", using latest node.\n" ); 
+
+                 // add this into the list of axis objects
+                 AxisObj.put(axisId, newaxis);
+
+             }
+
+             //  If there is a reference object, clone it to get
+             //  the new axis
+             if (axisIdRef != null) {
+
+                 if (AxisObj.contains(axisIdRef)) {
+
+ //                   Object refAxisObj = AxisObj.get(axisIdRef);
+//                    newaxis = (Axis) refAxisObj.clone();
+
+                    // override attrs with those in passed list
+//                    newaxis.setXMLAttributes(attrs);
+
+                 } else {
+
+                    Log.errorln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
+                    return;
+
+                 }
+             }
+
+             // add this axis to the current array object
+             currentArray.addAxis(newaxis);
+
+             currentDatatypeObject = "lastAxis";
+
+          } else {
+
+             Log.errorln("Axis object:"+newaxis+" lacks either axisId or axisIdRef, ignoring!");
+
+          }
+
+       }
+    }
+
+    // ROOT NODE 
+    //
+
+    // Root node start 
+    class rootStartElementHandlerFunc implements StartElementHandlerAction {
+       public void action (AttributeList attrs) { 
+          // The root node is just a "structure" node,
+          // but is always the first one.
+          XDF.setXMLAttributes(attrs); // set XML attributes from passed list 
+          currentStructure = XDF;      // current working structure is now the root 
+                                       // structure
+
+          // if this global option is set in the reader, we use it
+          if(Options.contains("DefaultDataDimensionSize")) { 
+             int value = ((Integer) Options.get("DefaultDataDimensionSize")).intValue();
+             XDF.setDefaultDataArraySize(value);
+          }
+       }
+    }
+
+
+// generic node end
+class genericEndElementHandlerFunc implements EndElementHandlerAction {
+   public void action () { System.out.println("End generic node"); }
 }
-
-interface EndElementAction {
-  public void action ();
-}
-
-//
-// External classes (put here because only Reader uses them)  
-//
-
-// array node start 
-class arrayStartElementHandlerFunc implements StartElementAction {
-  public void action (AttributeList attrs) { 
-    System.out.println("GOT AN ARRAY NODE"); 
-  }
-}
-
-// array node end
-class arrayEndElementHandlerFunc implements EndElementAction {
-  public void action () { System.out.println("End array node"); }
-}
-
-// root node start 
-class rootStartElementHandlerFunc implements StartElementAction {
-  public void action (AttributeList attrs) { 
-    System.out.println("GOT The ROOT NODE"); 
-  }
-}
-
-// root node end
-class rootEndElementHandlerFunc implements EndElementAction {
-  public void action () { System.out.println("End root node"); }
-}
-
 
 // CDATA EXAMPLE FUNCTION STUFF
-class charDataXDFHandlerFunc1 implements CharDataAction {
+class charDataXDFHandlerFunc1 implements CharDataHandlerAction {
   public void action (char buf [], int offset, int len) { 
     System.out.println("call to start XDF node"); 
   }
 }
 
+} // End of XDFSaxDocumentHandler class 
+
+// 
+// Interfaces for Parser DocumentHandler Actions 
+//
+
+interface StartElementHandlerAction {
+  public void action (AttributeList attrs);
+}
+
+interface CharDataHandlerAction {
+  public void action (char buf [], int offset, int len);
+}
+
+interface EndElementHandlerAction {
+  public void action ();
+}
+
 /* Modification History:
  *
  * $Log$
- * Revision 1.3  2000/10/23 18:32:05  thomas
- * Further cut for the Reader. Need to implement individual
- * start, end and char data handlers. Framework about
- * complete though.
+ * Revision 1.4  2000/10/24 17:03:10  thomas
+ * This is an interim version. Most of the basic structure
+ * is here, but the reader lacks the various handlers
+ * needed for various XDF nodes. -b.t.
  *
  * 
  */
