@@ -506,8 +506,8 @@ public class Field extends BaseObjectWithXMLElements {
      // occurence in the XDF DTD
      attribOrder.add(0, NOTELIST_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, RELATION_XML_ATTRIBUTE_NAME);
-     attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, DISABLEDVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, UNDERFLOWVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, OVERFLOWVALUE_XML_ATTRIBUTE_NAME);
@@ -556,6 +556,9 @@ public class Field extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2001/09/20 20:58:14  thomas
+ * unit/dataFormat reversed from DTDcvs update fixed
+ *
  * Revision 1.20  2001/09/19 17:51:32  thomas
  * made some set*List methods deprecated
  *
