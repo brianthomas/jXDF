@@ -192,6 +192,20 @@ import java.io.StringWriter;
                entityObj.toXMLWriter(outputWriter, newindent); 
             }
          }
+
+         // we need to "auto-magically" add the xdf notation node, if it doesnt exist in the list
+         // BUT there are Href entity objects
+         if (notationObjList.size() == 0) 
+         {
+
+            Log.warnln("xdf notation missing!, adding new NotationNode to DocumentType object:"+this);
+            NotationNode xdfNotation = new NotationNode();
+            xdfNotation.setName(Constants.XDF_NOTATION_NAME);
+            xdfNotation.setPublicId(Constants.XDF_NOTATION_PUBLICID);
+            this.addNotation(xdfNotation);
+
+         }
+
       }
 
       if (notationObjList.size() > 0) {
@@ -211,7 +225,8 @@ import java.io.StringWriter;
             }
          }
 
-      }
+      } 
+
 
       if (entityObjList.size() > 0 || notationObjList.size() > 0) 
          outputWriter.write("]");
@@ -227,6 +242,9 @@ import java.io.StringWriter;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/09/27 17:20:29  thomas
+ * fix for writing out DocumentType where entities exist, but notationNode has been forgotten to be set
+ *
  * Revision 1.1  2001/09/13 21:37:58  thomas
  * *** empty log message ***
  *
