@@ -162,11 +162,20 @@ public class Structure extends BaseObjectWithXMLElements {
     return (List) ((Attribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /** Set the *structList* attribute
-      @deprecated You should use the add/remove methods to manipulate this list.
+ /** Convenience method to set the list of structures held within this object.
    */
-  public void setStructList(List structList) {
-    ((Attribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).setAttribValue(structList);
+  public void setStructList (List structList) {
+
+    // clear list
+    ((Attribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).setAttribValue(Collections.synchronizedList(new ArrayList()));
+
+    // repopulate it from passed List
+    Iterator iter = structList.iterator();
+     while (iter.hasNext()) {
+        Structure struct= (Structure) iter.next();
+        this.addStructure(struct);
+     }
+
   }
 
   /**
@@ -176,20 +185,19 @@ public class Structure extends BaseObjectWithXMLElements {
     return (List) ((Attribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /** Set the *arrayList* attribute
+ /** Convenience method to set the list of arrays within this object.
    */
-  public void setArrayList (List arrayList) 
-  {
+  public void setArrayList(List arrayList) {
+    // clear list
+    ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(Collections.synchronizedList(new ArrayList()));
 
-     ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(Collections.synchronizedList(new ArrayList()));
- //  ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(array);
-
-     Iterator iter = arrayList.iterator();
-     while(iter.hasNext()) {
-        Array thisArray = (Array) iter.next();
-        this.addArray(thisArray);
+    // repopulate it from passed List
+    Iterator iter = arrayList.iterator();
+     while (iter.hasNext()) {
+        Array array = (Array) iter.next();
+        this.addArray(array);
      }
-      
+
   }
 
   /**
@@ -199,10 +207,18 @@ public class Structure extends BaseObjectWithXMLElements {
     return (List) ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /** Set the *noteList* attribute.
+  /** Convenience method to set the list of notes within this object.
    */
-  public void setNoteList (List notes) {
-    ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
+  public void setNoteList (List noteList) {
+    // clear list
+    ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(Collections.synchronizedList(new ArrayList()));
+
+    // repopulate it from passed List
+    Iterator iter = noteList.iterator();
+     while (iter.hasNext()) {
+        Note note = (Note) iter.next();
+        this.addNote(note);
+     }
   }
 
   /** Set the *noteList* attribute
@@ -466,14 +482,12 @@ public class Structure extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
- * Revision 1.25  2001/10/02 19:52:32  thomas
- * changed set*List methods somewhat
+ * Revision 1.26  2001/10/02 20:19:35  thomas
+ * merged from branch ver017
  *
- * Revision 1.24.4.2  2001/10/02 18:15:23  thomas
- * made change to setArrayList
  *
- * Revision 1.24.4.1  2001/10/02 18:06:25  thomas
- * added setNoteList
+ * Revision 1.24.2.1  2001/10/02 18:23:56  thomas
+ * made changes to setList methods
  *
  * Revision 1.24  2001/09/19 17:51:32  thomas
  * made some set*List methods deprecated
