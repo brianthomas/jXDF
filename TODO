@@ -7,20 +7,25 @@
 	this package "BETA"
         ------------------------------------------------------------
 
+        - check that notesEndElementHandlerFunc is finished (?)
+
+        - readId/readIdRef not quite working, looks like deep clone issue with/DataIOStyle class.
+
 	- Impliment octal/hex data read/write in SaxDocHandler.
 
 	- Impliment binary data read/write in SaxDocHandler/Binary*DataFormats.
 
         - Dropping relationship after output fed thru parser a second time.
-
-        - readId/readIdRef not quite working, looks like deep clone issue with/DataIOStyle class.
-
-        - check that notesEndElementHandlerFunc is finished (?)
+          (relationship node not implemented yet).
 
 	- always use constants (sPCDATAAttribute = "value") 
+          check that all Constants in CONSTANTS class are used. Make attribute names
+          wired in constants class (?).
 
 	- if the attribute is primitive number, *get* function overloading, two
  	 *set* functions--one returning primitive number, one returning Number object
+         (not really needed. What we do *need* to do is make sure its always an
+          object that is returned by get method). 
 
 	- Check this: Do we update all derived locators when axis is add/removed from an array?
 
@@ -31,6 +36,12 @@
 
         - for all classes on all non-String Set attribute methods, do check 
           to insure item is within reasonable bounds.
+
+        - Need to implement a shadow array for precision on numbers within the dataCube.
+          setData may adjust precision to be *lower* than declared in the relevant 
+          dataFormat object but may *never* insert a number with *higher* precision than
+          currently exists in the dataCube. Need a arrayObj.getPrecision(locator) method
+          to identify precision on each cell.
 
 
 	A list of things that have to be done before we can consider
@@ -51,7 +62,13 @@
 	- Treatment of special characters (like NEWLINE) should be entities 
           (&newline;) in element attributes of output XML (this causes a problem
           with being able to re-load delimited case data w/ newline recordterminators). 
-          [Note: this will probably be solved by putting delimiter info into CDATA section] 
+          But note one problem with this is that by definition, &newLine; is converted 
+          to a space by all XML parsers (!!).
+	  For the time being this is solved by having a special function, writeOutAttribute,
+	  handle the writing of attributes in output XML. This funct. basically 
+	  looks at the value string of the attribute character by character and
+	  converts newline/carriageReturns into &#010; and &#013; entities respectively. 
+          This is a slow solution, but it works. Isnt there something better?
 
         - Need to examine bufferedIO. The claim is that this will speed IO
           operations up for large arrays.
@@ -78,6 +95,8 @@
 	    2. Remove unnecessary methods like setDimension, etc.
 
 	- Overflow, Underflow, NaN issues for data. Define what does "null" cell really mean?.
+
+	- Version control for the Reader. Check that we have right DTD for software.
 
 
         Things for the next big version upgrade to XDF version 0.19
