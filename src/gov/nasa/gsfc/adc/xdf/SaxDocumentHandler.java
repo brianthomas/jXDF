@@ -144,18 +144,21 @@ public class SaxDocumentHandler extends HandlerBase {
     private int CurrentIOCmdIndex = 0;      // For formatted reads, which formattedIOCmd we are currently reading 
     private int CurrentDataFormatIndex = 0; // which dataformat index (in DatFormatList[]) we currently are reading
     private DataFormat DataFormatList[];       // list of CurrentArray.getDataFormatList();
+    private int NrofDataFormats;
+    private int[] IntRadix;
     private int LastFastAxisCoordinate;
     private AxisInterface FastestAxis;
     private ArrayList AxisReadOrder;
 
     // lookup tables holding objects that have id/idref stuff
-    private Hashtable FieldObj = new Hashtable();
-    private Hashtable ValueListObj = new Hashtable();
-    private Hashtable ValueObj = new Hashtable();
-    private Hashtable ParamObj = new Hashtable();
+    private Hashtable ArrayObj = new Hashtable();
     private Hashtable AxisObj = new Hashtable();
-    private Hashtable ReadObj = new Hashtable();
+    private Hashtable FieldObj = new Hashtable();
     private Hashtable NoteObj = new Hashtable();
+    private Hashtable ParamObj = new Hashtable();
+    private Hashtable ReadObj = new Hashtable();
+    private Hashtable ValueObj = new Hashtable();
+    private Hashtable ValueListObj = new Hashtable();
 
     // this is a BAD thing. I have been having troubles distinguishing between
     // important whitespace (e.g. char data within a data node) and text nodes
@@ -650,6 +653,7 @@ public class SaxDocumentHandler extends HandlerBase {
     } 
 
 
+    // This and its sub-routines are Not currently used
     private void loadHrefDataIntoCurrentArray () {
  
        Href hrefObj = CurrentArray.getDataCube().getHref();
@@ -680,9 +684,8 @@ public class SaxDocumentHandler extends HandlerBase {
              // ok, got a bytestream, now read the info
              // Need to use a buffered reader here!!!
              if (in != null) {
-                // probably could treat endian/nrofDataFormat as a globals too, since thats
+                // probably could treat endian as a global too, since thats
                 // how we treat the rest of the array parameters
-                int nrofDataFormat = DataFormatList.length;
                 String endian = CurrentArray.getXMLDataIOStyle().getEndian();
                 byte[] data = new byte[INPUTREADSIZE];
                 int bytes_read = 0;
@@ -694,7 +697,7 @@ public class SaxDocumentHandler extends HandlerBase {
                   if ( readAmount == -1 )
                   {
                       // pour out remaining buffer into the current array
-                     addByteDataToCurrentArray(data, bytes_read, endian, nrofDataFormat);
+                     addByteDataToCurrentArray(data, bytes_read, endian );
 
 Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
 
@@ -710,7 +713,7 @@ Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
 Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
 
                      // pour out buffer into array
-                     addByteDataToCurrentArray(data, bytes_read, endian, nrofDataFormat);
+                     addByteDataToCurrentArray(data, bytes_read, endian );
                      bytes_read = 0;
                   }
 
@@ -729,7 +732,7 @@ Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
     }
 
 // the problem: need to keep track of the formatting chars. 
-    private void addByteDataToCurrentArray (byte[] data, int amount, String endian, int nrofDataFormat) {
+    private void addByteDataToCurrentArray (byte[] data, int amount, String endian) {
 
         ArrayList commandList = (ArrayList) ((FormattedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).getCommands();
         int nrofIOCmd = commandList.size();
@@ -788,8 +791,8 @@ Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+by
                }
 
                // advance our global pointer to the current DataFormat
-               if (nrofDataFormat > 1)
-                  if (CurrentDataFormatIndex == (nrofDataFormat - 1))
+               if (NrofDataFormats > 1)
+                  if (CurrentDataFormatIndex == (NrofDataFormats - 1))
                      CurrentDataFormatIndex = 0;
                   else
                      CurrentDataFormatIndex++;
@@ -822,7 +825,7 @@ Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+by
     private Integer convert2bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
       
        int i;
-       if(endianStyle.equals("BigEndian"))
+       if(endianStyle.equals(Constants.BIG_ENDIAN))
            i = (bb[sbyte]&0xFF) << 8  | (bb[sbyte+1]&0xFF);
        else
            i = (bb[sbyte+1]&0xFF) << 8  | (bb[sbyte]&0xFF);
@@ -835,7 +838,7 @@ Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+by
     private Integer convert4bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
 
        int i;
-       if(endianStyle.equals("BigEndian"))
+       if(endianStyle.equals(Constants.BIG_ENDIAN))
            i = (bb[sbyte]&0xFF) << 24  | (bb[sbyte+1]&0xFF) << 16 | (bb[sbyte+2]&0xFF) << 8 | (bb[sbyte+3]&0xFF);
        else
            i = (bb[sbyte+3]&0xFF) << 24  | (bb[sbyte+2]&0xFF) << 16 | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
@@ -848,7 +851,7 @@ Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+by
     private Float convert4bytesToFloat (String endianStyle, byte[] bb, int sbyte) {
 
        int i;
-       if(endianStyle.equals("BigEndian")) 
+       if(endianStyle.equals(Constants.BIG_ENDIAN)) 
           i = (bb[sbyte]&0xFF) << 24  | (bb[sbyte+1]&0xFF) << 16 | (bb[sbyte+2]&0xFF) << 8 | (bb[sbyte+3]&0xFF);
        else 
           i = (bb[sbyte+3]&0xFF) << 24  | (bb[sbyte+2]&0xFF) << 16 | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
@@ -873,7 +876,7 @@ Log.errorln("");
        int i1;
        int i2;
 
-       if(endianStyle.equals("BigEndian")) 
+       if(endianStyle.equals(Constants.BIG_ENDIAN)) 
        { 
           i1 =  (bb[sbyte]&0xFF) << 24 | (bb[sbyte+1]&0xFF) << 16 | (bb[sbyte+2]&0xFF) << 8 | (bb[sbyte+3]&0xFF);
           i2 =  (bb[sbyte+4]&0xFF) << 24 | (bb[sbyte+5]&0xFF) << 16 | (bb[sbyte+6]&0xFF) << 8 | (bb[sbyte+7]&0xFF);
@@ -904,7 +907,7 @@ Log.errorln("");
             if(((BinaryIntegerDataFormat) binaryFormatObj).numOfBytes() == 2) 
             {
                // 16 bit 
-               if(endianStyle.equals("BigEndian")) 
+               if(endianStyle.equals(Constants.BIG_ENDIAN)) 
                   i = (bb[0]&0xFF) << 8  | (bb[1]&0xFF);
                else 
                   i = (bb[1]&0xFF) << 8  | (bb[0]&0xFF);
@@ -928,7 +931,7 @@ Log.errorln("");
             else if(((BinaryIntegerDataFormat) binaryFormatObj).numOfBytes() == 4) 
             {
                // 32 bit (long) 
-               if(endianStyle.equals("BigEndian")) 
+               if(endianStyle.equals(Constants.BIG_ENDIAN)) 
                   i = (bb[0]&0xFF) << 24  | (bb[1]&0xFF) << 16 | (bb[2]&0xFF) << 8 | (bb[3]&0xFF);
                else 
                   i = (bb[3]&0xFF) << 24  | (bb[2]&0xFF) << 16 | (bb[1]&0xFF) << 8 | (bb[0]&0xFF);
@@ -947,7 +950,7 @@ Log.errorln("");
             if(((BinaryFloatDataFormat) binaryFormatObj).numOfBytes() == 4) 
             {
                // 32 bit float
-               if(endianStyle.equals("BigEndian")) 
+               if(endianStyle.equals(Constants.BIG_ENDIAN)) 
                   i = bb[0] << 24  | (bb[1]&0xFF) << 16 | (bb[2]&0xFF) << 8 | (bb[3]&0xFF);
                else
                   i = bb[3] << 24  | (bb[2]&0xFF) << 16 | (bb[1]&0xFF) << 8 | (bb[0]&0xFF);
@@ -1044,6 +1047,7 @@ Log.errorln("");
     //
     private void initEndHandlerHashtable () {
 
+       endElementHandlerHashtable.put(XDFNodeName.ARRAY, new arrayEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.DATA, new dataEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.FIELDGROUP, new fieldGroupEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.NOTES, new notesEndElementHandlerFunc());
@@ -1077,25 +1081,23 @@ Log.errorln("");
 
     private void addDataToCurrentArray ( Locator dataLocator, 
                                          String thisString, 
-                                         DataFormat CurrentDataFormat
+                                         DataFormat CurrentDataFormat, 
+                                         int intRadix
                                        ) 
     {
 
-// Log.error("addDatatoArray:["+thisString+"]");
 
        // Note that we dont treat binary data at all here 
        try {
 
            if ( CurrentDataFormat instanceof StringDataFormat) {
 
-// Log.errorln(" StringDataFormat");
               CurrentArray.setData(dataLocator, thisString);
 
            } else if ( CurrentDataFormat instanceof FloatDataFormat
                        || CurrentDataFormat instanceof BinaryFloatDataFormat) 
            {
 
-// Log.errorln(" FloatDataFormat");
               Double number = new Double (thisString);
               CurrentArray.setData(dataLocator, number.doubleValue());
 
@@ -1103,9 +1105,13 @@ Log.errorln("");
                        || CurrentDataFormat instanceof BinaryIntegerDataFormat) 
            {
 
-// Log.errorln(" IntegerDataFormat");
-              Integer number = new Integer (thisString);
-              CurrentArray.setData(dataLocator, number.intValue());
+              // Integer number = new Integer (thisString);
+
+              if (intRadix == 16) // peal off leading "0x"
+                  thisString = thisString.substring(2);
+
+              int thisInt = Integer.parseInt(thisString, intRadix); 
+              CurrentArray.setData(dataLocator, thisInt);
 
            } else {
               Log.warnln("Unknown data format, unable to setData:["+thisString+"], ignoring request");
@@ -1481,6 +1487,156 @@ Log.errorln(" TValue:"+valueString);
        return values;
     }
           
+    private Array appendArrayToArray (Array arrayToAppendTo, Array arrayToAdd) {
+
+
+       if (arrayToAppendTo != null) 
+       {
+
+          List origAxisList = arrayToAppendTo.getAxisList(); 
+          List addAxisList = arrayToAdd.getAxisList(); 
+          Hashtable correspondingAddAxis = new Hashtable();
+          Hashtable correspondingOrigAxis = new Hashtable();
+
+          // 1. determine the proper alignment of the axes between both arrays
+          //    Then cross-reference each in lookup Hashtables.
+          Iterator iter = origAxisList.iterator();
+          while (iter.hasNext()) {
+
+             AxisInterface origAxis = (AxisInterface) iter.next();
+             String align = origAxis.getAlign();
+
+             // search the list of the other array for a matching axis 
+             boolean gotAMatch = false;
+             Iterator iter2 = addAxisList.iterator();
+             while (iter2.hasNext()) 
+             {
+
+                AxisInterface addAxis = (AxisInterface) iter2.next();
+                String thisAlign = addAxis.getAlign();
+                 if(thisAlign != null) 
+                 {
+                    if(thisAlign.equals(align)) 
+                    {
+                       correspondingAddAxis.put(origAxis.getAxisId(), addAxis);
+                       correspondingOrigAxis.put(addAxis.getAxisId(), origAxis);
+                       gotAMatch = true;
+                       break;
+                    }
+                 } else { 
+                    Log.errorln("Cant align axes, axis missing defined align attribute. Aborting.");
+                    return arrayToAppendTo;
+                 }
+             }
+
+             // no match?? then alignments are mis-specified.
+             if (!gotAMatch) {
+                Log.errorln("Cant align axes, axis has align attribute that is mis-specified. Aborting.");
+                return arrayToAppendTo;
+             }
+
+          }
+       
+          // 2. "Append" axis values to original axis. Because
+          // there are 2 different ways to add in data we either
+          // have a pre-existing axis value, in which case we dont
+          // need to expand the existing axis, or there is no pre-existing
+          // value so we tack it in. We need to figure out here if an
+          // axis value already exists, and if it doesnt then we add it in. 
+          //
+          Iterator iter3 = origAxisList.iterator();
+          while (iter3.hasNext()) 
+          {
+
+             AxisInterface origAxis = (AxisInterface) iter3.next();
+             AxisInterface addAxis = (AxisInterface) correspondingAddAxis.get(origAxis.getAxisId());
+
+             if (addAxis instanceof Axis && origAxis instanceof Axis) 
+             {
+                List valuesToAdd = ((Axis) addAxis).getAxisValues();
+                Iterator iter4 = valuesToAdd.iterator();
+
+                while (iter4.hasNext()) {
+                   Value value = (Value) iter4.next();
+                   if (((Axis) origAxis).getIndexFromAxisValue(value) == -1) {
+                      ((Axis) origAxis).addAxisValue(value);
+                   }
+                }
+             } else if (addAxis instanceof FieldAxis && origAxis instanceof FieldAxis) {
+
+                  // both are fieldAxis
+                Log.errorln("Dont know how to merge field Axis data. Aborting.");
+                System.exit(-1);
+
+             } else {
+                // mixed class Axes?? (e.g. a fieldAxis id matches Axis id??!? Error!!)
+                Log.errorln("Dont know how to merge data. Aborting.");
+                System.exit(-1);
+             }
+
+          }
+
+          // 3. Append data from one array to the other appropriately 
+          Locator origLocator = arrayToAppendTo.createLocator();
+          Locator addLocator = arrayToAdd.createLocator();
+
+          while (addLocator.hasNext()) 
+          {
+             try {
+
+                // retrieve the data
+                Object data = arrayToAdd.getData(addLocator);
+                
+                // set up the origLocator
+                List locatorAxisList = addLocator.getIterationOrder();
+                Iterator iter5 = locatorAxisList.iterator();
+                Log.debug("Appending data to array(");
+                while (iter5.hasNext()) {
+                   Axis addAxis = (Axis) iter5.next();
+                   Value thisAxisValue = addLocator.getAxisValue(addAxis); 
+                   Axis thisAxis = (Axis) correspondingOrigAxis.get(addAxis.getAxisId()); 
+
+                   try {
+                      origLocator.setAxisIndexByAxisValue(thisAxis, thisAxisValue);
+
+                      Log.debug(origLocator.getAxisIndex(thisAxis)+",");
+
+                   } catch (AxisLocationOutOfBoundsException e) {
+                       Log.errorln("Weird axis out of bounds error for append array.");
+                   }
+                }
+
+                // add in the data as appropriate.
+                Log.debugln(") => ["+data.toString()+"]");
+
+                try {
+
+                   if (data instanceof Double) 
+                       arrayToAppendTo.setData(origLocator, (Double) data);
+                   else if (data instanceof Integer) 
+                       arrayToAppendTo.setData(origLocator, (Integer) data);
+                   else if (data instanceof String ) 
+                       arrayToAppendTo.setData(origLocator, (String) data);
+                   else
+                       Log.errorln("Cant understand class of data !(Double|Integer|String). ignoring append");
+
+                } catch (SetDataException e) {
+                   Log.errorln("Cant setData. Ignoring append");
+                }
+
+             } catch (NoDataException e) {
+                // do nothing for NoDataValues??
+             }
+
+             addLocator.next(); // go to next location
+          }
+         
+       } else 
+          Log.errorln("Cannot append to null array. Ignoring request.");
+
+       return arrayToAppendTo;
+    }
+
     //
     // Internal Classes
     //
@@ -1580,6 +1736,30 @@ Log.errorln(" TValue:"+valueString);
     // ARRAY NODE
     //
 
+    // Array node end
+    class arrayEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action (SaxDocumentHandler handler) {
+
+          // well, well, which array will we deal with here?
+          // if an appendto is specified, then we will try to append this array
+          // to the specified one, otherwise, the current array is added to 
+          // the current structure.
+          String arrayAppendId = CurrentArray.getAppendTo();
+          if (arrayAppendId != null)
+          {
+             // we just add it to the designated array
+             Array arrayToAppendTo = (Array) ArrayObj.get(arrayAppendId);
+             appendArrayToArray(arrayToAppendTo, CurrentArray);
+          }
+          else
+          {
+             // add the current array and add this array to current structure 
+             CurrentStructure.addArray(CurrentArray);
+          }
+
+       }
+    }
+
     // Array node start 
     class arrayStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
@@ -1588,9 +1768,14 @@ Log.errorln(" TValue:"+valueString);
           Array newarray = new Array();
           newarray.setXMLAttributes(attrs); // set XML attributes from passed list 
 
-          // set current array and add this array to current structure 
-          CurrentArray = CurrentStructure.addArray(newarray);
+          // add this array to our list of arrays if it has an ID
+          if (newarray != null) { 
+             String arrayId = newarray.getArrayId();
+             if ( arrayId != null)
+                 ArrayObj.put(arrayId, newarray);
+          }
 
+          CurrentArray = newarray;
           setCurrentDatatypeObject(CurrentArray);
 
           return newarray;
@@ -1743,7 +1928,7 @@ Log.errorln(" TValue:"+valueString);
 
           // bump up DataFormat appropriately
           if (MaxDataFormatIndex > 0) { 
-             int currentFastAxisCoordinate = TaggedLocatorObj.getAxisLocation(FastestAxis);
+             int currentFastAxisCoordinate = TaggedLocatorObj.getAxisIndex(FastestAxis);
              if ( currentFastAxisCoordinate != LastFastAxisCoordinate ) 
              { 
                 LastFastAxisCoordinate = currentFastAxisCoordinate;
@@ -1780,7 +1965,7 @@ Log.errorln(" TValue:"+valueString);
                 DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
 
                 // adding data based on what type..
-                addDataToCurrentArray(TaggedLocatorObj, thisString, CurrentDataFormat); 
+                addDataToCurrentArray(TaggedLocatorObj, thisString, CurrentDataFormat, IntRadix[CurrentDataFormatIndex]); 
 
              }
 
@@ -1843,15 +2028,8 @@ Log.errorln(" TValue:"+valueString);
               CurrentDataFormatIndex = 0; 
               ArrayList strValueList;
 
-//              boolean dataHasSpecialIntegers = false;
-
               // set up appropriate instructions for reading
               if ( formatObj instanceof FormattedXMLDataIOStyle ) {
-/*
-      $template  = $formatObj->_templateNotation(1);
-      $recordSize = $formatObj->bytes();
-      $data_has_special_integers = $formatObj->hasSpecialIntegers;
-*/
 
                  // snag the string representation of the values
                  strValueList = formattedSplitStringIntoStringObjects( DATABLOCK.toString(), 
@@ -1881,11 +2059,11 @@ Log.errorln(" TValue:"+valueString);
 
                  // adding data based on what type..
                  String thisData = (String) iter.next();
-                 addDataToCurrentArray(myLocator, thisData, CurrentDataFormat);
+                 addDataToCurrentArray(myLocator, thisData, CurrentDataFormat, IntRadix[CurrentDataFormatIndex]);
 
                  // bump up DataFormat appropriately
                  if (MaxDataFormatIndex > 0) {
-                    int currentFastAxisCoordinate = myLocator.getAxisLocation(FastestAxis);
+                    int currentFastAxisCoordinate = myLocator.getAxisIndex(FastestAxis);
                     if ( currentFastAxisCoordinate != LastFastAxisCoordinate )
                     {
                        LastFastAxisCoordinate = currentFastAxisCoordinate;
@@ -1982,6 +2160,26 @@ Log.errorln(" TValue:"+valueString);
 
              // reset the list of dataformats we are reading
              DataFormatList = CurrentArray.getDataFormatList();
+             NrofDataFormats = DataFormatList.length; 
+             IntRadix = new int [NrofDataFormats];
+
+             // set up some other global information bout the dataformats
+             // that will help speed reading 
+             for (int i=0; i < NrofDataFormats; i++) { 
+               if (DataFormatList[i] instanceof IntegerDataFormat) {
+                  String type = ((IntegerDataFormat) DataFormatList[i]).getType();
+                  if (type.equals(Constants.INTEGER_TYPE_DECIMAL))
+                     IntRadix[i] = 10; 
+                  else if (type.equals(Constants.INTEGER_TYPE_HEX))
+                     IntRadix[i] = 16; 
+                  else if (type.equals(Constants.INTEGER_TYPE_OCTAL))
+                     IntRadix[i] = 8; 
+                  else
+                     IntRadix[i] = 10; // default
+               } else if (DataFormatList[i] instanceof BinaryIntegerDataFormat) {
+                     IntRadix[i] = 10;
+               }
+             }
 
           }
 
@@ -3610,6 +3808,12 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.29  2001/02/07 18:46:25  thomas
+ * Enabled append array and binary writing. Fixed up
+ * the binary r/w code somewhat but it needs to be
+ * redone properly. Some small changes for Jaxp (SAX1)
+ * compatiblity. -b.t.
+ *
  * Revision 1.28  2001/01/29 19:29:35  thomas
  * Changes related to combining ExponentialDataFormat
  * and FloatDataFormat classes. -b.t.
