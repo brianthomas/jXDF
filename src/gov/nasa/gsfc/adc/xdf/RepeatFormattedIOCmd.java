@@ -29,6 +29,7 @@ import java.util.Hashtable;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /** this class handles the repeat ELEMENT
@@ -74,31 +75,35 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   //Get/Set methods
   //
 
-  /** set the *count* attribute
+  /** Set the *count* attribute. 
    */
   public void setCount(Integer numCount) {
-    ((XMLAttribute) attribHash.get("count")).setAttribValue(numCount);
+    if (numCount.intValue() < 1) {
+       Log.warnln("Cant set repeatFormattedIOCmd count to less than 1, ignoring set request.");
+    } else {
+       ((XMLAttribute) attribHash.get("count")).setAttribValue(numCount);
+    }
   }
 
-  /** get the *count* attribute
+  /** Get the *count* attribute. 
    */
   public Integer getCount() {
-    return (Integer)  ((XMLAttribute) attribHash.get("count")).getAttribValue();
+    return new Integer((String) ((XMLAttribute) attribHash.get("count")).getAttribValue());
   }
 
-  /** set the formatCommandList
+  /** Set the formatCommandList. 
    */
   public void setFormatCommandList(List formatList) {
      formatCommandList = formatList;
   }
 
-  /** get the formatCommandList
+  /** Get the formatCommandList. 
   */
   public List getFormatCommandList() {
    return formatCommandList;
   }
 
-  /** add a command to the formatCommandList
+  /** Add a command to the formatCommandList
     * @return the command that is added
     */
   public FormattedIOCmd addFormatCommand(FormattedIOCmd formatCmd) {
@@ -106,10 +111,27 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
     return formatCmd;
   }
 
-  /** convenience methods that return the command list
+  /** Convenience method that returns the command list. Repeat
+      commands are expanded into their component parts. 
    */
   public List getCommands() {
-     return formatCommandList;
+
+     ArrayList commandList = new ArrayList();
+
+     Iterator iter = formatCommandList.iterator();
+     while (iter.hasNext()) {
+        FormattedIOCmd thisCommand = (FormattedIOCmd) iter.next();
+        if (thisCommand instanceof RepeatFormattedIOCmd) {
+           int count = ((RepeatFormattedIOCmd) thisCommand).getCount().intValue();
+           while (count-- > 0) {
+              commandList.addAll(((RepeatFormattedIOCmd) thisCommand).getCommands());
+           }
+        } else {
+           commandList.add(thisCommand);
+        }
+     }
+
+     return (List) commandList;
   }
 
   /**deep copy of this RepeatFormattedIOCmd object
@@ -181,6 +203,12 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/11/20 18:31:35  thomas
+ * fixed getCommands method to return expaneded
+ * command list. Fixed setCount to prevent <1 value
+ * from being placed in count attribute. Made getCount
+ * truely return Integer object. -b.t.
+ *
  * Revision 1.2  2000/11/16 20:06:09  kelly
  * fixed documentation.  -k.z.
  *
