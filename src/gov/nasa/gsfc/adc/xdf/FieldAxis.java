@@ -198,7 +198,7 @@ public class FieldAxis extends BaseObject implements AxisInterface{
    * @return: field object ref on success, null on failure
    *
    */
-  public Field AddField (Field field) {
+  public Field addField (Field field) {
      if (field == null) {
       Log.warn("in FieldAxis.addField(),Field passed in is null");
       return null;
@@ -262,6 +262,9 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.4  2000/10/30 18:47:23  thomas
+  * Quick bug fix. AddField method should be "addField"-b.t.
+  *
   * Revision 1.3  2000/10/30 18:18:20  kelly
   * more completion  -k.z.
   *
