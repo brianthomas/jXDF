@@ -1058,7 +1058,8 @@ public class SaxDocumentHandler extends DefaultHandler {
     throws SetDataException
     {
 
-        ArrayList commandList = (ArrayList) ((FormattedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).getFormatCommands();
+        ArrayList commandList = (ArrayList) 
+              ((FormattedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).getFormatCommands();
         int nrofIOCmd = commandList.size();
         int bytes_added = 0;
 
@@ -1112,8 +1113,48 @@ public class SaxDocumentHandler extends DefaultHandler {
 // Log.errorln("Got Href Data Integer:["+myValue.toString()+ "]["+bytes_added+"]["+bytes_to_add+"]");
 
                   // int numOfBytes = ((BinaryIntegerDataFormat) currentDataFormat).numOfBytes();
-                  int myValue = convertBytesToInteger (bytes_to_add, endian, data, bytes_added);
-                  CurrentArray.setData(location, myValue);
+                  // int myValue = convertBytesToInteger (bytes_to_add, endian, data, bytes_added);
+                  // CurrentArray.setData(location, myValue);
+
+                  // is it better to use a dispatch table here?
+                  switch (bytes_to_add) 
+                  {
+
+                     case 1: { // 8-bit 
+                        short val = convert1byteToShort (data, bytes_added);
+                        CurrentArray.setData(location, val);
+                        break;
+                     }
+
+                     case 2: { // 16-bit 
+                        short val = convert2bytesToShort (endian, data, bytes_added);
+                        CurrentArray.setData(location, val);
+                        break;
+                     }
+
+                     case 3: { // 24-bit (unusual) 
+                        int val = convert3bytesToInt (endian, data, bytes_added);
+                        CurrentArray.setData(location, val);
+                        break;
+                     }
+
+                     case 4: { // 32-bit
+                        int val = convert4bytesToInt (endian, data, bytes_added);
+                        CurrentArray.setData(location, val);
+                        break;
+                     }
+
+                     case 8: { // 64-bit 
+                        long val = convert8bytesToLong (endian, data, bytes_added);
+                        CurrentArray.setData(location, val);
+                        break;
+                     }
+
+                     default:
+                        Log.errorln("XDF Can't handle binary integers of byte size:"+bytes_to_add+". Aborting!");
+                        System.exit(-1);
+
+                  }
 
                } 
 
@@ -1157,13 +1198,13 @@ public class SaxDocumentHandler extends DefaultHandler {
         switch (numOfBytes) {
 
            case 1: // 8-bit 
-              return convert1byteToInteger (bb, sbyte);
+              return convert1byteToInt (bb, sbyte);
            case 2: // 16-bit 
-              return convert2bytesToInteger (endianStyle, bb, sbyte);
+              return convert2bytesToInt (endianStyle, bb, sbyte);
            case 3: // 24-bit (unusual) 
-              return convert3bytesToInteger (endianStyle, bb, sbyte);
+              return convert3bytesToInt (endianStyle, bb, sbyte);
            case 4: // 32-bit
-              return convert4bytesToInteger (endianStyle, bb, sbyte);
+              return convert4bytesToInt (endianStyle, bb, sbyte);
               // This will most likely break the Java Integer. Lets not pretend
               // that we support it yet. Will have to contemplate BigInteger implementation for this. 
            /*
@@ -1179,15 +1220,20 @@ public class SaxDocumentHandler extends DefaultHandler {
     }
 
     // for 8-bit Int
-    private int convert1byteToInteger (byte[] bb, int sbyte) {
+    private int convert1byteToInt (byte[] bb, int sbyte) {
 
        int i = bb[sbyte]&0xFF;
        return i; // new Integer(i);
 
     }
 
+    private short convert1byteToShort (byte[] bb, int sbyte) {
+       short i = (short) (bb[sbyte]&0xFF);
+       return i;
+    }
+
     // for 16-bit Int
-    private int convert2bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
+    private int convert2bytesToInt (String endianStyle, byte[] bb, int sbyte) {
       
        int i;
        if(endianStyle.equals(Constants.BIG_ENDIAN))
@@ -1199,8 +1245,19 @@ public class SaxDocumentHandler extends DefaultHandler {
 
     }
 
+    private short convert2bytesToShort (String endianStyle, byte[] bb, int sbyte) {
+
+       short i;
+       if(endianStyle.equals(Constants.BIG_ENDIAN))
+           i = (short) ((bb[sbyte]&0xFF) << 8  | (bb[sbyte+1]&0xFF));
+       else
+           i = (short) ((bb[sbyte+1]&0xFF) << 8  | (bb[sbyte]&0xFF));
+
+       return i;
+    }
+
     // for 24-bit Int
-    private int convert3bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
+    private int convert3bytesToInt (String endianStyle, byte[] bb, int sbyte) {
 
        int i;
        if(endianStyle.equals(Constants.BIG_ENDIAN))
@@ -1208,12 +1265,12 @@ public class SaxDocumentHandler extends DefaultHandler {
        else
            i = (bb[sbyte+2]&0xFF) << 16  | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
 
-       return i; // new Integer(i);
+       return i; 
 
     }
 
     // for 32-bit Int
-    private int convert4bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
+    private int convert4bytesToInt (String endianStyle, byte[] bb, int sbyte) {
 
        int i;
        if(endianStyle.equals(Constants.BIG_ENDIAN))
@@ -1221,7 +1278,20 @@ public class SaxDocumentHandler extends DefaultHandler {
        else
            i = (bb[sbyte+3]&0xFF) << 24  | (bb[sbyte+2]&0xFF) << 16 | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
 
-       return i; // new Integer(i);
+       return i; 
+
+    }
+
+    // for 64-bit Int
+    private long convert8bytesToLong (String endianStyle, byte[] bb, int sbyte) {
+
+       long i;
+       if(endianStyle.equals(Constants.BIG_ENDIAN))
+           i = (bb[sbyte]&0xFF) << 56  | (bb[sbyte+1]&0xFF) << 48 | (bb[sbyte+2]&0xFF) << 40 | (bb[sbyte+3]&0xFF) << 32 | (bb[sbyte+4]&0xFF) << 24  | (bb[sbyte+5]&0xFF) << 16 | (bb[sbyte+6]&0xFF) << 8 | (bb[sbyte+7]&0xFF);
+       else
+           i = (bb[sbyte+7]&0xFF) << 56  | (bb[sbyte+6]&0xFF) << 48 | (bb[sbyte+5]&0xFF) << 40 | (bb[sbyte+4]&0xFF) << 32 | (bb[sbyte+3]&0xFF) << 24  | (bb[sbyte+2]&0xFF) << 16 | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
+
+       return i;
 
     }
 
@@ -1492,6 +1562,7 @@ Log.errorln("");
 
 // this stuff slows down the parser too much to leave commented in.
 // uncomment as needed
+/*
 Log.info("Add Data:["+thisString+"] (");
 List axes = dataLocator.getIterationOrder();
 Iterator liter = axes.iterator();
@@ -1500,6 +1571,7 @@ while (liter.hasNext()) {
    Log.info(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
 }
 Log.infoln(") ["+CurrentDataFormat+"]");
+*/
 
        // Note that we dont treat binary data at all here 
        try {
@@ -2608,52 +2680,6 @@ Log.errorln(" TValue:"+valueString);
           }
        }
     }
-
-
-/*
-    class dataCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
-
-       // only do something here IF we are reading in data at the moment
-       // is this needed??
-       if (DataNodeLevel > 0) {
-
-          XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
-          String thisString = new String(buf,offset,len);
-
-          if ( readObj instanceof TaggedXMLDataIOStyle ) {
-
-             // dont add this data unless it has more than just whitespace
-             if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(thisString) ) {
-
-                Log.debugln("ADDING TAGGED DATA to ("+TaggedLocatorObj+") : ["+thisString+"]");
-
-                DataTagLevel = CurrentDataTagLevel;
-
-                DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
-
-                // adding data based on what type..
-                addDataToCurrentArray(TaggedLocatorObj, thisString, CurrentDataFormat, IntRadix[CurrentDataFormatIndex]); 
-
-             }
-
-          } else if ( readObj instanceof DelimitedXMLDataIOStyle ||
-                    readObj instanceof FormattedXMLDataIOStyle )
-          {
-
-              // add it to the datablock if it isnt all whitespace ?? 
-              if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(thisString) ) 
-                  DATABLOCK.append(thisString);
-
-           } else {
-               Log.errorln("UNSUPPORTED Data Node CharData style:"+readObj.toString()+", Aborting!\n");
-               System.exit(-1);
-           }
-
-         }
-       }
-    }
-*/
 
     class dataEndElementHandlerFunc implements EndElementHandlerAction {
        public void action (SaxDocumentHandler handler) { 
@@ -4235,13 +4261,16 @@ while (iter.hasNext()) {
           String valueListString = new String (buf, offset, len);
           ValueList thisValueList = CurrentValueList;
 
-          // safety check
-          if (!thisValueList.getIsDelimitedCase() )
+          // safety checks 
+          if ( !thisValueList.getIsDelimitedCase() )
           {
              String noWhiteSpaceList = valueListString.trim();
-             if (noWhiteSpaceList.length() > 0) 
-                Log.errorln("Got non-whitespace character data for algorithm valueList. Ignoring.");
-             return;
+             if (noWhiteSpaceList.length() > 0) { 
+                Log.errorln("Got non-whitespace character data for valueList with size attribute! Ignoring.");
+                return;
+             } else {
+                Log.warnln("Got size attribute set on delimited valueList. Ignoring attribute.");
+             }
           }
 
           // 2. reconsitute information we need
@@ -4362,7 +4391,8 @@ while (iter.hasNext()) {
            CurrentValueList = new ValueList();
 
            // 2. populate ValueListparameters from attribute list 
-           CurrentValueList.init(attribListToHashtable(attrs));
+           Hashtable attribs = attribListToHashtable(attrs);
+           CurrentValueList.init(attribs);
 
            // 3. populate ValueListparameters w/ parent name 
            String parentNodeName = getParentNodeName(XDFNodeName.VALUEGROUP);
@@ -4370,7 +4400,10 @@ while (iter.hasNext()) {
 
            // 4. set this parameter to false to indicate the future is not
            // yet determined for this :)
-           CurrentValueList.setIsDelimitedCase(false);
+           if (attribs.containsKey("size"))
+              CurrentValueList.setIsDelimitedCase(false);
+           else
+              CurrentValueList.setIsDelimitedCase(true);
 
            return (Object) null;
 
@@ -4526,6 +4559,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.57  2001/09/20 15:06:32  thomas
+ * changed handling of addByteData method, fix to valueList non-whitespace char data for algorithm version
+ *
  * Revision 1.56  2001/09/19 17:52:13  thomas
  * inserted safety check for valueList end elements that have whitespace chardata but are algorithm prescription
  *
