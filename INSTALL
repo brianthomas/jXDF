@@ -1,7 +1,13 @@
 
+
+	This package is designed for use under Java 1.2.2. It shouldnt
+	have any problems running under 1.3, but let me know if thats
+	not the case.
+	
 	We are planning better support than what is given below,
 	however, I just havent had the time to compile the code
 	under a broad series of platforms, only Linux is truely tested.
+
 	Good Luck. -b.t.
 
 

@@ -28,8 +28,7 @@
 	For more details on missing features/problems that remain in 
 	the package please refer to the TODO file.
 
-	Please report bugs, comments and feature requests to 
-        xdf-dev@xdf.gsfc.nasa.gov.
+	Please report bugs, comments and feature requests to xdf-dev@xdf.gsfc.nasa.gov.
 
 	See the samples directory for sample code, a DTD and xml files.
 
@@ -37,16 +36,20 @@
 
 	http://tarantella.gsfc.nasa.gov/xml/XDFhome.html
 
-   The Java XDF Package was developed by programmers at: 
-   -----------------------------------------------------
 
-           The Astronomical Data Center, Code 631, NASA/GSFC,
+   Credits
+   -------
 
-           Raytheon Technical Services Company, Lanham Md
+       The Java XDF Package was developed by programmers at
+       Raytheon Technical Services Company, Lanham MD,  
+       and Century Computing, a Division of AppNet, Inc. under contract of
+       the Astronomical Data Center, Code 631, NASA/GSFC.
 
-           and
+       Individual credits for material included in this package :
 
-           Century Computing, a Division of AppNet, Inc.
+       Brian Thomas (Project Lead, object design, baseObject/Reader classes) 
+       Kelly Zeng   (Perl porting, several new classes unforseen by Brian) 
+       Lynne Case   (Code review and critical comments) 
 
 
    For information concerning this code:
@@ -55,6 +58,9 @@
    Email contact:
 
       Brian Thomas <thomas@adc.gsfc.nasa.gov> 
+
+   Major release announcements occur on the xdf-announce mailing list, 
+   please join if you are interested in this information.
 
    Mailing lists (and list archives) available at:
       http://xdf.gsfc.nasa.gov/

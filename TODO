@@ -1,7 +1,7 @@
 	
 
 	A list of things that have to be done before we can consider
-	this package "ALPHA"
+	this package "BETA"
         ------------------------------------------------------------
 
 	- Implement Formatted reads.
@@ -10,20 +10,12 @@
           is implemented). Remove extraneous methods.
 
         - make init protected for all main classes (to allow inheritance of classes
-          in other dataformats).
-
-	- Efficiency issues. Don't use sth. like attrib.size() in the for loop
-          (now fixed? review code again)
+          in other dataformats like FITSML).
 
         - Group cloning needs to be finished.
           XMLDataIOStyle has clone method in it, correct? (I did this, please check kelly)
 
-	- Use singleton for PrettyOutput, etc.
-
-	- In some cases, passing null of not reasonable. We dont have 
-          to check null to save some time. 
-
-        - in SaxDocumentHandler, need set/get for AxisObj, FieldObj, private
+        - In SaxDocumentHandler, need set/get for AxisObj, FieldObj, private
           globals so we can mimic id/idref stuff. In fact, we should just
           switch to 1 global array of generic objects... 
 
@@ -34,9 +26,6 @@
 	- Impliment octal/hex data read/write in SaxDocHandler.
 
 	- Impliment binary data read/write in SaxDocHandler/Binary*DataFormats.
-       
-        - Are Utility, Constants classes truely independant? Shunt methods to
-          places they are used.
 
         - fix the repeatable attribute on string parsing
 
@@ -51,16 +40,9 @@
 	- if the attribute is primitive number, *get* function overloading, two
  	 *set* functions--one returning primitive number, one returning Number object
 
-	- Syncronization may be violated for ArrayList? look into changing 
-	  these to Vector (resolved?).
-
-	- Check synchronization issues on all code (develop threaded tests). 
-
 	- Update all derived locators when axis is add/removed from an array.
 
-	- Review the API. Remove unnecessary methods like setDimension, etc.
-
-        - Remove Perl junk in documentation. Improve the content of the text.
+        - Remove Perl junk in documentation. Improve the content of the doc text.
 
 	- Number of significant digits being written out in XML is not
           controlled by dataFormat at this time. Also, Exponential format
@@ -68,7 +50,7 @@
 
 
 	A list of things that have to be done before we can consider
-	this package "BETA"
+	this package "FINAL"
         ------------------------------------------------------------
    
 	- Improve efficiency of data reading. Direct char->number converstion
@@ -90,6 +72,15 @@
 	   to be is difficult for me to understand, but thats another matter..).
 	   ) so we need to review if current implementation is correct.
 
+	- Check synchronization issues on all code (develop threaded tests). 
+
+        - Need Code review, issues:
+            1. Are Utility, Constants (and other) classes truely independant? 
+               Shunt methods to places they are used.
+	    2. Remove unnecessary methods like setDimension, etc.
+
+	- Overflow, Underflow, NaN issues for data. What does "null" cell really mean?.
+
 
         Things for the next big version upgrade to XDF version 0.19
         ============================================================
@@ -97,6 +88,8 @@
 	- Allow for uneven precision in data. 
 
 	- MathML units.
+
+        - placement of parameter objects under more classes (e.x. axis, field)
 
 	- XDF functions.
 
@@ -108,6 +101,8 @@
         Longer term issues
         ==================
 
+        - Making the package compile on W32 machines using nmake.
+
         - Large datasets. When to automatically switch to persistent dataCube 
           How much memory to use, efficiency issues. Native code alternative to
           Java (?).
@@ -116,6 +111,9 @@
 	  a way of finding the science parameters/keywords even if XDF parameter
           isnt used to hold the information.
 
-	- Overflow, underflow, NaN issues for data. What does "null" cell really mean?.
+	- use of offset reading to allow XDF to wrap complex binary/ascii data file(s).
+
+	- explore holding recursive datastructures? Ex. FITS BINTABLE, b-trees, etc.
+
 
 
