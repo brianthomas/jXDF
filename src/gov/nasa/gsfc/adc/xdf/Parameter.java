@@ -62,7 +62,7 @@ import java.util.Set;
   */
 
 
-public class Parameter extends BaseObject implements ParameterInterface {
+public class Parameter extends BaseObjectWithValueList {
 
    //
    // Fields
@@ -221,13 +221,26 @@ public class Parameter extends BaseObject implements ParameterInterface {
     return (String) ((XMLAttribute) attribHash.get(DATATYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /**set the *valueList* attribute
+  /** Set the list of values held by this Parameter from the passed list.
    */
-  public void setValueList(List value) {
-     ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).setAttribValue(value);
+  public void setValueList(List listOfValues) {
+     resetValues();
+     Iterator iter = listOfValues.iterator();
+     while (iter.hasNext()) {
+        addValue((Value) iter.next());
+     }
   }
 
-  /**
+  /** Set the list of values held by this Parameter 
+    *  using those held in the passed ValueList object.
+    */
+   public void setValueList (ValueListInterface valueListObj)
+   {
+      resetValues();
+      addValueList(valueListObj);
+   }
+
+  /** Get the current list of values held within this Parameter. 
    * @return the current *valueList* attribute
    */
   public List getValueList() {
@@ -259,21 +272,85 @@ public class Parameter extends BaseObject implements ParameterInterface {
   //Other PUBLIC Methods
   //
 
-  /** insert an Value object into the valueList
-   * @param v - Value to be added
-   * @return an Value object
+  /** Append a list of values held by the passed ValueList into this Parameter 
+    * object.
+    */
+   public boolean addValueList (ValueListInterface valueListObj) 
+   {
+
+      List values = valueListObj.getValues();
+
+      // do we have any new values?
+      if (values.size() > 0) {
+
+         addValueListObj(valueListObj);
+
+         // append in new values to Parameter obj 
+         Iterator iter = values.iterator();
+         while (iter.hasNext()) {
+            Value thisValue = ((Value) iter.next());
+            internalAddValue(thisValue);
+         }
+
+         return true;
+
+      } else {
+
+         // safety, needed?
+         hasValueListCompactDescription = false;
+         Log.warnln("Warning: no Values appended, ValueList empty. Parameter unchanged.");
+         return false;
+
+      }
+
+   }
+
+  /** Resets the value list in this parameter to be empty.
    */
-  public boolean addValue(Value v) {
-    getValueList().add(v);
-    return true;
+  public void resetValues () {
+
+     // bah. cant use iterator, get concurrent modification error then.. :P
+     // remove old values by setting to empty list 
+     ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).setAttribValue(Collections.synchronizedList(new ArrayList()));
+     resetBaseValueListObjects();
+
   }
+
+
+  /** Add a Value object to this Parameter. Note that adding a Value will
+   * void any compact (valueList) description of the values when 
+   * toXMLOutputStream is called (e.g. those values formerly inserted via the
+   * addValueList or setValueList methods; these prior Values *do* 
+   * remain within the Parameter however). 
+   * @param valueObj - Value object to be added
+   * @return true on success, false on failure
+   */
+
+   public boolean addValue(Value valueObj) {
+
+      if (internalAddValue(valueObj)) {
+
+         // no compact description allowed now 
+         resetBaseValueListObjects();
+         return true;
+      }
+      return false;
+
+   }
 
   /** removes an Value from the list of values in this Parameter object
    * @param what - Value to be removed
    * @return true on success, false on failure
    */
    public boolean removeValue(Value what) {
-     return removeFromList(what, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
+      boolean isRemoveSuccess = removeFromList(what, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
+      if (isRemoveSuccess) //decrement length if removal successful
+      {
+        // no compact description allowed now 
+        resetBaseValueListObjects();
+        return true;
+      }
+      return false;
   }
 
 
@@ -302,8 +379,15 @@ public class Parameter extends BaseObject implements ParameterInterface {
    * @param index - list index number of the Value to be removed
    * @return true on success, false on failure
    */
-  public boolean removeValue(int index) {
-     return removeFromList(index, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
+  public boolean removeValue (int index) {
+      boolean isRemoveSuccess = removeFromList(index, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
+      if (isRemoveSuccess) //decrement length if removal successful
+      {
+        // no compact description allowed now 
+        resetBaseValueListObjects();
+        return true;
+      }
+      return false;
   }
 
   /** A convinience methods.  returns a list of values in this parameter
@@ -316,7 +400,7 @@ public class Parameter extends BaseObject implements ParameterInterface {
    * @param Note
    * @return an Note object
    */
-  public boolean addNote(NoteInterface n) {
+  public boolean addNote(Note n) {
     getNoteList().add(n);
     return true;
   }
@@ -325,7 +409,7 @@ public class Parameter extends BaseObject implements ParameterInterface {
    * @param Note to be removed
    * @return true on success, false on failure
    */
-   public boolean removeNote(NoteInterface what) {
+   public boolean removeNote(Note what) {
      return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -415,13 +499,39 @@ public class Parameter extends BaseObject implements ParameterInterface {
     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
+
+     // set the valueList field for BaseObjectWithValueList
+     valueListXMLItemName = VALUELIST_XML_ATTRIBUTE_NAME;
+
   };
 
- }
+   //
+   // Private Methods
+   //
+
+   /* insert an Value object into the valueList
+    * @param v - Value to be added
+    * @return an Value object
+    */
+   private boolean internalAddValue(Value valueObj) {
+
+      if (valueObj == null) {
+         Log.warn("in Parameter, addValue(), the Value passed in is null");
+         return false;
+      }
+
+      getValueList().add(valueObj);
+      return true;
+   }
+
+}
 
  /* Modification History
   *
   * $Log$
+  * Revision 1.18  2001/07/11 22:38:33  thomas
+  * Changes related to ValueList objects
+  *
   * Revision 1.17  2001/06/26 21:22:25  huang
   * changed return type to boolean for all addObject()
   *

@@ -76,7 +76,7 @@ public class SaxDocumentHandler extends HandlerBase {
 //    private static final String sHandlerXDFDTDName = "XDF_017.dtd";
 
     // The XDF structure that is populated by the XDF DocumentHandler
-    private XDFInterface XDF; 
+    private XDF XDF; 
 
     // Options for the document handler
     private Hashtable Options;
@@ -88,8 +88,8 @@ public class SaxDocumentHandler extends HandlerBase {
     private Hashtable defaultHandlerHashtable;      // default handlers 
 
     // References to the current working structure/array
-    private StructureInterface CurrentStructure;   
-    private ArrayInterface     CurrentArray;   
+    private Structure CurrentStructure;   
+    private Array CurrentArray;   
     private Object    CurrentDatatypeObject;
     private ArrayList CurrentNodePath = new ArrayList();
     private ArrayList CurrentFormatObjectList = new ArrayList ();
@@ -139,7 +139,7 @@ public class SaxDocumentHandler extends HandlerBase {
     private ArrayList NoteLocatorOrder = new ArrayList();
 
     // Keeping track of working valueList node (attributes) settings
-    private Hashtable CurrentValueListParameter = new Hashtable();
+    private ValueList CurrentValueList; // = new Hashtable();
 
     // Data writing stuff
     private int CurrentDataTagLevel = 0; // how nested we are within d0/d1/d2 data tags
@@ -185,7 +185,7 @@ public class SaxDocumentHandler extends HandlerBase {
        init();
     }
 
-    public SaxDocumentHandler (XDFInterface XDFstructure)
+    public SaxDocumentHandler (XDF XDFstructure)
     {
        init();
        setReaderXDFStructureObj(XDFstructure);
@@ -203,14 +203,14 @@ public class SaxDocumentHandler extends HandlerBase {
 
     /** Get the structure object that the Reader will parse an InputSource into. 
     */
-    public XDFInterface getReaderXDFStructureObj () 
+    public XDF getReaderXDFStructureObj () 
     {
       return XDF;
     }
 
     /** Set the structure object that the Reader will parse an InputSource into. 
     */
-    public void setReaderXDFStructureObj (XDFInterface XDFstructure)
+    public void setReaderXDFStructureObj (XDF XDFstructure)
     {
        XDF = XDFstructure; // set the structure to read into to be passed ref. 
     }
@@ -384,19 +384,19 @@ public class SaxDocumentHandler extends HandlerBase {
        return CurrentDatatypeObject;
     }
 
-    public void setCurrentArray(ArrayInterface array) {
+    public void setCurrentArray(Array array) {
        CurrentArray = array;
     }
 
-    public ArrayInterface getCurrentArray () {
+    public Array getCurrentArray () {
        return CurrentArray;
     }
 
-    public void setCurrentStructure (StructureInterface structure) {
+    public void setCurrentStructure (Structure structure) {
        CurrentStructure = structure;
     }
 
-    public StructureInterface getCurrentStructure () {
+    public Structure getCurrentStructure () {
        return CurrentStructure;
     }
 
@@ -647,39 +647,42 @@ public class SaxDocumentHandler extends HandlerBase {
 
     }
 
-    private Value createCurrentValueListValueObj (String valueString) {
+    private Value createValueListValueObj (ValueList thisValueList, String valueString) {
 
        Value valueObj = new Value ();
 
        if (valueString != null) {
+          
+           // legacy laziness
+           Hashtable currentValueListParameter = thisValueList.getAttribs();
 
-           if ( CurrentValueListParameter.containsKey("noDataValue") &&
-                ((String) CurrentValueListParameter.get("noDataValue")).equals(valueString) )
+           if ( currentValueListParameter.containsKey("noDataValue") &&
+                ((String) currentValueListParameter.get("noDataValue")).equals(valueString) )
            {
               valueObj.setSpecial("noData");
            }
-           else if ( CurrentValueListParameter.containsKey("infiniteValue") &&
-                ((String) CurrentValueListParameter.get("infiniteValue")).equals(valueString) )
+           else if ( currentValueListParameter.containsKey("infiniteValue") &&
+                ((String) currentValueListParameter.get("infiniteValue")).equals(valueString) )
            {
               valueObj.setSpecial("infinite");
            }
-           else if ( CurrentValueListParameter.containsKey("infiniteNegativeValue") &&
-                ((String) CurrentValueListParameter.get("infiniteNegativeValue")).equals(valueString) )
+           else if ( currentValueListParameter.containsKey("infiniteNegativeValue") &&
+                ((String) currentValueListParameter.get("infiniteNegativeValue")).equals(valueString) )
            {
               valueObj.setSpecial("infiniteNegative");
            }
-           else if ( CurrentValueListParameter.containsKey("notANumberValue") &&
-                ((String) CurrentValueListParameter.get("notANumberValue")).equals(valueString) )
+           else if ( currentValueListParameter.containsKey("notANumberValue") &&
+                ((String) currentValueListParameter.get("notANumberValue")).equals(valueString) )
            {
               valueObj.setSpecial("notANumber");
            }
-           else if ( CurrentValueListParameter.containsKey("underflowValue") &&
-                ((String) CurrentValueListParameter.get("underflowValue")).equals(valueString) )
+           else if ( currentValueListParameter.containsKey("underflowValue") &&
+                ((String) currentValueListParameter.get("underflowValue")).equals(valueString) )
            {
               valueObj.setSpecial("underflow");
            }
-           else if ( CurrentValueListParameter.containsKey("overflowValue") &&
-                ((String) CurrentValueListParameter.get("overflowValue")).equals(valueString) )
+           else if ( currentValueListParameter.containsKey("overflowValue") &&
+                ((String) currentValueListParameter.get("overflowValue")).equals(valueString) )
            {
               valueObj.setSpecial("overflow");
            }
@@ -1280,6 +1283,25 @@ Log.debugln(") ");
        }
     }
 
+    private ArrayList splitStringIntoValueObjects ( String valueListString, ValueList thisValueList )
+    {
+
+        ArrayList valueList = new ArrayList();
+        ArrayList strList = splitStringIntoStringObjects( valueListString, thisValueList.getDelimiter(),
+                                                          thisValueList.getRepeatable(), null
+                                                        );
+
+        Iterator iter = strList.iterator();
+        while (iter.hasNext()) {
+           String strValue = (String) iter.next();
+           Value newvalue = createValueListValueObj(thisValueList, strValue);
+           valueList.add(newvalue);
+        }
+
+        return valueList;
+    }
+
+
     // *sigh* lack of regular expression support makes this 
     // more difficult to do. I expect that it will be possible to 
     // break this in various ways if the PCDATA in the XML 
@@ -1621,14 +1643,15 @@ Log.errorln(" TValue:"+valueString);
 
     // For the case where valueList is storing values in 
     // algorithmic fashion
-    private ArrayList getValueListNodeValues () {
+/*
+    private ArrayList getValueListNodeValues (ValueList thisValueList) {
 
        ArrayList values = new ArrayList();
 
        // parameters for the algorithm
-       int size  = Integer.valueOf((String) CurrentValueListParameter.get("size")).intValue();
-       int start = Integer.valueOf((String) CurrentValueListParameter.get("start")).intValue();
-       int step  = Integer.valueOf((String) CurrentValueListParameter.get("step")).intValue();
+       int size  = Integer.valueOf(thisValueList.getSize()).intValue();
+       int start = Integer.valueOf(thisValueList.getStart()).intValue();
+       int step  = Integer.valueOf(thisValueList.getStep()).intValue();
 
        // do the algorithm to populate the values in the ArrayList 
        int numberOfValues = 0;
@@ -1642,9 +1665,10 @@ Log.errorln(" TValue:"+valueString);
        
        return values;
     }
+*/
           
-    public ArrayInterface appendArrayToArray ( ArrayInterface arrayToAppendTo, 
-                                               ArrayInterface arrayToAdd ) 
+    public Array appendArrayToArray ( Array arrayToAppendTo, 
+                                      Array arrayToAdd ) 
     {
 
        if (arrayToAppendTo != null) 
@@ -1797,6 +1821,70 @@ Log.errorln(" TValue:"+valueString);
     //
     // Internal Classes
     //
+
+    // internal valueList class for holding info about various kinds.
+    private class ValueList implements Cloneable {
+
+       // needed for the algorithm description
+       private Hashtable attribs = new Hashtable();
+       private String parentNode = null;
+       private boolean isDelimitedCase;
+
+       public String getValueListId() { return (String) attribs.get("valueListId"); }
+       public void setValueListId(String value) { attribs.put("valueListId", value); }
+
+       public String getValueListIdRef() { return (String) attribs.get("valueListIdRef"); }
+       public void setValueListIdRef(String value) { attribs.put("valueListIdRef", value); }
+
+       public int getStart () { return Integer.valueOf((String) attribs.get("start")).intValue(); } 
+       public void setStart (String value) { attribs.put("start", value); }
+
+       public int getStep() { return Integer.valueOf((String) attribs.get("step")).intValue(); } 
+       public void setStep (String value) { attribs.put("step", value); }
+
+       public int getSize() { return Integer.valueOf((String) attribs.get("size")).intValue(); } 
+       public void setSize(String value) { attribs.put("size", value); }
+
+       public String getDelimiter() { return (String) attribs.get("delimiter"); }
+       public void setDelimiter(String value) { attribs.put("delimiter", value); }
+
+       public String getRepeatable() { return (String) attribs.get("repeatable"); }
+       public void setRepeatable(String value) { attribs.put("repeatable", value); }
+
+       public String getInfinite() { return (String) attribs.get("infiniteValue"); }
+       public String getInfiniteNegative() { return (String) attribs.get("infiniteNegativeValue"); }
+       public String getNoData() { return (String) attribs.get("noDataValue"); }
+       public String getNotANumber() { return (String) attribs.get("notANumberValue"); }
+       public String getOverflow() { return (String) attribs.get("overflowValue"); }
+       public String getUnderflow() { return (String) attribs.get("underflowValue"); }
+
+       public String getParentNodeName() { return parentNode; }
+       public void setParentNodeName (String value) { parentNode = value; }
+
+       public boolean getIsDelimitedCase() { return isDelimitedCase; }
+       public void setIsDelimitedCase(boolean value) { isDelimitedCase = value; }
+
+       public Hashtable getAttribs() { return attribs; }
+
+       public void init (Hashtable attribtable) {
+          attribs = attribtable; 
+          isDelimitedCase = false;
+       }
+
+       protected Object clone () throws CloneNotSupportedException {
+
+          //shallow copy for fields
+          ValueList cloneObj = (ValueList) super.clone();
+
+          // copy attribs
+          cloneObj.attribs = (Hashtable) attribs.clone();
+
+          return cloneObj;
+
+       }
+
+
+    }
 
     /*
        Now, Some defines based on XDF DTD.
@@ -2352,10 +2440,12 @@ Log.errorln(" TValue:"+valueString);
               myLocator.setIterationOrder(AxisReadOrder);
               formatObj.setIOAxesOrder(AxisReadOrder);
 
+/*
 Iterator thisIter = AxisReadOrder.iterator();
 while(thisIter.hasNext()) {
   Log.debugln("ReadAxis: "+((AxisInterface) thisIter.next()).getAxisId());
 }
+*/
               CurrentDataFormatIndex = 0; 
               ArrayList strValueList;
 
@@ -3603,9 +3693,7 @@ while(thisIter.hasNext()) {
               // (only to fields!)
               List axisList = (List) CurrentArray.getAxes();
               AxisInterface lastAxisObject = (AxisInterface) axisList.get(axisList.size()-1);
-//              Axis lastAxisObject = (Axis) CurrentArray.getAxes().get(CurrentArray.getAxes().size()-1);
               if(lastAxisObject instanceof Axis) {
-		  //                 newunit = ((Axis) lastAxisObject).addUnit(newunit);
 		  ((Axis) lastAxisObject).addUnit(newunit);
               } else {
                  Log.errorln("Tried to add Unit to FieldAxis!! Aborting!");
@@ -3614,7 +3702,6 @@ while(thisIter.hasNext()) {
 
           } else if ( gParentNodeName.equals(XDFNodeName.ARRAY) )
           {
-	      //              newunit = CurrentArray.addUnit(newunit);
 	      CurrentArray.addUnit(newunit);
           } else {
               Log.warnln("Unknown grandparent object, cant add unit, ignoring.");
@@ -3689,11 +3776,7 @@ while(thisIter.hasNext()) {
 
                     List axisList = (List) CurrentArray.getAxes();
                     Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-		    //                    newvalue = lastAxisObject.addAxisValue(newvalue);
 		    lastAxisObject.addAxisValue(newvalue);
-//          } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
-//          {
-//
                  } else {
                     Log.errorln("Error: weird parent node "+parentNodeName+" for value.");
                     System.exit(-1); // fatal error, shut down 
@@ -3785,12 +3868,7 @@ while(thisIter.hasNext()) {
 
               List axisList = (List) CurrentArray.getAxes();
               Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-	      //              newvalue = lastAxisObject.addAxisValue(newvalue);
 	      lastAxisObject.addAxisValue(newvalue);
-//          } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
-//          {
-//
-//
 
           } else {
              Log.errorln("Error: weird parent node "+parentNodeName+" for value.");
@@ -3834,7 +3912,6 @@ while(thisIter.hasNext()) {
               // get the last axis
               List axisList = (List) CurrentArray.getAxes();
               Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-	      //              newvalueGroup = lastAxisObject.addValueGroup(newvalueGroup);
 	      lastAxisObject.addValueGroup(newvalueGroup);
               LastValueGroupParentObject = lastAxisObject;
 
@@ -3885,19 +3962,13 @@ while(thisIter.hasNext()) {
           // 1. set up information we need
           // our string that we will parse
           String valueListString = new String (buf, offset, len);
-          String delimiter = (String) CurrentValueListParameter.get("delimiter");
-          String repeatable = (String) CurrentValueListParameter.get("repeatable");
+          ValueList thisValueList = CurrentValueList;
 
-          // 2. reconsitute information stored in CurrentValueListParameter table 
-          String parentNodeName = (String) CurrentValueListParameter.get("parentNodeName");
+          // 2. reconsitute information we need
+          String parentNodeName = thisValueList.getParentNodeName();
 
-          // 3. split up string into values based on declared delimiter
-          // and snag the string representation of the values
-          ArrayList strValueList = 
-              splitStringIntoStringObjects(valueListString, delimiter, repeatable, null );
-
-          // 4. add these values to the lookup table, if the original valueList had an ID
-          String valueListId = (String) CurrentValueListParameter.get("valueListId");
+          // 3. add these values to the lookup table, if the original valueList had an ID
+          String valueListId = thisValueList.getValueListId();
           if (valueListId != null) {
 
               // a warning check, just in case 
@@ -3905,23 +3976,29 @@ while(thisIter.hasNext()) {
                  Log.warnln("More than one valueList node with valueListId=\""+valueListId+"\", using latest node." );
 
               // add the valueList array into the list of valueList objects
-              ValueListObj.put(valueListId, strValueList);
+              ValueListObj.put(valueListId, thisValueList);
 
           }
 
-          //  5. If there is a reference object, clone it to get
+          //  4. If there is a reference object, clone it to get
           //     the new valueList
-          String valueListIdRef = (String) CurrentValueListParameter.get("valueListIdRef");
+          String valueListIdRef = thisValueList.getValueListIdRef();
           if (valueListIdRef != null) {
 
              if (ValueListObj.containsKey(valueListIdRef)) {
 
                  // Just a simple clone since we have stored the ArrayList rather than the
                  // ValueList object (which actually doesnt exist. :P
-                 ArrayList refValueListObj = (ArrayList) ValueListObj.get(valueListIdRef);
-                 strValueList = (ArrayList) refValueListObj.clone();
+                 ValueList refValueListObj = (ValueList) ValueListObj.get(valueListIdRef);
+                 try {
+                    thisValueList = (ValueList) refValueListObj.clone();
+                 } catch (java.lang.CloneNotSupportedException e) {
+                    Log.errorln("Weird error, cannot clone valueList object. Aborting read.");
+                    System.exit(-1);
+                 }
 
-// This is missing. Should allow override.
+// This is missing. Should allow override. 
+// later note to self: Huh??  
 /*
                  // override attrs with those in passed list
               //   strValueList.setXMLAttributes(attrs);
@@ -3939,9 +4016,20 @@ while(thisIter.hasNext()) {
               }
           }
 
+          // 5. split up string into Value Objects based on declared delimiter
+          ArrayList myValueList = splitStringIntoValueObjects( valueListString, thisValueList);
 
           // 6. determine where these values go and then insert them
-          //   (hurm. could have reused code here. lazy. feh.
+          ValueListDelimitedList newValueListObj = new ValueListDelimitedList (myValueList,
+                                                    thisValueList.getDelimiter(),
+                                                    thisValueList.getNoData(),
+                                                    thisValueList.getInfinite(),
+                                                    thisValueList.getInfiniteNegative(),
+                                                    thisValueList.getNotANumber(),
+                                                    thisValueList.getOverflow(),
+                                                    thisValueList.getUnderflow()
+                                                                              );
+
           if( parentNodeName.equals(XDFNodeName.AXIS) )
           {
 
@@ -3949,47 +4037,13 @@ while(thisIter.hasNext()) {
              List axisList = (List) CurrentArray.getAxes();
              Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
 
-             // now create value objects, add them to groups 
-             Iterator iter = strValueList.iterator();
-             while (iter.hasNext())
-             {
-                String valueString = (String) iter.next();
-
-                // add the value to the axis
-                Value newvalue = createCurrentValueListValueObj(valueString);
-                lastAxisObject.addAxisValue(newvalue);
-
-                // add this object to all open value groups
-                Iterator groupIter = CurrentValueGroupList.iterator();
-                while (groupIter.hasNext())
-                {
-                   ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
-                   newvalue.addToGroup(nextValueGroupObj);
-                }
-             }
+             lastAxisObject.addAxisValueList(newValueListObj);
 
           } 
            else if( parentNodeName.equals(XDFNodeName.PARAMETER) )
           {
 
-             // now create value objects, add them to groups 
-             Iterator iter = strValueList.iterator();
-             while (iter.hasNext())
-             {
-                String valueString = (String) iter.next();
-
-                // add the value to the axis
-                Value newvalue = createCurrentValueListValueObj(valueString);
-                LastParameterObject.addValue(newvalue);
-
-                // add this object to all open value groups
-                Iterator groupIter = CurrentValueGroupList.iterator();
-                while (groupIter.hasNext())
-                {
-                   ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
-                   newvalue.addToGroup(nextValueGroupObj);
-                }
-             }
+             LastParameterObject.addValueList( newValueListObj);
 
           } 
           else 
@@ -3998,7 +4052,22 @@ while(thisIter.hasNext()) {
              System.exit(-1);
           } 
 
-          CurrentValueListParameter.put("isDelimitedCase", "true"); // notify that we did the list 
+          // now add valueObjects to groups 
+          Iterator iter = myValueList.iterator();
+          while (iter.hasNext())
+          {
+
+             Value newvalue = (Value) iter.next();
+             // add this object to all open value groups
+             Iterator groupIter = CurrentValueGroupList.iterator();
+             while (groupIter.hasNext())
+             {
+                ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
+                newvalue.addToGroup(nextValueGroupObj);
+             }
+          }
+
+          CurrentValueList.setIsDelimitedCase(true); // notify that we did the list 
 
        }
     }
@@ -4010,18 +4079,18 @@ while(thisIter.hasNext()) {
        public Object action (SaxDocumentHandler handler, AttributeList attrs) {
  
            // 1. re-init
-           CurrentValueListParameter.clear();
+           CurrentValueList = new ValueList();
 
            // 2. populate ValueListparameters from attribute list 
-           CurrentValueListParameter = attribListToHashtable(attrs);
+           CurrentValueList.init(attribListToHashtable(attrs));
 
            // 3. populate ValueListparameters w/ parent name 
            String parentNodeName = getParentNodeName(XDFNodeName.VALUEGROUP);
-           CurrentValueListParameter.put("parentNodeName", parentNodeName);
+           CurrentValueList.setParentNodeName(parentNodeName);
 
            // 4. set this parameter to false to indicate the future is not
            // yet determined for this :)
-           CurrentValueListParameter.put("isDelimitedCase", "false"); 
+           CurrentValueList.setIsDelimitedCase(false);
 
            return (Object) null;
 
@@ -4031,40 +4100,47 @@ while(thisIter.hasNext()) {
     class valueListEndElementHandlerFunc implements EndElementHandlerAction {
        public void action (SaxDocumentHandler handler) {
 
+          ValueList thisValueList = CurrentValueList;
+
           // generate valuelist values from algoritm IF we need to
           // (e.g. values where'nt in a delimited cdata list)
           // check to see if we didnt alrealy parse from a delmited string.
-          if ( ((String) CurrentValueListParameter.get("isDelimitedCase")).equals("true") ) 
+          if ( thisValueList.getIsDelimitedCase() )
              return; // we already did the list, leave here 
 
-
           // 1. grab parent node name
-          String parentNodeName = (String) CurrentValueListParameter.get("parentNodeName");
+          String parentNodeName = thisValueList.getParentNodeName();
 
           // 2. Find the list of values. If there is a reference object, clone it to get
           //    the new values list, otherwise, determine values from attributes 
           //    (e.g. algorithm method)
-          ArrayList values = null;
-          String valueListIdRef = (String) CurrentValueListParameter.get("valueListIdRef");
+          String valueListIdRef = thisValueList.getValueListIdRef();
           if (valueListIdRef != null) {
              if (ValueListObj.containsKey(valueListIdRef)) {
 
                  // Just a simple clone since we have stored the ArrayList rather than the
                  // ValueList object (which actually doesnt exist. :P
+                 /*
                  ArrayList refValueListObj = (ArrayList) ValueListObj.get(valueListIdRef);
                  values  = (ArrayList) refValueListObj.clone();
+                 */
+                 ValueList refValueListObj = (ValueList) ValueListObj.get(valueListIdRef);
+                 try {
+                    thisValueList = (ValueList) refValueListObj.clone();
+                 } catch (java.lang.CloneNotSupportedException e) {
+                    Log.errorln("Weird error, cannot clone valueList object. Aborting read.");
+                    System.exit(-1);
+                 }
 
              } else {
                  Log.warnln("Error: Reader got an valueList with ValueListIdRef=\""+valueListIdRef+"\" but no previous valueList has that id! Ignoring add valueList request.");
                  return;
               }
 
-          } else { 
-             values = getValueListNodeValues();
           } 
 
-          // 4. add these values to the lookup table, if the original valueList had an ID
-          String valueListId = (String) CurrentValueListParameter.get("valueListId");
+          // 4. add this valueList to the lookup table, if the original valueList had an ID
+          String valueListId = thisValueList.getValueListId();
           if (valueListId != null) {
 
               // a warning check, just in case 
@@ -4072,92 +4148,83 @@ while(thisIter.hasNext()) {
                  Log.warnln("More than one valueList node with valueListId=\""+valueListId+"\", using latest node." );
 
               // add the valueList array into the list of valueList objects
-              ValueListObj.put(valueListId, values);
+              ValueListObj.put(valueListId, thisValueList);
 
           }
 
           // 5. Populate correct parent node w/ values 
-          if(values.size() > 0 ) { // needed safety?
+          ValueListAlgorithm valueListObj = new ValueListAlgorithm ( thisValueList.getStart(),
+                                                                     thisValueList.getStep(),
+                                                                     thisValueList.getSize(),
+                                                                     thisValueList.getNoData(),
+                                                                     thisValueList.getInfinite(),
+                                                                     thisValueList.getInfiniteNegative(),
+                                                                     thisValueList.getNotANumber(),
+                                                                     thisValueList.getOverflow(),
+                                                                     thisValueList.getUnderflow()
+                                                                   );
 
-             ArrayList valueObjList = new ArrayList();
+          if( parentNodeName.equals(XDFNodeName.AXIS) )
+          {
 
-             if( parentNodeName.equals(XDFNodeName.AXIS) )
+             // get the last axis
+             List axisList = (List) CurrentArray.getAxes();
+             Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+
+             lastAxisObject.addAxisValueList( valueListObj);
+
+          } 
+          else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
+          {
+
+             LastParameterObject.addValueList( valueListObj);
+
+          } 
+          else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
+          {
+
+             if ( LastValueGroupParentObject instanceof Parameter )
              {
 
-                    // get the last axis
-                    List axisList = (List) CurrentArray.getAxes();
-                    Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+                Parameter myParamObject = (Parameter) LastValueGroupParentObject;
+   
+                myParamObject.addValueList( valueListObj);
 
-                    Iterator iter = values.iterator();
-                    while (iter.hasNext()) {
-                        String valuePCDATA = (String) iter.next();
-                        // Value value = new Value (valuePCDATA);
-                        Value value = createCurrentValueListValueObj(valuePCDATA);
-                        if(lastAxisObject.addAxisValue(value)) 
-                           valueObjList.add(value);
-                    }
-
-             } 
-             else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
+             } else if ( LastValueGroupParentObject instanceof Axis )
              {
 
-                if ( LastValueGroupParentObject instanceof Parameter )
-                {
+                // get the last axis
+                Axis myAxisObject = (Axis) LastValueGroupParentObject;
 
-                    Parameter myParamObject = (Parameter) LastValueGroupParentObject;
-
-                    Iterator iter = values.iterator();
-                    while (iter.hasNext()) {
-                        String valuePCDATA = (String) iter.next();
-                       // Value value = new Value (valuePCDATA);
-                        Value value = createCurrentValueListValueObj(valuePCDATA);
-			((Parameter) LastValueGroupParentObject).addValue(value);
-                        valueObjList.add(value);
-                    }
-
-                } else if ( LastValueGroupParentObject instanceof Axis )
-                {
-
-                    // get the last axis
-                    Axis myAxisObject = (Axis) LastValueGroupParentObject;
-
-                    Iterator iter = values.iterator();
-                    while (iter.hasNext()) {
-                        String valuePCDATA = (String) iter.next();
-                        // Value value = new Value (valuePCDATA);
-                        Value value = createCurrentValueListValueObj(valuePCDATA);
-                        if (myAxisObject.addAxisValue(value))
-                           valueObjList.add(value); 
-                    }
-
-                } else {
-                    Log.warnln("Error: unknown valueGroupParent "+LastValueGroupParentObject+
-                               " cant treat for "+XDFNodeName.VALUELIST);
-                    return; // bail 
-
-                }
-
-             } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
-             {
-
-                 Iterator iter = values.iterator();
-                 while (iter.hasNext())
-                 {
-                    String valuePCDATA = (String) iter.next();
-                   // Value value = new Value (valuePCDATA);
-                    Value value = createCurrentValueListValueObj(valuePCDATA);
-		    LastParameterObject.addValue(value);
-                    valueObjList.add(value);
-                 }
+                myAxisObject.addAxisValueList( valueListObj);
 
              } else {
-                 Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST);
-                 System.exit(-1); // fatal error, shut down 
+                Log.warnln("Error: unknown valueGroupParent "+LastValueGroupParentObject+
+                           " cant treat for "+XDFNodeName.VALUELIST);
+                return; // bail 
+
              }
+
+          } else {
+             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST);
+             System.exit(-1); // fatal error, shut down 
           }
 
-// Need to do something wi/ ValueObjList HERE?? 
+          // now add valueObjects to groups 
+          List values = valueListObj.getValues();
+          Iterator iter = values.iterator();
+          while (iter.hasNext())
+          {
 
+             Value newvalue = (Value) iter.next();
+             // add this object to all open value groups
+             Iterator groupIter = CurrentValueGroupList.iterator();
+             while (groupIter.hasNext())
+             {
+                ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
+                newvalue.addToGroup(nextValueGroupObj);
+             }
+          }
 
        }
     }
@@ -4178,6 +4245,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.39  2001/07/11 22:38:37  thomas
+ * Changes related to ValueList objects
+ *
  * Revision 1.38  2001/07/02 21:17:57  thomas
  * bug fix: missed inserting special values for algorithm valueList expansion.
  *
