@@ -60,6 +60,16 @@ public class IntegerDataFormat extends NumberDataFormat {
     init();
   }
 
+
+  /**
+   * constructor with a width
+   */
+  public IntegerDataFormat (int width)  
+  {
+    init();
+    setWidth (width);  
+  }
+
    //
    // Get/Set Methods
    //
@@ -191,6 +201,9 @@ public class IntegerDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/07/29 16:55:36  huang
+ * added a constructor
+ *
  * Revision 1.12  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
