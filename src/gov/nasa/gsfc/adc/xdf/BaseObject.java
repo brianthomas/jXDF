@@ -442,7 +442,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
       }
 
-      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+      if (Specification.getInstance().isPrettyXDFOutput()  && nodeNameString != null) 
+	  writeOut(outputstream, Constants.NEW_LINE);
     }//synchronize
   }
 
@@ -849,6 +850,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.44  2001/06/12 17:17:09  huang
+ * donot writeout a newline if the nodeName is null
+ *
  * Revision 1.43  2001/05/24 17:23:16  huang
  * fixed a bug in findAllChildHrefObjects()
  *
