@@ -207,7 +207,7 @@ public class Field extends BaseObject {
    /** set the *noteList* attribute
       @return: the current *noteList* attribute
     */
-   public void setNoteList(List note) 
+   public void setNoteList(List note)
    {
       ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
    }
@@ -215,7 +215,7 @@ public class Field extends BaseObject {
    /** getNoteList
        @return: the current *noteList* attribute
    */
-   public List getNoteList() 
+   public List getNoteList()
    {
       return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
    }
@@ -236,7 +236,7 @@ public class Field extends BaseObject {
       return (FieldRelationship) ((XMLAttribute) attribHash.get("relation")).getAttribValue();
    }
 
-   // 
+   //
    // Other public methods
    //
 
@@ -326,6 +326,10 @@ public class Field extends BaseObject {
       return false;
   }
 
+  public Object clone() throws CloneNotSupportedException {
+    return super.clone();
+  }
+
    //
    // Private Methods
    //
@@ -369,6 +373,9 @@ public class Field extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/06 21:26:21  kelly
+ * added clone() -k.z.
+ *
  * Revision 1.8  2000/11/02 17:05:29  thomas
  * Units are inited as Unit obj rather than null (kelly);
  * Field Relationship methods added. Clean up of file,
