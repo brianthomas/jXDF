@@ -808,6 +808,9 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
   */
   //declare as proteced, sub-classes may use --k.z. 10/17/2000
   protected void writeOut ( OutputStream outputstream, String msg ) {
+    if (msg == null) {
+      return ;
+    }
 
     try {
       outputstream.write(msg.getBytes());
@@ -823,7 +826,7 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
      // set object attributes from an AttributeList
      if (attrs != null) {
         // whip thru the list, setting each value
-        for (int i = 0; i < attrs.getLength (); i++) { 
+        for (int i = 0; i < attrs.getLength (); i++) {
           ((XMLAttribute) this.attribHash.get(attrs.getName(i))).setAttribValue(attrs.getValue(i));
         }
      }
@@ -1003,6 +1006,9 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2000/10/31 22:09:08  kelly
+ * minor fix.
+ *
  * Revision 1.18  2000/10/31 18:41:14  thomas
  * Removed error report from set attributes. -b.t.
  *
