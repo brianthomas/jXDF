@@ -1,5 +1,9 @@
+
 // XDF XMLDataIOStyle Class
 // CVS $Id$
+
+// XMLDataIOStyle.java Copyright (C) 2000 Brian Thomas,
+// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
 /*
     This program is free software; you can redistribute it and/or modify
@@ -18,13 +22,13 @@
 
 */
 
-
 package gov.nasa.gsfc.adc.xdf;
-import java.util.*;
-import java.io.*;
 
-// XMLDataIOStyle.java Copyright (C) 2000 Brian Thomas,
-// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import java.io.OutputStream;
 
 /**XMLDataIOStyle.java: This abstract class indicates how records are to be read/written
  * back out into XDF formatted XML files.
@@ -253,6 +257,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/08 20:28:14  thomas
+ * Trimmed down import path to just needed classes -b.t
+ *
  * Revision 1.7  2000/11/08 19:18:07  thomas
  * Changed the name of toXDF* methods to toXML* to
  * better reflect the nature of the output (its not XDF
