@@ -206,6 +206,8 @@ public class Note extends BaseObject {
    protected void init()
    {
 
+      resetXMLAttributes();
+
       classXDFNodeName = "note";
 
       // order matters! these are in *reverse* order of their
