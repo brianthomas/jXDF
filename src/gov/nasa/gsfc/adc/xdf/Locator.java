@@ -343,7 +343,9 @@ import java.util.List;
       axisOrderList = Collections.synchronizedList(new ArrayList());
 
       // lastly, set the iteration order.
-      setIterationOrder(axisList);
+      // this should be a safe call (e.g. the XMLDataIOStyle will be defined,
+      // and the ggetIOAxesOrder will return the correct number of unique axes)
+      setIterationOrder(parentArray.getXMLDataIOStyle().getIOAxesOrder());
 
    }
 
@@ -355,6 +357,10 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.25  2001/07/19 21:53:20  thomas
+ * argh, that writeAxisIOORder stuff still getting bugs.
+ * Wasnt being set in locator init.
+ *
  * Revision 1.24  2001/07/11 22:35:21  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *
