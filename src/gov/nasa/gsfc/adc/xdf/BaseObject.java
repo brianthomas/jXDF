@@ -514,7 +514,8 @@ public abstract class BaseObject implements Serializable {
 
       // ok, now deal with closing the node
       if (nodeNameString != null) {
-        // indent = deal_with_closing_group_nodes();
+        // Needed??
+        //dealWithClosingGroupNodes(containedObj, outputstream, indent);
         if (sPrettyXDFOutput) writeOut(outputstream, indent);
         if (!dontCloseNode)
           if ( nodeNameString.equals(sXDFStructureNodeName) && !XMLDeclAttribs.isEmpty() )
@@ -564,6 +565,16 @@ public abstract class BaseObject implements Serializable {
 
   /** A different invokation style. It has defaults for the XML Declaration
       setting standalone to "no" and version to the value of sXMLSpecVersion.
+  */
+  public void toXDFOutputStream (OutputStream outputstream, String indent)
+  {
+     Hashtable XMLDeclAttribs = new Hashtable();
+     toXDFOutputStream(outputstream, XMLDeclAttribs, indent);
+  }
+
+  /** A different invokation style. It has defaults for the XML Declaration
+      setting standalone to "no" and version to the value of sXMLSpecVersion.
+      Indentation starts as "".
   */
   public void toXDFOutputStream (OutputStream outputstream)
   {
@@ -658,19 +669,63 @@ public abstract class BaseObject implements Serializable {
   // PRIVATE Methods
   //
 
-  /** FILL IN
+  /** Method determines if any of the group objects to which the passed object
+      belongs are already opened and opens them If they arent already opened.
   */
-  private void dealWithOpeningGroupNodes (BaseObject obj, OutputStream o, String indent) {
+  private String dealWithOpeningGroupNodes (BaseObject obj, OutputStream outputstream, String indent) {
 
-    // fill in later
-    Log.error("ERROR: dealWithOpeningGroupNodes called but method is empty!");
+    // Should *both* groupMemberHash and openGroupNodeHash be synchronized??
+    synchronized(obj.groupMemberHash) {
+      synchronized(obj.openGroupNodeHash) {
+        Iterator iter = obj.groupMemberHash.iterator(); // Must be in synchronized block
+        while (iter.hasNext()) {
+          Group memberGroup = (Group) iter.next();
+          // determine if this group that we belong to is already 
+          // open or not.
+          if(!obj.openGroupNodeHash.contains(memberGroup)) {
+            // its *not* already open, so we bump up the indentation,
+            // open it and add it to the open group node list.
+            indent.concat(sPrettyXDFOutputIndentation); 
+            memberGroup.toXDFOutputStream(outputstream, indent);
+            obj.openGroupNodeHash.add(memberGroup); 
+          }
+        }
+      }
+    }
+
+    return indent;
   }
 
-  /** FILL IN
+  /** Method determines if any of the currently open group objects 
+      belong to the current object and closes them if they arent.
   */
-  private void dealWithClosingGroupNodes (BaseObject obj, OutputStream o, String indent) {
-    // fill in later
-    Log.error("ERROR: dealWithClosingGroupNodes called but method is empty!");
+  private String dealWithClosingGroupNodes (BaseObject obj, OutputStream outputstream, String indent) {
+
+    // Should *both* groupMemberHash and openGroupNodeHash be synchronized??
+    synchronized(obj.groupMemberHash) {
+      synchronized(obj.openGroupNodeHash) {
+
+        Iterator iter = obj.openGroupNodeHash.iterator(); // Must be in synchronized block
+        while (iter.hasNext()) {
+          Group openGroup = (Group) iter.next();
+          // determine if this group that we belong to is already 
+          // open or not.
+          if(!obj.groupMemberHash.contains(openGroup)) {
+            // its *not* a member of this group and its still open, 
+            // so we need to close it.
+
+            if (sPrettyXDFOutput) writeOut(outputstream, indent);
+            writeOut(outputstream, "</" + openGroup.classXDFNodeName + ">");
+            if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
+            obj.openGroupNodeHash.remove(openGroup);
+            // peel off some indent
+            indent = indent.substring(0,indent.length() - sPrettyXDFOutputIndentation.length());
+          }
+        }
+      }
+    }
+
+    return indent;
   }
 
   /** Basically this rearranges XMLAttribute information into a more convient
@@ -818,4 +873,14 @@ public abstract class BaseObject implements Serializable {
   } // end of internal Class XMLAttribute
 
 } // end of BaseObject Class
+
+/* Modification History:
+ *
+ * $Log$
+ * Revision 1.9  2000/10/10 19:12:05  cvs
+ * First Feature complete version of the base class.
+ * Added in dealWith(Open|Closed)Node private methods
+ * used by toXDFOutputStream. -b.t.
+ *
+ */
 
