@@ -11,6 +11,8 @@
 
         - readId/readIdRef not quite working, looks like deep clone issue with/DataIOStyle class.
 
+        - correct href handling. Use entities to read in the files. 
+
 	- Impliment octal/hex data read/write in SaxDocHandler.
 
 	- Impliment binary data read/write in SaxDocHandler/Binary*DataFormats.
