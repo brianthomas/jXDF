@@ -141,6 +141,14 @@ package gov.nasa.gsfc.adc.xdf;
         return false;
     }
 
+    public static boolean isValidStandalone (String str) {
+
+        if ( str != null &&
+                (str.equals("yes") || str.equals("no")) )
+           return true;
+
+        return false;
+    }
 
     public static boolean isValidValueSpecial(String strValueSpecial) {
       if (strValueSpecial == null) return true;
@@ -176,6 +184,9 @@ package gov.nasa.gsfc.adc.xdf;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/09/14 18:22:01  thomas
+ * added isValidStandalone method
+ *
  * Revision 1.9  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
