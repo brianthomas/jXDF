@@ -245,7 +245,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
     // open file writer
  //   try {
-      FileWriter fileout = new FileWriter(filename);
+      Writer fileout = new BufferedWriter (new FileWriter(filename));
+      // FileWriter fileout = new FileWriter(filename);
       toXMLWriter(fileout);
       fileout.close();
 /*
@@ -320,7 +321,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
           outputWriter.write(Constants.NEW_LINE);
   }
 
-  private void basicXMLWriter ( 
+  protected void basicXMLWriter ( 
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -760,7 +761,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
           if ( obj.attribType == Constants.STRING_TYPE)
           {
 
-            if (attribName.equals(Specification.getInstance().getPCDATAAttribute())) {
+            if (attribName.equals(Constants.PCDATA_ATTRIBUTE)) {
               xmlInfo.put("PCDATA", obj.attribValue);
             }else {
               Hashtable item = new Hashtable();
@@ -917,51 +918,14 @@ public abstract class BaseObject implements Serializable, Cloneable {
     return indent;
   }
 
-
-  /** Find all of the child href objects in this object.
-   */
-  protected ArrayList findAllChildHrefObjects () {
-
-     ArrayList list = new ArrayList();
-
-     if (this instanceof Structure) {
-
-        List arrayList = ((Structure) this).getArrayList();
-        synchronized (arrayList) {
-           Iterator iter = arrayList.iterator(); // Must be in synchronized block
-           while (iter.hasNext()) {
-               Array childArray = (Array) iter.next();
-               Href hrefObj = childArray.getDataCube().getHref();
-               if (hrefObj != null) 
-                  list.add(hrefObj);
-           }
-        } // sychronized arrayList 
-
-	// a temporary fix for recursive href searching
-        List structList = ((Structure) this).getStructList();
-        synchronized (structList) {
-           Iterator iter = structList.iterator(); // Must be in synchronized block
-           while (iter.hasNext()) {
-               Structure childStruct = (Structure) iter.next();
-	       if (childStruct != null) {
-		   ArrayList childList = childStruct.findAllChildHrefObjects();
-		   if (childList != null && childList.size() > 0) {
-		       Iterator childIter = childList.iterator();
-		       while (childIter.hasNext())
-			   list.add(childIter.next());
-		   }
-	       }
-	   }
-        } // sychronized structList 
-     }
-     return list;
-  }
-
 } // end of BaseObject Class
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.56  2001/09/05 22:06:40  thomas
+ * made basicXMLWriter protected, added BufferedWriter to toXMLFile method, moved findAllChildHrefObjects method to Structure class
+ *
  * Revision 1.55  2001/09/04 21:17:16  thomas
  * added deprecated tag to toXMLOutputStream docs
  *
