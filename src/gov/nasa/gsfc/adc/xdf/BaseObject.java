@@ -788,10 +788,10 @@ public abstract class BaseObject implements Serializable {
     */
     public String setAttribType(String strType) {
       if (
-           strType != Constants.STRING_TYPE ||
-           strType != Constants.OBJECT_TYPE ||
-           strType != Constants.NUMBER_TYPE ||
-           strType != Constants.LIST_TYPE
+           !strType.equals(Constants.STRING_TYPE) ||
+           !strType.equals(Constants.OBJECT_TYPE) ||
+           !strType.equals(Constants.NUMBER_TYPE) ||
+           !strType.equals(Constants.LIST_TYPE) 
          )
       {
         Log.error("Type not a defined constant for XMLAttribute");
