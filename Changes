@@ -4,6 +4,7 @@ Package Version History
 0.01   9/15/00  Initial code/directory structure laid down and
                 Java project started. 
 
-0.17a 11/09/00  First alpha version. Delimited and Tagged ASCII
-                IO implemented. 
+0.17a 11/11/00  First alpha version. Delimited and Tagged ASCII
+                IO implemented. Formatted and Binary data IO 
+		missing. Deep cloning *is* implemented. 
 

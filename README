@@ -7,6 +7,11 @@
 	functionality has yet been implemented and that we reserve
 	the right to significantly revise the API.
 
+	This code is released under the GNU GENERAL PUBLIC LICENSE
+ 	and is freeware. Please refer to the GPL.TXT file included
+	in this distribution for more information on the terms of 
+	this license.
+
 	As you might guess, this package is currently under heavy 
 	construction. That said, a subset of the final forseen 
 	functionality of the package is fairly well implemented. 
@@ -19,6 +24,9 @@
        	read/write functionality. Delimited writes work unless newline
 	returns are used as either a delimiter or recordTerminator
 	character.
+
+	For more details on missing features/problems that remain in 
+	the package please refer to the TODO file.
 
 	Please report bugs, comments and feature requests to 
         xdf-dev@xdf.gsfc.nasa.gov.
