@@ -9,6 +9,8 @@
         that code.) 
         ------------------------------------------------------------
 
+        - XDF validator application.
+
 	- add logarithm attribute to Units class (per new DTD).
 
         - UTF16 not implemented (at least not checked, reading *may* work).

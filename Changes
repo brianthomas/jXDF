@@ -52,7 +52,7 @@
 
 0.17-beta1   5/??/01  - Added BaseObjectWithXMLElements class. Array, Field, Structure, Axis
                         classes may now hold new XMLElements.
-                      - Added ability to add an arbitary attribute (e.g. previously undeclared 
+                      - Added ability to add an arbitary XML attribute (e.g. previously undeclared 
                         attribute that isnt a part of the class in the DTD) to any class that 
                         inherits from BaseObject.
                       - Re-added writeAxisOrder stuff to XMLDataIOStyle classes. Fixed write
@@ -65,7 +65,7 @@
                       - Added get/set Long/Short Data methods in DataCube.
                       - Higher dimesional arrays not implemented correctly (!! in 3+ dimensions). Fixed.
                       - Added get/setIOAxesOrder in XMLDataIOStyle.
-                      - add methods now uniformly return "boolean" rather than an object.
+                      - public add methods now uniformly return "boolean" rather than an object.
                       - added compression/decompression support for GZIP, Zip (bzip2, UNIX "compress" 
                         and Xmill still missing)
                       - bug fix to valueGroup printing in toXMLOutputStream.
