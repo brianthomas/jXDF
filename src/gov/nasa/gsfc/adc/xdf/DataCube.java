@@ -1465,6 +1465,24 @@ protected boolean  removeData (Locator locator) {
                Log.warnln("Warning: formatted exponential width too large, trimming trailing digits.\n");
             }
 
+/*
+         } else if ( thisDataFormat instanceof BinaryFloatDataFormat)
+         {
+         
+            Double thisDatum = new Double(getDoubleData(locator));
+            byte[] byteValues = new byte[1];
+            byteValues[0] = thisDatum.byteValue();
+            output = new String(byteValues);
+            
+         } else if ( thisDataFormat instanceof BinaryIntegerDataFormat)
+         {
+
+            Integer thisDatum = new Integer(getIntData(locator));
+            byte[] byteValues = new byte[1];
+            byteValues[0] = thisDatum.byteValue();
+            output = new String(byteValues);
+*/ 
+
          } else {
             Log.errorln("Unknown Dataformat:"+thisDataFormat.getClass().toString()
                         +" is not implemented for formatted writes. Aborting.");
@@ -1565,6 +1583,10 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.21  2001/01/29 05:03:37  thomas
+  * Half-hearted code for binary writing. Disabled
+  * for the time being. -b.t.
+  *
   * Revision 1.20  2001/01/19 22:33:12  thomas
   * Some small changes to the output when Href is
   * used. -b.t.
