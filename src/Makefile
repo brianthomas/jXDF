@@ -2,8 +2,6 @@
 # Makefile by -b.t. (thomas@adc.gsfc.nasa.gov) from 
 # modified version first created by Bob Schaefer
 
-# CVS $Id$
-
 .KEEP_STATE:
 
 # If you're using JDK 1.1 you'll need to specify the path to
@@ -34,13 +32,21 @@ XDF_BIN_PATH = ../
 XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/Array.java \
 	$(XDF_SOURCE_PATH)/Axis.java \
-	$(XDF_SOURCE_PATH)/Object.java \
-	$(XDF_SOURCE_PATH)/Reader.java \
-	$(XDF_SOURCE_PATH)/MsgHandler.java \
-	$(XDF_SOURCE_PATH)/SaxDocHandler.java \
+	$(XDF_SOURCE_PATH)/BaseObject.java \
+	$(XDF_SOURCE_PATH)/Constants.java \
+	$(XDF_SOURCE_PATH)/Field.java \
+	$(XDF_SOURCE_PATH)/Group.java \
+	$(XDF_SOURCE_PATH)/Note.java \
+	$(XDF_SOURCE_PATH)/Parameter.java \
+	$(XDF_SOURCE_PATH)/ParameterGroup.java \
 	$(XDF_SOURCE_PATH)/Structure.java \
-	$(XDF_SOURCE_PATH)/Value.java
+	$(XDF_SOURCE_PATH)/XMLAttribute.java 
 
+#	$(XDF_SOURCE_PATH)/SaxDocHandler.java \
+#	$(XDF_SOURCE_PATH)/Reader.java \
+#	$(XDF_SOURCE_PATH)/Locator.java \
+#	$(XDF_SOURCE_PATH)/Value.java
+ 
 #	$(XDF_SOURCE_PATH)/BinaryFloatDataFormat.java \
 #	$(XDF_SOURCE_PATH)/BinaryFloatStyle.java \
 #	$(XDF_SOURCE_PATH)/BinaryIntegerDataFormat.java \
@@ -51,7 +57,6 @@ XDF_SOURCES = \
 #	$(XDF_SOURCE_PATH)/ErroredValue.java \
 #	$(XDF_SOURCE_PATH)/ExponentDataFormat.java \
 #	$(XDF_SOURCE_PATH)/ExponentStyle.java \
-#	$(XDF_SOURCE_PATH)/Field.java \
 #	$(XDF_SOURCE_PATH)/FieldAxis.java \
 #	$(XDF_SOURCE_PATH)/FieldGroup.java \
 #	$(XDF_SOURCE_PATH)/FieldRelation.java \
@@ -59,13 +64,9 @@ XDF_SOURCES = \
 #	$(XDF_SOURCE_PATH)/FixedStyle.java \
 #	$(XDF_SOURCE_PATH)/FormattedIOCmd.java \
 #	$(XDF_SOURCE_PATH)/FormattedXMLDataIOStyle.java \
-#	$(XDF_SOURCE_PATH)/Group.java \
 #	$(XDF_SOURCE_PATH)/IntegerDataFormat.java \
 #	$(XDF_SOURCE_PATH)/IntegerStyle.java \
-#	$(XDF_SOURCE_PATH)/Locator.java \
-#	$(XDF_SOURCE_PATH)/Note.java \
-#	$(XDF_SOURCE_PATH)/Parameter.java \
-#	$(XDF_SOURCE_PATH)/ParameterGroup.java \
+#	$(XDF_SOURCE_PATH)/MsgHandler.java \
 #	$(XDF_SOURCE_PATH)/ReadCellFormattedIOCmd.java \
 #	$(XDF_SOURCE_PATH)/RepeatFormattedIOCmd.java \
 #	$(XDF_SOURCE_PATH)/SkipCharFormattedIOCmd.java \
