@@ -935,7 +935,7 @@ public void toXDFOutputStream (
       DataFormat[] dataFormatList = parentArray.getDataFormatList();
       for (int i = 0; i < NoDataValues.length; i++) {
         DataFormat d =  dataFormatList[i];
-        if (d !=null)
+        if (d != null && d.getNoDataValue() != null)
           NoDataValues[i]=d.getNoDataValue().toString();
       }
     }
@@ -947,7 +947,7 @@ public void toXDFOutputStream (
       }
     }
 
-    if (readObj.getClass().getName().endsWith("TaggedXMLDataIOStyle")) {
+    if (readObj instanceof TaggedXMLDataIOStyle) {
       String[] tagOrder = ((TaggedXMLDataIOStyle)readObj).getAxisTags();
       int stop = tagOrder.length;
       String[] tags = new String[stop];
@@ -965,26 +965,31 @@ public void toXDFOutputStream (
       }
       writeTaggedData(outputstream, currentLocator, indent, axisLength, tags, 0, fastestAxis, NoDataValues);
 
-    }  //done dealwith with TaggedXMLDataIOSytle
+    }  //done dealing with with TaggedXMLDataIOSytle
     else {
-     if (readObj.getClass().getName().endsWith("DelimitedXMLDataIOStyle")) {
-      writeDelimitedData(outputstream, currentLocator, (DelimitedXMLDataIOStyle) readObj, fastestAxis, NoDataValues);
+       if (readObj instanceof DelimitedXMLDataIOStyle) {
+           writeDelimitedData( outputstream, currentLocator, 
+                               (DelimitedXMLDataIOStyle) readObj, 
+                               fastestAxis, NoDataValues );
 
-     }
+       }
     }
-    //close the tagged data section
+
+    //close the data section appropriately 
     if (niceOutput) {
       writeOut(outputstream, Constants.NEW_LINE);
       writeOut(outputstream, indent);
     }
+
     writeOut(outputstream, "</" + nodeName + ">");
     if (niceOutput)
       writeOut(outputstream, Constants.NEW_LINE);
+
   }
 
 
-  /**write data with no less than 3D, using recursion, expansive, data with no more
-    than 3D has special methods, data retrieval is ok,
+  /**  write data with no less than 3D, using recursion, expansive, data with no more
+       than 3D has special methods, data retrieval is ok,
     */
 
 protected void writeTaggedData(OutputStream outputstream,
@@ -1001,7 +1006,8 @@ protected void writeTaggedData(OutputStream outputstream,
     if (sPrettyXDFOutput) {
       indent += sPrettyXDFOutputIndentation;
     }
-    //base case
+
+    //base case (writes the last 2 inner dimensions of the data cube)
     if (which == tags.length-2) {
       int stop = axisLength[which];
       String tag1 = (String) tags[which+1];
@@ -1019,14 +1025,21 @@ protected void writeTaggedData(OutputStream outputstream,
 	int fastestAxisLength = fastestAxis.getLength();
 	int dataNum = 0;
 	while (dataNum < fastestAxisLength) {
-          writeOut( outputstream, "<" + tag1 + ">");
+          writeOut( outputstream, "<" + tag1 );
   	  try {
-            writeOut(outputstream, getStringData(locator));
+             writeOut( outputstream, ">" + getStringData(locator));
+             writeOut( outputstream, "</" + tag1 + ">");
           }
           catch (NoDataException e) {
-            writeOut(outputstream, noDataValues[locator.getAxisLocation(fastestAxis)]);
+             // opps! no data in that location. Print out accordingly
+             String noDataValueString = noDataValues[locator.getAxisLocation(fastestAxis)];
+             if (noDataValueString != null) 
+             { 
+                writeOut(outputstream, ">" + noDataValueString );
+                writeOut( outputstream, "</" + tag1 + ">");
+             } else 
+                writeOut( outputstream, "/>");
 	  }
-          writeOut( outputstream, "</" + tag1 + ">");
 
 	  dataNum ++;
 	  locator.next();
@@ -1040,6 +1053,7 @@ protected void writeTaggedData(OutputStream outputstream,
       }
     }
     else {
+      // the 'outer' data tag wrapper. writes dimension 3 or higher tags
       int stop = axisLength[which];
       which++;
       for (int i = 0; i < stop; i++) {
@@ -1095,6 +1109,11 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.7  2000/11/01 16:28:25  thomas
+  * Updated taggedIOsection to write out noDataValued
+  * data that has no noDataValue defined to be an empty
+  * tag. -b.t.
+  *
   * Revision 1.6  2000/10/31 21:37:18  kelly
   * --completed *toXDF* for delimited IO style.
   * --added NoDataException handling  -k.z.
