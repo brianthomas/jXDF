@@ -117,12 +117,10 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
                                    String noChildObjectNodeName
                                  )
    {
-
       // while writing out, attribHash should not be changed
       synchronized (attribHash) {
 
          String nodeNameString = this.classXDFNodeName;
-   
          // Setup. Sometimes the name of the node we are opening is different from
          // that specified in the classXDFNodeName (*sigh*)
          if (newNodeNameString != null) nodeNameString = newNodeNameString;
@@ -193,7 +191,6 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
              pcdata != null || 
              noChildObjectNodeName != null)
          {
-   
            // close the opening tag
            if (nodeNameString != null) {
              writeOut(outputstream, ">");
@@ -300,7 +297,8 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
    
          }
    
-         if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
+         if (Specification.getInstance().isPrettyXDFOutput() && nodeNameString != null ) 
+	     writeOut(outputstream, Constants.NEW_LINE);
 
       } //end synchronize
 
