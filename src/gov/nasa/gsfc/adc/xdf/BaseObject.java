@@ -611,6 +611,47 @@ public abstract class BaseObject implements Serializable {
 
   }
 
+  /** Clone an XDF object.
+   */
+  protected Object clone () {
+ 
+     BaseObject cloneObj = null;
+
+     try {
+       cloneObj = (BaseObject) super.clone();
+
+Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
+
+       // Clone the fields
+
+       // XMLAttributes Clone
+       cloneObj.attribHash = new Hashtable();
+       Enumeration keys = this.attribHash.keys();
+       while ( keys.hasMoreElements() )
+       {
+           Object key = keys.nextElement();
+           XMLAttribute XMLAttributeValue = (XMLAttribute) this.attribHash.get((String) key);
+           cloneObj.attribHash.put((String) key, XMLAttributeValue.clone()); 
+       }
+
+
+//       cloneObj.classXDFNodeName = this.classXDFNodeName;
+//       cloneObj.attribOrder = this.attribOrder;
+//       cloneObj.groupMemberHash = Collections.synchronizedSet(new HashSet());
+//       cloneObj.openGroupNodeHash = Collections.synchronizedSet(new HashSet());
+       
+  /** This field stores object references to those group objects to which a given
+      object belongs.
+  */    
+
+
+     } catch (java.lang.CloneNotSupportedException e) {
+        Log.errorln("Error: Clone not supported by class "+this.getClass().toString());
+     }
+
+     return (Object) cloneObj;
+  }
+
   //
   // PROTECTED Methods
   //
@@ -751,9 +792,7 @@ public abstract class BaseObject implements Serializable {
 
   /** Write message out to specified OutputStream Object.
   */
-  /**declare as proteced, sub-classes may use --k.z. 10/17/2000
-   *
-   */
+  //declare as proteced, sub-classes may use --k.z. 10/17/2000
   protected void writeOut ( OutputStream outputstream, String msg ) {
 
     try {
@@ -763,6 +802,17 @@ public abstract class BaseObject implements Serializable {
     }
   }
 
+  /** Set the XMLattributes of this object using the passed AttributeList
+   */
+  // NOTE: this is essentially the Perl update method
+  protected void setXMLAttributes (AttributeList attrs) {
+     // set object attributes from an AttributeList 
+     if (attrs != null) {
+        // whip thru the list, setting each value
+        for (int i = 0; i < attrs.getLength (); i++)
+          ((XMLAttribute) this.attribHash.get(attrs.getName(i))).setAttribValue(attrs.getValue(i));
+     }
+  }
 
 
   //
@@ -858,23 +908,6 @@ public abstract class BaseObject implements Serializable {
   }
 
   //
-  // Protected methods
-  //
-
-  /** Set the XMLattributes of this object using the passed AttributeList
-   */
-  // NOTE: this is essentially the Perl update method
-  protected void setXMLAttributes (AttributeList attrs) {
-     // set object attributes from an AttributeList 
-     if (attrs != null) {
-        // whip thru the list, setting each value
-        for (int i = 0; i < attrs.getLength (); i++) 
-          ((XMLAttribute) this.attribHash.get(attrs.getName(i))).setAttribValue(attrs.getValue(i));
-     }
-  }
-
-
-  //
   // Internal Classes
   //
 
@@ -882,7 +915,7 @@ public abstract class BaseObject implements Serializable {
       These attributes will be used to re-construct an XDF file/stream
       from the Java object.
   */
-  public static class XMLAttribute {
+  public static class XMLAttribute implements Cloneable {
 
     protected Object attribValue;
     protected String attribType;
@@ -920,13 +953,32 @@ public abstract class BaseObject implements Serializable {
     /** Get the value of this XMLAttribute.
     */
     public Object getAttribValue() {
-      return attribValue;
+       return attribValue;
     }
 
     /** Get the XMLAttribute value type.
     */
     public String getAttribType() {
-      return attribType;
+       return attribType;
+    }
+
+    public Object clone () {
+
+       XMLAttribute cloneObj = null;
+
+       try {
+
+          cloneObj = (XMLAttribute) super.clone();
+
+          // need to clone the fields here too
+//          cloneObj.attribType = new String(this.attribType);
+//          cloneObj.attribValue = this.attribValue.clone();
+
+       } catch (java.lang.CloneNotSupportedException e) {
+          Log.errorln("Error: Clone not supported for XMLAttribute.");
+       }
+
+       return (Object) cloneObj;
     }
 
   } // end of internal Class XMLAttribute
@@ -936,6 +988,10 @@ public abstract class BaseObject implements Serializable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2000/10/24 21:34:24  thomas
+ * Added some clone code needed by the Reader (now)
+ * and programmers (later, when we have some!) -b.t.
+ *
  * Revision 1.14  2000/10/24 15:02:51  thomas
  * Hmm. minor problem with XMLDeclAttribs portion
  * of toXDFOutputStream ("SYSTEM" decl missing, and
