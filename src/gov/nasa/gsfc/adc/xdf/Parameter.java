@@ -101,37 +101,6 @@ public class Parameter extends BaseObject {
   }
 
 
- /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init()
-  {
-
-    classXDFNodeName = "parameter";
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"noteList");
-    attribOrder.add(0,"valueList");
-    attribOrder.add(0,"units");
-    attribOrder.add(0,"datatype");
-    attribOrder.add(0,"paramIdRef");
-    attribOrder.add(0,"paramId");
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
-
-     //set up the attribute hashtable key with the default initial value
-    attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
-    attribHash.put("datatype", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("paramIdRef", new XMLAttribute(null, Constants.STRING_TYPE));  //double check k.z.
-    attribHash.put("paramId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
-
-  };
-
   //
   //Get/Set Methods
   //
@@ -390,4 +359,50 @@ public class Parameter extends BaseObject {
     return cloneObj;
   }
 
+  // 
+  // Protected Methods 
+  // 
+ 
+  /** Special private method used by constructor methods to
+      conviently build the XML attribute list for a given class.
+   */
+  protected void init()
+  {
+
+    classXDFNodeName = "parameter";
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0,"noteList");
+    attribOrder.add(0,"valueList");
+    attribOrder.add(0,"units");
+    attribOrder.add(0,"datatype");
+    attribOrder.add(0,"paramIdRef");
+    attribOrder.add(0,"paramId");
+    attribOrder.add(0,"description");
+    attribOrder.add(0,"name");
+
+     //set up the attribute hashtable key with the default initial value
+    attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
+    attribHash.put("datatype", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("paramIdRef", new XMLAttribute(null, Constants.STRING_TYPE));  //double check k.z.
+    attribHash.put("paramId", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+
+  };
+
  }
+
+ /* Modification History
+  *
+  * $Log$
+  * Revision 1.12  2000/11/27 16:57:45  thomas
+  * Made init method protected so that extending
+  * Dataformats may make use of them. -b.t.
+  * 
+  *
+  */
+

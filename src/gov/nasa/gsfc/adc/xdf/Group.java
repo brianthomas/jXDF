@@ -66,22 +66,6 @@ public class Group extends BaseObject {
 
   }
 
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init()
-  {
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
-
-    //set up the attribute hashtable key with the default initial value
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
-  }
-
   //
   //Get/Set Methods
   //
@@ -167,6 +151,26 @@ public class Group extends BaseObject {
     }
   }
 
+
+  // 
+  // Protected Methods
+  //
+
+  /** Special private method used by constructor methods to
+   *  conviently build the XML attribute list for a given class.
+   */
+  protected void init()
+  {
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0,"description");
+    attribOrder.add(0,"name");
+
+    //set up the attribute hashtable key with the default initial value
+    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+  }
 
 
 }

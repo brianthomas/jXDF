@@ -71,24 +71,6 @@ import java.util.Hashtable;
 
   }
 
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init()
-  {
-
-    classXDFNodeName = "unit";  //XDF node name
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"value");
-    attribOrder.add(0,"power");
-
-    attribHash.put("value", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("power", new XMLAttribute(null, Constants.DOUBLE_TYPE));
-
-  };
-
   //
   //Get/Set methods
   //
@@ -122,21 +104,36 @@ import java.util.Hashtable;
     return (String) ((XMLAttribute) attribHash.get("value")).getAttribValue();
   }
 
-// I dont think this is even used. commented out for now. -b.t.
-  /*update: special for Value Objects
-   * set its value attribute to the contents of passed string
-   * overload the update in BaseObject which takes the Hashtable as param
+  //
+  // Protected Methods
+  //
+  /** Special private method used by constructor methods to
+      conviently build the XML attribute list for a given class.
    */
-/*
-  public String update(String value) {
-    return setValue(value);
-  }
-*/
+  protected void init()
+  {
+
+    classXDFNodeName = "unit";  //XDF node name
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0,"value");
+    attribOrder.add(0,"power");
+
+    attribHash.put("value", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("power", new XMLAttribute(null, Constants.DOUBLE_TYPE));
+
+  };
+
  }
 
  /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/27 16:57:45  thomas
+ * Made init method protected so that extending
+ * Dataformats may make use of them. -b.t.
+ *
  * Revision 1.8  2000/11/20 22:03:48  thomas
  * Split up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for

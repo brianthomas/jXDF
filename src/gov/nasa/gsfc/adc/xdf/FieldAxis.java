@@ -283,13 +283,13 @@ public class FieldAxis extends BaseObject implements AxisInterface{
   }
 
   //
-  // Private Methods
+  // Protected Methods
   //
 
-  /** a special private method used by constructor methods to
+  /** A special private method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
 
     classXDFNodeName = "fieldAxis";
@@ -322,6 +322,10 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.12  2000/11/27 16:57:45  thomas
+  * Made init method protected so that extending
+  * Dataformats may make use of them. -b.t.
+  *
   * Revision 1.11  2000/11/16 19:58:41  kelly
   * fixed documentation.  -k.z.
   *

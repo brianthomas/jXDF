@@ -81,10 +81,10 @@ public class ValueGroup extends Group {
     }
 
     //
-    // Private Methods
+    // Protected Methods
     //
 
-    private void init () {
+    protected void init () {
        classXDFNodeName = "valueGroup";
     }
 
@@ -94,6 +94,10 @@ public class ValueGroup extends Group {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/27 16:57:45  thomas
+ * Made init method protected so that extending
+ * Dataformats may make use of them. -b.t.
+ *
  * Revision 1.4  2000/11/16 20:11:15  kelly
  * fixed documentation.  -k.z.
  *

@@ -79,10 +79,10 @@ import java.util.Hashtable;
     }
 
     //
-    // Private Methods
+    // Protected Methods
     //
 
-    private void init () {
+    protected void init () {
 
        classXDFNodeName = "fieldGroup";
 
@@ -93,6 +93,10 @@ import java.util.Hashtable;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/11/27 16:57:45  thomas
+ * Made init method protected so that extending
+ * Dataformats may make use of them. -b.t.
+ *
  * Revision 1.2  2000/11/16 19:58:59  kelly
  * fixed documentation.  -k.z.
  *

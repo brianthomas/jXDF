@@ -307,13 +307,13 @@ public class Field extends BaseObject {
   }
 
    //
-   // Private Methods
+   // Protected Methods
    //
 
    /** A special private method used by constructor methods to
        conviently build the XML attribute list for a given class.
     */
-   private void init()
+   protected void init()
    {
 
      classXDFNodeName = "field";
@@ -349,6 +349,10 @@ public class Field extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2000/11/27 16:57:45  thomas
+ * Made init method protected so that extending
+ * Dataformats may make use of them. -b.t.
+ *
  * Revision 1.11  2000/11/16 19:58:28  kelly
  * fixed documentation.  -k.z.
  *

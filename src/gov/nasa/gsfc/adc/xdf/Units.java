@@ -76,27 +76,9 @@ import java.io.OutputStream;
   }
 
 
- /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init()
-  {
-
-    classXDFNodeName = "units";
-    XDFNodeName = classXDFNodeName;
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"unitList");
-    attribOrder.add(0,"system");
-    attribOrder.add(0,"factor");
-
-    attribHash.put("unitList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("system", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("factor", new XMLAttribute(null, Constants.DOUBLE_TYPE));
-  }
   //
   //Get/Set Methods
+  //
 
   /**Change the XDF node name for this object.
      @param String
@@ -245,12 +227,40 @@ import java.io.OutputStream;
                            );
   }
 
+  //
+  // Protected Methods
+  //
+
+  /** Special private method used by constructor methods to
+   *  conviently build the XML attribute list for a given class.
+   */
+  protected void init()
+  {
+
+    classXDFNodeName = "units";
+    XDFNodeName = classXDFNodeName;
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0,"unitList");
+    attribOrder.add(0,"system");
+    attribOrder.add(0,"factor");
+
+    attribHash.put("unitList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put("system", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("factor", new XMLAttribute(null, Constants.DOUBLE_TYPE));
+  }
+
 
  }  //end of Units Class
 
  /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2000/11/27 16:57:45  thomas
+ * Made init method protected so that extending
+ * Dataformats may make use of them. -b.t.
+ *
  * Revision 1.10  2000/11/20 22:03:48  thomas
  * Split up XMLAttribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for

@@ -671,7 +671,7 @@ import java.util.Vector;
   /** a special private method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
-  private void init()
+  protected void init()
   {
 
     classXDFNodeName = "array";
@@ -772,6 +772,10 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.19  2000/11/27 16:57:44  thomas
+  * Made init method protected so that extending
+  * Dataformats may make use of them. -b.t.
+  *
   * Revision 1.18  2000/11/17 19:01:27  thomas
   * Small fix to addAxis warning message. -b.t.
   *

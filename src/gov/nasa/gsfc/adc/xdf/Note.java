@@ -189,13 +189,13 @@ public class Note extends BaseObject implements Cloneable {
    }
 
    //
-   // Private Methods
+   // Protected Methods
    //
 
    /** a special private method used by constructor methods to
        conviently build the XML attribute list for a given class.
     */
-   private void init()
+   protected void init()
    {
 
       classXDFNodeName = "note";

@@ -68,47 +68,6 @@ public class Axis extends BaseObject implements AxisInterface {
   }
 
 
- /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init()
-  {
-
-    classXDFNodeName = "axis";
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"valueList");
-    attribOrder.add(0,"axisUnits");
-    attribOrder.add(0,"axisDatatype");
-    attribOrder.add(0,"align");  //not sure what it is???
-    attribOrder.add(0,"axisIdRef");
-    attribOrder.add(0,"axisId");
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
-
-     //set up the attribute hashtable key with the default initial value
-
-     //set the minimum array size(essentially the size of the axis)
-    attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList(Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE));
-    attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("align", new XMLAttribute(null, Constants.STRING_TYPE));  //double check???
-
-    //set up the axisUnits attribute
-    Units unitsObj = new Units();
-    attribHash.put("axisUnits", new XMLAttribute(unitsObj, Constants.OBJECT_TYPE));
-    unitsObj.setXDFNodeName("axisUnits");
-
-    attribHash.put("axisDatatype",new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
-
-    length = 0;
-
-  }
-
-
   //
   //Get/Set Methods
   //
@@ -481,11 +440,59 @@ public class Axis extends BaseObject implements AxisInterface {
     return cloneObj;
   }
 
+  // 
+  // Protected Methods
+  //
+
+  /** Special private method used by constructor methods to
+      conviently build the XML attribute list for a given class.
+   */
+  protected void init()
+  {
+
+    classXDFNodeName = "axis";
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0,"valueList");
+    attribOrder.add(0,"axisUnits");
+    attribOrder.add(0,"axisDatatype");
+    attribOrder.add(0,"align");  //not sure what it is???
+    attribOrder.add(0,"axisIdRef");
+    attribOrder.add(0,"axisId");
+    attribOrder.add(0,"description");
+    attribOrder.add(0,"name");
+
+     //set up the attribute hashtable key with the default initial value
+
+     //set the minimum array size(essentially the size of the axis)
+    attribHash.put("valueList", new XMLAttribute(Collections.synchronizedList(new ArrayList(Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE));
+    attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("align", new XMLAttribute(null, Constants.STRING_TYPE));  //double check???
+
+    //set up the axisUnits attribute
+    Units unitsObj = new Units();
+    attribHash.put("axisUnits", new XMLAttribute(unitsObj, Constants.OBJECT_TYPE));
+    unitsObj.setXDFNodeName("axisUnits");
+
+    attribHash.put("axisDatatype",new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+
+    length = 0;
+
+  }
+ 
 }  //end of Axis class
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2000/11/27 16:57:44  thomas
+ * Made init method protected so that extending
+ * Dataformats may make use of them. -b.t.
+ *
  * Revision 1.15  2000/11/16 19:45:34  kelly
  * fixed documentation.
  *
