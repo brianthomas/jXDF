@@ -426,11 +426,16 @@ import java.util.Vector;
 	     removeAxis(i);
          }
 
+         hasFieldAxis = false;
+
 	 //add new axes
 	 if (axisList != null && axisList.size() > 0) {
 	     Iterator iter = axisList.iterator();
 	     while (iter.hasNext())
-		 addAxis((AxisInterface) iter.next());
+             {
+		 AxisInterface axis = (AxisInterface) iter.next();
+		 addAxis(axis);
+             }
 	 }
      }
    
@@ -542,21 +547,32 @@ import java.util.Vector;
           @param axis - Axis to be added
           @return an Axis object on success, null on failure
       */
-      public AxisInterface addAxis(AxisInterface axis) {
+     public AxisInterface addAxis (AxisInterface axis) {
 
-        if (axis instanceof FieldAxis) 
-        {
-           setFieldAxis((FieldAxis) axis);
-        } else if (canAddAxisObjToArray((Axis) axis)) { //check if the axis can be added
-//           getDataCube().incrementDimension((Axis) axis);  //increment the DataCube dimension by 1
-           getAxes().add((Axis) axis);
-           updateChildLocators((Axis) axis, "add");
-           updateNotesLocationOrder(); // reset to the current order of the axes
+        if (canAddAxisObjToArray(axis)) { //check if the axis can be added
+
+           if (axis instanceof FieldAxis) { 
+
+              setFieldAxis((FieldAxis) axis); // special routine, there can only be one in list 
+                                              // amoungst other things.
+           } else {
+
+              getAxes().add((Axis) axis);
+              updateChildLocators((Axis) axis, "add");
+              updateNotesLocationOrder(); // reset to the current order of the axes
+              getXMLDataIOStyle().getIOAxesOrder().add(axis); // tack this axis on the end
+
+           }
+        
+           // update readAxisOrder by taking on new axis.
+           getXMLDataIOStyle().getIOAxesOrder().add(axis); 
+
         } else {  
            return null;
         }
-   
+
         return axis;
+
      }
    
       /**removes a Axis object from axisList
@@ -566,10 +582,17 @@ import java.util.Vector;
       * double check the implication on datacube
       */
      public boolean removeAxis (AxisInterface axisObj) {
-       boolean isRemoveSuccess = removeFromList(axisObj, getAxes(), AXISLIST_XML_ATTRIBUTE_NAME);
-       if (isRemoveSuccess) {    //remove successful
-          getDataCube().reset(); // reset data within the datacube
-          updateChildLocators(axisObj, "remove");
+
+       boolean isRemoveSuccess = false;
+       if (axisObj instanceof FieldAxis) {
+          isRemoveSuccess = setFieldAxis(null);
+       } else {
+          isRemoveSuccess = removeFromList(axisObj, getAxes(), AXISLIST_XML_ATTRIBUTE_NAME);
+          if (isRemoveSuccess) {    //remove successful
+             getDataCube().reset(); // reset data within the datacube
+             updateChildLocators(axisObj, "remove");
+             getXMLDataIOStyle().setIOAxesOrder(getAxes()); // reset IO ordering
+          }
        }
        return isRemoveSuccess;
      }
@@ -580,11 +603,19 @@ import java.util.Vector;
       *           false on failure and keep the dimension unchanged
       */
      public boolean removeAxis (int index) {
+
        AxisInterface removeAxis = (AxisInterface) getAxes().get(index);
-       boolean isRemoveSuccess = removeFromList(index, getAxes(), AXISLIST_XML_ATTRIBUTE_NAME);
-       if (isRemoveSuccess) {  //remove successful
-          getDataCube().reset(); // reset data within the datacube
-          updateChildLocators(index, "remove");
+       boolean isRemoveSuccess = false;
+
+       if (removeAxis instanceof FieldAxis) {
+          isRemoveSuccess = setFieldAxis(null);
+       } else {
+          isRemoveSuccess = removeFromList(index, getAxes(), AXISLIST_XML_ATTRIBUTE_NAME);
+          if (isRemoveSuccess) {  //remove successful
+             getDataCube().reset(); // reset data within the datacube
+             updateChildLocators(index, "remove");
+             getXMLDataIOStyle().setIOAxesOrder(getAxes()); // reset IO ordering
+          }
        }
        return isRemoveSuccess;
      }
@@ -750,8 +781,6 @@ import java.util.Vector;
    public void setData (Locator locator, double [] numValue) 
        throws SetDataException {
 
-System.out.println ("DEBUG: double []: " + numValue.length);
-
        for (int i = 0; i < numValue.length; i++) {
 	   this.setData(locator, numValue[i]);
 	   locator.next();
@@ -764,8 +793,6 @@ System.out.println ("DEBUG: double []: " + numValue.length);
    public void setData (Locator locator, int [] numValue) 
        throws SetDataException {
 
-System.out.println ("DEBUG: int []: " + numValue.length);
-
        for (int i = 0; i < numValue.length; i++) {
 	   this.setData(locator, numValue[i]);
 	   locator.next();
@@ -777,8 +804,6 @@ System.out.println ("DEBUG: int []: " + numValue.length);
     */
    public void setData (Locator locator, long [] numValue) 
        throws SetDataException {
-
-System.out.println ("DEBUG: long []: " + numValue.length);
 
        for (int i = 0; i < numValue.length; i++) {
 	   this.setData(locator, (int) numValue[i]);
@@ -793,8 +818,6 @@ System.out.println ("DEBUG: long []: " + numValue.length);
    public void setData (Locator locator, float [] numValue) 
        throws SetDataException {
 
-System.out.println ("DEBUG: float []: " + numValue.length);
-
        for (int i = 0; i < numValue.length; i++) {
 	   this.setData(locator, (double) numValue[i]);
 	   locator.next();
@@ -808,14 +831,11 @@ System.out.println ("DEBUG: float []: " + numValue.length);
    public void setData (Locator locator, String [] numValue) 
        throws SetDataException {
 
-System.out.println ("DEBUG: String []: " + numValue.length);
-
        for (int i = 0; i < numValue.length; i++) {
 	   this.setData(locator, numValue[i]);
 	   locator.next();
        }
    }
-
 
    /** Set the value of the requested datacell. 
     * Overwrites existing datacell value if any.
@@ -919,66 +939,86 @@ System.out.println ("DEBUG: String []: " + numValue.length);
        }
    }
 
-   /** Changes the FieldAxis object in this Array to the indicated one.
-       @return true if successful, false if not.
+  /** Changes the FieldAxis object in this Array to the indicated one.
+      If null object is passed, then it will remove the current FieldAxis. 
+      from the array axis list.
+      @return true if successful, false if not.
     */
+   // You can't just add in a FieldAxis, as there can only be one in list 
+   // amoungst other things which we check/do here.
    public boolean setFieldAxis (FieldAxis fieldAxis) {
 
-       if (!canAddAxisObjToArray(fieldAxis))
+       if (fieldAxis != null && !canAddAxisObjToArray(fieldAxis))
          return false;
-   
-       hasFieldAxis = false; 
 
-       if (getFieldAxis() != null) { // replace or removal 
-         List axisList = getAxes();
-         axisList.remove(0);
-         if (fieldAxis != null) { 
-            axisList.add(0, fieldAxis);  //replace the old fieldAxis with the new one
-            hasFieldAxis = true;
-         } 
-       } else {  //add a fieldAxis where none prev existed.
-         if (fieldAxis != null) { // only if we have something to add 
-            getAxes().add(0, fieldAxis);
-//            getDataCube().incrementDimension(fieldAxis); // increment dimension
-            hasFieldAxis = true;
-            getDataCube().reset(); // reset data within the datacube
-                                   // since we no longer can guarente internal ordering
-                                   // as the field axis goes in slot "0".
-         }
+       if (hasFieldAxis) { // already one exists
+
+          FieldAxis removeAxis = null;
+          if (fieldAxis != null) {
+              removeAxis = (FieldAxis) getAxes().get(0);
+              getAxes().set(0, fieldAxis); // replace current fieldAxis with this one 
+          } else {
+              removeAxis = (FieldAxis) getAxes().remove(0); // delete old axis
+              hasFieldAxis = false;
+          }
+
+          // reset IO ordering by removing old axis and then
+          // inserting in new one in its place (if new axis exists) 
+          int removeIndex = getXMLDataIOStyle().getIOAxesOrder().lastIndexOf(removeAxis); 
+          getXMLDataIOStyle().getIOAxesOrder().remove(removeIndex); 
+          if (fieldAxis != null) 
+             getXMLDataIOStyle().getIOAxesOrder().add(removeIndex, fieldAxis); 
+
+       } else { // add in new fieldAxis 
+
+          hasFieldAxis = true; 
+          getAxes().add(0, fieldAxis);  //replace the old fieldAxis with the new one
+          getXMLDataIOStyle().getIOAxesOrder().add(fieldAxis); // tack it on the end 
+
        }
+
+       getDataCube().reset(); // reset data within the datacube
 
        // IF we had an object, update the locators
        if (fieldAxis != null) {
           updateChildLocators(fieldAxis, "add");
+       } else { 
+          hasFieldAxis = false; 
        }
 
        updateNotesLocationOrder(); // reset to the current order of the axes
                                    // may not be needed, but we do for all cases anyways
    
-       //array doenst hold a dataformat anymore
-       //each field along the fieldAxis should have dataformat
+       // array doenst hold a dataformat anymore
+       // each field along the fieldAxis should have dataformat
        // IF fieldAxis exists
        if (hasFieldAxis) { 
           setDataFormat(null);
        }
 
        return true;
+
    }
-   
+
    public FieldAxis getFieldAxis() {
-       List axisList = getAxes();
-       if (axisList.size() == 0 || !this.hasFieldAxis() ){  //empty axisList or lacks field Axis 
-         return null;
-       }
-   
-       Object axisObj = axisList.get(0);
-   
-       if (axisObj instanceof FieldAxis)
-         return (FieldAxis) axisObj;
-       else
-         return null;
+
+       FieldAxis fieldAxis = null;
+
+       if (hasFieldAxis) {
+          List axisList = getAxes();
+          Iterator iter = axisList.iterator();
+          while (iter.hasNext()) {
+             Object axis = (Object) iter.next();
+             if (axis instanceof FieldAxis) {
+                 return (FieldAxis) axis;
+             }
+          }
+       } 
+
+       return fieldAxis;
+
    }
-   
+
    public boolean hasFieldAxis() {
        return hasFieldAxis;
    }
@@ -1051,9 +1091,9 @@ System.out.println ("DEBUG: String []: " + numValue.length);
        //set up the attribute hashtable key with the default initial value
        attribHash.put(NOTES_XML_ATTRIBUTE_NAME, new XMLAttribute(new Notes(), Constants.OBJECT_TYPE));
        attribHash.put(DATACUBE_XML_ATTRIBUTE_NAME, new XMLAttribute(new DataCube(this), Constants.OBJECT_TYPE));
+       attribHash.put(AXISLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
        //default is TaggedXMLDataIOStyle
        attribHash.put(XMLDATAIOSTYLE_XML_ATTRIBUTE_NAME, new XMLAttribute(new TaggedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
-       attribHash.put(AXISLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
        attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));
        attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));
        attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
@@ -1151,6 +1191,10 @@ System.out.println ("DEBUG: String []: " + numValue.length);
 /**
   * Modification History:
   * $Log$
+  * Revision 1.29  2001/06/18 21:41:33  thomas
+  * removed extraneous DEBUG statements. Revamp of
+  * addAxis and setFieldAxis for new dataCube design.
+  *
   * Revision 1.28  2001/06/18 17:08:40  thomas
   * fixed setAxisList bug. Removed extraneous methods
   * of incrementDimension, decrementDimension. Small
