@@ -1,0 +1,27 @@
+<!--  
+   myDocument.dtd - Shows how to write a DTD that embeds (aggregates) XDF nodes
+-->
+
+<!--  The following introduces all of the XDF DTD into this DTD. -->
+<!ENTITY % XDF_DTD SYSTEM "XDF_018.dtd">
+%XDF_DTD;
+
+<!-- now we create our own nodes. -->
+
+<!ELEMENT document (keyword*, tables)>
+
+<!ELEMENT keyword ((keywordValue | keyword+))>
+<!ATTLIST keyword
+	name 	CDATA  #IMPLIED
+	description CDATA #IMPLIED
+>
+
+<!ELEMENT keywordValue (#PCDATA)>
+
+<!-- the tables node takes one or more XDF nodes -->
+<!ELEMENT tables (XDF+)>
+<!ATTLIST tables
+        name    CDATA  #IMPLIED
+        description CDATA #IMPLIED
+>
+
