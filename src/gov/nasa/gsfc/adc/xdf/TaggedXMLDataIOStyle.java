@@ -151,12 +151,12 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
    {
 
      // List axisList = getIOAxesOrder(); 
-     List axisList = getParentArray().getAxes();
-     int stop = axisList.size();
-     String[] tags = new String[stop];
-     String tag;
+     // List axisList = getParentArray().getAxes();
+     int size = getParentArray().getAxes().size();
+     String[] tags = new String[size];
+     // String tag;
 
-     for (int i = 0; i < stop; i++) {
+     for (int i = 0; i < size; i++) {
        // String axisId = ((AxisInterface) axisList.get(i)).getAxisId();
        // tags[i] = (String) tagHash.get(axisId);
        tags[i] = "d" + i;
@@ -200,18 +200,16 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 
       //write out the tags info
       String[] tags = getAxisTags();
-      String axisId;
-      String tag;
 
-      List axisList = parentArray.getAxes();
 /*
+      List axisList = parentArray.getAxes();
       List axisList = getIOAxesOrder(); // actually, for tagged data order isnt important
                                         // in the least, its tagToAxis that is important.
-*/
       int numberOfAxes = axisList.size();   
-      for (int i = 0; i < numberOfAxes ; i++) {
-         axisId = ((AxisInterface) axisList.get(i)).getAxisId();
-         tag = tags[i];
+*/
+      for (int i = 0, size = tags.length; i < size; i++) {
+         String tag = tags[i];
+         String axisId = (String) axisIdHash.get(tag); // ((AxisInterface) axisList.get(i)).getAxisId();
          if (niceOutput) {
             outputWriter.write( Constants.NEW_LINE);
             outputWriter.write( indent);
@@ -296,6 +294,9 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2001/09/20 21:00:33  thomas
+ * clean up plus bug fix: tag to axis could be reversed!
+ *
  * Revision 1.18  2001/09/18 17:47:27  thomas
  * bug fixes for tagged data which has non-'d0' field axis (e.g. transposed data)
  *
