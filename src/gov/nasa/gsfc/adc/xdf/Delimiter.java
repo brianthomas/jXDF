@@ -28,7 +28,7 @@ import java.util.Hashtable;
 import java.io.IOException;
 import java.io.Writer;
 
-/** this class handles the recordTerminator ELEMENT
+/** this class handles the delimiter ELEMENT
    @version $Revision$
  */
 public class Delimiter extends BaseObject {
