@@ -124,13 +124,14 @@ public class SaxDocumentHandler implements DocumentHandler {
     private int MaxDataFormatIndex = 0;     // max allowed index in the DataFormatList[]
     private int CurrentDataFormatIndex = 0; // which dataformat index (in DatFormatList[]) we currently are reading
     private DataFormat DataFormatList[];       // list of CurrentArray.getDataFormatList();
-    private int LastFastAxisCoordinate = 0;
+    private int LastFastAxisCoordinate;
     private AxisInterface FastestAxis;
     private ArrayList AxisReadOrder;
 
     // lookup tables holding objects that have id/idref stuff
     private Hashtable FieldObj = new Hashtable();
     private Hashtable AxisObj = new Hashtable();
+    private Hashtable ReadObj = new Hashtable();
     private Hashtable NoteObj = new Hashtable();
 
     // this is a BAD thing. I have been having troubles distinguishing between
@@ -228,6 +229,19 @@ public class SaxDocumentHandler implements DocumentHandler {
     public String getCurrentNodeName () {
        int pathSize = CurrentNodePath.size();
        return (String) CurrentNodePath.get((pathSize-1));
+    }
+
+    // find unique id name within a list of objects 
+    public String findUniqueIdName( Hashtable list, String baseIdName) {
+
+       StringBuffer testName = new StringBuffer(baseIdName);
+
+       while (list.containsKey(testName.toString())) {
+           testName.append("0"); // isnt there something better to append here?? 
+       }
+
+       return testName.toString();
+
     }
 
     // return the element before last 
@@ -575,13 +589,8 @@ public class SaxDocumentHandler implements DocumentHandler {
                                        ) 
     {
 
-AxisInterface FastAxis = (AxisInterface) CurrentArray.getAxisList().get(0);
-AxisInterface SlowAxis = (AxisInterface) CurrentArray.getAxisList().get(1);
-
-       // Note that we dont treat binary data at all 
+       // Note that we dont treat binary data at all here 
        try {
-          
-Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastAxis)+","+dataLocator.getAxisLocation(SlowAxis)+"]");
 
            if ( CurrentDataFormat instanceof StringDataFormat) {
               CurrentArray.setData(dataLocator, thisString);
@@ -752,13 +761,20 @@ Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastAxis)+",
                  int endDataPosition = dataPosition + formatObj.numOfBytes();
 
                  // add in our object
+                 if(endDataPosition > dataLength) { 
+                    Log.errorln("Format specification exceeded data width, Bad format?");
+                    Log.errorln("Run in debug mode to examine formatted read. Aborting.");
+                    System.exit(-1); // throw IOException;
+                 }
+
                  String thisData = data.substring(dataPosition,endDataPosition);
 
                  // remove leading whitespace from what will be non-string data.
-                 if (Character.isWhitespace(thisData.charAt(0)) && !(formatObj instanceof StringDataFormat)) 
+                 if (Character.isWhitespace(thisData.charAt(0)) && 
+                      !(formatObj instanceof StringDataFormat)) 
                     thisData = trimLeadingWhitespace(thisData);
 
-                 Log.debugln("Got Data:["+thisData+"] ("+dataPosition+","+endDataPosition+")");
+                 Log.debugln("Got Formatted DataCell:["+thisData+"]");
 
                  stringObjList.add(thisData);
 
@@ -994,7 +1010,11 @@ Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastAxis)+",
 
                     // override attrs with those in passed list
                     newaxis.setXMLAttributes(attrs);
-                    newaxis.setAxisId(null); // shouldnt have the axisId from refObj
+                    // give the clone a unique axisId
+                    newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId())); 
+
+                    // add this into the list of axis objects
+                    AxisObj.put(newaxis.getAxisId(), newaxis);
            
                  } else {
                     Log.warnln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
@@ -1181,13 +1201,6 @@ Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastAxis)+",
               }
 
               Locator myLocator = CurrentArray.createLocator();
-List iterationList = myLocator.getIterationOrder();
-Iterator liter = iterationList.iterator();
-while (liter.hasNext()) {
-   Axis axis = (Axis) liter.next();
-   Log.errorln("ITERATION AXIS NAME:"+axis.getName());
-}
-
               myLocator.setIterationOrder(AxisReadOrder);
 
 
@@ -1202,9 +1215,7 @@ while (liter.hasNext()) {
       $template  = $formatObj->_templateNotation(1);
       $recordSize = $formatObj->bytes();
       $data_has_special_integers = $formatObj->hasSpecialIntegers;
-
 */
-
 
                  // snag the string representation of the values
                  strValueList = formattedSplitStringIntoStringObjects( DATABLOCK.toString(), 
@@ -1233,7 +1244,8 @@ while (liter.hasNext()) {
                  DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
 
                  // adding data based on what type..
-                 addDataToCurrentArray(myLocator, (String) iter.next(), CurrentDataFormat);
+                 String thisData = (String) iter.next();
+                 addDataToCurrentArray(myLocator, thisData, CurrentDataFormat);
 
                  // bump up DataFormat appropriately
                  if (MaxDataFormatIndex > 0) {
@@ -1299,7 +1311,7 @@ while (liter.hasNext()) {
 
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
           FastestAxis = (AxisInterface) CurrentArray.getAxisList().get(0);
-          LastFastAxisCoordinate = 0;
+          LastFastAxisCoordinate = -1;
 
           if ( readObj instanceof TaggedXMLDataIOStyle) {
              TaggedLocatorObj = CurrentArray.createLocator();
@@ -1400,7 +1412,12 @@ while (liter.hasNext()) {
 
                 // override attrs with those in passed list
                 newfield.setXMLAttributes(attrs);
-                newfield.setFieldId(null); // shouldnt have fieldId from the refObj 
+                // give the clone a unique fieldId
+                newfield.setFieldId(findUniqueIdName(FieldObj, newfield.getFieldId())); 
+
+                // add this into the list of field objects
+                FieldObj.put(newfield.getFieldId(), newfield);
+
 
              } else {
                 Log.warnln("Error: Reader got an field with FieldIdRef=\""+fieldIdRef+"\" but no previous field has that id! Ignoring add field request.");
@@ -1471,6 +1488,11 @@ while (liter.hasNext()) {
 
                     // override attrs with those in passed list
                     newfieldaxis.setXMLAttributes(attrs);
+                    // give the clone a unique axisId
+                    newfieldaxis.setAxisId(findUniqueIdName(AxisObj, newfieldaxis.getAxisId())); 
+
+                    // add this into the list of axis objects
+                    AxisObj.put(newfieldaxis.getAxisId(), newfieldaxis);
 
                  } else {
                     Log.warnln("Error: Reader got an fieldaxis with AxisIdRef=\""+axisIdRef+"\" but no previous field axis has that id! Ignoring add fieldAxis request.");
@@ -1693,7 +1715,11 @@ while (liter.hasNext()) {
 
                  // override attrs with those in passed list
                  newnote.setXMLAttributes(attrs);
-                 newnote.setNoteId(null); // note shouldnt have noteId from the parent
+                 // give the clone a unique Id
+                 newnote.setNoteId(findUniqueIdName(NoteObj, newnote.getNoteId())); 
+
+                 // add this into the list of note objects
+                 NoteObj.put(newnote.getNoteId(), newnote);
 
               } else {
                  Log.warnln("Error: Reader got a note with NoteIdRef=\""+noteIdRef+"\" but no previous note has that id! Ignoring add note request.");
@@ -1982,8 +2008,55 @@ while (liter.hasNext()) {
           //  XMLDataIOStyle object for this array yet, do it now. 
           if ( !(DataIOStyleAttribs.isEmpty()) ) {
 
-             FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
-             // readObj.setXMLAttributes(DataIOStyleAttribs);
+             // create new object appropriately 
+             FormattedXMLDataIOStyle readObj = 
+                 new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
+
+             String readId = readObj.getReadId();
+             String readIdRef = readObj.getReadIdRef();
+
+             // add this object to the lookup table, if it has an ID
+             if (readId != null) {
+
+                // a warning check, just in case 
+                if (ReadObj.containsKey(readId))
+                   Log.warnln("More than one read node with readId=\""+readId+"\", using latest node." );
+
+                // add this into the list of note objects
+                ReadObj.put(readId, readObj);
+
+             }
+
+             //  If there is a reference object, clone it to get
+             //  the new readObj
+             if (readIdRef != null) {
+
+                if (ReadObj.containsKey(readIdRef)) {
+
+                   BaseObject refReadObj = (BaseObject) ReadObj.get(readIdRef);
+                   try {
+                      readObj = (FormattedXMLDataIOStyle) refReadObj.clone();
+                   } catch (java.lang.CloneNotSupportedException e) {
+                      Log.errorln("Weird error, cannot clone FormattedXMLDataIOStyle (read node) object. Aborting read.");
+                      System.exit(-1);
+                   }
+
+                   // override attrs with those in passed list
+                   readObj.hashtableInitXDFAttributes(DataIOStyleAttribs);
+
+                   // give the clone a unique Id
+                   readObj.setReadId(findUniqueIdName(ReadObj, readObj.getReadId()));
+
+                   // add this into the list of note objects
+                   ReadObj.put(readObj.getReadId(), readObj);
+
+                } else {
+                   Log.warnln("Error: Reader got a read node with ReadIdRef=\""+readIdRef+"\" but no previous read node has that id! Ignoring add request.");
+                   return (Object) null;
+                }
+             }
+
+
              CurrentArray.setXMLDataIOStyle(readObj); 
 
              DataIOStyleAttribs = new Hashtable();  // clear table 
@@ -2567,6 +2640,12 @@ while (liter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2000/11/22 21:23:24  thomas
+ * Implimented Formatted Reads. Fixed AxisId/IdRef
+ * problem of not having unique id on cloned axis.
+ * (in fact, fixed this for all other id/idRef type objects
+ * too). -b.t.
+ *
  * Revision 1.17  2000/11/20 22:09:05  thomas
  * *** empty log message ***
  *
