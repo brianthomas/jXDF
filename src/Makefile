@@ -49,6 +49,7 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/Log.java \
 	$(XDF_SOURCE_PATH)/NoDataException.java \
 	$(XDF_SOURCE_PATH)/Note.java \
+	$(XDF_SOURCE_PATH)/NotesLocationOrder.java \
 	$(XDF_SOURCE_PATH)/Parameter.java \
 	$(XDF_SOURCE_PATH)/ParameterGroup.java \
 	$(XDF_SOURCE_PATH)/Reader.java \
