@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+import java.io.Writer;
 import java.io.OutputStream;
 import java.io.IOException;
 
@@ -201,7 +202,7 @@ import java.io.IOException;
   }
 
   /**
-   * assemble all the units in the list of units held in this object and return
+   * Assemble all the units in the list of units held in this object and return
    * it as a string
    */
    public String toString() {
@@ -232,18 +233,22 @@ import java.io.IOException;
   }
 
 
+  public void toXMLWriter (
+                             Writer outputWriter,
+                             String indent
+                          )
+  throws java.io.IOException
+  {
+     super.toXMLWriter( outputWriter, indent, false, XDFNodeName, noUnitChildNodeName);
+  }
+
   public void toXMLOutputStream  (
                                    OutputStream outputstream,
                                    String indent
                                  )
   throws java.io.IOException
   {
-    super.toXMLOutputStream( outputstream,
-                             indent,
-                             false,
-                             XDFNodeName,
-                             noUnitChildNodeName
-                           );
+     super.toXMLOutputStream( outputstream, indent, false, XDFNodeName, noUnitChildNodeName);
   }
 
   //
@@ -278,6 +283,9 @@ import java.io.IOException;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2001/07/31 21:09:04  thomas
+ * bug fix, needed toXMLWriter method.
+ *
  * Revision 1.18  2001/07/19 21:59:44  thomas
  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
  * in the XDF class)
