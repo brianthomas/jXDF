@@ -62,7 +62,7 @@ import java.util.Set;
   */
 
 
-public class Parameter extends BaseObject {
+public class Parameter extends BaseObject implements ParameterInterface {
 
    //
    // Fields
@@ -304,7 +304,7 @@ public class Parameter extends BaseObject {
    * @param Note
    * @return an Note object
    */
-  public Note addNote(Note n) {
+  public NoteInterface addNote(NoteInterface n) {
     getNoteList().add(n);
     return n;
   }
@@ -313,7 +313,7 @@ public class Parameter extends BaseObject {
    * @param Note to be removed
    * @return true on success, false on failure
    */
-   public boolean removeNote(Note what) {
+   public boolean removeNote(NoteInterface what) {
      return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -410,6 +410,9 @@ public class Parameter extends BaseObject {
  /* Modification History
   *
   * $Log$
+  * Revision 1.15  2001/05/04 20:30:30  thomas
+  * added Interface stuff.
+  *
   * Revision 1.14  2001/05/02 18:16:39  thomas
   * Minor changes related to API standardization effort.
   *
