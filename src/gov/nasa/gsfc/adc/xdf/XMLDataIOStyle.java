@@ -38,7 +38,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   //
 
   protected Array parentArray;
-  public final static String DefaultEncoding = Constants.ISO_8859_1;
+  public final static String DefaultEncoding = Constants.IO_ENCODING_ISO_8859_1;
   public final static String DefaultEndian = Constants.BIG_ENDIAN;
   public final static String UntaggedInstructionNodeName = "for";
 
@@ -117,7 +117,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String setEncoding (String strEncoding)
   {
-    if (!Utility.isValidEncoding(strEncoding)) {
+    if (!Utility.isValidIOEncoding(strEncoding)) {
       Log.error("not valid encoding.  'set' request ingored. returning null");
       return null;
     }
@@ -248,8 +248,11 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/27 21:25:34  kelly
+ * minor fix
+ *
  * Revision 1.2  2000/10/17 21:51:53  kelly
- * pretty much completed the class, including teh *toXDF* routines.  -k.z.
+ * pretty much completed the class, including the *toXDF* routines.  -k.z.
  *
  * Revision 1.1  2000/10/11 19:06:26  kelly
  * created the class
