@@ -106,9 +106,12 @@ public class Log {
       istream.close();
     }
     catch (IOException e) {
+/*
+      // These lines just are irritating, commenting out 
       System.err.println("Could not read configuration file [" + configFileName+ "].");
       System.err.println("Ignoring configuration file [" + configFileName+"].");
       System.err.println("using default config");
+*/
       defaultConfig();
       return;
     }
