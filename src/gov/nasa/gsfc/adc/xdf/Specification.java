@@ -1,3 +1,4 @@
+
 // XDF Specification Class
 // CVS $Id$
 
@@ -34,6 +35,7 @@ public class Specification {
   private static Specification instance;
 
   private static Boolean mutex = new Boolean(true);
+
   /** Stores whether nicely formatted XDF should be output from any toXML*
       method. Nice formatting includes nested indentation and return characters
       to improve human readability of output XDF (but blows up the size of
@@ -81,7 +83,7 @@ public class Specification {
   /** The XDF node name for the structure class.
   */
   private String XDFStructureNodeName = "structure"; // bad. we should call the
-                                                             // class to find this out. -b.t.
+                                                     // class to find this out. -b.t.
 
   /** The name of the relevant version of XDF DTD file for this package.
   */
@@ -96,7 +98,7 @@ public class Specification {
   private String PCDATAAttribute = "value";
 
   /**
-   * This private constructor is definced so the compiler won't generate a
+   * This private constructor is defined so the compiler won't generate a
    * default public contructor
    */
   private Specification() {
@@ -170,7 +172,10 @@ public class Specification {
    */
   public void setDefaultDataArraySize(int arraySize) {
     synchronized (mutex) {
-      defaultDataArraySize = arraySize;
+      if(arraySize > 0)
+         defaultDataArraySize = arraySize;
+      else 
+         Log.warnln("Specification.setDefaultdataArraySize(): warning cannot set below 1. Ignoring request.");
     }
   }
 
@@ -199,9 +204,21 @@ public class Specification {
   public String getPCDATAAttribute() {
     return PCDATAAttribute;
   }
+
   /** Get the XDF node name for the structure class.
    */
   public String getXDFStructureNodeName() {
     return XDFStructureNodeName;
   }
+
 }
+
+/* Modification history
+ *
+ * $Log$
+ * Revision 1.2  2000/11/27 17:14:30  thomas
+ * added bounds check on set dataArraySize -b.t.
+ *
+ *
+ */
+
