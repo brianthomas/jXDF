@@ -156,7 +156,7 @@ import java.util.*;
 
     //default is TaggedXMLDataIOStyle, xmlDataOStyle.parentArray = this
     attribHash.put("xmlDataIOStyle", new XMLAttribute(new TaggedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
-    attribHash.put("dataFormat", new XMLAttribute(new StringDataFormat(), Constants.OBJECT_TYPE));
+    attribHash.put("dataFormat", new XMLAttribute(null, Constants.OBJECT_TYPE));
     attribHash.put("units", new XMLAttribute(null, Constants.OBJECT_TYPE));
     attribHash.put("axisList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("paramList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
@@ -237,15 +237,10 @@ import java.util.*;
    * to this method include L<XDF::BinaryIntegerDataFormat>, L<XDF::BinaryFloatDataFormat>,
    * L<XDF::ExponentDataFormat>, L<XDF::FixedDataFormat>, L<XDF::IntegerDataFormat>,
    * or L<XDF::StringDataFormat>.
-   * RETURNS an object reference if successfull, null if not.
+   * RETURNS an object reference
   */
   public DataFormat setDataFormat(DataFormat dataFormat)
   {
-
-    if (dataFormat == null) {  //failure to setDataFormat
-      Log.error("in Array, setDataFormat, param passsed in is null, ignore, returning null");
-      return null;
-    }
     return (DataFormat) ((XMLAttribute) attribHash.get("dataFormat")).setAttribValue(dataFormat);
 
   }
@@ -555,18 +550,11 @@ import java.util.*;
     return getNoteList();
   }
 
-  /**addData: Append the SCALAR value onto the requested datacell
+  /**appendData: Append the string value onto the requested datacell
    * (via L<XDF::DataCube> LOCATOR REF).
    */
-  public double  addData (Locator locator, double numValue) {
-    return getDataCube().addData(locator, numValue);
-  }
-
-  /**addData: Append the SCALAR value onto the requested datacell
-   * (via L<XDF::DataCube> LOCATOR REF).
-   */
-  public String  addData (Locator locator, String strValue) {
-    return getDataCube().addData(locator, strValue);
+  public String  appendData (Locator locator, String strValue) throws SetDataException{
+    return getDataCube().appendData(locator, strValue);
   }
 
   /** setData: Set the SCALAR value of the requested datacell
@@ -654,14 +642,14 @@ import java.util.*;
   /**getDataFormatList: Get the dataFormatList for this array.
    *
    */
-  public List getDataFormatList() {
+  public DataFormat[] getDataFormatList() {
     FieldAxis fieldAxis = getFieldAxis();
     if (fieldAxis !=null)
       return fieldAxis.getDataFormatList();
     else {  //not fieldAxis
-      List list = new ArrayList();  //syn?
-      list.add(getDataFormat());
-      return list;
+      DataFormat[] d = new DataFormat[1];
+      d[0] = getDataFormat();
+      return d;
     }
   }
   /** addFieldAxis: A convenience method (same as setFieldAxis()).
@@ -682,6 +670,10 @@ import java.util.*;
       getDataCube().incrementDimension(fieldAxis);
     }
     hasFieldAxis = true;
+
+    //array doenst hold a dataformat anymore
+    //each field along the fieldAxis should have dataformat
+    setDataFormat(null);
     return fieldAxis;
   }
   public FieldAxis getFieldAxis() {
@@ -745,6 +737,10 @@ import java.util.*;
  /**
   * Modification History:
   * $Log$
+  * Revision 1.10  2000/10/31 21:39:06  kelly
+  * --completed appendData for String data
+  * --getFormatList() is returning DataFormat[] now instead of List, faster.  -k.z.
+  *
   * Revision 1.9  2000/10/30 18:15:28  kelly
   * minor fix
   *
