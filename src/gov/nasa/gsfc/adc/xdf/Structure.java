@@ -379,19 +379,39 @@ public class Structure extends BaseObject {
     return paramGroupOwnedHash.remove(group);
   }
 
-  /** read
-   * Read in an XML file using XDF::Reader.
+  /** Read in an XML file using XDF::Reader.
    * @return: the structure read in on success, null on failure.
    */
 
    // This will make a call to the XDF::Reader class one day.
-   public void read() {
-     Log.error("Structure.read() is called, but the function is empty.");
+   public void loadFromXDFFile (String filename) 
+   {
+
+      // clear out existing settings in our structure
+      // with a quick init. Trust java to garbage collect
+      // freed objects(!!)
+      this.init(); 
+      
+      // create an XDFreader, declare this structure object
+      // to be the one it should read into. 
+      gov.nasa.gsfc.adc.xdf.Reader reader = new gov.nasa.gsfc.adc.xdf.Reader(this);
+      try {
+        reader.parsefile(filename);
+      } catch (java.io.IOException e) {
+        Log.printStackTrace(e);
+      } 
+
    }
+
+}
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/10/23 18:32:39  thomas
+ * Changed to allow reading in of XDF files. loadfromXDFfile
+ * method implemented. -b.t.
+ *
  * Revision 1.8  2000/10/10 19:15:22  cvs
  * Added History section to end of file. -b.t.
  *
@@ -399,4 +419,3 @@ public class Structure extends BaseObject {
  */
 
 
-}
