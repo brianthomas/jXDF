@@ -35,13 +35,16 @@ public interface AxisInterface {
    public String getAlign();
    /* ugh. shouldnt be public method */
    public void setParentArray(Array parent);
-   public boolean addXMLElement (XMLElement element);
+   public boolean addXMLElementNode (XMLElementNode element);
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/07/26 15:54:31  thomas
+ * addXMLElementNode method name change.
+ *
  * Revision 1.8  2001/07/11 22:35:20  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *
