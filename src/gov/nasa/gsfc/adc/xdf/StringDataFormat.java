@@ -64,42 +64,49 @@ public class StringDataFormat extends DataFormat {
 
   /**set the *lessThanValue* attribute
    */
+/*
   public void setLessThanValue(Object strLessThanValue) {
      ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanValue);
   }
 
   /**set the *lessThanValueOrEqualValue* attribute
    */
+/*
   public void setLessThanOrEqualValue(Object strLessThanOrEqualValue) {
      ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanOrEqualValue);
   }
 
   /**set the *greaterThanValue* attribute
    */
+/*
   public void setGreaterThanValue(Object strGreaterThanValue) {
     ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanValue);
   }
 
   /**set the *greaterThanOrEqualValue* attribute
    */
+/*
   public void setGreaterThanOrEqualValue(Object strGreaterThanOrEqualValue) {
     ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanOrEqualValue);
   }
 
   /** set the *infiniteValue* attribute
    */
+/*
   public void setInfiniteValue(Object strInfiniteValue) {
     ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteValue);
   }
 
   /**set the *infiniteNegativeValue* attribute
    */
+/*
   public void setInfiniteNegativeValue(Object strInfiniteNegativeValue) {
     ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteNegativeValue);
   }
 
   /**set the *noDataValue* attribute
    */
+/*
   public void setNoDataValue(Object strNoDataValue) {
      ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strNoDataValue);
   }
@@ -172,6 +179,10 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/04/27 21:30:59  thomas
+ * Removed get/set methods for lessThan, greaterthan attribs.
+ * These are now in Field and Array classes.
+ *
  * Revision 1.11  2001/02/07 18:44:03  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These
