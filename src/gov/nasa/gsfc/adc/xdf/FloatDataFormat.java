@@ -219,6 +219,12 @@ public class FloatDataFormat extends NumberDataFormat {
       generateFormatPattern();
    }
 
+   
+   /**
+       @deprecated use the setAttributes method instead
+    */
+   public void setXMLAttributes (Attributes attrs) { this.setAttributes(attrs); } 
+
   //
   // Private Methods 
   //
@@ -341,6 +347,9 @@ public class FloatDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/09/18 20:32:20  thomas
+ * added back in setXMLAttribute(s) convience method, w/ deprecated statement
+ *
  * Revision 1.8  2001/09/18 17:43:32  thomas
  * small change to prevent exponent attrib from writing out if undefined
  *

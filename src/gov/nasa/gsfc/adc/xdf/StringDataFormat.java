@@ -139,6 +139,11 @@ public class StringDataFormat extends DataFormat {
       generateFormatPattern();
    }
 
+   /**
+       @deprecated use the setAttributes method instead
+    */
+   public void setXMLAttributes (Attributes attrs) { this.setAttributes(attrs); } 
+
    /** A convenience method.
       @return the number of bytes this StringDataFormat holds.
     */
@@ -181,6 +186,9 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/09/18 20:32:20  thomas
+ * added back in setXMLAttribute(s) convience method, w/ deprecated statement
+ *
  * Revision 1.15  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *

@@ -534,6 +534,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
      } //synchronize
   }
 
+  /**
+      @deprecated Use the setAttributes method instead.
+   */
+  public void setXMLAttributes (Attributes attrs) { this.setAttributes(attrs); }
+
   public void setAttribute (String name, String value) {
 
      if (this.attribHash.containsKey(name)) {
@@ -553,6 +558,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
      }
 
   }
+
+  /**
+      @deprecated Use the setAttribute method instead.
+   */
+  public void setXMLAttribute (String name, String value) { this.setAttribute(name,value); }
 
   /* Appends on an XML attribute into the object.
       @return: true if successfull.
@@ -927,6 +937,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.59  2001/09/18 20:32:34  thomas
+ * added back in setXMLAttribute(s) convience method, w/ deprecated statement
+ *
  * Revision 1.58  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
