@@ -1,5 +1,13 @@
-
+// XDF Parameter Class
+// CVS $Id$
 package gov.nasa.gsfc.adc.xdf;
+
+/**
+ * XMLAttribute.java:to store XML attributes of XDF
+ * @author: Brian Thomas (thomas@adc.gsfc.nasa.gov)
+ *          Kelly Zeng (kelly.zeng@commerceone.com)
+ * @version $Revision$
+ */
 
 public class XMLAttribute {
 
@@ -11,12 +19,14 @@ public class XMLAttribute {
     attribType = strType;
   }
 
-  public void setAttribValue(Object objValue) {
+  public Object setAttribValue(Object objValue) {
     attribValue = objValue;
+    return attribValue;
   }
 
-  public void setAttribType(String strType) {
+  public String setAttribType(String strType) {
     attribType = strType;
+    return attribType;
   }
 
   public Object getAttribValue() {

@@ -8,7 +8,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * BaseObject.java: The base class for most XDF objects 
+ * BaseObject.java: The base class for most XDF objects
  * @author: Brian Thomas (thomas@adc.gsfc.nasa.gov)
  *          Kelly Zeng (kelly.zeng@commerceone.com)
  * @version: $Revision$
@@ -60,6 +60,10 @@ public abstract class BaseObject implements Serializable {
   //
   // Get/Set Methods
   //
+
+  public String getClassXMLName() {
+    return classXMLName;
+  }
 
   public Hashtable getAttribHash() {
     return attribHash;
@@ -405,18 +409,18 @@ public abstract class BaseObject implements Serializable {
   // PROTECTED Methods
   //
 
-  /** hashtableInitXDFAttributes 
+  /** hashtableInitXDFAttributes
    *  A little method to initialize XDF attributes from a given Hashtable.
-   *  Hashtable key/value pairs coorespond to the class XDF attribute 
-   *  names and their desired values. 
+   *  Hashtable key/value pairs coorespond to the class XDF attribute
+   *  names and their desired values.
    */
-  protected void hashtableInitXDFAttributes (Hashtable InitAttributeTable) 
+  protected void hashtableInitXDFAttributes (Hashtable InitAttributeTable)
   {
-    
+
     Object attribute;
     Object obj;
 
-    for (int i = 0; i < attribOrder.size(); i++) 
+    for (int i = 0; i < attribOrder.size(); i++)
     {
       attribute  = attribOrder.get(i);
       obj = InitAttributeTable.get(attribute);
@@ -429,7 +433,7 @@ public abstract class BaseObject implements Serializable {
 
     }
 
-  } 
+  }
 
   /**removeFromList
    * Pass in object to remove

@@ -3,10 +3,8 @@ package gov.nasa.gsfc.adc.xdf;
 import java.util.*;
 
 /**
- * Array.java
+ * Unit.java:
  */
 
- public class Array extends BaseObject{
-
+ public class Unit extends BaseObject{
  }
-

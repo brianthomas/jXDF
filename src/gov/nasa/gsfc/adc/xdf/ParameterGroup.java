@@ -9,5 +9,5 @@ import java.util.*;
  * @author: Kelly Zeng (kelly.zeng@commerceone.com)
  */
 
- public class ParameterGroup {
+ public class ParameterGroup extends BaseObject{
  }

@@ -7,7 +7,7 @@ package gov.nasa.gsfc.adc.xdf;
 import java.util.*;
 
 /**
- * Structure.java 
+ * Structure.java
  * @author: Kelly Zeng (kelly.zeng@commerceone.com)
  *          Brian Thomas (thomas@adc.gsfc.nasa.gov)
  * @version $Revision$
@@ -21,42 +21,42 @@ public class Structure extends BaseObject {
 
   protected Set paramGroupOwnedHash = Collections.synchronizedSet(new HashSet());  //double check, init size?
 
-  // 
+  //
   // Constructor and related methods
   //
 
-  /** The no argument constructor. 
+  /** The no argument constructor.
    */
-  public Structure () 
+  public Structure ()
   {
     init();
   }
 
   /**  This constructor takes a Java Hashtable as an initializer of
-       the XML attributes of the object to be constructed. The 
-       Hashtable key/value pairs coorespond to the class XDF attribute 
-       names and their desired values. 
+       the XML attributes of the object to be constructed. The
+       Hashtable key/value pairs coorespond to the class XDF attribute
+       names and their desired values.
     */
-  public Structure ( Hashtable InitXDFAttributeTable ) 
+  public Structure ( Hashtable InitXDFAttributeTable )
   {
 
-    // init the XML attributes (to defaults) 
+    // init the XML attributes (to defaults)
     init();
 
-    // init the value of selected XML attributes to HashTable values 
+    // init the value of selected XML attributes to HashTable values
     hashtableInitXDFAttributes(InitXDFAttributeTable);
 
   }
 
-  /** init -- special private method used by constructor methods to 
-   *  conviently build the XML attribute list for a given class. 
+  /** init -- special private method used by constructor methods to
+   *  conviently build the XML attribute list for a given class.
    */
   private void init()
   {
 
     classXMLName = "structure";
 
-    // order matters! these are in *reverse* order of their 
+    // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
     attribOrder.add(0,"noteList");
     attribOrder.add(0,"arrayList");
@@ -76,23 +76,23 @@ public class Structure extends BaseObject {
 
   //
   //Get/Set Methods
-  // take a 2nd look at the return value of the set methods, not efficient, standard???
+  //
 
-  public String setName (String strName) 
+  public String setName (String strName)
   {
-    ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
-    return getName();
+    return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+
   }
 
-  public String getName() 
+  public String getName()
   {
     return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
   }
 
-  public String setDescription (String strDesc) 
+  public String setDescription (String strDesc)
   {
-    ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
-    return getDescription();
+    return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+
   }
 
   public String getDescription() {
@@ -100,8 +100,7 @@ public class Structure extends BaseObject {
   }
 
   public List setParamList(List param) {
-    ((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
-    return getParamList();
+    return (List)((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
   }
 
   public List getParamList() {
@@ -109,8 +108,7 @@ public class Structure extends BaseObject {
   }
 
   public List setStructList(List struct) {
-    ((XMLAttribute) attribHash.get("structList")).setAttribValue(struct);
-    return getStructList();
+    return (List)((XMLAttribute) attribHash.get("structList")).setAttribValue(struct);
   }
 
   public List getStructList() {
@@ -118,37 +116,34 @@ public class Structure extends BaseObject {
   }
 
   public List setArrayList(List array) {
-    ((XMLAttribute) attribHash.get("arrayList")).setAttribValue(array);
-    return getArrayList();
+    return (List) ((XMLAttribute) attribHash.get("arrayList")).setAttribValue(array);
   }
 
   public List getArrayList() {
     return (List) ((XMLAttribute) attribHash.get("arrayList")).getAttribValue();
   }
 
-
+  // i dont understand what this is doing.  kz
   public Note setNote (Note note, int i) {
     return note;
   }
 
+  //i dont understand what this is doing. kz
   public Note removeNote (Note note, int i) {
     return note;
   }
- 
+
   public List setNoteList(List note) {
-    ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
-    return getNoteList();
+    return (List)((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
   }
 
-  /** getNoteList
-  */
   public List getNoteList() {
     return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
   }
 
   /** setParamGroupOwnedHash
   */
-  public Set setParamGroupOwnedHash(Set paramGroup) 
+  public Set setParamGroupOwnedHash(Set paramGroup)
   {
     paramGroupOwnedHash = paramGroup;
     return paramGroupOwnedHash;
@@ -156,7 +151,7 @@ public class Structure extends BaseObject {
 
   /** getParamGroupOwnedHash
   */
-  public Set getParamGroupOwnedHash() 
+  public Set getParamGroupOwnedHash()
   {
     return paramGroupOwnedHash;
   }
@@ -189,7 +184,7 @@ public class Structure extends BaseObject {
      return removeFromList(what, getNoteList(), "noteList");
   }
 
-  /**getNote
+  /**getNotes
    */
   public List getNotes() {
     return getNoteList();
