@@ -58,6 +58,9 @@ public abstract class Constants {
   */
   public static final String PCDATA_ATTRIBUTE = "value";
 
+  public static final String XDF_NOTATION_NAME = "xdf";
+ 
+  public static final String XDF_NOTATION_PUBLICID = "application/xdf";
 
   /** Due to the limitations of DTD's only a limited number of dimensions are supported 
       for tagged data.
@@ -180,6 +183,9 @@ public abstract class Constants {
 /* Modification History
  * 
  * $Log$
+ * Revision 1.18  2001/09/27 17:19:27  thomas
+ * added default values for NotationNode publicId and name
+ *
  * Revision 1.17  2001/09/18 17:42:21  thomas
  * added MAX_TAGGED_DIMENSIONS value
  *
