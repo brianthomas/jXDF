@@ -1,11 +1,36 @@
 
+/*
+    CVS $Id$
+
+    CreateXdf.java Copyright (C) 2001 Ping Huang
+    ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*/
+
 import java.io.*;
 import java.util.*;
 
 import gov.nasa.gsfc.adc.xdf.*;
 
-// a little program showing how to create and populate
-// one type of XDF object.
+/* Here is a little program showing how to build an XDF object in
+ * a program from scratch, rather than from loading from a file.
+ */
+
+// written by Ping Huang, huang@roamer.gsfc.nasa.gov
 
 public class CreateXdf
 {
@@ -47,9 +72,7 @@ public class CreateXdf
 	field2.setDataFormat(dateFormat);
 
 	fieldGroup.addMemberObject(field1);
-        field1.addToGroup(fieldGroup);
 	fieldGroup.addMemberObject(field2);
-        field2.addToGroup(fieldGroup);
 	
 	fieldAxis.addFieldGroup(fieldGroup);
 	fieldAxis.addField(field1);
@@ -67,11 +90,28 @@ public class CreateXdf
 	
 	for (int i=0; i<ROW; i++) {
 	    for (int j=0; j<COL; j++) {
-//		System.out.println("DEBUG: i = " + i + " j= " +j);
 		array.setData(locator,i+j);
 		locator.next();
 	    }
 	}
+
+	// the following 4 lines to declear the data will be written to
+	// a seperate file, xdf_table;
+	Entity href = new Entity();
+	href.setName("xdf_table");
+	href.setSystemId("xdf_table");
+	array.setHref(href);
+
+	// the following 6 lines to set write out style: formatted style
+	// otherwise, data will be in tagged format
+	/*
+	FormattedXMLDataIOStyle xmlIOStyle = new FormattedXMLDataIOStyle(array);
+	List cmdList = new Vector();
+	ReadCellFormattedIOCmd readCell = new ReadCellFormattedIOCmd();
+	cmdList.add(readCell);
+	xmlIOStyle.setFormatCommandList(cmdList);
+	array.setXMLDataIOStyle(xmlIOStyle);
+	*/
 
 	structure.addArray(array);
 	xdf.addStructure(structure);
@@ -86,6 +126,5 @@ public class CreateXdf
 	wo.flush();
 	wo.close();
     }
-
 }
 
