@@ -57,6 +57,8 @@ public class DataCube extends BaseObject {
    //
 
    /* XML attribute names */
+   private static final String STARTBYTE_XML_ATTRIBUTE_NAME = "startByte";
+   private static final String ENDBYTE_XML_ATTRIBUTE_NAME = "endByte";
    private static final String CHECKSUM_XML_ATTRIBUTE_NAME = "checksum";
    private static final String COMPRESSION_TYPE_XML_ATTRIBUTE_NAME = "compression";
    private static final String ENCODING_XML_ATTRIBUTE_NAME = "encoding";
@@ -84,6 +86,11 @@ public class DataCube extends BaseObject {
    private double expandFactor = 1.3; // when expanding internal data storage arrays
                                       // we increase capacity by 30% over needed new cap.
                                       // to prevent constantly having to call for more expansion.
+
+   /* default attribute values */
+   public static final int DEFAULT_STARTBYTE = 0;
+
+
    //
    // Constructor and related methods
    //
@@ -145,7 +152,7 @@ public class DataCube extends BaseObject {
 
    /** Set the *encoding* attribute. Note that this attribute is different in nature
        from the encoding attribute on the XMLDataIOStyle objects. Currently reading of
-       data encoded data is not supported. 
+       encoded data is not supported.
    */
    public void setEncoding (String strEncoding)
    {
@@ -186,7 +193,36 @@ public class DataCube extends BaseObject {
     return (String) ((Attribute) attribHash.get(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
+  /** set the *startByte* attribute
+   */
+  public void setStartByte (Integer sbyte) {
+     if (sbyte != null) 
+        ((Attribute) attribHash.get(STARTBYTE_XML_ATTRIBUTE_NAME)).setAttribValue(sbyte);
+     else
+        Log.warnln("DataCube.setStartByte() cant accept null value. Ignoring request.");
+  }
+
   /**
+   * @return the current *startByte* attribute
+   */
+  public Integer getStartByte() {
+     return (Integer) ((Attribute) attribHash.get(STARTBYTE_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
+  /** set the *endByte* attribute
+   */
+  public void setEndByte (Integer ebyte) {
+     ((Attribute) attribHash.get(ENDBYTE_XML_ATTRIBUTE_NAME)).setAttribValue(ebyte);
+  }
+
+  /**
+   * @return the current *endByte* attribute
+   */
+  public Integer getEndByte() {
+     return (Integer) ((Attribute) attribHash.get(ENDBYTE_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
+  /*
    * @return the current dimension
    */
 /*
@@ -819,7 +855,6 @@ public class DataCube extends BaseObject {
       }
 */
   
-  
       String compress = getCompression();
       if (compress != null && dataOutputStream != null ) {  
           outputWriter.write( " "+COMPRESSION_TYPE_XML_ATTRIBUTE_NAME+"=\"");
@@ -854,6 +889,20 @@ public class DataCube extends BaseObject {
           }
       }
   
+      Integer startByte = getStartByte();
+      if (startByte != null && startByte.intValue() != 0) {
+         outputWriter.write( " "+STARTBYTE_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputWriter, startByte.toString());
+         outputWriter.write( "\"");
+      }
+
+      Integer endByte = getEndByte();
+      if (endByte != null) {
+         outputWriter.write( " "+ENDBYTE_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputWriter, endByte.toString());
+         outputWriter.write( "\"");
+      }
+
       if (writeHrefAttribute) 
           outputWriter.write("/>");  //we just close the data node now
       else 
@@ -1952,12 +2001,16 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
+    attribOrder.add(0, ENDBYTE_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, STARTBYTE_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, COMPRESSION_TYPE_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, ENCODING_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, CHECKSUM_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, HREF_XML_ATTRIBUTE_NAME);
 
     //set up the attribute hashtable key with the default initial value
+    attribHash.put(ENDBYTE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.INTEGER_TYPE));
+    attribHash.put(STARTBYTE_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_STARTBYTE), Constants.INTEGER_TYPE));
     attribHash.put(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
     attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
     attribHash.put(CHECKSUM_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
