@@ -4235,6 +4235,15 @@ while (iter.hasNext()) {
           String valueListString = new String (buf, offset, len);
           ValueList thisValueList = CurrentValueList;
 
+          // safety check
+          if (!thisValueList.getIsDelimitedCase() )
+          {
+             String noWhiteSpaceList = valueListString.trim();
+             if (noWhiteSpaceList.length() > 0) 
+                Log.errorln("Got non-whitespace character data for algorithm valueList. Ignoring.");
+             return;
+          }
+
           // 2. reconsitute information we need
           String parentNodeName = thisValueList.getParentNodeName();
 
@@ -4517,6 +4526,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.56  2001/09/19 17:52:13  thomas
+ * inserted safety check for valueList end elements that have whitespace chardata but are algorithm prescription
+ *
  * Revision 1.55  2001/09/19 17:32:46  thomas
  * changed weird parent handling, no need to dump core, we'll just ignore the miscreant object for now
  *
