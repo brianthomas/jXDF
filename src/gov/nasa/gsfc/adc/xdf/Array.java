@@ -434,11 +434,6 @@ import java.util.Vector;
         ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).setAttribValue(dataFormat);
      }
    
-     public Object getData (Locator locator)
-     throws NoDataException 
-     {
-        return getDataCube().getData(locator); 
-     }
 
      /**
       * @return the current *dataFormat* attribute
@@ -575,6 +570,8 @@ import java.util.Vector;
         // return getDataCube().getDimension();
         return getAxes().size();
       }
+
+
    
       //
       // Other Public Methods
@@ -672,6 +669,9 @@ import java.util.Vector;
       */
      public boolean removeAxis (int index) {
 
+       if (index < 0 || index > getAxes().size() - 1)
+	   return false; // error msg???
+
        AxisInterface removeAxis = (AxisInterface) getAxes().get(index);
        boolean isRemoveSuccess = false;
 
@@ -688,6 +688,17 @@ import java.util.Vector;
        return isRemoveSuccess;
      }
    
+
+     /**
+      * @retuen the axis object at a given index
+      */
+      public AxisInterface getAxis(int index) {
+	  if (index < 0 || index > getAxes().size() - 1)
+	      return null;
+	  return (AxisInterface) getAxes().get(index);
+      }
+
+
      /**Insert an Unit object into the Units object held in this object.
       * @param unit - Unit to be added
       * @return an Unit object
@@ -849,7 +860,9 @@ import java.util.Vector;
 	       throw new SetDataException (msg);
 	   }
        } else {
-	   if (dataObj instanceof Short )
+	   if (dataObj instanceof Byte )
+	       setData (locator, (Byte) dataObj);
+	   else if (dataObj instanceof Short )
 	       setData (locator, (Short) dataObj);
 	   else if (dataObj instanceof Integer )
 	       setData (locator, (Integer) dataObj);
@@ -1096,7 +1109,149 @@ import java.util.Vector;
        getDataCube().setHref(hrefObj);
    }
 
-   /**Get the String data in the requested datacell
+
+
+   /** 
+    * @return the data object at the requested datacell 
+    */
+    public Object getData (Locator locator)
+     throws NoDataException 
+     {
+        return getDataCube().getData(locator); 
+     }
+
+
+    /**
+     * @return the data object at the requested datacell: int[]
+     * @parm dataCellPosition an array of indexes along each axis;
+     * index starts at 0, so [1,2] would be 2nd row and 3rd column in a
+     * 2-d table.
+     */
+    public Object getData (int [] dataCellPosition)
+	throws NoDataException
+    {
+	// create a temporary locator object;
+	// and move to the position specified by dataCellPosition[]
+	Locator locator = new Locator(this);
+	locator.setLocation(dataCellPosition);
+	return getData(locator);
+    }
+
+    /**
+     * @return a record, an array of object 
+     * e.g. a row or a column of data in a 2-d table
+     * In general, this record could be along any axis and the
+     * data value in each cell along the axis could be anything,
+     * we use an object represent the data value;
+     * To get a record along a field axis, e.g. ina 2-d table,
+     * special getRecord () method should return an array of primitive
+     * data types; a user should only use a cast such as
+     *   (int []) to cast the return object into a primitive array.
+     * @parm axisIndex along which the record will be extracted;
+     * @parm axisStart starting position of the record along @parm axis;
+     * @parm length the number of dataCells to be extracted
+     * @parm anyValidAxisPosition any valid postion used to extract
+     * the axis position WRT the rest of the frame; 
+     */
+    public Object [] getRecord (int axisIndex, int axisStart, int length, int [] anyValidAxisPosition) 
+	throws NoDataException
+    {
+	// first check if arguments are within the data boundary
+	AxisInterface axisObj =  getAxis(axisIndex);
+	if (axisObj == null)
+	    return null; // error msg ???
+	int axisLength = axisObj.getLength();
+	if (axisStart < 0 ||
+	    axisStart + length > axisLength ||
+	    anyValidAxisPosition.length != getAxes().size())
+	    return null; // error msg???
+
+	// get each dataCell value as an object
+	Object [] record = new Object [length];
+	for (int i = 0; i<length; i++) {
+	    Locator lo = new Locator(this);
+	    int [] dataCellPosition = anyValidAxisPosition;
+	    dataCellPosition [axisIndex] = i + axisStart;
+	    record[i]=getData(dataCellPosition);
+	}
+	return record;
+    }
+
+
+   /**@return the double data at the requested datacell
+    */
+   public double getDoubleData(Locator locator) throws NoDataException {
+       try {
+         return getDataCube().getDoubleData(locator);
+       }
+       catch (NoDataException e) {
+         throw e;
+       }
+   }
+   
+
+   /**Return the float data in the requested datacell
+    */
+   public float getFloatData(Locator locator) throws NoDataException {
+       try {
+         return getDataCube().getFloatData(locator);
+       }
+       catch (NoDataException e) {
+         throw e;
+       }
+   }
+ 
+  /**
+   * Return the long data in the requested datacell
+   */
+   public long getLongData(Locator locator) throws NoDataException {
+       try {
+         return getDataCube().getLongData(locator);
+       }
+       catch (NoDataException e) {
+         throw e;
+       }
+   }
+
+   /**
+    * Return the integer data in the requested datacell
+    */
+   public int getIntData(Locator locator) throws NoDataException {
+       try {
+         return getDataCube().getIntData(locator);
+       }
+       catch (NoDataException e) {
+         throw e;
+       }
+   }
+
+   /**
+    * Return the short data in the requested datacell
+    */
+   public short getShortData(Locator locator) throws NoDataException {
+       try {
+         return getDataCube().getShortData(locator);
+       }
+       catch (NoDataException e) {
+         throw e;
+       }
+   }
+
+   /**
+    * Return the byte data in the requested datacell
+    */
+   public byte getByteData(Locator locator) throws NoDataException {
+       try {
+         return getDataCube().getByteData(locator);
+       }
+       catch (NoDataException e) {
+         throw e;
+       }
+   }
+
+
+   /**
+    * Return the String data in the requested datacell
     */
    public String getStringData(Locator locator) 
    throws NoDataException 
@@ -1109,28 +1264,7 @@ import java.util.Vector;
        }
    }
    
-   /**Get the integer data in the requested datacell
-    */
-   public int getIntData(Locator locator) throws NoDataException {
-       try {
-         return getDataCube().getIntData(locator);
-       }
-       catch (NoDataException e) {
-         throw e;
-       }
-   }
 
-   /**Get the double data in the requested datacell
-    */
-   public double getDoubleData(Locator locator) throws NoDataException {
-       try {
-         return getDataCube().getDoubleData(locator);
-       }
-       catch (NoDataException e) {
-         throw e;
-       }
-   }
-   
    /** Remove the requested data from the indicated datacell
     *  (via DataCube LOCATOR REF) in the DataCube held in this Array.
     */
@@ -1476,6 +1610,7 @@ import java.util.Vector;
       return shortAxis;
    }
 
+
    public int getShortAxisSize () {
 
       AxisInterface shortAxis = getShortAxis();
@@ -1511,4 +1646,6 @@ import java.util.Vector;
    }
    
 }  //end of Array class
+
+
 
