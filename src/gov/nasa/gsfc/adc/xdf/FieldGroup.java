@@ -33,6 +33,10 @@ import java.util.Hashtable;
     // Fields
     //
 
+    /* XML attribute names */
+    private static final String CLASS_XML_ATTRIBUTE_NAME = new String("class");
+
+
     /** This field stores object references to those field group objects
        to which this array object belongs
     */
@@ -83,6 +87,12 @@ import java.util.Hashtable;
 
        classXDFNodeName = "fieldGroup";
 
+       // append to the end
+       attribOrder.add(CLASS_XML_ATTRIBUTE_NAME);
+
+       //set up the attribute hashtable key with the default initial value
+       attribHash.put(CLASS_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+
     }
 
  }
@@ -90,6 +100,9 @@ import java.util.Hashtable;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2001/08/01 18:13:53  thomas
+ * added Class attribute
+ *
  * Revision 1.5  2001/06/28 16:50:54  thomas
  * changed add method(s) to return boolean.
  *
