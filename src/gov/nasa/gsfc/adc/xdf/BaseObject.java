@@ -797,11 +797,16 @@ public abstract class BaseObject implements Serializable, Cloneable {
    */
   // NOTE: this is essentially the Perl update method
   protected void setXMLAttributes (AttributeList attrs) {
+
      // set object attributes from an AttributeList
      if (attrs != null) {
         // whip thru the list, setting each value
-        for (int i = 0; i < attrs.getLength (); i++) {
-          ((XMLAttribute) this.attribHash.get(attrs.getName(i))).setAttribValue(attrs.getValue(i));
+        int size = attrs.getLength();
+        for (int i = 0; i < size; i++) {
+           String name = attrs.getName(i);
+           String value = attrs.getValue(i);
+           if (name != null && value != null) 
+              ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
         }
      }
   }
@@ -907,6 +912,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.23  2000/11/03 21:23:33  thomas
+ * Small change to setXMLAttributes to intercept null
+ * values in the attributelist. -b.t.
+ *
  * Revision 1.22  2000/11/02 17:55:11  kelly
  * implements Cloneable now.
  *
