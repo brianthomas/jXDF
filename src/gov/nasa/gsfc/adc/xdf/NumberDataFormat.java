@@ -47,6 +47,7 @@ public abstract class NumberDataFormat extends DataFormat {
 
    /** set the *lessThanValue* attribute
     */
+/*
    public void setLessThanValue(Object number) {
 
       if (Utility.isValidNumberObject(number))
@@ -58,6 +59,7 @@ public abstract class NumberDataFormat extends DataFormat {
 
    /** set the *lessThanValueOrEqualValue* attribute
     */
+/*
    public void setLessThanOrEqualValue(Object number) {
 
       if (Utility.isValidNumberObject(number))
@@ -69,6 +71,7 @@ public abstract class NumberDataFormat extends DataFormat {
 
    /** set the *greaterThanValue* attribute
     */
+/*
    public void setGreaterThanValue(Object number) {
 
       if (Utility.isValidNumberObject(number))
@@ -80,6 +83,7 @@ public abstract class NumberDataFormat extends DataFormat {
 
    /** set the *greaterThanOrEqualValue* attribute
     */
+/*
    public void setGreaterThanOrEqualValue(Object number) {
 
       if (Utility.isValidNumberObject(number))
@@ -90,6 +94,7 @@ public abstract class NumberDataFormat extends DataFormat {
 
    /** set the *infiniteValue* attribute
     */
+/*
    public void setInfiniteValue(Object number) {
 
       if (Utility.isValidNumberObject(number))
@@ -101,6 +106,7 @@ public abstract class NumberDataFormat extends DataFormat {
 
    /** set the *infiniteNegativeValue* attribute
     */
+/*
    public void setInfiniteNegativeValue(Object number) {
 
       if (Utility.isValidNumberObject(number))
@@ -112,6 +118,7 @@ public abstract class NumberDataFormat extends DataFormat {
 
    /** set the *noDataValue* attribute
     */
+/*
    public void setNoDataValue(Object number) {
 
       if (Utility.isValidNumberObject(number))
@@ -120,12 +127,17 @@ public abstract class NumberDataFormat extends DataFormat {
          Log.warnln("Could'nt set the noDataValue as it is not a valid number object. Ignoring request.");
 
    }
+ */
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/04/27 21:30:22  thomas
+ * accomodating DTD, no longer have set/get methods for
+ * lessthan, greaterThan, etc in dataformat classes.
+ *
  * Revision 1.1  2001/02/07 18:52:52  thomas
  * Inital Version. Concat's set methods that
  * the number-based (ascii) dataformats need into
