@@ -41,7 +41,7 @@ import java.util.List;
   //
   //Fields
   //
-  protected ArrayInterface parentArray;
+  protected Array parentArray;
   protected List axisOrderList;
   private boolean HasNext;
 
@@ -150,29 +150,6 @@ import java.util.List;
   {
      return HasNext;
   }
-
-/*
-  public boolean hasNext() 
-  {
-
-    int size = axisOrderList.size();
-
-    for (int i = 0; i < size ; i++) {
-      AxisInterface axis = (AxisInterface) axisOrderList.get(i);
-      int index = ((Integer) locations.get(axis)).intValue();
-      if (index < (axis.getLength()-1)) {
-        return true; // because index not at last position
-                     // on that axis it must be true there is a next location 
-                     // within the dataCube
-      } //else if (index == (axis.getLength()-1)) {
-        // at limit of the position 
-      //}
-    }
-
-    return false;
-
-  }
-*/
 
   /** Change the locator coordinates to the next datacell as
       determined from the locator iteration order.
@@ -378,6 +355,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.24  2001/07/11 22:35:21  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.23  2001/06/28 16:50:54  thomas
  * changed add method(s) to return boolean.
  *

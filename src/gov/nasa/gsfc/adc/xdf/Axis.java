@@ -27,7 +27,9 @@ import java.util.Iterator;
    @version $Revision$
 */
 
-public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
+public class Axis extends BaseObjectWithXMLElementsAndValueList
+implements AxisInterface 
+{
 
    //
    // Fields
@@ -67,15 +69,16 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
 
   /** 
-   *  Create an Axis with a desired dimension 
-   *  with each axis value to be an empty string;
-   *  axis values can be reset using setAxisValue () or setValueList()
+   *  Create an Axis with a desired dimension. 
+   *  This axis is populated with the correct number of axis Values,
+   *  with each axis Value being set to an integer equal to the internal index.
+   *  Axis values can be later reset using setAxisValue () or setValueList().
    */
   public Axis (int dimension)
   {
-    init();
-    for (int i=0; i<dimension; i++)
-	addAxisValue (new Value (""));
+     init();
+     ValueListAlgorithm newValueListObj = new ValueListAlgorithm(0,1,dimension);
+     setAxisValueList(newValueListObj);
   }
 
 
@@ -95,6 +98,18 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
   }
 
+  /** A combination of the prior constructors.
+   */
+  public Axis ( Hashtable InitXDFAttributeTable, int dimension )
+  {
+      init();
+
+      // init the value of selected XML attributes to HashTable values
+      hashtableInitXDFAttributes(InitXDFAttributeTable);
+
+      ValueListAlgorithm newValueListObj = new ValueListAlgorithm(0,1,dimension);
+      setAxisValueList(newValueListObj);
+  }
 
   //
   //Get/Set Methods
@@ -210,13 +225,35 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
     return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /** set the *valueList* attribute
+  /** Set the values contained in this Axis from the passed List. The passed
+    * list may contain either Value or UnitDirection objects.
    */
-  public void setValueList(List valueList) {
-     ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).setAttribValue(valueList);
+  public void setValueList(List listOfAxisValues) {
+     length = 0;
+     ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).setAttribValue(Collections.synchronizedList(new ArrayList()));
+     Iterator iter = listOfAxisValues.iterator();
+     while (iter.hasNext()) {
+        Object value = iter.next();
+        if (value instanceof Value) {
+           addAxisValue((Value) value);
+        } else {
+           addAxisUnitDirection((UnitDirection) value);
+        }
+     }
   }
 
-  /**
+  /** Set the values contained in this Axis from the passed ValueList. 
+    * The passed values are construed as axisValues (e.g. NOT UnitDirection 
+    * objects).
+    */ 
+   public void setAxisValueList (ValueListInterface valueListObj)
+   {
+      resetAxisValues();
+      addAxisValueList(valueListObj);
+   }
+
+
+  /** The valueList is the list of axisValues or UnitDirection objects held within this Axis. 
    * @return the current *valueList* attribute
    */
   public List getValueList() {
@@ -261,37 +298,72 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
   }
 
   //
-  //Other PUBLIC methods
+  // Other PUBLIC methods
   //
 
-  /** Add a Value object to this axis.
+   /** Resets the axis value list to be empty and the axis length to 0. 
+    */
+   public void resetAxisValues () {
+      setValueList(new ArrayList());
+   }
+
+   public boolean addAxisValueList (ValueListInterface valueListObj)
+   {
+
+      List values = valueListObj.getValues();
+
+      // do we have any new values?
+      if (values.size() > 0) {
+
+         addValueListObj(valueListObj);
+
+         // append in new values to Parameter obj 
+         Iterator iter = values.iterator();
+         while (iter.hasNext()) {
+            Value thisValue = ((Value) iter.next());
+            internalAddAxisValue(thisValue);
+         }
+
+         return true;
+
+      } else {
+
+         // safety, needed?
+         hasValueListCompactDescription = false;
+         Log.warnln("Warning: no Values appended, ValueList empty. Parameter unchanged.");
+         return false;
+
+      }
+
+   }
+
+  /** Add a Value object to this axis. Note that adding an axisValue will
+   * void any compact (valueList) description of the axis values when 
+   * toXMLOutputStream is called (e.g. those Values formerly inserted via the
+   * addAxisValueList or setAxisValueList methods; these prior axisValues *do* 
+   * remain within the Axis however). 
    * @param valueObj - Value object to be added
    * @return true on success, false on failure
    */
 
    public boolean addAxisValue(Value valueObj) {
 
-      if (valueObj == null) {
-         Log.warn("in Axis, addAxisValue(), the Value passed in is null");
-         return false;
+      if (internalAddAxisValue(valueObj)) {
+
+         // no compact description allowed now 
+         resetValueListObjects();
+         return true;
       }
-
-      // ok to add
-      getValueList().add(valueObj);
-      length++;  //bump up length
-
-      // inform parent array of the change
-      if ( parentArray != null) {
-         parentArray.needToUpdateLongArrayMult = true;
-      }
-
-      return true;
+      return false;
 
    }
 
-
-
    /**Set the value of this axis at the given index.
+     Note that setting an axisValue will
+   * void any compact (valueList) description of the axis values when 
+   * toXMLOutputStream is called (e.g. those Values formerly inserted via the
+   * addAxisValueList or setAxisValueList methods; these prior axisValues *do* 
+   * remain within the Axis however).
     *  @param index, valueObj
     */
 
@@ -301,6 +373,9 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
         Log.error("in Axis, setAxisValue(), the Value passed in is null");
         return;
       }
+
+     // no compact description allowed now 
+      resetValueListObjects();
 
       List values = getValueList();
       if (index < 0 || index >length) {  //invalid index
@@ -322,10 +397,16 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
 
     /** Set the value of this axis at the given index.
+  Note that setting an axisValue will
+   * void any compact (valueList) description of the axis values when 
+   * toXMLOutputStream is called (e.g. those values formerly inserted via the
+   * addAxisValueList or setAxisValueList methods; these prior axisValues *do* 
+   * remain within the Axis however).
     * @param UnitDirectionObj, index
     */
 
     public void setAxisValue(int index, UnitDirection unitDirectionObj) {
+
       if (unitDirectionObj== null) {
         Log.error("in Axis, setAxisValue(), the unitDirectionObj passed in is null");
         return;
@@ -335,6 +416,9 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
         Log.error("in Axis, setAxisValue(), the index is out of range");
         return;
       }
+
+      // no compact description allowed now 
+      resetValueListObjects();
 
       if (index == length) {  //add value to the end of valueList
         Log.warn("the index is actually the current valueList length, bumping the length by 1");
@@ -349,16 +433,24 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
     }
 
   /**Add an UnitDirection object to this axis.
+  Note that setting an axisValue will
+   * void any compact (valueList) description of the axis values when 
+   * toXMLOutputStream is called (e.g. those values formerly inserted via the
+   * addAxisValueList or setAxisValueList methods; these prior axisValues *do* 
+   * remain within the Axis however).
    * @param unitDirectionObj - UnitDirection to be added
    * @return true on success, false on failure
    */
 
-   public boolean addAxisUnitDirection(UnitDirection unitDirectionObj) {
+   public boolean addAxisUnitDirection (UnitDirection unitDirectionObj) {
 
       if (unitDirectionObj == null) {
          Log.warn("in Axis, addAxisUnitDirection(), the UnitDirection object passed in is null");
          return false;
       }
+
+      // no compact description allowed now 
+      resetValueListObjects();
 
       getValueList().add(unitDirectionObj);
       length++;  //bump up length
@@ -371,38 +463,67 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
       return true;
    }
 
-   /**removes a Value object from the list of values in this Axis object
-   * @param what - Value to be removed
+   /**removes a Value object from the list of values in this Axis object. 
+  Note that removing an axisValue will
+   * void any compact (valueList) description of the axis values when 
+   * toXMLOutputStream is called (e.g. those values formerly inserted via the
+   * addAxisValueList or setAxisValueList methods; these prior axisValues *do* 
+   * remain within the Axis however).
+   * @param what - Value object to be removed
    * @return true on success, false on failure
    */
-   public boolean removeAxisValue(Value what) {
-      boolean isRemoveSuccess = removeFromList(what, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
-      if (isRemoveSuccess)  //decrement length if removal successful
+   public boolean removeAxisValue (Value what) {
+      boolean isRemoveSuccess = removeFromList (what, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
+      if (isRemoveSuccess) { //decrement length if removal successful
         length--;
+        // no compact description allowed now 
+        resetValueListObjects();
+      }
+
       return isRemoveSuccess;
   }
 
 
 
-  /**removes an Value from the list of values in this Axis object
+  /**removes an Value from the list of values in this Axis object. 
+  Note that removing an axisValue will
+   * void any compact (valueList) description of the axis values when 
+   * toXMLOutputStream is called (e.g. those values formerly inserted via the
+   * addAxisValueList or setAxisValueList methods; these prior axisValues *do* 
+   * remain within the Axis however).
    * @param index - list index number of the Value object to be removed
    * @return true on success, false on failure
    */
-  public boolean removeAxisValue(int index) {
-     boolean isRemoveSuccess = removeFromList(index, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
+  public boolean removeAxisValue (int index) {
+     boolean isRemoveSuccess = removeFromList (index, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
       if (isRemoveSuccess) //decrement length if removal successful
+      {
         length--;
+        // no compact description allowed now 
+        resetValueListObjects();
+      }
+
       return isRemoveSuccess;
   }
 
-  /**removes an UnitDirection from the list of values in this Axis object
+  /**removes an UnitDirection from the list of values in this Axis object. 
+  Note that removing an axisValue will
+   * void any compact (valueList) description of the axis values when 
+   * toXMLOutputStream is called (e.g. those values formerly inserted via the
+   * addAxisValueList or setAxisValueList methods; these prior axisValues *do* 
+   * remain within the Axis however).
    * @param what - UnitDirection to be removed
    * @return true on success, false on failure
    */
-   public boolean removeAxisValue(UnitDirection what) {
-      boolean isRemoveSuccess = removeFromList(what, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
+   public boolean removeAxisValue (UnitDirection what) {
+      boolean isRemoveSuccess = removeFromList (what, getValueList(), VALUELIST_XML_ATTRIBUTE_NAME);
       if (isRemoveSuccess)  //decrement length if removal successful
+      {
         length--;
+        // no compact description allowed now 
+        resetValueListObjects();
+      }
+
       return isRemoveSuccess;
   }
 
@@ -525,48 +646,82 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
     super.init();
 
-    classXDFNodeName = "axis";
+     classXDFNodeName = "axis";
 
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0, VALUELIST_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, DATATYPE_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, ALIGN_XML_ATTRIBUTE_NAME);  //not sure what it is???
-    attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
+     // order matters! these are in *reverse* order of their
+     // occurence in the XDF DTD
+     attribOrder.add(0, VALUELIST_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, DATATYPE_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, ALIGN_XML_ATTRIBUTE_NAME);  //not sure what it is???
+     attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
-    //set up the attribute hashtable key with the default initial values 
-    attribHash.put(VALUELIST_XML_ATTRIBUTE_NAME, 
+     //set up the attribute hashtable key with the default initial values 
+     attribHash.put(VALUELIST_XML_ATTRIBUTE_NAME, 
         new XMLAttribute(  Collections.synchronizedList (new ArrayList (
                            Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE
                         )
                   );
-    attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(ALIGN_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));  //double check???
+     attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(ALIGN_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));  //double check???
 
-    //set up the axisUnits attribute
-    Units unitsObj = new Units();
-    attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new XMLAttribute(unitsObj, Constants.OBJECT_TYPE));
-    unitsObj.setXDFNodeName(UNITS_XML_ATTRIBUTE_NAME);
+     //set up the axisUnits attribute
+     Units unitsObj = new Units();
+     attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new XMLAttribute(unitsObj, Constants.OBJECT_TYPE));
+     unitsObj.setXDFNodeName(UNITS_XML_ATTRIBUTE_NAME);
 
-    attribHash.put(DATATYPE_XML_ATTRIBUTE_NAME,new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(DATATYPE_XML_ATTRIBUTE_NAME,new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
-    // set the initial length;
-    length = 0;
+     // set the initial length;
+     length = 0;
+
+     // set the valueList field for BaseObjectWithXMLElementsAndValueList
+     valueListXMLItemName = VALUELIST_XML_ATTRIBUTE_NAME;
 
   }
+
+   //
+   // Private Methods
+   //
+
+   // this is needed by add/set AxisValueList to prevent compact valueList
+   // description from being reset. 
+   private boolean internalAddAxisValue(Value valueObj) {
+
+      if (valueObj == null) {
+         Log.warn("in Axis, addAxisValue(), the Value passed in is null");
+         return false;
+      }
+
+      // ok to add
+      getValueList().add(valueObj);
+      length++;  //bump up length
+
+      // inform parent array of the change
+      if ( parentArray != null) {
+         parentArray.needToUpdateLongArrayMult = true;
+      }
+
+      return true;
+
+   }
+
+
 
 }  //end of Axis class
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.26  2001/07/11 22:35:20  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.25  2001/07/05 22:13:45  huang
  * modified constructor (int dimension)
  *

@@ -53,7 +53,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    //
    // Constructors
    //
-   public DelimitedXMLDataIOStyle (ArrayInterface parentArray)
+   public DelimitedXMLDataIOStyle (Array parentArray)
    {
       super(parentArray);
    }
@@ -63,7 +63,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
         Hashtable key/value pairs coorespond to the class XDF attribute
         names and their desired values.
     */
-   public DelimitedXMLDataIOStyle ( ArrayInterface parentArray, Hashtable InitXDFAttributeTable )
+   public DelimitedXMLDataIOStyle ( Array parentArray, Hashtable InitXDFAttributeTable )
    {
       super(parentArray, InitXDFAttributeTable);
    }
@@ -234,6 +234,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/07/11 22:35:21  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.14  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).

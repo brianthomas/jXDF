@@ -37,7 +37,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
-public class XDF extends Structure implements XDFInterface {
+public class XDF extends Structure {
 
    //
    //Fields
@@ -333,6 +333,9 @@ public class XDF extends Structure implements XDFInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/07/11 22:35:21  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.3  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).

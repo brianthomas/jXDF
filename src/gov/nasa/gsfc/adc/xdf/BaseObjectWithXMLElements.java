@@ -38,7 +38,8 @@ import java.io.IOException;
 /**
      The base object class for XDF objects which may hold internal XML elements.
  */
-public abstract class BaseObjectWithXMLElements extends BaseObject implements Cloneable {
+public abstract class BaseObjectWithXMLElements extends BaseObject 
+{
 
    //
    // Fields
@@ -46,7 +47,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
 
    /* XML attribute names */
 //   protected static final String XML_ELEMENTLIST_XML_ATTRIBUTE_NAME = new String("xmlElementList");
-   protected List xmlElementList = (List) new ArrayList();
+   protected List xmlElementList = Collections.synchronizedList(new ArrayList());
 
    /**  This constructor takes a Java Hashtable as an initializer of
         the XML attributes of the object to be constructed. The
@@ -128,37 +129,11 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
          // that specified in the classXDFNodeName (*sigh*)
          if (newNodeNameString != null) nodeNameString = newNodeNameString;
    
-/*
-         // 0. To be valid XML, we always start an XML block with an
-         //    XML declaration (e.g. somehting like "<?xml standalone="no"?>").
-         //    Here we deal with  printing out XML Declaration && its attributes
-         if ((XMLDeclAttribs !=null) &&(!XMLDeclAttribs.isEmpty())) {
-           indent = "";
-           writeXMLDeclToOutputStream(outputstream, XMLDeclAttribs);
-         }
-*/
-   
          // 1. open this node, print its simple XML attributes
          if (nodeNameString != null) {
    
            if (Specification.getInstance().isPrettyXDFOutput())
              writeOut(outputstream, indent); // indent node if desired
-           // For printing the opening statement we need to invoke a little
-           // Voodoo to keep the DTD happy: the first structure node is always
-           // called by the root node name instead of the usual nodeNameString
-           // We can tell this by checking if this object is derived from class
-           // Structure and if XMLDeclAttrib defined/populated with information
-   
-           // NOTE: This isnt really the way to do this. We need to check if 'this' is
-           // is or has as a superclass xdf.Structure instead of the 'string check' below.
-   
-           // check is class Strucuture & XMLDeclAttribs populated?
-   /*
-           if ( nodeNameString.equals(Specification.getInstance().getXDFStructureNodeName()) 
-                && !XMLDeclAttribs.isEmpty() )
-             nodeNameString = Specification.getInstance().getXDFRootNodeName();
-   */
-   
            writeOut(outputstream,"<" + nodeNameString);   // print opening statement
    
          }
@@ -216,23 +191,9 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
              if (item.get("type") == Constants.LIST_TYPE)
              {
    
-               List objectList = (List) item.get("value");
-               // Im not sure this synchronized wrapper is needed, we are
-               // only accessing stuff here.. Also, should synchronzied wrapper
-               // occur back in the getXMLInfo method instead where the orig
-               // access occured?!?
-               synchronized(objectList) {
-                 Iterator iter = objectList.iterator(); // Must be in synchronized block
-                 while (iter.hasNext()) {
-                   BaseObject containedObj = (BaseObject) iter.next();
-                   if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
-                     indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
-                     indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
-                     String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-                     containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
-                   }
-                 }
-               }
+                List objectList = (List) item.get("value");
+                indent = objectListToXMLOutputStream (outputstream, objectList, indent);
+
              }
              else if (item.get("type") == Constants.OBJECT_TYPE)
              {
@@ -309,9 +270,16 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
 
    }
 
-
    public Object clone() throws CloneNotSupportedException {
-      return super.clone();
+
+      BaseObjectWithXMLElements cloneObj = (BaseObjectWithXMLElements) super.clone();
+
+      cloneObj.xmlElementList = Collections.synchronizedList(new ArrayList());
+      int stop = this.xmlElementList.size();
+      for (int i = 0; i < stop; i++) {
+          cloneObj.xmlElementList.add( ((XMLElement) this.xmlElementList.get(i)).clone());
+      }
+      return cloneObj;
    }
 
    //

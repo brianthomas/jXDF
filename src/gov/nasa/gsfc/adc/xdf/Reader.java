@@ -72,7 +72,7 @@ public class Reader
         prior information in it, it will remain *unless* overridden by 
         conflicting information in the input source. 
      */
-    public Reader(XDFInterface xdfObject) 
+    public Reader(XDF xdfObject) 
     {
        myDocumentHandler = new SaxDocumentHandler(xdfObject);
     }
@@ -135,31 +135,24 @@ public class Reader
        myDocumentHandler.setDefaultCharDataHandler(handler);
     }
 
-    /** Set the structure object that the Reader will parse an InputSource into. 
+    /** Get the structure object that the Reader will parse an InputSource into. 
     */
-    public XDFInterface getReaderXDFStructureObj () 
+    public XDF getReaderXDFStructureObj () 
     {
       return myDocumentHandler.getReaderXDFStructureObj();
     }
 
-    /** Get the structure object that the Reader will parse an InputSource into. 
-    */
-    public void setReaderXDFStructureObj (XDFInterface XDFStructure)
-    {
-       myDocumentHandler.setReaderXDFStructureObj(XDFStructure);
-    }
-
-    /** Get the structure object that the Reader will parse an InputSource into. 
+    /** Set the structure object that the Reader will parse an InputSource into. 
     */
     public void setReaderXDFStructureObj (XDF XDFStructure)
     {
-       myDocumentHandler.setReaderXDFStructureObj((XDFInterface) XDFStructure);
+       myDocumentHandler.setReaderXDFStructureObj((XDF) XDFStructure);
     }
 
     /** Parse an InputSource into an XDF Structure object.
         @return XDF (structure) object
      */
-    public XDFInterface parse (InputSource inputsource) 
+    public XDF parse (InputSource inputsource) 
     throws java.io.IOException
     {
         String parsername = Specification.getInstance().getXMLParser();
@@ -171,7 +164,7 @@ public class Reader
        Set to private because we want users to only set XML parser in
        the Specification object, not override it in the method call. -b.t. 
      */
-    private XDFInterface parse (InputSource inputsource, String parsername) 
+    private XDF parse (InputSource inputsource, String parsername) 
     throws java.io.IOException
     {
 
@@ -215,7 +208,7 @@ public class Reader
     /** Parse a file into an XDF Structure object.
         @return XDF (structure) object
     */
-    public XDFInterface parsefile (String file)
+    public XDF parsefile (String file)
     throws java.io.IOException
     {
 
@@ -292,6 +285,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/07/11 22:35:21  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.14  2001/06/28 16:50:54  thomas
  * changed add method(s) to return boolean.
  *

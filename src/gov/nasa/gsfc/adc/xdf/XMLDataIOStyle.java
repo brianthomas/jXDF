@@ -58,16 +58,16 @@ public abstract class XMLDataIOStyle extends BaseObject {
    /* other */
    protected String UntaggedInstructionNodeName = "for";
    protected String UntaggedInstructionAxisIdRefName = "axisIdRef";
-   protected ArrayInterface parentArray;
+   protected Array parentArray;
 
   //no-arg constructor
-  public XMLDataIOStyle (ArrayInterface parentArray)
+  public XMLDataIOStyle (Array parentArray)
   {
      this.parentArray = parentArray;
      init();
   }
 
-  public XMLDataIOStyle (ArrayInterface parentArray, Hashtable InitXDFAttributeTable)
+  public XMLDataIOStyle (Array parentArray, Hashtable InitXDFAttributeTable)
   {
 
       this.parentArray = parentArray;
@@ -159,7 +159,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   }
 
 
-  public ArrayInterface getParentArray() { return parentArray; }
+  public Array getParentArray() { return parentArray; }
 
   //
   // Other Public Methods
@@ -329,6 +329,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.22  2001/07/11 22:35:21  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.21  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).

@@ -50,12 +50,12 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //
 
   //no-arg contructor
-  public TaggedXMLDataIOStyle(ArrayInterface parentArray) 
+  public TaggedXMLDataIOStyle(Array parentArray) 
   {
     super(parentArray);
   }
 
-  public TaggedXMLDataIOStyle(ArrayInterface parentArray, Hashtable InitXDFAttributeTable) 
+  public TaggedXMLDataIOStyle(Array parentArray, Hashtable InitXDFAttributeTable) 
   {
     super(parentArray,InitXDFAttributeTable);
   }
@@ -173,6 +173,9 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/07/11 22:35:21  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.15  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).

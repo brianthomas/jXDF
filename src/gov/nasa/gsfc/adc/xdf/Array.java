@@ -97,7 +97,7 @@ import java.util.Vector;
    * object ref of the FieldAxis object.
    */
 
-  public class Array extends BaseObjectWithXMLElements implements ArrayInterface
+  public class Array extends BaseObjectWithXMLElements 
   {
 
      //
@@ -449,7 +449,7 @@ import java.util.Vector;
    
      /** set the Notes object held by this Array object
       */
-     public void setArrayNotes (NotesInterface notes)
+     public void setArrayNotes (Notes notes)
      {
         ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
      }
@@ -457,7 +457,7 @@ import java.util.Vector;
      /** set the Notes object held by this Array object
          @deprecated use the setArrayNotes method instead.
       */
-     public void setNotesObject (NotesInterface notes)
+     public void setNotesObject (Notes notes)
      {
         ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
      }
@@ -465,18 +465,18 @@ import java.util.Vector;
      /**
         @return the current (array) Notes object that describes the notes held by this array. 
       */
-     public NotesInterface getArrayNotes()
+     public Notes getArrayNotes()
      {
-        return (NotesInterface) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
+        return (Notes) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
    
      /**
         @return the current (array) Notes object that describes the notes held by this array. 
         @deprecated use the getArrayNotes method instead.
      */
-     public NotesInterface getNotesObject()
+     public Notes getNotesObject()
      {
-        return (NotesInterface) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
+        return (Notes) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
 
      /* set the *axisList* attribute
@@ -735,7 +735,7 @@ import java.util.Vector;
       * @param p - the Parameter to be added
       * @return a Parameter object
       */
-     public boolean addParameter(ParameterInterface p) {
+     public boolean addParameter(Parameter p) {
        getParameters().add(p);
        return true;
      }
@@ -744,7 +744,7 @@ import java.util.Vector;
     * @param what - Parameter to be removed
     * @return true on success, false on failure
     */
-   public boolean removeParameter(ParameterInterface what) {
+   public boolean removeParameter(Parameter what) {
        return removeFromList(what, getParameters(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
    }
    
@@ -767,7 +767,7 @@ import java.util.Vector;
     * @param n - Note to be added
     * @return a Note object
     */
-   public boolean addNote(NoteInterface n) {
+   public boolean addNote(Note n) {
        return getArrayNotes().addNote(n);
    }
    
@@ -775,7 +775,7 @@ import java.util.Vector;
     * @param what - Note to be removed
     * @return true on success, false on failure
     */
-   public boolean removeNote(NoteInterface what) {
+   public boolean removeNote(Note what) {
         return (boolean) getArrayNotes().removeNote(what);
    }
    
@@ -1359,7 +1359,7 @@ import java.util.Vector;
             ((ArrayList) axisIdList).add(axisIdRef);
          }
    
-         NotesInterface notesObj = getArrayNotes();
+         Notes notesObj = getArrayNotes();
          notesObj.setLocationOrderList(axisIdList);
    }
    
@@ -1368,6 +1368,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.34  2001/07/11 22:35:21  thomas
+  * Changes related to adding valueList or removeal of unneeded interface files.
+  *
   * Revision 1.33  2001/07/02 21:19:29  thomas
   * changed attribs to match XDF DTD: now has notAnumber,
   * disabledValue, overflow/underflowValue.

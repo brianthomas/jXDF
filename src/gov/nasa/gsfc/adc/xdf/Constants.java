@@ -133,11 +133,21 @@ public abstract class Constants {
                                                        VALUE_SPECIAL_UNDERFLOW, VALUE_SPECIAL_OVERFLOW
                                                      };
 
+   public static final int VALUELIST_SIZE = 0;
+   public static final int VALUELIST_STEP = 1;
+   public static final int VALUELIST_START = 0;
+   public static final String VALUELIST_REPEATABLE = "no";
+   public static final String VALUELIST_DELIMITER = " ";
+
+
 }
 
 /* Modification History
  * 
  * $Log$
+ * Revision 1.13  2001/07/11 22:35:20  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.12  2001/07/02 21:20:32  thomas
  * added notAnumber, over|underflow to "special"
  * attribute on Value objects. changed fieldRelation

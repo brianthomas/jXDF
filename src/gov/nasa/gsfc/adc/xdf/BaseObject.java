@@ -287,37 +287,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
       // that specified in the classXDFNodeName (*sigh*)
       if (newNodeNameString != null) nodeNameString = newNodeNameString;
 
-/*
-      // 0. To be valid XML, we always start an XML block with an
-      //    XML declaration (e.g. somehting like "<?xml standalone="no"?>").
-      //    Here we deal with  printing out XML Declaration && its attributes
-      if ((XMLDeclAttribs !=null) &&(!XMLDeclAttribs.isEmpty())) {
-        indent = "";
-        writeXMLDeclToOutputStream(outputstream, XMLDeclAttribs);
-      }
-*/
-
       // 1. open this node, print its simple XML attributes
       if (nodeNameString != null) {
 
         if (Specification.getInstance().isPrettyXDFOutput())
           writeOut(outputstream, indent); // indent node if desired
-        // For printing the opening statement we need to invoke a little
-        // Voodoo to keep the DTD happy: the first structure node is always
-        // called by the root node name instead of the usual nodeNameString
-        // We can tell this by checking if this object is derived from class
-        // Structure and if XMLDeclAttrib defined/populated with information
-
-        // NOTE: This isnt really the way to do this. We need to check if 'this' is
-        // is or has as a superclass xdf.Structure instead of the 'string check' below.
-
-        // check is class Strucuture & XMLDeclAttribs populated?
-/*
-        if ( nodeNameString.equals(Specification.getInstance().getXDFStructureNodeName()) 
-             && !XMLDeclAttribs.isEmpty() )
-          nodeNameString = Specification.getInstance().getXDFRootNodeName();
-*/
-
         writeOut(outputstream,"<" + nodeNameString);   // print opening statement
 
       }
@@ -366,22 +340,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
           {
 
             List objectList = (List) item.get("value");
-            // Im not sure this synchronized wrapper is needed, we are
-            // only accessing stuff here.. Also, should synchronzied wrapper
-            // occur back in the getXMLInfo method instead where the orig
-            // access occured?!?
-            synchronized(objectList) {
-              Iterator iter = objectList.iterator(); // Must be in synchronized block
-              while (iter.hasNext()) {
-                BaseObject containedObj = (BaseObject) iter.next();
-                if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
-                  indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
-                  indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
-                  String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-                  containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
-                }
-              }
-            }
+            indent = objectListToXMLOutputStream (outputstream, objectList, indent);  
           }
           else if (item.get("type") == Constants.OBJECT_TYPE)
           {
@@ -652,11 +611,36 @@ public abstract class BaseObject implements Serializable, Cloneable {
         return true;
     }
     else { //invalid index number
-      Log.error("Error: passed index out of range.");
+      Log.errorln("Error: removeList was passed index="+listIndex+" which is out of range.");
       return false;
     }
 
   }
+
+   protected String objectListToXMLOutputStream (OutputStream outputstream, List objectList, String indent)
+   throws java.io.IOException
+   {
+
+      // Im not sure this synchronized wrapper is needed, we are
+      // only accessing stuff here.. Also, should synchronzied wrapper
+      // occur back in the getXMLInfo method instead where the orig
+      // access occured?!?
+      synchronized(objectList) {
+         Iterator iter = objectList.iterator(); // Must be in synchronized block
+         while (iter.hasNext()) {
+            BaseObject containedObj = (BaseObject) iter.next();
+            if (containedObj != null) { // can happen from pre-allocation of axis values, etc (?)
+               indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
+               indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
+               String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
+               containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
+            }
+         }
+      }
+
+      return indent;
+   }
+
 
   /** Basically this rearranges XMLAttribute information into a more convient
       order for the toXMLOutputstream method.
@@ -877,6 +861,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.49  2001/07/11 22:35:20  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.48  2001/07/06 19:04:23  thomas
  * toXMLOutputStream and related methods now pass on IOExceptions
  * to the application writer (e.g. they throw the error).

@@ -53,7 +53,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 
   /** constructor
    */
-  public FormattedXMLDataIOStyle (ArrayInterface parentArray)
+  public FormattedXMLDataIOStyle (Array parentArray)
   {
      super(parentArray);
   }
@@ -63,7 +63,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
        Hashtable key/value pairs coorespond to the class XDF attribute
        names and their desired values.
     */
-  public FormattedXMLDataIOStyle ( ArrayInterface parentArray, Hashtable InitXDFAttributeTable )
+  public FormattedXMLDataIOStyle ( Array parentArray, Hashtable InitXDFAttributeTable )
   {
      super(parentArray,InitXDFAttributeTable);
   }
@@ -248,6 +248,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2001/07/11 22:35:21  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.18  2001/07/06 19:05:01  thomas
  * toXMLOutputStream and related methods now throw
  * java.io.IOException

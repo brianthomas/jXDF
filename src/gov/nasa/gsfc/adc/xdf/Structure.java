@@ -57,7 +57,7 @@ import java.util.Set;
   * list reference to the Array objects held by this Structure.
  */
 
-public class Structure extends BaseObjectWithXMLElements implements StructureInterface {
+public class Structure extends BaseObjectWithXMLElements {
 
    //
    //Fields
@@ -235,7 +235,7 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param n - Note to be added
    * @return an Note object
    */
-  public boolean addNote(NoteInterface n) {
+  public boolean addNote(Note n) {
     getNoteList().add(n);
     return true;
   }
@@ -244,7 +244,7 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param what - Note to be removed
    * @return true on success, false on failure
    */
-   public boolean removeNote(NoteInterface what) {
+   public boolean removeNote(Note what) {
      return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -262,7 +262,7 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param p - Parameter
    * @return an Parameter object
    */
-  public boolean addParameter(ParameterInterface p) {
+  public boolean addParameter(Parameter p) {
     getParamList().add(p);
     return true;
   }
@@ -270,7 +270,7 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param what - Parameter to be removed
    * @return true on success, false on failure
    */
-  public boolean removeParameter(ParameterInterface what) {
+  public boolean removeParameter(Parameter what) {
     return  removeFromList(what, getParamList(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -286,7 +286,7 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param s - Structure to be added
    * @return an Structure object
    */
-  public boolean addStructure(StructureInterface s) {
+  public boolean addStructure(Structure s) {
     getStructList().add(s);
     return true;
   }
@@ -295,7 +295,7 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param what - Structure to be removed
    * @return true on success, false on failure
    */
-  public boolean removeStructure(StructureInterface what) {
+  public boolean removeStructure(Structure what) {
     return  removeFromList(what, getStructList(), STRUCTURELIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -311,7 +311,7 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param array - Array to be added
    * @return an Array object
    */
-  public boolean addArray(ArrayInterface array) {
+  public boolean addArray(Array array) {
     getArrayList().add(array);
     return true;
   }
@@ -320,7 +320,7 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param what - Array to be removed
    * @return true on success, false on failure
    */
-  public boolean removeArray(ArrayInterface what) {
+  public boolean removeArray(Array what) {
     return removeFromList(what, getArrayList(), ARRAYLIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -409,6 +409,9 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
 /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2001/07/11 22:35:21  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.20  2001/06/26 21:22:25  huang
  * changed return type to boolean for all addObject()
  *

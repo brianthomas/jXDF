@@ -60,7 +60,7 @@ public class DataCube extends BaseObject {
    private static final String HREF_XML_ATTRIBUTE_NAME = "href";
 
    private int dimension = 0;;
-   private ArrayInterface parentArray;
+   private Array parentArray;
    private boolean hasMoreData;
 
    // should be hex for faster comparison?
@@ -87,7 +87,7 @@ public class DataCube extends BaseObject {
 
   /** The constructor that takes parentArray as param.
    */
-  public DataCube(ArrayInterface parentArray) {
+  public DataCube(Array parentArray) {
      this.parentArray = parentArray;
      init();
   }
@@ -206,7 +206,7 @@ public class DataCube extends BaseObject {
   }
 
 
-  public ArrayInterface getParentArray() {
+  public Array getParentArray() {
      return parentArray;
   }
 
@@ -1648,6 +1648,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.38  2001/07/11 22:35:21  thomas
+  * Changes related to adding valueList or removeal of unneeded interface files.
+  *
   * Revision 1.37  2001/07/06 19:04:23  thomas
   * toXMLOutputStream and related methods now pass on IOExceptions
   * to the application writer (e.g. they throw the error).

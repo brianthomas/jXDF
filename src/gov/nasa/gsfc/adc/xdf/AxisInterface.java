@@ -28,19 +28,23 @@ package gov.nasa.gsfc.adc.xdf;
  *   and FieldAxis
  */
 
-public interface AxisInterface extends BaseObjectWithXMLElementsInterface {
+public interface AxisInterface {
 
    public int getLength();
    public String getAxisId();
    public String getAlign();
    /* ugh. shouldnt be public method */
    public void setParentArray(Array parent);
+   public boolean addXMLElement (XMLElement element);
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/07/11 22:35:20  thomas
+ * Changes related to adding valueList or removeal of unneeded interface files.
+ *
  * Revision 1.7  2001/06/26 19:44:59  thomas
  * added stuff to allow updating of dataCube in situations
  * where the axis size has changed.
