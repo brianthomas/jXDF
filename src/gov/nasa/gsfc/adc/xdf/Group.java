@@ -1,7 +1,4 @@
 
-package gov.nasa.gsfc.adc.xdf;
-import java.util.*;
-
 // CVS $Id$
 
 // Group.java Copyright (C) 2000 Brian Thomas,
@@ -24,10 +21,16 @@ import java.util.*;
 
 */
 
-/** This is an abstract class (and an interface??) -- need to ask
-    Kelly about the implementation.
+package gov.nasa.gsfc.adc.xdf;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Set;
+
+/** This is an abstract class for group objects.
  */
-public class Group extends BaseObject{
+public class Group extends BaseObject {
 
   // 
   // Fields
