@@ -25,15 +25,10 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.io.Writer;
-import java.io.StringWriter;
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-import java.io.OutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 /** Create a list of values from a simple (linear) algorithm. 
   * The ValueList object may be then passed on and used by other objects
@@ -45,205 +40,141 @@ import java.util.List;
   * a more compact format for describing the values so added to other objects
   * when they are written out using the toXMLOutputStream method.
   */
-public class ValueListAlgorithm implements ValueListInterface,Cloneable {
+public class ValueListAlgorithm extends ValueList {
 
+   //
    // Fields
-   private int valueListStart = Constants.VALUELIST_START;
-   private int valueListSize = Constants.VALUELIST_SIZE;
-   private int valueListStep = Constants.VALUELIST_STEP;
+   //
+   private static final String ALGORITHMLIST_XML_ATTRIBUTE_NAME = new String("algorithmList");
 
-   private List values;
-
-   private String valueListInfinite;
-   private String valueListInfiniteNegative;
-   private String valueListNoData;
-   private String valueListNotANumber;
-   private String valueListUnderflow;
-   private String valueListOverflow;
-
+   //
    // Constructors
-   /** Construct a list of values from an algorithm.
+   //
+
+   /** the no-arg Constructor */
+   public ValueListAlgorithm () {
+      init();
+   }
+
+   /** utility constructor. Will create a valueList from a linear polynomial 
+       with passed parameters.
     */
-   public ValueListAlgorithm (int start, int step, int size) {
-
-      setStart(start);
-      setStep(step);
-      setSize(size);
-
-      initValuesFromParams();
-
+   public ValueListAlgorithm (int intercept, int slope, int nrofValues) 
+   {
+      init();
    }
 
-   public ValueListAlgorithm (int start, int step, int size,
-                                     String noDataValue,
-                                     String infiniteValue,
-                                     String infiniteNegativeValue,
-                                     String notANumberValue,
-                                     String overflowValue,
-                                     String underflowValue ) 
-  {
-
-      setStart(start);
-      setStep(step);
-      setSize(size);
-
-      setNoDataValue(noDataValue);
-      setNotANumberValue(notANumberValue);
-      setInfiniteValue(infiniteValue);
-      setInfiniteNegativeValue(infiniteNegativeValue);
-      setUnderflowValue(underflowValue);
-      setOverflowValue(overflowValue);
-
-      initValuesFromParams();
-
-  }
-
-  // 
-  // Public Methods
-  //
-
-// accessor methods
-   public int getStart ( ) { return valueListStart; }
-   public void setStart (int value) { valueListStart = value; }
-
-   public int getStep( ) { return valueListStep; }
-   public void setStep (int value) { valueListStep = value; }
-
-   public int getSize( ) { return valueListSize; }
-   public void setSize (int value) { valueListSize = value; }
-
-   public String getNoDataValue () { return valueListNoData; }
-   public void setNoDataValue(String value) { valueListNoData = value; }
-
-   public String getInfiniteValue () { return valueListInfinite; }
-   public void setInfiniteValue (String value) { valueListInfinite = value; }
-
-   public String getInfiniteNegativeValue () { return valueListInfiniteNegative; }
-   public void setInfiniteNegativeValue (String value) { valueListInfiniteNegative = value; }
-
-   public String getNotANumberValue () { return valueListNotANumber; }
-   public void setNotANumberValue(String value) { valueListNotANumber = value; }
-
-   public String getOverflowValue () { return valueListOverflow; }
-   public void setOverflowValue (String value) { valueListOverflow= value; }
-
-   public String getUnderflowValue () { return valueListUnderflow; }
-   public void setUnderflowValue (String value) { valueListUnderflow= value; }
-
-
-
-   public List getValues () { return values; }
-
-   public void toXMLOutputStream (OutputStream outputstream, String indent)
-   throws java.io.IOException
+   /**  This constructor takes a Java Hashtable as an initializer of
+        the XML attributes of the object to be constructed. The
+        Hashtable key/value pairs coorespond to the class XDF attribute
+        names and their desired values.
+    */
+   public ValueListAlgorithm ( Hashtable InitXDFAttributeTable )
    {
 
-      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
-      toXMLWriter (outputWriter, indent, false, null, null);
+     // init the XML attributes (to defaults)
+     init();
 
-      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
-      // on SUN and Linux platforms show that it is. Hopefully we can remove
-      // this in the future.
-      outputWriter.flush();
+     // init the value of selected XML attributes to HashTable values
+     hashtableInitXDFAttributes(InitXDFAttributeTable);
 
-   }
-
-   public void toXMLWriter (
-                                Writer outputWriter,
-                                String indent
-                           )
-   throws java.io.IOException
-   {
-      toXMLWriter (outputWriter, indent, false, null, null);
-   }
-
-   public String toXMLString ()  
-   {
-
-     // hurm. Cant figure out how to use BufferedWriter here. fooey.
-     Writer outputWriter = (Writer) new StringWriter();
-     try {
-        // we use this so that newline *isnt* appended onto the last element node
-        basicXMLWriter(outputWriter, "", false, null, null);
-     } catch (java.io.IOException e) {
-        // weird. Out of memorY?
-        Log.errorln("Cant got IOException for toXMLWriter() method within toXMLString().");
-        Log.printStackTrace(e);
-     }
-
-     return outputWriter.toString();
-
-   }
-
-   public void toXMLWriter (
-                                Writer outputWriter,
-                                String indent,
-                                boolean dontCloseNode,
-                                String newNodeNameString,
-                                String noChildObjectNodeName
-                             )
-   throws java.io.IOException
-   {
-
-      basicXMLWriter(outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
-      if (Specification.getInstance().isPrettyXDFOutput()) //  && nodeNameString != null)
-          outputWriter.write(Constants.NEW_LINE);
-   }
-
-
-   protected String basicXMLWriter (
-                                Writer outputWriter,
-                                String indent,
-                                boolean dontCloseNode,
-                                String newNodeNameString,
-                                String noChildObjectNodeName
-                             )
-
-   throws java.io.IOException
-   {
-
-      if (Specification.getInstance().isPrettyXDFOutput())
-         outputWriter.write(indent); // indent node if desired
-
-      outputWriter.write("<valueList start=\""+valueListStart+"\" step=\""+valueListStep+"\" size=\""+valueListSize+"\"");
-      if (valueListNoData != null) outputWriter.write(" noDataValue=\""+valueListNoData+"\"");
-      if (valueListInfinite != null) outputWriter.write(" infiniteValue=\""+valueListInfinite+"\"");
-      if (valueListInfiniteNegative != null) outputWriter.write(" infiniteNegaiveValue=\""+valueListInfinite+"\"");
-      if (valueListNotANumber != null) outputWriter.write(" notANumberValue=\""+valueListNotANumber+"\"");
-      if (valueListUnderflow != null) outputWriter.write(" underflowValue=\""+valueListUnderflow+"\"");
-      if (valueListOverflow != null) outputWriter.write(" overflowValue=\""+valueListOverflow+"\"");
-      outputWriter.write("/>");
-
-/*
-      if (Specification.getInstance().isPrettyXDFOutput())
-          outputWriter.write(Constants.NEW_LINE);
-*/
-
-      return "valueList";
-   }
-
-   public Object clone() throws CloneNotSupportedException {
-      return super.clone();
    }
 
    // 
-   // Private Methods
+   // Public Methods
    //
 
-   private void initValuesFromParams()
+   //
+   // Accessor methods
+   //
+
+
+   /** get the list of algorithms held by this object
+    */
+   public List getAlgorithmList ()
+   {
+      return (List) ((Attribute) attribHash.get(ALGORITHMLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   //
+   // Other methods
+   //
+
+  /** Insert a Algorithm object into the list of algorithms held by this object.
+       @param algorithm - Algorithm to be added
+       @return a Algorithm object if successfull, null if not.
+    */
+   public boolean addAlgorithm (AlgorithmInterface algorithm )
+   {
+      getAlgorithmList().add(algorithm);
+      reloadValuesFromAlgorithms();
+      return true;
+   }
+
+   /** Remove a Algorithm object the list of algorithms held in
+       this object
+       @param Algorithm to be removed
+       @return true if successful, false if not
+    */
+   public boolean removeAlgorithm(AlgorithmInterface what) {
+      boolean status = removeFromList(what, getAlgorithmList(), ALGORITHMLIST_XML_ATTRIBUTE_NAME);
+      reloadValuesFromAlgorithms();
+      return status;
+   }
+
+   /** Remove an Algorithm object from the list of algorithms held in
+       this object
+       @param index -- list index number of the Algorithm object to be removed
+       @return true if successful, false if not
+    */
+   public boolean removeAlgorithm(int index) {
+      boolean status = removeFromList(index, getAlgorithmList(), ALGORITHMLIST_XML_ATTRIBUTE_NAME);
+      reloadValuesFromAlgorithms();
+      return status;
+   }
+
+   //
+   // Protected Methods
+   //
+
+   protected void init()
    {
 
-      values = Collections.synchronizedList(new ArrayList());
+      super.init();
 
-      // now populate values list
-      int currentValue = valueListStart;
-      int step = valueListStep;
-      int size = valueListSize;
-      for(int i = 0; i < size; i++) {
-         Value thisValue = new Value(currentValue);
-         currentValue += step;
-         values.add(thisValue);
+      classXDFNodeName = "valueListAlgorithm";
+
+      // order matters! these are in *reverse* order of their
+      // occurence in the XDF DTD
+      attribOrder.add(0, ALGORITHMLIST_XML_ATTRIBUTE_NAME);
+
+      attribHash.put(ALGORITHMLIST_XML_ATTRIBUTE_NAME, new Attribute(new Vector(), Constants.LIST_TYPE));
+
+   }
+
+   //
+   // Private methods
+   //
+
+   private void reloadValuesFromAlgorithms() {
+
+      resetValues();
+
+      List myValues = new Vector();
+      Iterator iter = getAlgorithmList().iterator();
+      while (iter.hasNext())
+      {
+          AlgorithmInterface algorithm = (AlgorithmInterface) iter.next();
+          List valuesToAdd = algorithm.getValues();
+          Iterator vaiter = valuesToAdd.iterator();
+          while (vaiter.hasNext())
+          {
+              Value nextValue = (Value) vaiter.next();
+              myValues.add(nextValue);
+          }
       }
+
+      setValues(myValues);
    }
 
 }

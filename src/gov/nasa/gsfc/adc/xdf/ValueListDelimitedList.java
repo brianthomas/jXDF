@@ -31,7 +31,7 @@ import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Vector;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,24 +44,32 @@ import java.util.List;
   */
 
    // internal valueList class for hold algorithm style 
-public class ValueListDelimitedList implements ValueListInterface,Cloneable {
+public class ValueListDelimitedList extends ValueList {
 
-   // needed for the algorithm description
-   private String valueListDelimiter = Constants.VALUELIST_DELIMITER;
-   private List values = new ArrayList();
+   //
+   // Fields
+   //
+   private static final String DELIMITER_XML_ATTRIBUTE_NAME = new String("delimiter");
+   private static final String REPEATABLE_XML_ATTRIBUTE_NAME = new String("repeatable");
+   private static final String VALUE_XML_ATTRIBUTE_NAME = new String("value");
+   private boolean isRepeatable = false;
 
-   private String valueListInfinite;
-   private String valueListInfiniteNegative;
-   private String valueListNoData;
-   private String valueListNotANumber;
-   private String valueListUnderflow;
-   private String valueListOverflow;
+   //
+   // Constructors
+   //
+
+   /** no arg constructor 
+    */
+   public ValueListDelimitedList () {
+       init();
+   }
 
    /** Constructs a valueList object with Values in passed List.
        Care should be taken that none of the Value objects are set
        to the same sequence of characters as the default delimiter.
     */
    public ValueListDelimitedList (List values) {
+      init();
       setValues(values);
    }
 
@@ -76,37 +84,9 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
          System.exit(-1);
       }
 
-      setDelimiter(delimiter);
-      setValues(values);
-   }
-
-   /** Constructs a valueList object with Values in passed List.
-       Care should be taken that none of the Value objects are set
-       to the same sequence of characters as the passed delimiter.
-    */
-   public ValueListDelimitedList(List values, String delimiter,
-                              String noDataValue,
-                              String infiniteValue,
-                              String infiniteNegativeValue,
-                              String notANumberValue,
-                              String overflowValue,
-                              String underflowValue )
-   {
-
-      if (delimiter == null) {
-         Log.errorln("ERROR: in ValueListDelimitedList() delimiter string can't be null.");
-         System.exit(-1);      
-      }
+      init();
 
       setDelimiter(delimiter);
-
-      setNoDataValue(noDataValue);
-      setNotANumberValue(notANumberValue);
-      setInfiniteValue(infiniteValue);
-      setInfiniteNegativeValue(infiniteNegativeValue);
-      setUnderflowValue(underflowValue);
-      setOverflowValue(overflowValue);
-
       setValues(values);
 
    }
@@ -116,163 +96,109 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
    //
 
    // accessor methods
-   public void setDelimiter (String value) { valueListDelimiter = value; }
-   public String getDelimiter () { return valueListDelimiter; }
 
-   public String getNoDataValue () { return valueListNoData; }
-   public void setNoDataValue(String value) { valueListNoData = value; }
-
-   public String getInfiniteValue () { return valueListInfinite; }
-   public void setInfiniteValue (String value) { valueListInfinite = value; }
-
-   public String getInfiniteNegativeValue () { return valueListInfiniteNegative; }
-   public void setInfiniteNegativeValue (String value) { valueListInfiniteNegative = value; }
-
-   public String getNotANumberValue () { return valueListNotANumber; }
-   public void setNotANumberValue(String value) { valueListNotANumber = value; }
-
-   public String getOverflowValue () { return valueListOverflow; }
-   public void setOverflowValue (String value) { valueListOverflow= value; }
-
-   public String getUnderflowValue () { return valueListUnderflow; }
-   public void setUnderflowValue (String value) { valueListUnderflow= value; }
-
-   public List getValues () { return values; }
-   public void setValues (List valueList) { values = valueList; }
-
-   public void toXMLOutputStream (OutputStream outputstream, String indent)
-   throws java.io.IOException
+   /** Sets the delimiter for this valuelist.
+   */
+   public void setDelimiter (String delimiter)
    {
-
-      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
-      toXMLWriter (outputWriter, indent, false, null, null);
-
-      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
-      // on SUN and Linux platforms show that it is. Hopefully we can remove
-      // this in the future.
-      outputWriter.flush();
-
-   }
-
-   public void toXMLWriter (
-                                Writer outputWriter,
-                                String indent
-                           )
-   throws java.io.IOException
-   {
-      toXMLWriter (outputWriter, indent, false, null, null);
-   }
-
-   public String toXMLString ()
-   {
-
-     // hurm. Cant figure out how to use BufferedWriter here. fooey.
-     Writer outputWriter = (Writer) new StringWriter();
-     try {
-        // we use this so that newline *isnt* appended onto the last element node
-        basicXMLWriter(outputWriter, "", false, null, null);
-     } catch (java.io.IOException e) {
-        // weird. Out of memorY?
-        Log.errorln("Cant got IOException for toXMLWriter() method within toXMLString().");
-        Log.printStackTrace(e);
-     }
-
-     return outputWriter.toString();
-
-   }
-
-   public void toXMLWriter (
-                                Writer outputWriter,
-                                String indent,
-                                boolean dontCloseNode,
-                                String newNodeNameString,
-                                String noChildObjectNodeName
-                             )
-   throws java.io.IOException
-   {
-
-      basicXMLWriter(outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
-      if (Specification.getInstance().isPrettyXDFOutput()) //  && nodeNameString != null)
-          outputWriter.write(Constants.NEW_LINE);
+      ((Attribute) attribHash.get(DELIMITER_XML_ATTRIBUTE_NAME)).setAttribValue(delimiter);
    }
 
 
-   protected String basicXMLWriter (
-                                Writer outputWriter,
-                                String indent,
-                                boolean dontCloseNode,
-                                String newNodeNameString,
-                                String noChildObjectNodeName
-                             )
-
-   throws java.io.IOException
+   /**
+    * @return the current *delimiter* attribute
+    */
+   public String getDelimiter()
    {
-
-      if (Specification.getInstance().isPrettyXDFOutput())
-         outputWriter.write(indent); // indent node if desired
-
-      // no need to have repeatable set to 'yes' would just waste space even if we used this functionality.
-      outputWriter.write("<valueList delimiter=\""+valueListDelimiter+"\" repeatable=\"no\"");
-      if (valueListNoData != null) outputWriter.write( " noDataValue=\""+valueListNoData+"\"");
-      if (valueListInfinite != null) outputWriter.write(" infiniteValue=\""+valueListInfinite+"\"");
-      if (valueListInfiniteNegative != null) outputWriter.write(" infiniteNegaiveValue=\""+valueListInfiniteNegative+"\"");
-      if (valueListNotANumber != null) outputWriter.write(" notANumberValue=\""+valueListNotANumber+"\"");
-      if (valueListUnderflow != null) outputWriter.write(" underflowValue=\""+valueListUnderflow+"\"");
-      if (valueListOverflow != null) outputWriter.write(" overflowValue=\""+valueListOverflow+"\"");
-      outputWriter.write(">");
-
-      Iterator iter = values.iterator();
-      while (iter.hasNext()) {
-
-         Value thisValue = (Value) iter.next();
-
-         String specialValue = thisValue.getSpecial();
-         if(specialValue != null) {
-            if(specialValue.equals(Constants.VALUE_SPECIAL_INFINITE)) {
-               doValuePrint (outputWriter, specialValue, valueListInfinite);
-            } else if(specialValue.equals(Constants.VALUE_SPECIAL_INFINITE_NEGATIVE)) {
-               doValuePrint (outputWriter, specialValue, valueListInfiniteNegative);
-            } else if(specialValue.equals(Constants.VALUE_SPECIAL_NODATA)) {
-               doValuePrint (outputWriter, specialValue, valueListNoData);
-            } else if(specialValue.equals(Constants.VALUE_SPECIAL_NOTANUMBER)) {
-               doValuePrint (outputWriter, specialValue, valueListNotANumber);
-            } else if(specialValue.equals(Constants.VALUE_SPECIAL_UNDERFLOW)) {
-               doValuePrint (outputWriter, specialValue, valueListUnderflow);
-            } else if(specialValue.equals(Constants.VALUE_SPECIAL_OVERFLOW)) {
-               doValuePrint (outputWriter, specialValue, valueListOverflow);
-            }
-
-         } else {
-            outputWriter.write(thisValue.getValue());
-         }
-
-         if (iter.hasNext())
-            outputWriter.write(valueListDelimiter);
-      }
-      outputWriter.write("</valueList>");
-     // if (Specification.getInstance().isPrettyXDFOutput())
-     //     outputWriter.write(Constants.NEW_LINE);
-
-      return "valueList";
+      return (String) ((Attribute) attribHash.get(DELIMITER_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
-   public Object clone() throws CloneNotSupportedException {
-      return super.clone();
+  /** Sets the repeatable for this valuelist.
+   */
+   public void setRepeatable (String repeatable)
+   {
+      if(repeatable == null || !repeatable.equals("yes"))
+         isRepeatable = false;
+      else
+         isRepeatable = true;
+
+      ((Attribute) attribHash.get(REPEATABLE_XML_ATTRIBUTE_NAME)).setAttribValue(repeatable);
+   }
+
+
+   /**
+    * @return the current *repeatable* attribute
+    */
+   public String getRepeatable()
+   {
+        return (String) ((Attribute) attribHash.get(REPEATABLE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   /** special utility method. Allows to quickly set the values of the valueList 
+     * from a passed string. Parsing of the string is done using the parameters
+     * of the valuelist.
+     */
+   public void setValues (String strListOfValues) {
+
+       List valuesToAdd = splitStringIntoValueObjects ( strListOfValues) ;
+       setPCDATA(strListOfValues);
+       setValues(valuesToAdd);
+
+   }
+
+   //
+   // Protected Methods
+   //
+
+   /** set the *value* attribute
+    */
+   protected void setPCDATA (String pcdata)
+   {
+      ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(pcdata);
+   }
+
+   protected void init()
+   {
+
+      super.init();
+
+      classXDFNodeName = "valueList";
+
+      // order matters! these are in *reverse* order of their
+      // occurence in the XDF DTD
+      attribOrder.add(0, VALUE_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, REPEATABLE_XML_ATTRIBUTE_NAME);
+      attribOrder.add(0, DELIMITER_XML_ATTRIBUTE_NAME);
+
+      attribHash.put(DELIMITER_XML_ATTRIBUTE_NAME, new Attribute(Constants.VALUELIST_DELIMITER, 
+                                                                           Constants.STRING_TYPE));
+      attribHash.put(REPEATABLE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+      attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+
+
    }
 
    //
    // Private Methods
    //
 
-   private void doValuePrint (Writer outputWriter, String specialValue, String value) 
-   throws java.io.IOException
+   private List splitStringIntoValueObjects ( String valueListString )
    {
-      if (value != null) {
-         outputWriter.write(value);
-      } else {
-         Log.errorln("Error: valueList doesnt have "+specialValue+" defined but value does. Ignoring value.");
-      }
-   }
+
+        Vector valueList = new Vector();
+        String regex = getDelimiter();
+        if (isRepeatable) 
+           regex = regex + "+";
+
+        String[] strList = valueListString.split(regex);
+
+        for(int i=0; i< strList.length; i++) {
+           Value newvalue = new Value(strList[i]);
+           valueList.add(newvalue);
+        }
+
+        return valueList;
+    }
 
 }
 
