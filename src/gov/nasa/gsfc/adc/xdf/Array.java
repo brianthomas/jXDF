@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -800,6 +799,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.14  2000/11/08 19:22:06  thomas
+  * Minor fix: import statement had 2 ArrayList entries. -b.t.
+  *
   * Revision 1.13  2000/11/06 21:11:52  kelly
   * added deep cloning  --k.z.
   *
