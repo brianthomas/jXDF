@@ -46,9 +46,10 @@ public abstract class Constants {
   public static final String DOUBLE_TYPE  = "Double";
 
   // allowable roles for the relation node
-  public static final String[] RELATION_ROLE_LIST = { "errors" , "sensitivity" , 
-                                                      "weights" , "references" , 
-                                                      "noteMarks"
+  public static final String[] RELATION_ROLE_LIST = { 
+                                                       "precision" , "positiveError", "negativeError" , 
+                                                       "error" , "sensitivity" , "quality", "weight" , 
+                                                       "reference" , "noteMark"
                                                     };
 
   //store the enum list of XMLattributeTypes
@@ -58,7 +59,7 @@ public abstract class Constants {
                                                         };
 
   public static final String NEW_LINE = System.getProperty("line.separator");
-  public static final int INIT_ATTRIBUTE_HASH_SIZE = 20;
+  public static final int INIT_ATTRIBUTE_HASH_SIZE = 5;
 
   public static final String BIG_ENDIAN = "BigEndian";
   public static final String LITTLE_ENDIAN = "LittleEndian";
@@ -123,15 +124,25 @@ public abstract class Constants {
    public static final String VALUE_SPECIAL_INFINITE = "infinite";
    public static final String VALUE_SPECIAL_INFINITE_NEGATIVE = "infiniteNegative";
    public static final String VALUE_SPECIAL_NODATA= "noData";
+   public static final String VALUE_SPECIAL_NOTANUMBER = "notANumber";
+   public static final String VALUE_SPECIAL_OVERFLOW = "overflow";
+   public static final String VALUE_SPECIAL_UNDERFLOW = "underflow";
 
    public static final String[] VALUE_SPECIAL_LIST = { VALUE_SPECIAL_INFINITE,  VALUE_SPECIAL_INFINITE_NEGATIVE,
-                                                       VALUE_SPECIAL_NODATA };
+                                                       VALUE_SPECIAL_NODATA, VALUE_SPECIAL_NOTANUMBER,
+                                                       VALUE_SPECIAL_UNDERFLOW, VALUE_SPECIAL_OVERFLOW
+                                                     };
 
 }
 
 /* Modification History
  * 
  * $Log$
+ * Revision 1.12  2001/07/02 21:20:32  thomas
+ * added notAnumber, over|underflow to "special"
+ * attribute on Value objects. changed fieldRelation
+ * role list of posssible values.
+ *
  * Revision 1.11  2001/02/07 18:41:13  thomas
  * Added more constants, floating bits. Some minor
  * changes to array decl of constants. -b.t.
