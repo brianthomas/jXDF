@@ -43,8 +43,6 @@ import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.ParserFactory;
-import com.sun.xml.parser.Resolver;
-
 import org.xml.sax.EntityResolver;
 
 /** This class is used to create Java (structure) objects from XDF files/streams.
@@ -203,7 +201,9 @@ public class Reader
         // static resolver methods handle that automatically
         // in most cases.
         //
-        input = Resolver.createInputSource (new File(file));
+//        input = Resolver.createInputSource (new File(file));
+        input = new InputSource (file);
+
 
         // now parse it, return whatever structure is derived 
         return parse(input);
@@ -264,6 +264,11 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/01/29 16:59:22  thomas
+ * Small change to bring into compliance with
+ * jaxp.jar (drop SUN specific "Resolver" class).
+ * 	-b.t.
+ *
  * Revision 1.10  2001/01/19 17:22:16  thomas
  * Added ability to set the XML parser to use.
  * Added ability to pick up UnparsedEntities. -b.t.
