@@ -1,35 +1,125 @@
+
 package gov.nasa.gsfc.adc.xdf;
 import java.util.*;
 
+// CVS $Id$
+
+// Group.java Copyright (C) 2000 Brian Thomas,
+// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+
+/*
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*/
+
+/** This is an abstract class (and an interface??) -- need to ask
+    Kelly about the implementation.
+ */
 public class Group extends BaseObject{
+
+  // 
+  // Fields
+  //
   private String name;
   private String description;
   protected Set memberObjHash = Collections.synchronizedSet(new HashSet());
 
+  //
+  // Constructors
+  //
+
+  /** No-argument constructor
+  */
   public Group() {
- //   attribList.add(new XMLAttribute("name", name,);
- //   attribList.add(new XMLAttribute("description", description, );
+
+    // init the XML attributes (to defaults)
+    init();
+  }
+
+  /** Constructor taking a hashtable with key/value pairs for
+      the object attributes. 
+  */
+  public Group(Hashtable InitXDFAttributeTable) {
+
+    // init the XML attributes (to defaults)
+    init();
+
+    // init the value of selected XML attributes to HashTable values
+    hashtableInitXDFAttributes(InitXDFAttributeTable);
 
   }
 
-  public String setName(String str) {
-    name = str;
-    return name;
+  /** init -- special private method used by constructor methods to
+   *  conviently build the XML attribute list for a given class.
+   */
+  private void init()
+  {
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0,"description");
+    attribOrder.add(0,"name");
+
+    //set up the attribute hashtable key with the default initial value
+    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
   }
 
-  public String getName() {
-    return name;
+  //
+  //Get/Set Methods
+  //
+
+  /**setName: set the *name* attribute
+   * @return: the current *name* attribute
+   */
+  public String setName (String strName)
+  {
+    return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+
   }
 
-  public String setDescription(String str) {
-    description = str;
-    return  description ;
+  /**getName
+   * @return: the current *name* attribute
+   */
+  public String getName()
+  {
+    return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
   }
 
+   /**setDescription: set the *description* attribute
+   * @return: the current *description* attribute
+   */
+  public String setDescription (String strDesc)
+  {
+    return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+  }
+
+   /**getDescription
+   * @return: the current *description* attribute
+   */
   public String getDescription() {
-    return description;
+    return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
   }
 
+  //
+  //Other PUBLIC Methods
+  //
+
+  /** Add an object as a member of this group.
+      @return: true if successfully adds this object as a member, false otherwise.
+  */
   public Object addMemberObject (Object obj) {
     if (obj!=null) {
       if (memberObjHash.add(obj))
@@ -41,6 +131,9 @@ public class Group extends BaseObject{
       return null;
   }
 
+  /** Remove an object from membership in this group.
+      @return: true if successfully removes the object from membership, false otherwise.
+  */
   public Object removeMemberObj (Object obj) {
      if (obj!=null) {
       if (memberObjHash.contains(obj))  {
@@ -54,6 +147,9 @@ public class Group extends BaseObject{
       return null;
   }
 
+  /** Determine if this group has passed object as a member.
+      @return: true if contains this object, false otherwise.
+  */
   public boolean hasMemberObj (Object obj) {
     if (obj!=null) {
       if (memberObjHash.contains(obj)) {
@@ -63,10 +159,18 @@ public class Group extends BaseObject{
         return false;
     }
     return false;
-
   }
-
 
 }
 
+/* Modification History:
+ *
+ * $Log$
+ * Revision 1.2  2000/10/10 19:14:59  cvs
+ * Added log history section, commenting on methods
+ * and fixed the constructor section (added init method).
+ * -b.t.
+ *
+ *
+ */
 
