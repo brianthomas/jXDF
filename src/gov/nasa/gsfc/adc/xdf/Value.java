@@ -84,17 +84,17 @@ public class Value extends BaseObject {
       ((XMLAttribute) attribHash.get("valueId")).setAttribValue(strValueId);
    }
 
-   /** get the *valueRef* attribute.
+   /** get the *valueIdRef* attribute.
    */
-   public String getValueRef() {
-      return (String) ((XMLAttribute) attribHash.get("valueRef")).getAttribValue();
+   public String getValueIdRef() {
+      return (String) ((XMLAttribute) attribHash.get("valueIdRef")).getAttribValue();
    }
 
    /** set the *valueRef* attribute.
    */
-   public void setValueRef (String strValueRef)
+   public void setValueIdRef (String strValueRef)
    {
-      ((XMLAttribute) attribHash.get("valueRef")).setAttribValue(strValueRef);
+      ((XMLAttribute) attribHash.get("valueIdRef")).setAttribValue(strValueRef);
    }
 
     /** get the *inequality*   attribute.
@@ -144,7 +144,7 @@ public class Value extends BaseObject {
       attribOrder.add(0,"value");
       attribOrder.add(0,"inequality");
       attribOrder.add(0,"special");
-      attribOrder.add(0,"valueRef");
+      attribOrder.add(0,"valueIdRef");
       attribOrder.add(0,"valueId");
 
 
@@ -152,7 +152,7 @@ public class Value extends BaseObject {
        attribHash.put("value", new XMLAttribute(null, Constants.STRING_TYPE));
        attribHash.put("inequality", new XMLAttribute(null, Constants.STRING_TYPE));
        attribHash.put("special", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("valueRef", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put("valueIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
        attribHash.put("valueId", new XMLAttribute(null, Constants.STRING_TYPE));
    }
 
@@ -161,6 +161,10 @@ public class Value extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/01/19 22:33:52  thomas
+ * ValueIdRef was misspelled!!! Now methods, attributes are
+ * correct. -b.t.
+ *
  * Revision 1.8  2000/11/16 20:11:01  kelly
  * fixed documentation.  -k.z.
  *
