@@ -24,8 +24,22 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.*;
-import java.io.*;
+import java.lang.Cloneable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+
 import org.xml.sax.AttributeList;
 
 /** The base class for most XDF objects.
@@ -903,6 +917,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.26  2000/11/08 19:33:30  thomas
+ * Trimmed down import path to just needed classes. b.t.
+ *
  * Revision 1.25  2000/11/08 19:18:07  thomas
  * Changed the name of toXDF* methods to toXML* to
  * better reflect the nature of the output (its not XDF
