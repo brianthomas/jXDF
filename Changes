@@ -63,4 +63,5 @@
                       - Higher dimesional arrays not implemented correctly (!! in 3+ dimensions). Fixed.
                       - Added get/setIOAxesOrder in XMLDataIOStyle.
                       - add methods now uniformly return "boolean" rather than an object.
-
+                      - added compression/decompression support for GZIP, Zip (bzip2, UNIX "compress" 
+                        and Xmill still missing)
