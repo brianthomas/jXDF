@@ -233,22 +233,16 @@ import java.io.IOException;
   }
 
 
-  public void toXMLWriter (
-                             Writer outputWriter,
-                             String indent
-                          )
+  protected void basicXMLWriter (
+                                   Writer outputWriter,
+                                   String indent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
+                                )
   throws java.io.IOException
   {
-     super.toXMLWriter( outputWriter, indent, false, XDFNodeName, noUnitChildNodeName);
-  }
-
-  public void toXMLOutputStream  (
-                                   OutputStream outputstream,
-                                   String indent
-                                 )
-  throws java.io.IOException
-  {
-     super.toXMLOutputStream( outputstream, indent, false, XDFNodeName, noUnitChildNodeName);
+     super.basicXMLWriter( outputWriter, indent, false, XDFNodeName, noUnitChildNodeName);
   }
 
   //
@@ -283,6 +277,9 @@ import java.io.IOException;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/09/05 22:00:58  thomas
+ * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter
+ *
  * Revision 1.19  2001/07/31 21:09:04  thomas
  * bug fix, needed toXMLWriter method.
  *

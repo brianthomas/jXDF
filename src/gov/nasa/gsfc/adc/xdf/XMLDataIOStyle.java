@@ -168,27 +168,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   // Other Public Methods
   //
 
-  public void toXMLOutputStream (
-                                   OutputStream outputstream,
-                                   String indent,
-                                   boolean dontCloseNode,
-                                   String newNodeNameString,
-                                   String noChildObjectNodeName
-                                )
-  throws java.io.IOException
-  {
-
-       Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
-       toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
-
-       // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
-       // on SUN and Linux platforms show that it is. Hopefully we can remove
-       // this in the future.
-       outputWriter.flush();
-
-  }
-
-  public void toXMLWriter (
+  protected void basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -259,9 +239,8 @@ public abstract class XMLDataIOStyle extends BaseObject {
     }
 
      outputWriter.write( "</read>");
-    if (niceOutput) {
-      outputWriter.write(Constants.NEW_LINE);
-     }
+
+//    if (niceOutput) { outputWriter.write(Constants.NEW_LINE); }
 
   }
 
@@ -352,6 +331,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.25  2001/09/05 22:00:58  thomas
+ * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter
+ *
  * Revision 1.24  2001/07/26 15:55:42  thomas
  * added flush()/close() statement to outputWriter object as
  * needed to get toXMLOutputStream to work properly.

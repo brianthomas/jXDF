@@ -79,26 +79,7 @@ public class NotesLocationOrder extends BaseObject {
       axisIdRefOrder = (ArrayList) orderList;
    }
 
-   public void toXMLOutputStream (  OutputStream outputstream, 
-                                    String indent,
-                                    boolean dontCloseNode,
-                                    String newNodeNameString,
-                                    String noChildObjectNodeName
-                                  ) 
-   throws java.io.IOException
-   {
-
-      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
-      toXMLWriter (outputWriter, indent, false, null, null);
-
-      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
-      // on SUN and Linux platforms show that it is. Hopefully we can remove
-      // this in the future.
-      outputWriter.flush();
-
-   }
-
-   public void toXMLWriter (
+   protected void basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -137,7 +118,8 @@ public class NotesLocationOrder extends BaseObject {
       // 3. Close this node
       if (Specification.getInstance().isPrettyXDFOutput()) outputWriter.write(indent); // indent node if desired
       outputWriter.write("</" + nodeNameString + ">");   // print opening statement
-      if (Specification.getInstance().isPrettyXDFOutput()) outputWriter.write( Constants.NEW_LINE);
+
+//      if (Specification.getInstance().isPrettyXDFOutput()) outputWriter.write( Constants.NEW_LINE);
 
    }
 
@@ -163,6 +145,9 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/09/05 22:00:58  thomas
+ * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter
+ *
  * Revision 1.10  2001/07/26 15:55:42  thomas
  * added flush()/close() statement to outputWriter object as
  * needed to get toXMLOutputStream to work properly.
