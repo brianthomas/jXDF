@@ -297,6 +297,7 @@ import java.util.*;
 
   /**setDataCube: set the *dataCube* attribute
    * @return: the current *dataCube* attribute
+   * double check, we should not allow user to set the datacube
    */
   public DataCube setDataCube(DataCube dataCube)
   {
@@ -367,7 +368,7 @@ import java.util.*;
       return group;
     }
     else {
-      Log.warn("in Structure.addParamGroup(). ParameterGroup passed in is null");
+      Log.warn("in Array.addParamGroup(). ParameterGroup passed in is null");
       return null;
     }
   }
@@ -378,7 +379,7 @@ import java.util.*;
    */
   public boolean removeParamGroup(ParameterGroup group) {
     if (group == null) {
-      Log.warn("in Structure.removeParamGroup().  ParameterGroup passed in is null");
+      Log.warn("in Array.removeParamGroup().  ParameterGroup passed in is null");
       return false;
     }
     return paramGroupOwnedHash.remove(group);
@@ -408,6 +409,7 @@ import java.util.*;
    * @param: Axis to be removed
    * @return: true on success and decrement the dimension,
    *          false on failure and keep the dimension unchanged
+   * double check the implication on datacube
    */
   public boolean removeAxis(Axis what) {
     boolean isRemoveSuccess = removeFromList(what, getAxisList(), "axisList");
@@ -672,16 +674,15 @@ import java.util.*;
 
     if (getFieldAxis() !=null) {
       List axisList = getAxisList();
-      axisList.remove(0);  //
+      axisList.remove(0);
       axisList.add(0, fieldAxis);  //replace the old fieldAxis with the new one
     }
     else {  //add fieldAxis and increment dimension
       getAxisList().add(0, fieldAxis);
-      //getDataCube().incrementDimension(fieldAxis);
+      getDataCube().incrementDimension(fieldAxis);
     }
-
-    //inficiency???
-    return getFieldAxis();
+    hasFieldAxis = true;
+    return fieldAxis;
   }
   public FieldAxis getFieldAxis() {
     List axisList = getAxisList();
@@ -744,6 +745,9 @@ import java.util.*;
  /**
   * Modification History:
   * $Log$
+  * Revision 1.9  2000/10/30 18:15:28  kelly
+  * minor fix
+  *
   * Revision 1.8  2000/10/27 21:05:37  kelly
   * --Units are initialized as null now.
   * --added exception for get/set data.
