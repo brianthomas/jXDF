@@ -33,14 +33,24 @@ import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.IOException;
 
+/*
 import org.apache.crimson.tree.ElementNode;
 import org.apache.crimson.tree.TextNode;
 import org.apache.crimson.tree.CDataNode;
+*/
+import org.dom4j.dom.DOMElement;
+import org.dom4j.dom.DOMCDATA;
+import org.dom4j.dom.DOMText;
+
 import org.xml.sax.Attributes;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+
+import org.dom4j.Namespace;
+import org.dom4j.QName;
 
 /** 
      This class is used to hold XML element node information *inside* XDF (and child) objects.
@@ -48,7 +58,7 @@ import org.w3c.dom.Node;
      the node name, node attributes AND PCData as well as child Elements.
  */
 
-public class XMLElementNode extends ElementNode implements Cloneable {
+public class XMLElementNode extends DOMElement implements Cloneable {
 
    // 
    // Fields
@@ -58,20 +68,20 @@ public class XMLElementNode extends ElementNode implements Cloneable {
    // Constructors
    //
 
-   //public XMLElement (String tagName, Document ownerDoc) { }
-
-   public XMLElementNode (String tagName) 
-//   throws DomEx
-   {
-      super(tagName);
-      init();
+   public XMLElementNode(String name) {
+      super(name);
    }
 
-   public XMLElementNode (String namespaceURI, String qName)
-//   throws DomEx
-   {
-      super(namespaceURI,qName);
-      init();
+   public XMLElementNode(QName qname) {
+      super(qname);
+   }
+
+   public XMLElementNode(QName qname, int attributeCount) {
+      super(qname, attributeCount);
+   }
+
+   public XMLElementNode(String name, Namespace namespace) {
+      super(name, namespace);
    }
 
 
@@ -82,19 +92,16 @@ public class XMLElementNode extends ElementNode implements Cloneable {
    /** Set the value of the PCDATA held by this XMLElementNode.
     */
    public void setPCData (String text) {
-//      myCDATA.delete(0,myCDATA.length());
-//      myCDATA.append(text);
       removeAllTextChildNodes();
-      TextNode newTextNode = new TextNode(text); // CDataNode is a special Text node 
+      DOMText newTextNode = new DOMText(text); // CDataNode is a special Text node 
       appendChild(newTextNode);
-
   }
 
    /** Set the value of the PCDATA held by this XMLElementNode.
        By using CDataNode here, the user may insure special characters like the
        lessthan sign are preserved without resorting to entities.
    */
-  public void setPCData (CDataNode textNode) {
+  public void setPCData (DOMCDATA textNode) {
       removeAllTextChildNodes();
       appendChild(textNode);
   }
@@ -105,7 +112,7 @@ public class XMLElementNode extends ElementNode implements Cloneable {
       int size = childNodes.getLength();
       for (int i = 0; i < size; i++) {
           Node thisNode = childNodes.item(i);
-          if (thisNode instanceof TextNode) {
+          if (thisNode instanceof DOMText) {
              removeChild(thisNode);
           }
       }
@@ -124,7 +131,7 @@ public class XMLElementNode extends ElementNode implements Cloneable {
       int size = childNodes.getLength();
       for (int i = 0; i < size; i++) {
           Node thisNode = childNodes.item(i);
-          if (thisNode instanceof TextNode) {
+          if (thisNode instanceof DOMText) {
              myCDATA.append(thisNode.toString());
           }
       }
@@ -158,22 +165,24 @@ public class XMLElementNode extends ElementNode implements Cloneable {
    /** appends more PCDATA into this XMLElementNode. 
     */
    public void appendPCData (String text) {
-      TextNode newTextNode = new TextNode(text);
+      DOMText newTextNode = new DOMText(text);
       appendChild(newTextNode);
    }
 
    /** appends more PCDATA into this XMLElementNode. 
     */
-   public void appendPCData (CDataNode textNode) {
+   public void appendPCData (DOMCDATA textNode) {
       appendChild(textNode);
    }
 
+/*
+   // ugh. Wont allow me to override the 'Element' method that is 
+   // already declared. so be it.
    public boolean addAttribute (String name, String value) {
       this.setAttribute(name, value);
       return true;
    }
 
-/*
    // ugh. Wont allow me to override the 'void' method that is 
    // already declared. so be it.
    public boolean removeAttribute ( String name ) 
@@ -222,6 +231,10 @@ public class XMLElementNode extends ElementNode implements Cloneable {
     */
    public void setXMLAttribute (String name, String value) { 
       this.setAttribute(name, value);
+   }
+
+   public void setAttributes (List attributeList) {
+
    }
 
    /** just a convience method for getAttribute
@@ -298,28 +311,25 @@ public class XMLElementNode extends ElementNode implements Cloneable {
    {
 
       boolean isPrettyOutput = Specification.getInstance().isPrettyXDFOutput();
-      if (isPrettyOutput) 
-          outputWriter.write(indent); // indent node if desired
-      //outputWriter.write(this.toString());
-      outputWriter.write("<XMLNodeHere/>");
-      if (isPrettyOutput) 
-          outputWriter.write(Constants.NEW_LINE); 
 
-/*
-      String nodeNameString = this.getTagName();
       // Setup. Sometimes the name of the node we are opening is different from
-      // that specified in the classXDFNodeName (*sigh*)
+      // that specified in the class getName method.
+      String nodeNameString = this.getName();
       if (newNodeNameString != null) nodeNameString = newNodeNameString;
 
       // 1. open this node, print its simple XML attributes
-      if (nodeNameString != null) {
+      if (nodeNameString != null) 
+      {
 
-        if (Specification.getInstance().isPrettyXDFOutput())
-          writeOut(outputstream, indent); // indent node if desired
-        writeOut(outputstream,"<" + nodeNameString);   // print opening statement
+        if (isPrettyOutput)
+          outputWriter.write(indent); // indent node if desired
+        outputWriter.write("<" + nodeNameString);   // print opening statement
 
       }
 
+      outputWriter.write(">"); //close node
+
+/*
       // 2. Print out string object XML attributes 
       ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
       // is synchronized here correct?
@@ -363,6 +373,8 @@ public class XMLElementNode extends ElementNode implements Cloneable {
 
       }
 */
+      if (isPrettyOutput) 
+          outputWriter.write(Constants.NEW_LINE);
 
    }
 
@@ -387,24 +399,15 @@ public class XMLElementNode extends ElementNode implements Cloneable {
 
    /**
     */
+/*
    public Object clone() throws CloneNotSupportedException {
      return super.clone(); 
    }
+*/
 
    //
    // Protected Methods
    //
-
-   /** A special method used by constructor methods to
-       convienently build the XML attribute list for a given class.
-    */
-   protected void init( )
-   {
-
-       resetXMLAttributes();
-
-   }
-
 
    //
    // Private Methods
@@ -423,6 +426,9 @@ public class XMLElementNode extends ElementNode implements Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/08/01 18:08:12  thomas
+ * new version using dom4j
+ *
  * Revision 1.1  2001/07/26 15:58:36  thomas
  * From the old 'XMLElement' class, just changed name.
  *
