@@ -823,8 +823,9 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
      // set object attributes from an AttributeList
      if (attrs != null) {
         // whip thru the list, setting each value
-        for (int i = 0; i < attrs.getLength (); i++)
+        for (int i = 0; i < attrs.getLength (); i++) { 
           ((XMLAttribute) this.attribHash.get(attrs.getName(i))).setAttribValue(attrs.getValue(i));
+        }
      }
   }
 
@@ -1002,6 +1003,9 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2000/10/31 18:41:14  thomas
+ * Removed error report from set attributes. -b.t.
+ *
  * Revision 1.17  2000/10/27 21:07:57  kelly
  * --fixed a bug in *toXDF* when writing out <units><unitless></units>
  * --fixed a bug when writing out the simplest node
