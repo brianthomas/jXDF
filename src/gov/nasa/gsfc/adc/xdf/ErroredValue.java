@@ -77,7 +77,7 @@ public class  ErroredValue extends Value {
        the value of the lowerErrorValue and upperErrorValue attributes. 
     */
    public String[] getErrorValues () {
-      String values[];
+      String values[] = new String [2];
       values[0] = getLowerErrorValue();
       values[1] = getUpperErrorValue();
       return values;
@@ -134,6 +134,9 @@ public class  ErroredValue extends Value {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/06/12 16:03:58  huang
+ * initialize a variable
+ *
  * Revision 1.7  2001/05/04 20:24:13  thomas
  * added super.init() to init() method.
  *
