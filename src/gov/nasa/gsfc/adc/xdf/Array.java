@@ -36,13 +36,14 @@ import java.util.Vector;
 
  /** DESCRIPTION
   *  XDF is the eXtensible Data Structure, which is an XML format designed to contain n-dimensional
-  * scientific/mathematical data. XDF::Array is the basic container for the n-dimensional array data.
+  * scientific/mathematical data. Array is the basic container for the n-dimensional array data.
   * It gives access to the array data and its descriptors (such as the array axii, associated
   * parameters, notes, etc).
-  *
-  *
+  * /
+
+  /**
   * Here is a diagram showing the inter-relations between these components
-  * of the XDF::Array in a 2-dimensional dataset with no fields.
+  * of the Array in a 2-dimensional dataset with no fields.
   *
   *
   *    axisValue -----> "9" "8" "7" "6" "5" "A"  .   .  "?"
@@ -80,21 +81,21 @@ import java.util.Vector;
    * arrayId
    * A scalar string holding the array Id of this Array.
    * axisList--
-   * a SCALAR (ARRAY REF) of the list of Axis> objects held within this array.
+   * a SCALAR (ARRAY REF) of the list of Axis objects held within this array.
    * paramList--
-   * reference of the list of Parameter> objects held within in this Array.
+   * reference of the list of Parameter objects held within in this Array.
    * notes --
    * reference of the object holding the list of Note objects held within this object.
    * dataCube
-   * object ref of the DataCube> object which is a matrix holding the mathematical data
+   * object ref of the DataCube object which is a matrix holding the mathematical data
    * of this array.
    * dataFormat
-   * object ref of the DataFormat> object.
+   * object ref of the DataFormat object.
    * units
-   * object ref of the Units> object of this array. The XDF::Units object
-   * is used to hold the XDF::Unit objects.
+   * object ref of the Units object of this array. The Units object
+   * is used to hold the Unit objects.
    * fieldAxis
-   * OBJECT REF of the FieldAxis> object.
+   * object ref of the FieldAxis object.
    */
 
   public class Array extends BaseObject{
@@ -108,7 +109,8 @@ import java.util.Vector;
   */
   protected Set paramGroupOwnedHash = Collections.synchronizedSet(new HashSet());
 
-  //the list of locators whose parentArray is this Array object
+  /**the list of locators whose parentArray is this Array object
+   */
   protected List locators = new Vector();
   protected boolean hasFieldAxis = false;
 
@@ -150,8 +152,8 @@ import java.util.Vector;
      ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
-  /**getName
-   * @return: the current *name* attribute
+  /** 
+   * @return the current *name* attribute
    */
   public String getName()
   {
@@ -165,8 +167,8 @@ import java.util.Vector;
      ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
   }
 
-   /**getDescription
-   * @return: the current *description* attribute
+   /*
+   * @return the current *description* attribute
    */
   public String getDescription() {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
@@ -178,8 +180,8 @@ import java.util.Vector;
      ((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
   }
 
-  /**getParamList
-   * @return: the current *paramList* attribute
+  /**
+   * @return the current *paramList* attribute
    */
   public List getParamList() {
     return (List) ((XMLAttribute) attribHash.get("paramList")).getAttribValue();
@@ -192,15 +194,15 @@ import java.util.Vector;
      ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
   }
 
-  /**getUnits
-   * @return: the current *units* attribute
+  /**
+   * @return the current *units* attribute
    */
   public Units getUnits()
   {
     return (Units) ((XMLAttribute) attribHash.get("units")).getAttribValue();
   }
 
-  /** Sets the data format *type* for this array (an XDF::DataFormat object
+  /** Sets the data format *type* for this array (an DataFormat object
    * is held in the attribute $obj->dataFormat, its type is accessible
    * Takes a SCALAR object reference as its argument. Allowed objects to pass
    * to this method include BinaryIntegerDataFormat, BinaryFloatDataFormat,
@@ -212,23 +214,23 @@ import java.util.Vector;
      ((XMLAttribute) attribHash.get("dataFormat")).setAttribValue(dataFormat);
   }
 
-  /**getDataFormat
-   * @return: the current *dataFormat* attribute
+  /**
+   * @return the current *dataFormat* attribute
    */
   public DataFormat getDataFormat()
   {
      return (DataFormat) ((XMLAttribute) attribHash.get("dataFormat")).getAttribValue();
   }
 
-  /** setNotesObject
+  /** set the Notes object held by this Array object
    */
   public void setNotesObject (Notes notes)
   {
      ((XMLAttribute) attribHash.get("notes")).setAttribValue(notes);
   }
 
-  /** getNotesObject
-     @return: the current *Notes* attribute object
+  /**
+     @return the current *Notes* attribute object
    */
   public Notes getNotesObject()
   {
@@ -241,26 +243,18 @@ import java.util.Vector;
      ((XMLAttribute) attribHash.get("axisList")).setAttribValue(axis);
   }
 
-  /**getAxisList
-   * @return: the current *axisList* attribute
+  /**
+   * @return the current *axisList* attribute
    */
   public List getAxisList() {
     return (List) ((XMLAttribute) attribHash.get("axisList")).getAttribValue();
   }
 
   /** set the *xmlDataIOStyle* attribute
-   * note we have to nsure that _parentArray is properly updated
+   * note we have to insure that _parentArray is properly updated
    */
   public void setXMLDataIOStyle(XMLDataIOStyle xmlDataIOStyle)
   {
-
-     if (xmlDataIOStyle == null)
-     {
-        Log.error("in Array.setXMLDataIOStyle(), param passed in is null, ");
-        Log.errorln("xmlDataIOStyle attribute not updated");
-        return; // bail
-     }
-
      //set the parent array to this object
      xmlDataIOStyle.setParentArray(this);
 
@@ -269,8 +263,8 @@ import java.util.Vector;
 
   }
 
-  /**getXMLDataIOStyle
-   * @return: the current *xmlDataIOStyle* attribute
+  /**
+   * @return the current *xmlDataIOStyle* attribute
    */
   public XMLDataIOStyle getXMLDataIOStyle()
   {
@@ -290,8 +284,8 @@ import java.util.Vector;
   }
 
 
-  /** getDataCube
-      @return: the current *DataCube* attribute
+  /**
+      @return the current *DataCube* attribute
    */
   public DataCube getDataCube()
   {
@@ -304,14 +298,14 @@ import java.util.Vector;
      ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
    }
 
-   /**getNoteList
-      @return: the current *noteList* attribute
+   /**
+      @return the current *noteList* attribute
    */
    public List getNoteList() {
       return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
    }
 
-   /**getDimension: set the dimension of the DataCube> held within this Array.
+   /** set the dimension of the DataCube held within this Array.
    */
    public int getDimension() {
      return getDataCube().getDimension();
@@ -321,7 +315,7 @@ import java.util.Vector;
    // Other Public Methods
    //
 
-   /**creatLocator: Create one instance of an Locator> object for this array.
+   /** Create one instance of an Locator object for this array.
     *
     */
    public Locator createLocator() {
@@ -332,37 +326,27 @@ import java.util.Vector;
       return locatorObj;
    }
 
-   /** addParamGroup: Insert an XDF::ParameterGroup object into this object.
-   * @param: ParameterGroup to be added
-   * @return:an XDF::ParameterGroup object reference on success, null on failure.
+   /** Insert an ParameterGroup object into this object.
+   * @param group - ParameterGroup to be added
+   * @return a ParameterGroup object reference on success, null on failure.
    */
   public ParameterGroup addParamGroup (ParameterGroup group) {
-    if (group !=null) {
       //add the group to the groupOwnedHash
       paramGroupOwnedHash.add(group);
       return group;
-    }
-    else {
-      Log.warn("in Array.addParamGroup(). ParameterGroup passed in is null");
-      return null;
-    }
   }
 
-  /**removeParamGroup: Remove an XDF::ParameterGroup object from the hashset--paramGroupOwnedHash
-   * @param: ParameterGroup to be removed
-   * @return: true on success, false on failure
+  /**Remove an ParameterGroup object from the hashset--paramGroupOwnedHash
+   * @param group - ParameterGroup to be removed
+   * @return true on success, false on failure
    */
   public boolean removeParamGroup(ParameterGroup group) {
-    if (group == null) {
-      Log.warn("in Array.removeParamGroup().  ParameterGroup passed in is null");
-      return false;
-    }
     return paramGroupOwnedHash.remove(group);
   }
 
-   /** addAxis: insert an Axis object into the list of axes held by this object.
-       @param: Axis to be added
-       @return: an Axis object on success, null on failure
+   /** insert an Axis object into the list of axes held by this object.
+       @param axis - Axis to be added
+       @return an Axis object on success, null on failure
    */
    public Axis addAxis(Axis axis) {
 
@@ -372,6 +356,7 @@ import java.util.Vector;
      getDataCube().incrementDimension(axis );  //increment the DataCube dimension by 1
 
      getAxisList().add(axis);
+
 
      //update the locators that is related to this Array object
      int stop = locators.size();
@@ -383,9 +368,9 @@ import java.util.Vector;
      return axis;
   }
 
-   /**removeAxis: removes an XDF::Axis object from axisList
-   * @param: Axis to be removed
-   * @return: true on success and decrement the dimension,
+   /**removes a Axis object from axisList
+   * @param what - Axis to be removed
+   * @return true on success and decrement the dimension,
    *          false on failure and keep the dimension unchanged
    * double check the implication on datacube
    */
@@ -396,9 +381,9 @@ import java.util.Vector;
     return isRemoveSuccess;
   }
 
-  /**removeAxis: removes an XDF::Axis object from AxisList
-   * @param: list index number
-   *  @return: true on success and decrement the dimension,
+  /**removes a Axis object from AxisList
+   * @param index - the index of the axis to be removed in the axisList
+   *  @return true on success and decrement the dimension,
    *           false on failure and keep the dimension unchanged
    */
   public boolean removeAxis(int index) {
@@ -408,16 +393,11 @@ import java.util.Vector;
     return isRemoveSuccess;
   }
 
-  /**addUnit: Insert an XDF::Unit object into the Units> object
-   * held in this object.
-   * @param: Unit to be added
-   * @return: an XDF::Unit object if successfull, null if not.
+  /**Insert an Unit object into the Units object held in this object.
+   * @param unit - Unit to be added
+   * @return an Unit object
    */
   public Unit addUnit(Unit unit) {
-    if (unit == null) {
-      Log.warn("in Array.addUnit(), the Unit passed in is null");
-      return null;
-    }
     Units u = getUnits();
     if (u == null) {
       u = new Units();
@@ -426,10 +406,10 @@ import java.util.Vector;
     return  u.addUnit(unit);
   }
 
-  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
+  /** Remove an Unit object from the Units object held in
    * this object
-   * @param: Unit to be removed
-   * @return: true if successful, false if not
+   * @param what - Unit to be removed
+   * @return true if successful, false if not
    */
   public boolean removeUnit(Unit what) {
     Units u = getUnits();
@@ -442,10 +422,10 @@ import java.util.Vector;
       return false;
   }
 
-  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
-   * this object
-   * @param: list index number
-   * @return: true if successful, false if not
+  /**Remove an Unit object from the Units object held in
+   * this Array object
+   * @param index - the index of the Unit to be removed
+   * @return true if successful, false if not
    */
   public boolean removeUnit(int index) {
    Units u = getUnits();
@@ -458,84 +438,74 @@ import java.util.Vector;
       return false;
   }
 
-  /** addParameter: insert an XDF::Parameter object into the paramList
-   * @param: XDF::Parameter
-   * @return: an XDF::Parameter object on success, null on failure
+  /** insert a Parameter object into the paramList
+   * @param p - the Parameter to be added
+   * @return a Parameter object
    */
   public Parameter addParameter(Parameter p) {
-    if (p == null) {
-      Log.warn("in Structure.addParameter, Parameter passed in is null");
-      return null;
-    }
     getParamList().add(p);
     return p;
   }
-  /**removeParameter: removes an XDF::Parameter object from paramList
-   * @param: Parameter to be removed
-   * @return: true on success, false on failure
+  /**removes an Parameter object from paramList
+   * @param what - Parameter to be removed
+   * @return true on success, false on failure
    */
   public boolean removeParameter(Parameter what) {
-    return  removeFromList(what, getParamList(), "paramList");
+    return removeFromList(what, getParamList(), "paramList");
   }
 
-  /**removeParameter: removes an XDF::Parameter object from paramList
-   * @param: list index number
-   * @return: true on success, false on failure
+  /** removes an Parameter object from paramList
+   * @param index - list index number of the Parameter object to be removed
+   * @return true on success, false on failure
    */
   public boolean removeParameter(int index) {
     return removeFromList(index, getParamList(), "paramList");
   }
 
-  /**A convenience method [same as $ArrayObj->dataCube()->maxDimensionIndex].
-   * Returns a SCALAR ARRAY REF of SCALARS (non-negative INTEGERS) which are the maximum index
-   * values along each dimension (FieldAxis and Axis objects).
+  /**A convenience method that returns an array ref of non-negative INTEGERS
+   * which are the maximum index values along each dimension (FieldAxis and Axis objects).
    */
   public int[] getMaxDataIndices () {
     return getDataCube().getMaxDataIndex();
 
   }
 
- /** addNote: insert a Note object into the list of notes in this Array object
-   * @param: Note
-   * @return: a Note object on success, null on failure
+ /** insert a Note object into the list of notes in this Array object
+   * @param n - Note to be added
+   * @return a Note object
    */
   public Note addNote(Note n) {
-/*
-    if (n == null) {
-      Log.warn("in Array.addNote(), the Note passed in is null");
-      return null;
-    }
-*/
+
     return getNotesObject().addNote(n);
-    //return n;
+
   }
 
-  /**removeNote: removes an XDF::Note object from the list of notes in this Array object
-   * @param: Note to be removed
-   * @return: true on success, false on failure
+  /**removes a Note object from the list of notes in this Array object
+   * @param what - Note to be removed
+   * @return true on success, false on failure
    */
    public boolean removeNote(Note what) {
      return (boolean) getNotesObject().removeNote(what); // removeFromList(what, getNoteList(), "noteList");
   }
 
 
-   /**removeNote: removes an XDF::Note object from the list of notes in this Array object
-   * @param: list index number
-   * @return: true on success, false on failure
+   /**removes a Note object from the list of notes in this Array object
+   * @param index - list index number of the Note to be removed
+   * @return true on success, false on failure
    */
   public boolean removeNote(int index) {
      return (boolean) getNotesObject().removeNote(index); // removeFromList(index, getNoteList(), "noteList");
   }
 
-  /**getNotes: Convenience method which returns a list of the notes held by
+  /**Convenience method which returns a list of the notes held by
    * this object.
    */
   public List getNotes() {
     return (List) getNotesObject().getNoteList();
   }
 
-  /**appendData: Append the string value onto the requested datacell
-   * (via DataCube> LOCATOR REF).
+  /** Append the string value onto the requested datacell
+   * (via DataCube LOCATOR REF).
    */
   public void appendData (Locator locator, String strValue) throws SetDataException{
      getDataCube().appendData(locator, strValue);
@@ -556,6 +526,10 @@ import java.util.Vector;
 
   }
 
+  /** Set the SCALAR value of the requested datacell
+   * (via LOCATOR ).
+   * Overwrites existing datacell value if any.
+   */
   public void setData (Locator locator, int numValue) throws SetDataException {
 
     try {
@@ -580,6 +554,9 @@ import java.util.Vector;
     }
   }
 
+  /**Get the String data in the requested datacell
+   *
+   */
   public String getStringData(Locator locator) throws NoDataException {
     try {
       return getDataCube().getStringData(locator);
@@ -589,6 +566,9 @@ import java.util.Vector;
     }
   }
 
+  /**Get the integer data in the requested datacell
+   *
+   */
   public int getIntData(Locator locator) throws NoDataException {
     try {
       return getDataCube().getIntData(locator);
@@ -597,7 +577,9 @@ import java.util.Vector;
       throw e;
     }
   }
-
+  /**Get the double data in the requested datacell
+   *
+   */
   public double getDoubleData(Locator locator) throws NoDataException {
     try {
       return getDataCube().getDoubleData(locator);
@@ -607,9 +589,8 @@ import java.util.Vector;
     }
   }
 
-  /** removeData : Remove the requested data from the indicated datacell
-   *  (via DataCube LOCATOR REF) in the XDF::DataCube held in this Array.
-   * (NOT CURRENTLY IMPLEMENTED).
+  /** Remove the requested data from the indicated datacell
+   *  (via DataCube LOCATOR REF) in the DataCube held in this Array.
    */
 
    public boolean  removeData (Locator locator) {
@@ -617,7 +598,7 @@ import java.util.Vector;
   }
 
 
-  /**getDataFormatList: Get the dataFormatList for this array.
+  /**Get the dataFormatList for this array.
    *
    */
   public DataFormat[] getDataFormatList() {
@@ -630,9 +611,9 @@ import java.util.Vector;
       return d;
     }
   }
-  /** addFieldAxis: A convenience method (same as setFieldAxis()).
+  /** A convenience method (same as setFieldAxis()).
    * Changes the FieldAxis object in this Array to the indicated one.
-   * @return: reference to fieldAxis if successful, null if not.
+   * @return reference to fieldAxis if successful, null if not.
    */
   public FieldAxis addFieldAxis(FieldAxis fieldAxis) {
     if (!canAddAxisObjToArray(fieldAxis))
@@ -660,6 +641,7 @@ import java.util.Vector;
     setDataFormat(null);
     return fieldAxis;
   }
+
   public FieldAxis getFieldAxis() {
     List axisList = getAxisList();
     if (axisList.size() == 0){  //empty axisList
@@ -689,7 +671,7 @@ import java.util.Vector;
   /** a special private method used by constructor methods to
    *  conviently build the XML attribute list for a given class.
    */
-  protected void init()
+  private void init()
   {
 
     classXDFNodeName = "array";
@@ -777,7 +759,7 @@ import java.util.Vector;
         cloneObj.paramGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.paramGroupOwnedHash.size()));
         Iterator iter = this.paramGroupOwnedHash.iterator();
         while (iter.hasNext()) {
-          cloneObj.paramGroupOwnedHash.add(iter.next());
+          cloneObj.paramGroupOwnedHash.add(((Group) iter.next()).clone());
         }
       }
     }
@@ -790,9 +772,8 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
-  * Revision 1.16  2000/11/10 06:23:14  thomas
-  * Updated init() method to be protected so inheriting
-  * classes may use. -b.t.
+  * Revision 1.17  2000/11/16 19:43:51  kelly
+  * *** empty log message ***
   *
   * Revision 1.15  2000/11/08 22:30:12  thomas
   * Changed set methods to return void. -b.t.
