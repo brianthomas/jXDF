@@ -2,16 +2,6 @@
 // XDF Array Class
 // CVS $Id$
 
-package gov.nasa.gsfc.adc.xdf;
-
-import java.util.Hashtable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.ArrayList;
-
 // Array.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
@@ -31,6 +21,18 @@ import java.util.ArrayList;
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
+
+package gov.nasa.gsfc.adc.xdf;
+
+import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 
  /** DESCRIPTION
   *  XDF is the eXtensible Data Structure, which is an XML format designed to contain n-dimensional
@@ -81,8 +83,8 @@ import java.util.ArrayList;
    * a SCALAR (ARRAY REF) of the list of Axis> objects held within this array.
    * paramList--
    * reference of the list of Parameter> objects held within in this Array.
-   * noteList--
-   * reference of the list of Note> objects held within this object.
+   * notes --
+   * reference of the object holding the list of Note objects held within this object.
    * dataCube
    * object ref of the DataCube> object which is a matrix holding the mathematical data
    * of this array.
@@ -219,7 +221,22 @@ import java.util.ArrayList;
    */
   public DataFormat getDataFormat()
   {
-    return (DataFormat) ((XMLAttribute) attribHash.get("dataFormat")).getAttribValue();
+     return (DataFormat) ((XMLAttribute) attribHash.get("dataFormat")).getAttribValue();
+  }
+
+  /** setNotesObject
+   */
+  public void setNotesObject (Notes notes)
+  {
+     ((XMLAttribute) attribHash.get("notes")).setAttribValue(notes);
+  }
+
+  /** getNotesObject
+     @return: the current *Notes* attribute object 
+   */
+  public Notes getNotesObject()
+  {
+     return (Notes) ((XMLAttribute) attribHash.get("notes")).getAttribValue();
   }
 
    /**setAxisList: set the *axisList* attribute
@@ -289,12 +306,12 @@ import java.util.ArrayList;
     return (DataCube) ((XMLAttribute) attribHash.get("dataCube")).getAttribValue();
   }
 
-  /** Set the *noteList* attribute
+   /** Set the *noteList* attribute
       @return: the current *noteList* attribute
-   */
-  public void setNoteList(List note) {
+    */
+   public void setNoteList(List note) {
      ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
-  }
+   }
 
    /**getNoteList
       @return: the current *noteList* attribute
@@ -349,23 +366,27 @@ import java.util.ArrayList;
     return paramGroupOwnedHash.remove(group);
   }
 
-   /** addAxis: insert an XDF::Axis object into the list of axises held by this Array object
-   * @param: XDF::Axis to be added
-   * @return: an XDF::Axis object on success, null on failure
+   /** addAxis: insert an Axis object into the list of axes held by this object. 
+       @param: Axis to be added
+       @return: an Axis object on success, null on failure
    */
-  public Axis addAxis(Axis axis) {
-    if (axis == null) {
-      Log.warn("in Array.addAxis(), the Axis passed in is null");
-      return null;
-    }
+   public Axis addAxis(Axis axis) {
 
-    if (!canAddAxisObjToArray(axis)) //check if the axis can be added
-      return null;
+      if (axis == null) {
+         Log.warn("in Array.addAxis(), the Axis passed in is null");
+         return null;
+      }
 
-    getDataCube().incrementDimension(axis );  //increment the DataCube dimension by 1
+     if (!canAddAxisObjToArray(axis)) //check if the axis can be added
+        return null;
 
-    getAxisList().add(axis);
-    return axis;
+     getDataCube().incrementDimension(axis );  //increment the DataCube dimension by 1
+
+     getAxisList().add(axis);
+
+     updateNotesLocationOrder(); // reset to the current order of the axes
+     
+     return axis;
   }
 
    /**removeAxis: removes an XDF::Axis object from axisList
@@ -480,17 +501,19 @@ import java.util.ArrayList;
 
   }
 
- /** addNote: insert an XDF::Note object into the list of notes in this Array object
-   * @param: XDF::Note
-   * @return: an XDF::Note object on success, null on failure
+ /** addNote: insert a Note object into the list of notes in this Array object
+   * @param: Note
+   * @return: a Note object on success, null on failure
    */
   public Note addNote(Note n) {
+/*
     if (n == null) {
       Log.warn("in Array.addNote(), the Note passed in is null");
       return null;
     }
-    getNoteList().add(n);
-    return n;
+*/
+    return getNotesObject().addNote(n);
+    //return n;
   }
 
   /**removeNote: removes an XDF::Note object from the list of notes in this Array object
@@ -498,7 +521,7 @@ import java.util.ArrayList;
    * @return: true on success, false on failure
    */
    public boolean removeNote(Note what) {
-     return removeFromList(what, getNoteList(), "noteList");
+     return (boolean) getNotesObject().removeNote(what); // removeFromList(what, getNoteList(), "noteList");
   }
 
 
@@ -507,14 +530,14 @@ import java.util.ArrayList;
    * @return: true on success, false on failure
    */
   public boolean removeNote(int index) {
-     return removeFromList(index, getNoteList(), "noteList");
+     return (boolean) getNotesObject().removeNote(index); // removeFromList(index, getNoteList(), "noteList");
   }
 
   /**getNotes: Convenience method which returns a list of the notes held by
    * this object.
    */
   public List getNotes() {
-    return getNoteList();
+    return (List) getNotesObject().getNoteList();
   }
 
   /**appendData: Append the string value onto the requested datacell
@@ -589,18 +612,18 @@ import java.util.ArrayList;
     }
   }
 
-  /**removeData : Remove the requested data from the indicated datacell
-   * (via DataCube LOCATOR REF) in the XDF::DataCube held in this Array.
-   * B<NOT CURRENTLY IMPLEMENTED>.
+  /** removeData : Remove the requested data from the indicated datacell
+   *  (via DataCube LOCATOR REF) in the XDF::DataCube held in this Array.
+   * (NOT CURRENTLY IMPLEMENTED).
    */
 
    public double  removeData (Locator locator, double numValue) {
     return getDataCube().removeData(locator, numValue);
   }
 
- /**removeData : Remove the requested data from the indicated datacell
+ /** removeData : Remove the requested data from the indicated datacell
    * (via DataCube LOCATOR REF) in the XDF::DataCube held in this Array.
-   * B<NOT CURRENTLY IMPLEMENTED>.
+   * (NOT CURRENTLY IMPLEMENTED).
    */
   public String  removeData (Locator locator, String strValue) {
     return getDataCube().removeData(locator, strValue);
@@ -676,7 +699,8 @@ import java.util.ArrayList;
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
-    attribOrder.add(0,"noteList");
+    attribOrder.add(0,"notes");
+    // attribOrder.add(0,"noteList");
     attribOrder.add(0,"dataCube");
     attribOrder.add(0,"xmlDataIOStyle");
     attribOrder.add(0, "axisList");
@@ -687,7 +711,8 @@ import java.util.ArrayList;
     attribOrder.add(0,"name");
 
     //set up the attribute hashtable key with the default initial value
-    attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put("notes", new XMLAttribute(new Notes(), Constants.OBJECT_TYPE));
+    // attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("dataCube", new XMLAttribute(new DataCube(this), Constants.OBJECT_TYPE));
 
 
@@ -736,10 +761,36 @@ import java.util.ArrayList;
     return true;
   }
 
- }
- /**
+   // Need to do this operation after every axis add
+   // reset to the current order of the axes.
+   // Note: IF there where lots of axes in an object
+   // then this could become a real processing bottleneck 
+   private void updateNotesLocationOrder () {
+
+      // ArrayList axisList = (ArrayList) getAxisList();
+      List axisList = getAxisList();
+      ArrayList axisIdList = new ArrayList();
+
+      // assemble the list of axisId's
+      Iterator iter = axisList.iterator();
+      while (iter.hasNext() ) {
+         AxisInterface axisObj = (AxisInterface) iter.next();
+         String axisIdRef = axisObj.getAxisId();
+         ((ArrayList) axisIdList).add(axisIdRef);
+      }
+      
+      Notes notesObj = getNotesObject();
+      notesObj.setLocationOrderList(axisIdList); 
+   }
+}
+
+/**
   * Modification History:
   * $Log$
+  * Revision 1.12  2000/11/02 19:44:29  thomas
+  * Added Notes object , removed old noteList XML attribute.
+  * Updated all add/remove/etc Notes methods. -b.t.
+  *
   * Revision 1.11  2000/11/02 18:06:33  thomas
   * Updated file to have void return from set methods.
   * Removed setParamOwnedHash and setDataCube
