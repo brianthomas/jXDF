@@ -1,10 +1,6 @@
 // XDF ExponentialDataFormat Class
 // CVS $Id$
 
-package gov.nasa.gsfc.adc.xdf;
-
-import java.util.Hashtable;
-
 // ExponentialDataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
@@ -26,6 +22,9 @@ import java.util.Hashtable;
 */
 
 
+package gov.nasa.gsfc.adc.xdf;
+
+import java.util.Hashtable;
 
 /**
  * ExponentialDataFormat.java:describes exponential (ASCII) floating point numbers
@@ -213,6 +212,9 @@ public class ExponentialDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/08 19:43:49  thomas
+ * Re-arranged header info to standard format for package. -b.t.
+ *
  * Revision 1.3  2000/10/27 21:15:47  kelly
  * get rid of classXDFNodeName, added specificDataFormatName to suit its
  * supper class DataFormat *toXDF*.  -k.z.
