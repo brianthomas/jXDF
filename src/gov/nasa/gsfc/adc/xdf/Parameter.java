@@ -1,8 +1,6 @@
+
 // XDF Parameter Class
 // CVS $Id$
-package gov.nasa.gsfc.adc.xdf;
-
-import java.util.*;
 
 // Parameter.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -24,7 +22,15 @@ import java.util.*;
 
 */
 
+package gov.nasa.gsfc.adc.xdf;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Parameter.java: An XDF::Parameter describes a scientific parameter assocated
