@@ -65,3 +65,5 @@
                       - add methods now uniformly return "boolean" rather than an object.
                       - added compression/decompression support for GZIP, Zip (bzip2, UNIX "compress" 
                         and Xmill still missing)
+                      - bug fix to valueGroup printing in toXMLOutputStream.
+                      - added convience methods for populating axis, fieldAxis at construction time.
