@@ -69,7 +69,7 @@ import java.util.HashSet;
        return group;
     }
 
-    /** Remove an XDF::ParameterGroup object from the hashset--paramGroupOwnedHash
+    /** Remove a ParameterGroup object from the hashset--paramGroupOwnedHash
         @return: true on success, false on failure
      */
     public boolean removeParamGroup(ParameterGroup group) {
@@ -86,7 +86,7 @@ import java.util.HashSet;
     //
 
     private void init () {
-       classXDFNodeName = "ParameterGroup";
+       classXDFNodeName = "parameterGroup";
     }
 
  }
