@@ -64,6 +64,7 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/Utility.java \
 	$(XDF_SOURCE_PATH)/Value.java \
 	$(XDF_SOURCE_PATH)/ValueGroup.java \
+	$(XDF_SOURCE_PATH)/XDF.java \
 	$(XDF_SOURCE_PATH)/XMLDataIOStyle.java
 
 #	$(XDF_SOURCE_PATH)/ExponentialDataFormat.java \
