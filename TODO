@@ -6,6 +6,12 @@
 
 	- Implement Formatted reads.
 
+        - make init protected for all main classes.
+
+        - in SaxDocumentHandler, need set/get for AxisObj, FieldObj, private
+          globals so we can mimic id/idref stuff. In fact, we should just
+          switch to 1 global array of generic objects... 
+
         - readId/readIdRef not implimented in SaxDocHandler (?)
 
         - XMLDataIOStyle has clone method in it, correct? (I did this, not kelly?)
