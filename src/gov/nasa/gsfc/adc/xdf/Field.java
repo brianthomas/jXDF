@@ -1,3 +1,4 @@
+
 // XDF Field Class
 // CVS $Id$
 
@@ -64,6 +65,7 @@
  * a OBJECT REF of the L<XDF::Units> object of this field. The XDF::Units object
  * is used to hold the L<XDF::Unit> objects.
  */
+
 package gov.nasa.gsfc.adc.xdf;
 import java.util.*;
 
@@ -103,156 +105,140 @@ public class Field extends BaseObject {
 
   }
 
+   //
+   //Get/Set Methods
+   //
 
- /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
+   /** Set the *name* attribute
+       @return: the current *name* attribute
+    */
+   public void setName (String strName)
+   {
+      ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+   }
+
+   /** getName
+       @return: the current *name* attribute
+    */
+   public String getName()
+   {
+      return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
+   }
+
+   /** set the *description* attribute
+       @return: the current *description* attribute
+    */
+   public void setDescription (String strDesc)
+   {
+      ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+   }
+
+   /** getDescription
+       @return: the current *description* attribute
    */
-  private void init()
-  {
+   public String getDescription() {
+      return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
+   }
 
-    classXDFNodeName = "field";
+   /** set the *fieldId* attribute
+       @return: the current *fieldId* attribute
+    */
+   public void setFieldId (String strField)
+   {
+      ((XMLAttribute) attribHash.get("fieldId")).setAttribValue(strField);
+   }
 
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"noteList");
-    attribOrder.add(0,"relation");
-    attribOrder.add(0,"units");
-    attribOrder.add(0,"dataFormat");
-    attribOrder.add(0,"class");
-    attribOrder.add(0,"fieldIdRef");
-    attribOrder.add(0,"fieldId");
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
+   /** getFieldId
+       @return: the current *fieldId* attribute
+    */
+   public String getFieldId()
+   {
+      return (String) ((XMLAttribute) attribHash.get("fieldId")).getAttribValue();
+   }
 
-     //set up the attribute hashtable key with the default initial value
-    attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("relation", new XMLAttribute(null, Constants.OBJECT_TYPE));  //double check
-    attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
-    attribHash.put("dataFormat", new XMLAttribute(null, Constants.OBJECT_TYPE));
-    attribHash.put("class", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("fieldIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("fieldId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+   /** set the *fieldIdRef* attribute
+       @return: the current *fieldIdRef* attribute
+    */
+   public void setFieldIdRef (String strField)
+   {
+      ((XMLAttribute) attribHash.get("fieldIdRef")).setAttribValue(strField);
+   }
 
-  };
+   /** getFieldIdRef
+       @return: the current *fieldIdRef* attribute
+    */
+   public String getFieldIdRef()
+   {
+      return (String) ((XMLAttribute) attribHash.get("fieldIdRef")).getAttribValue();
+   }
 
-  //
-  //Get/Set Methods
-  //
+   /** set the *units* attribute
+       @return: the current *units* attribute
+    */
+   public void setUnits (Units units)
+   {
+      ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
+   }
 
-  /**setName: set the *name* attribute
-   * @return: the current *name* attribute
-   */
-  public String setName (String strName)
-  {
-    return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
+   /** getUnits
+       @return: the current *units* attribute
+    */
+   public Units getUnits()
+   {
+      return (Units) ((XMLAttribute) attribHash.get("units")).getAttribValue();
+   }
 
-  }
-
-   /**getName
-   * @return: the current *name* attribute
-   */
-  public String getName()
-  {
-    return (String) ((XMLAttribute) attribHash.get("name")).getAttribValue();
-  }
-
-   /**setDescription: set the *description* attribute
-   * @return: the current *description* attribute
-   */
-  public String setDescription (String strDesc)
-  {
-    return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
-
-  }
-
-  /**getDescription
-   * @return: the current *description* attribute
-   */
-  public String getDescription() {
-    return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
-  }
-
-  /**setFieldId: set the *fieldId* attribute
-   * @return: the current *fieldId* attribute
-   */
-  public String setFieldId (String strField)
-  {
-    return (String) ((XMLAttribute) attribHash.get("fieldId")).setAttribValue(strField);
-
-  }
-  /**getFieldId
-   * @return: the current *fieldId* attribute
-   */
-  public String getFieldId()
-  {
-    return (String) ((XMLAttribute) attribHash.get("fieldId")).getAttribValue();
-  }
-
-  /**setParamIdRef: set the *fieldIdRef* attribute
-   * @return: the current *fieldIdRef* attribute
-   */
-  public String setFieldIdRef (String strField)
-  {
-    return (String) ((XMLAttribute) attribHash.get("fieldIdRef")).setAttribValue(strField);
-
-  }
-
-  /**getFieldIdRef
-   * @return: the current *fieldIdRef* attribute
-   */
-  public String getFieldIdRef()
-  {
-    return (String) ((XMLAttribute) attribHash.get("fieldIdRef")).getAttribValue();
-  }
-
-  /**setUnits: set the *units* attribute
-   * @return: the current *units* attribute
-   */
-  public Units setUnits (Units units)
-  {
-    return (Units) ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
-  }
-
-  /**getUnits
-   * @return: the current *units* attribute
-   */
-  public Units getUnits()
-  {
-    return (Units) ((XMLAttribute) attribHash.get("units")).getAttribValue();
-  }
-
-   /**setDataFormat: set the *dataFormat* attribute
-   * @return: the current *dataFormat* attribute
-   */
-  public DataFormat setDataFormat (DataFormat dataFormat)
-  {
-    return (DataFormat) ((XMLAttribute) attribHash.get("dataFormat")).setAttribValue(dataFormat);
-
-  }
+   /** setDataFormat: set the *dataFormat* attribute
+       @return: the current *dataFormat* attribute
+    */
+   public void setDataFormat (DataFormat dataFormat)
+   {
+       ((XMLAttribute) attribHash.get("dataFormat")).setAttribValue(dataFormat);
+   }
 
    /**getDataFormat
    * @return: the current *dataFormat* attribute
    */
-  public DataFormat getDataFormat()
-  {
-    return (DataFormat) ((XMLAttribute) attribHash.get("dataFormat")).getAttribValue();
-  }
+   public DataFormat getDataFormat()
+   {
+      return (DataFormat) ((XMLAttribute) attribHash.get("dataFormat")).getAttribValue();
+   }
 
-  /**setNoteList: set the *noteList* attribute
-   * @return: the current *noteList* attribute
-   */
-  public List setNoteList(List note) {
-    return (List)((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
-  }
+   /** set the *noteList* attribute
+      @return: the current *noteList* attribute
+    */
+   public void setNoteList(List note) 
+   {
+      ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
+   }
 
-  /**getNoteList
-   * @return: the current *noteList* attribute
+   /** getNoteList
+       @return: the current *noteList* attribute
    */
-  public List getNoteList() {
-    return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
-  }
+   public List getNoteList() 
+   {
+      return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
+   }
+
+   /** setRelationship: set the *relationship* attribute
+       @return: the current *dataFormat* attribute
+    */
+   public void setRelationship (FieldRelationship fieldRelation)
+   {
+       ((XMLAttribute) attribHash.get("relation")).setAttribValue(fieldRelation);
+   }
+
+   /** getRelationship
+       @return: the current *relationship* attribute
+   */
+   public FieldRelationship getRelationship ()
+   {
+      return (FieldRelationship) ((XMLAttribute) attribHash.get("relation")).getAttribValue();
+   }
+
+   // 
+   // Other public methods
+   //
 
   /** addNote: insert an XDF::Note object into the list of notes in this Field object
    * @param: XDF::Note
@@ -275,8 +261,6 @@ public class Field extends BaseObject {
      return removeFromList(what, getNoteList(), "noteList");
   }
 
-
-
    /**removeNote: removes an XDF::Note object from the list of notes in this Field object
    * @param: list index number
    * @return: true on success, false on failure
@@ -292,7 +276,7 @@ public class Field extends BaseObject {
     return getNoteList();
   }
 
-  /**addUnit: Insert an XDF::Unit object into the L<XDF::Units> object
+  /**addUnit: Insert a Unit object into the Units object
    * held in this object.
    * @param: Unit to be added
    * @return: an XDF::Unit object if successfull, null if not.
@@ -342,14 +326,53 @@ public class Field extends BaseObject {
       return false;
   }
 
+   //
+   // Private Methods
+   //
+
+   /** A special private method used by constructor methods to
+       conviently build the XML attribute list for a given class.
+    */
+   private void init()
+   {
+
+     classXDFNodeName = "field";
+
+     // order matters! these are in *reverse* order of their
+     // occurence in the XDF DTD
+     attribOrder.add(0,"noteList");
+     attribOrder.add(0,"relation");
+     attribOrder.add(0,"units");
+     attribOrder.add(0,"dataFormat");
+     attribOrder.add(0,"class");
+     attribOrder.add(0,"fieldIdRef");
+     attribOrder.add(0,"fieldId");
+     attribOrder.add(0,"description");
+     attribOrder.add(0,"name");
+
+      //set up the attribute hashtable key with the default initial value
+     attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put("relation", new XMLAttribute(null, Constants.OBJECT_TYPE));  //double check
+     attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
+     attribHash.put("dataFormat", new XMLAttribute(null, Constants.OBJECT_TYPE));
+     attribHash.put("class", new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put("fieldIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put("fieldId", new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+
+   };
+
 }
 
 
 /* Modification History:
  *
  * $Log$
- * Revision 1.7  2000/11/02 16:48:19  kelly
- * units is init as new Units() now.  -k.z.
+ * Revision 1.8  2000/11/02 17:05:29  thomas
+ * Units are inited as Unit obj rather than null (kelly);
+ * Field Relationship methods added. Clean up of file,
+ * set methods return void now. -b.t.
  *
  * Revision 1.6  2000/10/30 18:55:53  thomas
  * Attrib order in init had entry for "paramId" instead
