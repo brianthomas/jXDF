@@ -47,11 +47,15 @@ import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 
 // Java IO stuff
-import java.io.Reader;
+// import java.io.Reader;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader; // this can problably be dropped
+// import java.io.FileReader; // this can problably be dropped
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipInputStream;
 
 
 /** 
@@ -639,9 +643,9 @@ public class SaxDocumentHandler extends HandlerBase {
     // trying to do here.. At this time, it will read a file, 
     // I seriously doubt if this will really work for other URI's 
     // without serious change.
-    private String getHrefData (Href hrefObj) {
+    private String getHrefData (Href hrefObj, String compressionType) {
 
-       String buffer = null;
+       StringBuffer buffer = new StringBuffer();
 
        // well, we should be doing something with base here, 
        // but arent because it isnt captured by this API. feh.
@@ -651,15 +655,15 @@ public class SaxDocumentHandler extends HandlerBase {
 
           // we assume here that this is a file. hurm.
           String fileName = hrefObj.getSysId();
-          int size = 0;
+ //         int size = 0;
 
           try {
 
-             java.io.Reader in = null;
+             java.io.InputStream in = null;
 
              try {
                InputSource input = resolveEntity(hrefObj.getPubId(), hrefObj.getSysId()); 
-               in = (java.io.Reader) input.getCharacterStream();
+               in = input.getByteStream();
              } catch (SAXException e) {
                 Log.printStackTrace(e);
              } catch (NullPointerException e) {
@@ -667,20 +671,45 @@ public class SaxDocumentHandler extends HandlerBase {
                 // the parser open a regular URI connection to the system identifier.
                 // In our case, the sysId IS the filename.
                 File f = new File(hrefObj.getSysId());
-                size = (int) f.length();
-                in = (java.io.Reader) new FileReader(new File(hrefObj.getSysId()));
+//                size = (int) f.length();
+                in = (java.io.InputStream) new FileInputStream(new File(hrefObj.getSysId()));
              }
 
-             // ok, got a reader, read the info
-             // Need to use a buffered reader here!!!
-             if (in != null) {
-                char[] data = new char[size]; 
-                int chars_read = 0;
+             // ok, got an InputStream
+             // but do we have compressed data? If so wrap with decompress reader 
+             if (compressionType != null) {
+                if (compressionType.equals(Constants.DATA_COMPRESSION_GZIP)) {
+                   in = new GZIPInputStream(in);
+                } else if (compressionType.equals(Constants.DATA_COMPRESSION_ZIP)) {
+                   in = new ZipInputStream(in);
+                   ((ZipInputStream) in).getNextEntry(); // read only first entry for now 
+                } else {
+                   Log.errorln("Error: cant read data with compression type:"+compressionType);
+                   return new String("");
+                }
+             }
 
-                while (chars_read < size) 
-                  chars_read += in.read(data, chars_read, size-chars_read);
-          
-                buffer = new String(data);
+             // now, read the info
+             // *sigh*, we could be better off (faster) IF we actually populated the dataCube from
+             // here rather than insert it in a string Buffer and then re-parse it later on. *Pfhht*
+             if (in != null) {
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+                int size = 4096;
+                char[] data = new char[size]; 
+
+                int chars_this_read = 0;
+                int offset = 0;
+                while ( (chars_this_read = reader.read(data)) >= 0)
+                {
+                   buffer.append(data, 0, chars_this_read);
+                   if (chars_this_read < size) {
+                      break; // short read? then thats all
+                   } 
+                   offset += chars_this_read;
+                }
+
              }
   
           } catch (java.io.IOException e) {
@@ -688,10 +717,10 @@ public class SaxDocumentHandler extends HandlerBase {
           }
 
        } else {
-          Log.warnln("Can't read Href data, undefined sysId!");
+          Log.warnln("Can't read Href data, sysId is not defined! Ignoring read request.");
        }
 
-       return buffer;
+       return buffer.toString();
     } 
 
 
@@ -2444,7 +2473,10 @@ while(thisIter.hasNext()) {
 
           // tack in href data 
           if (CurrentArray.getDataCube().getHref() != null) 
-              DATABLOCK.append(getHrefData(CurrentArray.getDataCube().getHref()));
+              DATABLOCK.append(getHrefData(CurrentArray.getDataCube().getHref(), 
+                                           CurrentArray.getDataCube().getCompression()
+                                          )
+                              );
               //loadHrefDataIntoCurrentArray();
 
           // entered a datanode, raise the count 
@@ -4079,6 +4111,11 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.36  2001/06/27 21:19:01  thomas
+ * Better buffered reading of href data implimented
+ * (still not as good as it could be).
+ * Implemented reading of GZIP, Zip compressed Href data.
+ *
  * Revision 1.35  2001/06/26 21:22:25  huang
  * changed return type to boolean for all addObject()
  *
