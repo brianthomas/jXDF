@@ -63,10 +63,10 @@ public class ValueGroup extends Group {
     /**Insert a ValueGroup object into this object.
        @returna ValueGroup object reference on success, null on failure.
     */
-    public ValueGroup addValueGroup (ValueGroup group) {
+    public boolean addValueGroup (ValueGroup group) {
        //add the group to the groupOwnedHash
        addMemberObject((Object) group); 
-       return group;
+       return true;
     }
 
     /** Remove a ValueGroup object from this object.
@@ -98,6 +98,9 @@ public class ValueGroup extends Group {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2001/06/26 21:22:26  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.6  2001/05/04 20:26:41  thomas
  * added super.init() to init().
  *

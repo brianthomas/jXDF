@@ -33,14 +33,14 @@ import java.util.List;
 
 public interface ObjectWithParamsInterface {
 
-   public ParameterInterface addParameter (ParameterInterface param);
+   public boolean addParameter (ParameterInterface param);
    public boolean removeParameter (ParameterInterface param);
    public boolean removeParameter (int index);
    public void setParamList(List param);
    public List getParameters();
 
    // all of these objects can carry parametergroups too.
-   public ParameterGroup addParamGroup (ParameterGroup what);
+   public boolean addParamGroup (ParameterGroup what);
    public boolean removeParamGroup (ParameterGroup what);
 
 }
@@ -48,6 +48,9 @@ public interface ObjectWithParamsInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/06/26 21:22:25  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.1  2001/05/04 20:05:53  thomas
  * Initial version
  *

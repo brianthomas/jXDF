@@ -533,10 +533,10 @@ import java.util.Vector;
       * @param group - ParameterGroup to be added
       * @return a ParameterGroup object reference on success, null on failure.
       */
-     public ParameterGroup addParamGroup (ParameterGroup group) {
+     public boolean addParamGroup (ParameterGroup group) {
          //add the group to the groupOwnedHash
          paramGroupOwnedHash.add(group);
-         return group;
+         return true;
      }
    
      /**Remove an ParameterGroup object from the hashset--paramGroupOwnedHash
@@ -551,7 +551,7 @@ import java.util.Vector;
           @param axis - Axis to be added
           @return an Axis object on success, null on failure
       */
-     public AxisInterface addAxis (AxisInterface axis) {
+     public boolean addAxis (AxisInterface axis) {
 
         if (canAddAxisObjToArray(axis)) { //check if the axis can be added
 
@@ -574,10 +574,10 @@ import java.util.Vector;
 
 
         } else {  
-           return null;
+           return false;
         }
 
-        return axis;
+        return true;
 
      }
    
@@ -630,7 +630,7 @@ import java.util.Vector;
       * @param unit - Unit to be added
       * @return an Unit object
       */
-     public Unit addUnit(Unit unit) {
+     public boolean addUnit(Unit unit) {
        Units u = getUnits();
        if (u == null) {
          u = new Units();
@@ -675,9 +675,9 @@ import java.util.Vector;
       * @param p - the Parameter to be added
       * @return a Parameter object
       */
-     public ParameterInterface addParameter(ParameterInterface p) {
+     public boolean addParameter(ParameterInterface p) {
        getParameters().add(p);
-       return p;
+       return true;
      }
 
    /**removes an Parameter object from paramList
@@ -707,7 +707,7 @@ import java.util.Vector;
     * @param n - Note to be added
     * @return a Note object
     */
-   public NoteInterface addNote(NoteInterface n) {
+   public boolean addNote(NoteInterface n) {
        return getArrayNotes().addNote(n);
    }
    
@@ -1300,6 +1300,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.32  2001/06/26 21:22:25  huang
+  * changed return type to boolean for all addObject()
+  *
   * Revision 1.31  2001/06/26 19:44:58  thomas
   * added stuff to allow updating of dataCube in situations
   * where the axis size has changed.

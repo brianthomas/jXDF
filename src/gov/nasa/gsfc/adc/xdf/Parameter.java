@@ -263,9 +263,9 @@ public class Parameter extends BaseObject implements ParameterInterface {
    * @param v - Value to be added
    * @return an Value object
    */
-  public Value addValue(Value v) {
+  public boolean addValue(Value v) {
     getValueList().add(v);
-    return v;
+    return true;
   }
 
   /** removes an Value from the list of values in this Parameter object
@@ -281,10 +281,10 @@ public class Parameter extends BaseObject implements ParameterInterface {
    * @param group - ValueGroup to be added
    * @return a ValueGroup object
    */
-  public ValueGroup addValueGroup (ValueGroup group) {
+  public boolean addValueGroup (ValueGroup group) {
       //add the group to the groupOwnedHash
       valueGroupOwnedHash.add(group);
-      return group;
+      return true;
 
 
   }
@@ -316,9 +316,9 @@ public class Parameter extends BaseObject implements ParameterInterface {
    * @param Note
    * @return an Note object
    */
-  public NoteInterface addNote(NoteInterface n) {
+  public boolean addNote(NoteInterface n) {
     getNoteList().add(n);
-    return n;
+    return true;
   }
 
   /** removes an Note object from the list of notes in this Parameter object
@@ -344,7 +344,7 @@ public class Parameter extends BaseObject implements ParameterInterface {
    * @param Unit to be added
    * @return an Unit object if successfull, null if not.
    */
-  public Unit addUnit(Unit unit) {
+  public boolean addUnit(Unit unit) {
     return  getUnits().addUnit(unit);
   }
 
@@ -422,6 +422,9 @@ public class Parameter extends BaseObject implements ParameterInterface {
  /* Modification History
   *
   * $Log$
+  * Revision 1.17  2001/06/26 21:22:25  huang
+  * changed return type to boolean for all addObject()
+  *
   * Revision 1.16  2001/06/13 18:55:24  huang
   * added a contructor
   *

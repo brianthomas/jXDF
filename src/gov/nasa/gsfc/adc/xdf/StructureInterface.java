@@ -44,13 +44,13 @@ extends BaseObjectWithXMLElementsInterface,
    public String getDescription ();
    public void setDescription (String desc);
 
-   public ArrayInterface addArray (ArrayInterface array);
+   public boolean addArray (ArrayInterface array);
    public boolean removeArray(ArrayInterface array);
    public boolean removeArray(int index);
    public List getArrayList();
    public void setArrayList(List arrayList);
 
-   public StructureInterface addStructure (StructureInterface structure);
+   public boolean addStructure (StructureInterface structure);
    public boolean removeStructure (StructureInterface structure);
    public boolean removeStructure (int index);
    public List getStructList();
@@ -62,6 +62,9 @@ extends BaseObjectWithXMLElementsInterface,
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/06/26 21:22:25  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.1  2001/05/04 20:05:53  thomas
  * Initial version
  *

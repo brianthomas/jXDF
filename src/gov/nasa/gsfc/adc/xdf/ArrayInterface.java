@@ -74,7 +74,7 @@ extends BaseObjectWithXMLElementsInterface,
    public Object getNoDataValue();
    public void setNoDataValue(Object value);
 
-   public AxisInterface addAxis (AxisInterface axis);
+   public boolean addAxis (AxisInterface axis);
    public boolean removeAxis(AxisInterface axis);
    public boolean removeAxis(int index);
    public void setAxisList(List axisList);
@@ -123,6 +123,9 @@ extends BaseObjectWithXMLElementsInterface,
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/06/26 21:22:25  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.3  2001/06/26 19:44:58  thomas
  * added stuff to allow updating of dataCube in situations
  * where the axis size has changed.

@@ -235,9 +235,9 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param n - Note to be added
    * @return an Note object
    */
-  public NoteInterface addNote(NoteInterface n) {
+  public boolean addNote(NoteInterface n) {
     getNoteList().add(n);
-    return n;
+    return true;
   }
 
   /**removes an Note object from noteList
@@ -262,9 +262,9 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param p - Parameter
    * @return an Parameter object
    */
-  public ParameterInterface addParameter(ParameterInterface p) {
+  public boolean addParameter(ParameterInterface p) {
     getParamList().add(p);
-    return p;
+    return true;
   }
   /** removes an Parameter object from the parameter list. 
    * @param what - Parameter to be removed
@@ -286,9 +286,9 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param s - Structure to be added
    * @return an Structure object
    */
-  public StructureInterface addStructure(StructureInterface s) {
+  public boolean addStructure(StructureInterface s) {
     getStructList().add(s);
-    return s;
+    return true;
   }
 
   /** removes an Structure object from structList
@@ -311,9 +311,9 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param array - Array to be added
    * @return an Array object
    */
-  public ArrayInterface addArray(ArrayInterface array) {
+  public boolean addArray(ArrayInterface array) {
     getArrayList().add(array);
-    return array;
+    return true;
   }
 
   /** removes an Array object from arrayList
@@ -336,12 +336,10 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
    * @param ParameterGroup to be added
    * @return an ParameterGroup object reference
    */
-  public ParameterGroup addParamGroup (ParameterGroup group) {
+  public boolean addParamGroup (ParameterGroup group) {
     //add the group to the groupOwnedHash
     paramGroupOwnedHash.add(group);
-    return group;
-
-
+    return true;
   }
 
   /** Remove an ParameterGroup object from the hashset--paramGroupOwnedHash
@@ -411,6 +409,9 @@ public class Structure extends BaseObjectWithXMLElements implements StructureInt
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/06/26 21:22:25  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.19  2001/05/10 21:41:06  thomas
  * minor typesetting changes.
  *

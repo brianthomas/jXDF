@@ -123,10 +123,10 @@ public class Notes extends BaseObject implements NotesInterface {
        @param note - Note to be added
        @return a Note object if successfull, null if not.
     */
-   public NoteInterface addNote (NoteInterface note )
+   public boolean addNote (NoteInterface note )
    {
       getNoteList().add(note);
-      return note;
+      return true;
    }
 
    /** Remove a Note object the list of notes held in
@@ -194,6 +194,9 @@ public class Notes extends BaseObject implements NotesInterface {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.9  2001/06/26 21:22:25  huang
+  * changed return type to boolean for all addObject()
+  *
   * Revision 1.8  2001/05/04 20:30:50  thomas
   * Added Interface stuff.
   *

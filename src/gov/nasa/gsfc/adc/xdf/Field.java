@@ -343,9 +343,8 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
    * @param Note
    * @return an Note object
    */
-  public NoteInterface addNote(NoteInterface n) {
-    getNoteList().add(n);
-    return n;
+  public boolean addNote(NoteInterface n) {
+    return getNoteList().add(n);
   }
 
   /** removes an Note object from the list of notes in this Field object
@@ -383,7 +382,7 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
    * @param unit - Unit to be added
    * @return an Unit object
    */
-  public Unit addUnit(Unit unit) {
+  public boolean addUnit(Unit unit) {
 
     Units u = getUnits();
     if (u == null) {
@@ -489,6 +488,9 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/06/26 21:22:25  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.15  2001/05/04 20:25:13  thomas
  * changed super class to BaseObjectWIthXMLElements.
  * Added Interface stuff.

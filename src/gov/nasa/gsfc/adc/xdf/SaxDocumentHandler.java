@@ -2980,22 +2980,25 @@ while(thisIter.hasNext()) {
           if( parentNodeName.equals(XDFNodeName.ARRAY) ) 
           {
 
-            newparameter = (Parameter) CurrentArray.addParameter(newparameter);
+	      //newparameter = (Parameter) CurrentArray.addParameter(newparameter);
+	      CurrentArray.addParameter(newparameter);
 
           } else if ( parentNodeName.equals(XDFNodeName.ROOT) 
               || parentNodeName.equals(XDFNodeName.STRUCTURE) )
           {
-
-            newparameter = (Parameter) CurrentStructure.addParameter(newparameter);
+	      //            newparameter = (Parameter) CurrentStructure.addParameter(newparameter);
+	      CurrentStructure.addParameter(newparameter);
 
           } else if ( parentNodeName.equals(XDFNodeName.PARAMETERGROUP) ) 
 
           {
             // for now, just add as regular parameter 
             if(LastParameterGroupParentObject instanceof Array) {
-               newparameter = (Parameter) ((Array) LastParameterGroupParentObject).addParameter(newparameter);
+		//               newparameter = (Parameter) ((Array) LastParameterGroupParentObject).addParameter(newparameter);
+		((Array) LastParameterGroupParentObject).addParameter(newparameter);
             } else if(LastParameterGroupParentObject instanceof Structure) {
-               newparameter = (Parameter) ((Structure) LastParameterGroupParentObject).addParameter(newparameter);
+		//               newparameter = (Parameter) ((Structure) LastParameterGroupParentObject).addParameter(newparameter);
+		((Structure) LastParameterGroupParentObject).addParameter(newparameter);
             }
 
           } else {
@@ -3040,14 +3043,16 @@ while(thisIter.hasNext()) {
           if( parentNodeName.equals(XDFNodeName.ARRAY) )
           {
 
-              newparamGroup = CurrentArray.addParamGroup(newparamGroup);
+	      //              newparamGroup = CurrentArray.addParamGroup(newparamGroup);
+	      CurrentArray.addParamGroup(newparamGroup);
               LastParameterGroupParentObject = (Object) CurrentArray;
 
           } else if ( parentNodeName.equals(XDFNodeName.ROOT)
               || parentNodeName.equals(XDFNodeName.STRUCTURE) )
           {
 
-              newparamGroup = CurrentStructure.addParamGroup(newparamGroup);
+	      //              newparamGroup = CurrentStructure.addParamGroup(newparamGroup);
+	      CurrentStructure.addParamGroup(newparamGroup);
               LastParameterGroupParentObject = CurrentStructure;
 
           } else if ( parentNodeName.equals(XDFNodeName.PARAMETERGROUP) )
@@ -3056,8 +3061,8 @@ while(thisIter.hasNext()) {
 
               ParameterGroup LastParamGroupObject = (ParameterGroup) 
                    CurrentParameterGroupList.get(CurrentParameterGroupList.size()-1); 
-              newparamGroup = LastParamGroupObject.addParamGroup(newparamGroup);
-
+	      //              newparamGroup = LastParamGroupObject.addParamGroup(newparamGroup);
+	      LastParamGroupObject.addParamGroup(newparamGroup);
           } else {
 
               Log.errorln(" weird parent node $parent_node_name for parameterGroup");
@@ -3490,12 +3495,13 @@ while(thisIter.hasNext()) {
           if( gParentNodeName.equals(XDFNodeName.PARAMETER) )
           {
 
-              newunit = LastParameterObject.addUnit(newunit);
-
+	      //              newunit = LastParameterObject.addUnit(newunit);
+	      LastParameterObject.addUnit(newunit);
           } else if ( gParentNodeName.equals(XDFNodeName.FIELD) )
           {
 
-              newunit = LastFieldObject.addUnit(newunit);
+	      //              newunit = LastFieldObject.addUnit(newunit);
+	      LastFieldObject.addUnit(newunit);
 
           } else if ( gParentNodeName.equals(XDFNodeName.AXIS) )
           {
@@ -3506,7 +3512,8 @@ while(thisIter.hasNext()) {
               AxisInterface lastAxisObject = (AxisInterface) axisList.get(axisList.size()-1);
 //              Axis lastAxisObject = (Axis) CurrentArray.getAxes().get(CurrentArray.getAxes().size()-1);
               if(lastAxisObject instanceof Axis) {
-                 newunit = ((Axis) lastAxisObject).addUnit(newunit);
+		  //                 newunit = ((Axis) lastAxisObject).addUnit(newunit);
+		  ((Axis) lastAxisObject).addUnit(newunit);
               } else {
                  Log.errorln("Tried to add Unit to FieldAxis!! Aborting!");
                  System.exit(-1);
@@ -3514,9 +3521,8 @@ while(thisIter.hasNext()) {
 
           } else if ( gParentNodeName.equals(XDFNodeName.ARRAY) )
           {
-
-              newunit = CurrentArray.addUnit(newunit);
-
+	      //              newunit = CurrentArray.addUnit(newunit);
+	      CurrentArray.addUnit(newunit);
           } else {
               Log.warnln("Unknown grandparent object, cant add unit, ignoring.");
           }
@@ -3583,16 +3589,15 @@ while(thisIter.hasNext()) {
                  // determine where this goes and then insert it 
                  if( parentNodeName.equals(XDFNodeName.PARAMETER) )
                  {
-
-                    newvalue = LastParameterObject.addValue(newvalue);
-
+		     //                    newvalue = LastParameterObject.addValue(newvalue);
+		     LastParameterObject.addValue(newvalue);
                  } else if ( parentNodeName.equals(XDFNodeName.AXIS) )
                  {
 
                     List axisList = (List) CurrentArray.getAxes();
                     Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-                    newvalue = lastAxisObject.addAxisValue(newvalue);
-
+		    //                    newvalue = lastAxisObject.addAxisValue(newvalue);
+		    lastAxisObject.addAxisValue(newvalue);
 //          } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
 //          {
 //
@@ -3680,16 +3685,15 @@ while(thisIter.hasNext()) {
           // determine where this goes and then insert it 
           if( parentNodeName.equals(XDFNodeName.PARAMETER) )
           {
-
-              newvalue = LastParameterObject.addValue(newvalue);
-
+	      //              newvalue = LastParameterObject.addValue(newvalue);
+	      LastParameterObject.addValue(newvalue);
           } else if ( parentNodeName.equals(XDFNodeName.AXIS) ) 
           {
 
               List axisList = (List) CurrentArray.getAxes();
               Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-              newvalue = lastAxisObject.addAxisValue(newvalue);
-
+	      //              newvalue = lastAxisObject.addAxisValue(newvalue);
+	      lastAxisObject.addAxisValue(newvalue);
 //          } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
 //          {
 //
@@ -3737,14 +3741,15 @@ while(thisIter.hasNext()) {
               // get the last axis
               List axisList = (List) CurrentArray.getAxes();
               Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-              newvalueGroup = lastAxisObject.addValueGroup(newvalueGroup);
-
+	      //              newvalueGroup = lastAxisObject.addValueGroup(newvalueGroup);
+	      lastAxisObject.addValueGroup(newvalueGroup);
               LastValueGroupParentObject = lastAxisObject;
 
           } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
           {
 
-              newvalueGroup = LastParameterObject.addValueGroup(newvalueGroup);
+	      //              newvalueGroup = LastParameterObject.addValueGroup(newvalueGroup);
+	      LastParameterObject.addValueGroup(newvalueGroup);
               LastValueGroupParentObject = LastParameterObject;
 
           } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
@@ -3753,8 +3758,8 @@ while(thisIter.hasNext()) {
 
              ValueGroup lastValueGroup = (ValueGroup) 
                     CurrentValueGroupList.get(CurrentValueGroupList.size()-1);
-             newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
-
+	     //             newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
+	     lastValueGroup.addValueGroup(newvalueGroup);
           } else {
              Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUEGROUP);
              System.exit(-1); // fatal error, shut down 
@@ -4010,7 +4015,8 @@ while(thisIter.hasNext()) {
                     while (iter.hasNext()) {
                         String valuePCDATA = (String) iter.next();
                         Value value = new Value (valuePCDATA);
-                        valueObjList.add(myParamObject.addValue(value));
+			((Parameter) LastValueGroupParentObject).addValue(value);
+                        valueObjList.add(value);
                     }
 
                 } else if ( LastValueGroupParentObject instanceof Axis )
@@ -4041,7 +4047,8 @@ while(thisIter.hasNext()) {
                  {
                     String valuePCDATA = (String) iter.next();
                     Value value = new Value (valuePCDATA);
-                    valueObjList.add(LastParameterObject.addValue(value));
+		    LastParameterObject.addValue(value);
+                    valueObjList.add(value);
                  }
 
              } else {
@@ -4072,6 +4079,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.35  2001/06/26 21:22:25  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.34  2001/06/19 15:06:56  thomas
  * removed DTD handler info, as its duplicated in Specification class
  *

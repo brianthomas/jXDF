@@ -428,7 +428,7 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
    * @param unit - Unit to be added
    * @return an Unit object
    */
-  public Unit addUnit(Unit unit) {
+  public boolean addUnit(Unit unit) {
     return  getAxisUnits().addUnit(unit);
   }
 
@@ -454,10 +454,10 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
    * @Value: group - ValueGroup to be added
    * @returnan a ValueGroup object reference
    */
-  public ValueGroup addValueGroup (ValueGroup group) {
+  public boolean addValueGroup (ValueGroup group) {
       //add the group to the groupOwnedHash
       valueGroupOwnedHash.add(group);
-      return group;
+      return true;
 
   }
 
@@ -564,6 +564,9 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.23  2001/06/26 21:22:25  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.22  2001/06/26 19:44:58  thomas
  * added stuff to allow updating of dataCube in situations
  * where the axis size has changed.

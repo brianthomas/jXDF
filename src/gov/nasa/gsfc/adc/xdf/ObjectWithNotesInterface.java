@@ -33,7 +33,7 @@ import java.util.List;
 
 public interface ObjectWithNotesInterface {
 
-   public NoteInterface addNote (NoteInterface note);
+   public boolean addNote (NoteInterface note);
    public boolean removeNote (NoteInterface note);
    public boolean removeNote (int index);
    public void setNotes(List notesList);
@@ -44,6 +44,9 @@ public interface ObjectWithNotesInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/06/26 21:22:25  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.1  2001/05/04 20:05:53  thomas
  * Initial version
  *

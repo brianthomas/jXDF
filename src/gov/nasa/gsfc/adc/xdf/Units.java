@@ -162,9 +162,9 @@ import java.io.OutputStream;
    * @param Unit to be added
    * @return an Unit object if successfull, null if not.
    */
-  public Unit addUnit(Unit unit) {
+  public boolean addUnit(Unit unit) {
     getUnitList().add(unit);
-    return unit;
+    return true;
   }
 
    /** Remove an Unit object the list of units held in
@@ -279,6 +279,9 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/06/26 21:22:26  huang
+ * changed return type to boolean for all addObject()
+ *
  * Revision 1.15  2001/05/24 17:24:24  huang
  * added/modified constructors and other convenience methods
  *
