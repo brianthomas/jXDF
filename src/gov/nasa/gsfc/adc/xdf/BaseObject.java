@@ -548,12 +548,17 @@ public abstract class BaseObject implements Serializable, Cloneable {
        Return a string representation of the corresponnding XML representation of this object.
    */
   public String toXMLString () 
-  throws java.io.IOException
   {
 
      // hurm. Cant figure out how to use BufferedWriter here. fooey.
      Writer outputWriter = (Writer) new StringWriter();
-     toXMLWriter(outputWriter, "", false, null, null);
+     try {
+        toXMLWriter(outputWriter, "", false, null, null);
+     } catch (java.io.IOException e) { 
+        // weird. Out of memorY?
+        Log.errorln("Cant got IOException for toXMLWriter() method within toXMLString().");
+        Log.printStackTrace(e);
+     }
 
      return outputWriter.toString();
 
@@ -919,6 +924,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.53  2001/07/31 21:09:46  thomas
+ * toXMLString no longer throws ioexception.
+ *
  * Revision 1.52  2001/07/26 15:55:42  thomas
  * added flush()/close() statement to outputWriter object as
  * needed to get toXMLOutputStream to work properly.
