@@ -31,11 +31,15 @@ package gov.nasa.gsfc.adc.xdf;
 public interface AxisInterface {
   public int getLength();
   public String getAxisId();
+  public String getAlign();
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/02/07 18:42:57  thomas
+ * No real change. -b.t.
+ *
  * Revision 1.4  2000/11/16 19:50:07  kelly
  * fixed documentation.  -k.z.
  *
