@@ -193,7 +193,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
     List axisList = getParentArray().getAxisList();
     String axisId;
     for (int i = 0; i< axisList.size(); i++) {
-      axisId = ((Axis)axisList.get(i)).getAxisId();
+      axisId = ((AxisInterface)axisList.get(i)).getAxisId();
       indents.add(nextIndent);
       if (niceOutput)
         writeOut(outputstream, nextIndent);
@@ -232,9 +232,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
    public List getReadAxisOrder() {
     List readList = new ArrayList();
     List axisList = getParentArray().getAxisList();
-    Axis axisObj;
+    AxisInterface axisObj;
     for (int i = 0; i< axisList.size(); i++) {
-      axisObj = (Axis) axisList.get(i);
+      axisObj = (AxisInterface) axisList.get(i);
       readList.add(axisObj.getAxisId());
     }
 
@@ -248,6 +248,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/10/30 18:17:01  kelly
+ * Axis and FieldAxis now share common interface.  -k.z.
+ *
  * Revision 1.3  2000/10/27 21:25:34  kelly
  * minor fix
  *
