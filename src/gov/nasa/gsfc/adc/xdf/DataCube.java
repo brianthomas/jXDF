@@ -57,7 +57,7 @@ public class DataCube extends BaseObject {
   private static final String HREF_XML_ATTRIBUTE_NAME = "href";
 
   private int dimension = 0;;
-  private Array parentArray;
+  private ArrayInterface parentArray;
   private boolean hasMoreData;
 
   /**
@@ -76,7 +76,7 @@ public class DataCube extends BaseObject {
 
   /** The constructor that takes parentArray as param.
    */
-  public DataCube(Array parentArray) {
+  public DataCube(ArrayInterface parentArray) {
      this.parentArray = parentArray;
      init();
   }
@@ -191,7 +191,7 @@ public class DataCube extends BaseObject {
   }
 
 
-  public Array getParentArray() {
+  public ArrayInterface getParentArray() {
      return parentArray;
   }
 
@@ -495,14 +495,15 @@ public void setData (Locator locator, double numValue)
 throws SetDataException
 {
 
-// Log.debugln("double setData["+numValue+"]");
 
   List axisList = parentArray.getAxes();
   List prev = data;
   List current = data;
+
+  // find the number of axes. Base handling on number
   int numOfAxis = axisList.size();
-  if (numOfAxis == 1) {
-    Axis axis = (Axis) axisList.get(0);
+  if (numOfAxis == 1) { // only one axis 
+    AxisInterface axis = (AxisInterface) axisList.get(0);
     int index = locator.getAxisIndex(axis);
 
     if (data.get(0) == null) {
@@ -551,13 +552,19 @@ throws SetDataException
 
   } //  end of if (numOfAxis == 1)
 
-  //contructs arraylist of arraylist to represent the multi-dimension
-  for (int i = numOfAxis-1 ; i >=2; i--) {
-    Axis axis = (Axis) axisList.get(i);
+  // Multiple axes handling. 
+
+  // constructs arraylist for first 2 dimensions as a beginning for
+  // representing the multi-dimension data?? 
+  for (int i = numOfAxis-1 ; i >= 2; i--) { // orig line. 3 dimensions?? 
+//  for (int i = numOfAxis-1 ; i > 2; i--) {
+    AxisInterface axis = (AxisInterface) axisList.get(i);
     int index =  locator.getAxisIndex(axis);
     int end = axis.getLength() - prev.size();
     for (int k = 0; k < end ; k++)  //expand it if prev.size < index+1
-      prev.add(null);
+    {
+        prev.add(null);
+    }
     current = (List) prev.get(index);
     if (current == null) {  //expand the datacube
       int length = ((Axis) axisList.get(i-1)).getLength();
@@ -573,12 +580,13 @@ throws SetDataException
   int index0;
   int index1;
   if (parentArray.hasFieldAxis()) {
-    index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
-    index1 = locator.getAxisIndex((Axis) axisList.get(1) );
+    //FieldAxis is always the second to last innermost layer
+    index0 = locator.getAxisIndex((AxisInterface) axisList.get(0));
+    index1 = locator.getAxisIndex((AxisInterface) axisList.get(1));
   }
   else {
-    index0 = locator.getAxisIndex((Axis) axisList.get(1) );
-    index1 = locator.getAxisIndex((Axis) axisList.get(0));
+    index0 = locator.getAxisIndex((AxisInterface) axisList.get(1) );
+    index1 = locator.getAxisIndex((AxisInterface) axisList.get(0));
   }
 
   int stop = 2*(index0+1)-current.size();
@@ -591,15 +599,12 @@ throws SetDataException
     int length;
     //expand array of byte and String
     if (parentArray.hasFieldAxis())
-      length= ((Axis) axisList.get(1)).getLength();
+      length= ((AxisInterface) axisList.get(1)).getLength();
     else
-      length = ((Axis) axisList.get(0)).getLength();
+      length = ((AxisInterface) axisList.get(0)).getLength();
     current.set(newCoordinate, new byte[length]);
     current.set(newCoordinate+1, new double[length]);
   }
-
-//Log.debugln("Current is"+current.getClass().toString());
-//Log.debugln("retrieve item is"+ current.get(newCoordinate+1));
 
   int arrayLength = ((double[]) current.get(newCoordinate+1)).length;
   if ( arrayLength< index1+1) {  ////have to expand the array
@@ -720,10 +725,10 @@ throws SetDataException
  int index1;
  if (parentArray.hasFieldAxis()) { //fieldAxis is always the 2nd to last layer
     index0 = locator.getAxisIndex((FieldAxis) axisList.get(0));
-    index1 = locator.getAxisIndex((Axis) axisList.get(1) );
+    index1 = locator.getAxisIndex((Axis) axisList.get(1));
   }
   else {
-    index0 = locator.getAxisIndex((Axis) axisList.get(1) );
+    index0 = locator.getAxisIndex((Axis) axisList.get(1));
     index1 = locator.getAxisIndex((Axis) axisList.get(0));
   }
 
@@ -788,8 +793,6 @@ throws SetDataException
 public void setData (Locator locator, String strValue) 
 throws SetDataException
 {
-
-// Log.debugln("setData["+strValue+"]");
 
   List axisList = parentArray.getAxes();
   List prev = data;
@@ -1161,7 +1164,11 @@ protected boolean  removeData (Locator locator) {
     }
     else {
           NoDataValues = new String[1];
-          NoDataValues[0] = parentArray.getNoDataValue();
+          String value = (String) null;
+          if (parentArray.getNoDataValue() != null) {
+              value = parentArray.getNoDataValue().toString(); // this is a HACK 
+          }
+          NoDataValues[0] = value;
 /*
      // what tis this?? If there is no fieldAxis, then no fields,
      // and hence, only ONE noDataValue.
@@ -1850,6 +1857,10 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.28  2001/05/04 20:22:01  thomas
+  * Minor bugfixes. Implement ArrayInterface for parentArray. Implement
+  * AxisInterface in places, but not complete with this work.
+  *
   * Revision 1.27  2001/05/02 18:16:39  thomas
   * Minor changes related to API standardization effort.
   *
