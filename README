@@ -12,6 +12,12 @@
 	in this distribution for more information on the terms of 
 	this license.
 
+        To use the XDF package you will need to acquire the org.xml.sax 
+        package. The SAX package ships with a simple non-validating
+	(and fast) parser from SUN, however, you may use other XML
+ 	parsers with XDF if you so choose (we use Xerces from the 
+        apache project). 
+
 	As you might guess, this package is currently under heavy 
 	construction. That said, a subset of the final forseen 
 	functionality of the package is fairly well implemented. 
@@ -19,14 +25,12 @@
 	The stability and features of the java objects is good, the 
 	main lack remains in the IO portion of the package. At this 
 	time it is possible to create java XDF structure objects from
-	both delimited and tagged ASCII data (of any dimensionality).
-	Binary data is not currently implemented, nor is the formatted
-       	read/write functionality. Delimited writes work unless newline
-	returns are used as either a delimiter or recordTerminator
-	character.
+	all supported types of ASCII data (of any dimensionality).
+	Binary data is not currently implemented.
 
 	This package supports SAX1 parsers. SAX2 and schema will be 
-	supported as soon as these become comfortably mature recogmendations. 
+	supported as soon as these become comfortably mature W3C
+        recogmendations. 
 
 	For more details on missing features/problems that remain in 
 	the package please refer to the TODO file.
@@ -72,9 +76,10 @@
 
        Individual credits for material included in this package :
 
-       Brian Thomas (Project Lead, object design, baseObject/Reader classes) 
-       Kelly Zeng   (Perl porting, several new classes unforseen by Brian) 
+       Brian Thomas (Project design and lead programmer) 
+       Kelly Zeng   (Porting of Perl to Java, several new classes unforseen by Brian) 
        Lynne Case   (Code review and critical comments) 
+       Ed Shaya     (XDF DTD development)
 
 
    For information concerning this code:

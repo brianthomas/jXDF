@@ -201,7 +201,7 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     return (Field) getFieldList().get(index);
   }
 
-  /** convience method that returns all field object held in this FieldAxis
+  /** convenience method that returns all field object held in this FieldAxis
    * object.
    * @return a list of field object reference(ordered by field axis index)
    */
@@ -287,7 +287,7 @@ public class FieldAxis extends BaseObject implements AxisInterface{
   //
 
   /** A special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
+   *  conveniently build the XML attribute list for a given class.
    */
   protected void init()
   {
@@ -322,6 +322,9 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.13  2001/01/19 17:24:07  thomas
+  * *** empty log message ***
+  *
   * Revision 1.12  2000/11/27 16:57:45  thomas
   * Made init method protected so that extending
   * Dataformats may make use of them. -b.t.
