@@ -62,11 +62,24 @@ import java.util.*;
       return false;
     }
 
+     public static boolean isValidEncoding(String strEncoding) {
+      List encodingList = Constants.ENCODINGS_LIST;
+      for (int i = 0; i< encodingList.size(); i++) {
+        if (strEncoding.equals(encodingList.get(i)))
+          return true;
+      }
+      return false;
+    }
+
+
   }  //end of Utility class
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/10/18 18:48:34  kelly
+ * added isValidEncoding method.  -k.z.
+ *
  * Revision 1.1  2000/10/16 14:52:41  kelly
  * create the class for util routines.  --k.z.
  *
