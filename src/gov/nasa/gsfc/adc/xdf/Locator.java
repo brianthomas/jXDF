@@ -123,6 +123,18 @@ import java.util.List;
     }
   }
 
+  public boolean hasNext() {
+    int size = axisOrderList.size();
+    for (int i = 0; i < size ; i++) {
+      AxisInterface axis = (AxisInterface) axisOrderList.get(i);
+      int index = ((Integer) locations.get(axis)).intValue();
+      if (index < axis.getLength()-1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**next: Change the locator coordinates to the next datacell as
    * determined from the locator iteration order.
    *  Returns '0' if it must cycle back to the first datacell
@@ -145,6 +157,8 @@ import java.util.List;
     }
     return !outofDataCells;
   }
+
+
 
   /**prev: Change the locator coordinates to the previous datacell as
    * determined from the locator iteration order.
@@ -279,6 +293,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2000/11/09 23:25:18  kelly
+ * added hasNext() method
+ *
  * Revision 1.12  2000/11/09 04:24:12  thomas
  * Implimented small efficiency improvements to traversal
  * loops. -b.t.
