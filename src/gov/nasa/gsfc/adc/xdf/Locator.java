@@ -179,6 +179,29 @@ import java.util.List;
   }
 
 
+  /**
+   * set location according to dimension indexes;
+   * e.g. [1,2] means the 2nd row and 3rd column in a 2-d table
+   * (index starts at 0).
+   * @return boolean: true if the input indexes are within the
+   * array axes' range; false, otherwise
+   */
+  public boolean setLocation(int [] location) {
+      if (location.length != dimension)
+	  return false; // error msg???
+      for (int i=0; i<dimension; i++) {
+	  AxisInterface axis = (AxisInterface) axisOrderList.get(i);
+	  // Ping??? some general Array dataCell exception class
+	  // should be defined to handle this type of errors elegantly
+	  if (location[i] >= 0 && location[i] <= axis.getLength()-1)
+	      locations.put(axis, new Integer(location[i]));
+	  else
+	      return false; // error msg ???
+      }
+      return true;
+  }
+
+
   /** Change the locator coordinates to the next datacell as
       determined from the locator iteration order.
       Returns false if it must cycle back to the first datacell
@@ -190,7 +213,7 @@ import java.util.List;
 
     nextCellAvailable = true;
 
-    for (int i = 0; i < dimension ; i++) {
+    for (int i = 0; i < dimension; i++) {
       AxisInterface axis = (AxisInterface) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
       // are we still within the axis?
@@ -317,6 +340,7 @@ import java.util.List;
 
     //
     //PROTECTED methods
+    // (These 3 methods should not be here, solution Ping???)
     //
 
     /** Add an axis object to the list of axes within this Locator.
@@ -330,6 +354,7 @@ import java.util.List;
           return false;
        }
        locations.put(addAxisObj, new Integer(0));
+       dimension++;
        return true;
 
     }
@@ -343,6 +368,7 @@ import java.util.List;
        int index = axisOrderList.indexOf(removeAxisObj);
        if (index > -1) { 
           removeAxis(index);
+	  dimension--;
        } else  
           Log.warnln("Locator.removeAxis() could not remove Axis from locator.");
 
@@ -354,9 +380,10 @@ import java.util.List;
     protected void removeAxis(int index) {
 
        Object removedAxisObj = axisOrderList.remove(index);
-       if (removedAxisObj != null) 
+       if (removedAxisObj != null) {
           locations.remove(removedAxisObj);
-
+	  dimension--;
+       }
     }
 
     //
@@ -364,10 +391,6 @@ import java.util.List;
     //
 
     private void init (Array array) {
-
-       // just created, must have a next cell but no previous cell
-       nextCellAvailable = true;
-       prevCellAvailable = false;
 
        // set the parentArray
        parentArray = array;
@@ -378,12 +401,27 @@ import java.util.List;
          to the origin (ie index 0 for each axis).
          We choose the parent Array axisList ordering for our
          default location ordering.
+
+	 We also assume every array has data, 
+         i.e.  axisList != null
        */
 
       List axisList = parentArray.getAxes();
-      dimension = axisList.size();
+      if (axisList == null) {
+	  // shoudl thorw an exception, allowed by dtd???
+	  // could use jdk1.4 assertion???
+	  locations = new Hashtable();
+          dimension=0;
+	  nextCellAvailable = false;
+      } else {
+	  locations = new Hashtable(axisList.size());
+          dimension = axisList.size();
+	  nextCellAvailable = true;
+      }
 
-      locations = new Hashtable(axisList.size());
+      // at the first element (if any), no PREVious element available
+      prevCellAvailable = false;
+
       axisOrderList = Collections.synchronizedList(new ArrayList());
 
       // lastly, set the iteration order.
@@ -396,5 +434,15 @@ import java.util.List;
 
 
 }  //end of Locator class
+
+
+
+
+
+
+
+
+
+
 
 
