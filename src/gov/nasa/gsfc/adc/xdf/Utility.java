@@ -31,6 +31,11 @@ package gov.nasa.gsfc.adc.xdf;
 
   public class Utility {
     public static boolean isValidEndian(String strEndian) {
+
+      // tagged dataformat (which must be all ASCII) will need to have
+      // the null value set here.
+      // if (strEndian == null) return true;
+
       String[] endianList = Constants.ENDIANS_LIST;
       int stop = endianList.length;
       for (int i = 0; i < stop; i++) {
@@ -184,6 +189,9 @@ package gov.nasa.gsfc.adc.xdf;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/09/18 17:44:13  thomas
+ * small documentation insert
+ *
  * Revision 1.10  2001/09/14 18:22:01  thomas
  * added isValidStandalone method
  *
