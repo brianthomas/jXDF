@@ -46,3 +46,6 @@
                        from consideration.
                      - Added append array functionality.
       
+0.17-beta0_1 3/28/01  bug fix
+                     - bug in BaseObject class that caused crash for certain toXMLOutputStream 
+                       calls (private field XMLNotationHash not properly declared). FIXED. 
