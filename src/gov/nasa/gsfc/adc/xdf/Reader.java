@@ -81,6 +81,13 @@ public class Reader
        myDocumentHandler = new SaxDocumentHandler(xdfObject);
     }
 
+    /** Pass a document handler to use by the Reader. 
+     */
+    public Reader(SaxDocumentHandler docHandler) 
+    {
+       myDocumentHandler = docHandler;
+    }
+
     //
     // Public Methods
     //
@@ -300,7 +307,6 @@ public class Reader
 
         // now parse it, return whatever structure is derived 
         XDF myXDFObject = parse(input);
-System.err.println("parseString returns object:"+myXDFObject);
         return myXDFObject;
 
     }
@@ -361,6 +367,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.22  2001/09/27 17:21:03  thomas
+ * added new construtor that takes a SaxDocumentHandler as an argv
+ *
  * Revision 1.21  2001/09/20 21:00:02  thomas
  *  now converts SAXExceptions,etc into java.io.exceptions
  *
