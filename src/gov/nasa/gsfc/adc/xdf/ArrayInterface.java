@@ -77,6 +77,7 @@ extends BaseObjectWithXMLElementsInterface,
    public AxisInterface addAxis (AxisInterface axis);
    public boolean removeAxis(AxisInterface axis);
    public boolean removeAxis(int index);
+   public void setAxisList(List axisList);
    public List getAxes();
    public FieldAxis getFieldAxis ();
    public boolean setFieldAxis (FieldAxis fieldAxis);
@@ -117,6 +118,9 @@ extends BaseObjectWithXMLElementsInterface,
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/06/18 17:09:09  thomas
+ * added setAxisList to interface.
+ *
  * Revision 1.1  2001/05/04 20:05:53  thomas
  * Initial version
  *
