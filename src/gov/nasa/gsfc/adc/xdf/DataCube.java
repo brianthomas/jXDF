@@ -179,7 +179,7 @@ public class DataCube extends BaseObject {
    * @return int[]
    */
   public int[] getMaxDataIndex() {
-     List axes = parentArray.getAxisList();
+     List axes = parentArray.getAxes();
      int[] maxDataIndices = new int[axes.size()];
 
      int stop = axes.size();
@@ -202,7 +202,7 @@ public class DataCube extends BaseObject {
 
   /** increase the dimension by 1
    * @return the current dimension ( which is incremented)
-   * this is called after the Array the DataCube belongs to adds an Axis
+   * this is called after an Array adds an Axis
    */
 public int incrementDimension(Axis axis) {
   if (dimension==0) {  //add first dimension
@@ -247,16 +247,13 @@ public int incrementDimension(FieldAxis fieldAxis) {
   }
 }
 
-  /** decrease the dimension by 1
-   * @return the current dimension ( which is decremented)
+  /** decrease the number of dimensions by 1
      <b> NOT CURRENTLY IMPLEMENTED </b>
    */
-
   //not right, have to write again, double check implications of dataCube
-public int decrementDimension() {
-  Log.errorln("in DataCube, decrementDimension(), methods empty, returning -1");
-  return -1;
-
+public boolean decrementDimension(AxisInterface axis) { 
+  Log.errorln("in DataCube, decrementDimension(), method is empty, returning false.");
+  return false;
 }
 
 
@@ -265,7 +262,7 @@ public int decrementDimension() {
 public Object getData (Locator locator) throws NoDataException
 {
 
-  List axisList = parentArray.getAxisList();
+  List axisList = parentArray.getAxes();
   List current = data;
   int numOfAxis = axisList.size();
 
@@ -340,7 +337,7 @@ throws NoDataException
 public int getIntData (Locator locator) 
 throws NoDataException
 {
-  List axisList = parentArray.getAxisList();
+  List axisList = parentArray.getAxes();
   List current = data;
   int numOfAxis = axisList.size();
   if (numOfAxis == 1) {
@@ -395,7 +392,7 @@ throws NoDataException
  */
 public double getDoubleData(Locator locator) throws NoDataException {
 
-  List axisList = parentArray.getAxisList();
+  List axisList = parentArray.getAxes();
   List current = data;
   int numOfAxis = axisList.size();
 
@@ -500,7 +497,7 @@ throws SetDataException
 
 // Log.debugln("double setData["+numValue+"]");
 
-  List axisList = parentArray.getAxisList();
+  List axisList = parentArray.getAxes();
   List prev = data;
   List current = data;
   int numOfAxis = axisList.size();
@@ -649,7 +646,7 @@ throws SetDataException
 public void setData(Locator locator, int numValue) 
 throws SetDataException 
 {
-  List axisList = parentArray.getAxisList();
+  List axisList = parentArray.getAxes();
   List prev = data;
   List current = data;
   int numOfAxis = axisList.size();
@@ -794,7 +791,7 @@ throws SetDataException
 
 // Log.debugln("setData["+strValue+"]");
 
-  List axisList = parentArray.getAxisList();
+  List axisList = parentArray.getAxes();
   List prev = data;
   List current = data;
   int numOfAxis = axisList.size();
@@ -937,7 +934,7 @@ throws SetDataException
    */
 
 protected boolean  removeData (Locator locator) {
-  List axisList = parentArray.getAxisList();
+  List axisList = parentArray.getAxes();
   List current = data;
   int numOfAxis = axisList.size();
   if (numOfAxis == 1) {
@@ -1137,7 +1134,7 @@ protected boolean  removeData (Locator locator) {
 
     Locator currentLocator = parentArray.createLocator();
 
-    AxisInterface fastestAxis = (AxisInterface) parentArray.getAxisList().get(0);
+    AxisInterface fastestAxis = (AxisInterface) parentArray.getAxes().get(0);
     //stores the NoDataValues for the parentArray,
     //used in writing out when NoDataException is caught
     String[] NoDataValues;
@@ -1414,7 +1411,7 @@ protected boolean  removeData (Locator locator) {
       synchronized (data) 
       { 
 
-        List commands = readObj.getCommands(); // returns expanded list (no repeat cmds) 
+        List commands = readObj.getFormatCommands(); // returns expanded list (no repeat cmds) 
         String endian = readObj.getEndian();
         int nrofCommands = commands.size();
         int currentCommand = 0;
@@ -1853,6 +1850,9 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.27  2001/05/02 18:16:39  thomas
+  * Minor changes related to API standardization effort.
+  *
   * Revision 1.26  2001/04/27 21:27:50  thomas
   * Small change to accomodate moving get/set LessThan, etc methods
   * from dataformat to Field class.

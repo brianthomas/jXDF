@@ -46,7 +46,7 @@ import java.io.OutputStream;
 
   //double check
   protected static String unitDivideSymbol = "/";
-  protected static String classNoUnitChildNodeName = "unitless";
+  protected static String noUnitChildNodeName = "unitless";
 
  //
   // Constructor and related methods
@@ -73,6 +73,18 @@ import java.io.OutputStream;
     // init the value of selected XML attributes to HashTable values
     hashtableInitXDFAttributes(InitXDFAttributeTable);
 
+  }
+
+  // 
+  // Class methods
+  //
+
+  /**
+   * @return Name of the child node to print in the toXMLOutputStream method when
+   * an  Units object contains NO Unit child objects.
+   */
+  static public String getNoUnitChildXMLNodeName() {
+    return noUnitChildNodeName;
   }
 
 
@@ -140,14 +152,6 @@ import java.io.OutputStream;
     return getUnitList();
   }
 
-  /**
-   * @return Name of the child node to print in the toXMLOutputStream method when
-   * an  Units object contains NO Unit child objects.
-   */
-  public String getClassNoUnitChildName() {
-    return classNoUnitChildNodeName;
-  }
-
   //
   //Other PUBLIC Methods
   //
@@ -183,7 +187,7 @@ import java.io.OutputStream;
    * assemble all the units in the list of units held in this object and return
    * it as a string
    */
-   public String value() {
+   public String toString() {
     StringBuffer strValue = new StringBuffer();
     Number factor = getFactor();  //retrieve the *factor* attribute
     List units = getUnitList();   //retrieve the *unitList* attribute
@@ -223,7 +227,7 @@ import java.io.OutputStream;
                              indent,
                              false,
                              XDFNodeName,
-                             classNoUnitChildNodeName
+                             noUnitChildNodeName
                            );
   }
 
@@ -257,6 +261,9 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/05/02 18:16:39  thomas
+ * Minor changes related to API standardization effort.
+ *
  * Revision 1.11  2000/11/27 16:57:45  thomas
  * Made init method protected so that extending
  * Dataformats may make use of them. -b.t.

@@ -81,7 +81,7 @@ import java.util.List;
   public void setAxisIndex (AxisInterface axisObj, int index) 
   throws AxisLocationOutOfBoundsException 
   {
-    if ((!parentArray.getAxisList().contains(axisObj)) ||
+    if ((!parentArray.getAxes().contains(axisObj)) ||
         (index < 0) ||
         (index > axisObj.getLength()-1) ) {
         throw new AxisLocationOutOfBoundsException();
@@ -130,7 +130,7 @@ import java.util.List;
    throws AxisLocationOutOfBoundsException
    {
 
-      if ((!parentArray.getAxisList().contains(axisObj)) ||
+      if ((!parentArray.getAxes().contains(axisObj)) ||
           valueObj == null ) {
           Log.error("Either axisObj is not an Axis ref contained in Locator's parentArray or Value is null");
           Log.errorln("Ignoring request.");
@@ -356,7 +356,7 @@ import java.util.List;
          default location ordering.
        */
 
-      List axisList = parentArray.getAxisList();
+      List axisList = parentArray.getAxes();
 
       locations = new Hashtable(axisList.size());
       axisOrderList = Collections.synchronizedList(new ArrayList());
@@ -374,6 +374,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2001/05/02 18:16:39  thomas
+ * Minor changes related to API standardization effort.
+ *
  * Revision 1.20  2001/04/23 18:52:17  huang
  * clear the axisOrderList before re-ordering
  *

@@ -179,18 +179,24 @@ public class Structure extends BaseObject {
 
   /**set the *noteList* attribute
    */
-  public void setNoteList(List note) {
-    ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(note);
+  public void setNotes (List notes) {
+    ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
   }
 
-  /**getNoteList
-   * @return the current *noteList* attribute
+  /**
+   * @return the current list of notes held by this structure.
    */
-  public List getNoteList() {
+  public List getNotes () {
     return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-
+  /**
+   * @return the current *noteList* attribute
+   * @deprecated Outdated method. Use getNotes instead.
+   */
+  public List getNoteList () {
+    return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+  } 
 
   /**
   */
@@ -258,14 +264,7 @@ public class Structure extends BaseObject {
      return removeFromList(index, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
-   /**
-   * @return the current *noteList* held by this object
-   */
-  public List getNotes() {
-    return getNoteList();
-  }
-
- /**  nsert an Parameter object into the paramList
+ /** Insert a Parameter object into the paramter list.  
    * @param p - Parameter
    * @return an Parameter object
    */
@@ -273,7 +272,7 @@ public class Structure extends BaseObject {
     getParamList().add(p);
     return p;
   }
-  /** removes an Parameter object from paramList
+  /** removes an Parameter object from the parameter list. 
    * @param what - Parameter to be removed
    * @return true on success, false on failure
    */
@@ -437,6 +436,9 @@ public class Structure extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/05/02 18:16:39  thomas
+ * Minor changes related to API standardization effort.
+ *
  * Revision 1.16  2001/02/07 18:44:03  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These

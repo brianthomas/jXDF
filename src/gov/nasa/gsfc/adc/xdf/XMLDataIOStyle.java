@@ -274,7 +274,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
    public List getReadAxisOrder() {
     List readList = new ArrayList();
-    List axisList = getParentArray().getAxisList();
+    List axisList = getParentArray().getAxes();
     AxisInterface axisObj;
     int size =  axisList.size();
     for (int i = 0; i < size; i++) {
@@ -290,6 +290,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/05/02 18:16:39  thomas
+ * Minor changes related to API standardization effort.
+ *
  * Revision 1.15  2001/02/07 18:44:04  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These

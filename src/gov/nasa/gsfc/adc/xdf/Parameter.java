@@ -75,7 +75,7 @@ public class Parameter extends BaseObject {
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("paramIdRef");
    private static final String DATATYPE_XML_ATTRIBUTE_NAME = new String("datatype");
    private static final String UNITS_XML_ATTRIBUTE_NAME = new String("units");
-   private static final String NOTELIST_XML_ATTRIBUTE_NAME = new String("noteList");
+   private static final String NOTELIST_XML_ATTRIBUTE_NAME = new String("notes");
    private static final String VALUELIST_XML_ATTRIBUTE_NAME = new String("valueList");
 
   /** This field stores object references to those value group objects
@@ -222,14 +222,22 @@ public class Parameter extends BaseObject {
     return (List) ((XMLAttribute) attribHash.get(VALUELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /**set the *noteList* attribute
+  /**set the list of notes within this object
    */
-  public void setNoteList(List note) {
-     ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(note);
+  public void setNotes (List notes) {
+     ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
   }
 
   /**
-   * @return the current *noteList* attribute
+   * @return the current list of notes in this object. 
+   */
+  public List getNotes() {
+    return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
+  /**
+   * @return the current list of notes in this object. 
+   * @depreciated Discontinued in favor of the getNotes method.
    */
   public List getNoteList() {
     return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
@@ -319,13 +327,6 @@ public class Parameter extends BaseObject {
      return removeFromList(index, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
-  /** Convenience method which returns a list of the notes held by
-   * this object.
-   */
-  public List getNotes() {
-    return getNoteList();
-  }
-
   /** Insert an Unit object into the L<Units> object
    * held in this object.
    * @param Unit to be added
@@ -409,6 +410,9 @@ public class Parameter extends BaseObject {
  /* Modification History
   *
   * $Log$
+  * Revision 1.14  2001/05/02 18:16:39  thomas
+  * Minor changes related to API standardization effort.
+  *
   * Revision 1.13  2001/02/07 18:44:04  thomas
   * Converted XML attribute decl
   * to use constants (final static fields within the object). These

@@ -96,7 +96,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   /** Convenience method that returns the command list. Repeat
       commands are expanded into their component parts. 
    */
-  public List getCommands() {
+  public List getFormatCommands() {
      
      ArrayList commandList = new ArrayList();
 
@@ -106,7 +106,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         if (thisCommand instanceof RepeatFormattedIOCmd) {
            int count = ((RepeatFormattedIOCmd) thisCommand).getCount().intValue();
            while (count-- > 0) {
-              commandList.addAll(((RepeatFormattedIOCmd) thisCommand).getCommands());
+              commandList.addAll(((RepeatFormattedIOCmd) thisCommand).getFormatCommands());
            }
         } else {
            commandList.add(thisCommand);
@@ -143,7 +143,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 
      synchronized (parentArray) {
 
-        List axisList = parentArray.getAxisList();
+        List axisList = parentArray.getAxes();
         Iterator iter = axisList.iterator(); 
         while(iter.hasNext()) {
            AxisInterface axis = (AxisInterface) iter.next();
@@ -226,7 +226,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, indent);
       }
       writeOut(outputstream, "<" + UntaggedInstructionNodeName + " "+UntaggedInstructionAxisIdRefName+"=\"");
-      writeOut(outputstream, ((AxisInterface) parentArray.getAxisList().get(which)).getAxisId() + "\">");
+      writeOut(outputstream, ((AxisInterface) parentArray.getAxes().get(which)).getAxisId() + "\">");
       which++;
       nestedToXDF(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation(), which, stop);
 
@@ -258,6 +258,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/05/02 18:16:39  thomas
+ * Minor changes related to API standardization effort.
+ *
  * Revision 1.11  2001/02/07 18:44:03  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These

@@ -734,7 +734,7 @@ Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
 // the problem: need to keep track of the formatting chars. 
     private void addByteDataToCurrentArray (byte[] data, int amount, String endian) {
 
-        ArrayList commandList = (ArrayList) ((FormattedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).getCommands();
+        ArrayList commandList = (ArrayList) ((FormattedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).getFormatCommands();
         int nrofIOCmd = commandList.size();
         int bytes_added = 0;
 
@@ -806,7 +806,7 @@ Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+by
 
             } else if (currentIOCmd instanceof RepeatFormattedIOCmd) {
                // shouldnt happen
-               Log.errorln("Argh getCommands not working right, got repeat command in addByteData!!!");
+               Log.errorln("Argh getFormatCommands not working right, got repeat command in addByteData!!!");
                System.exit(-1);
             }
 
@@ -1357,7 +1357,7 @@ Log.errorln(" TValue:"+valueString);
 
 
         ArrayList stringObjList = new ArrayList();
-        List commandList = readObj.getCommands();
+        List commandList = readObj.getFormatCommands();
         // DataFormat dataFormat[] = CurrentArray.getDataFormatList();
 
         String endian = readObj.getEndian();
@@ -1493,8 +1493,8 @@ Log.errorln(" TValue:"+valueString);
        if (arrayToAppendTo != null) 
        {
 
-          List origAxisList = arrayToAppendTo.getAxisList(); 
-          List addAxisList = arrayToAdd.getAxisList(); 
+          List origAxisList = arrayToAppendTo.getAxes(); 
+          List addAxisList = arrayToAdd.getAxes(); 
           Hashtable correspondingAddAxis = new Hashtable();
           Hashtable correspondingOrigAxis = new Hashtable();
 
@@ -2184,7 +2184,7 @@ Log.errorln(" TValue:"+valueString);
           }
 
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
-          FastestAxis = (AxisInterface) CurrentArray.getAxisList().get(0);
+          FastestAxis = (AxisInterface) CurrentArray.getAxes().get(0);
           LastFastAxisCoordinate = -1;
 
           if ( readObj instanceof TaggedXMLDataIOStyle) {
@@ -2361,7 +2361,7 @@ Log.errorln(" TValue:"+valueString);
              }
 
              // add this axis to the current array object
-             CurrentArray.addFieldAxis(newfieldaxis);
+             CurrentArray.setFieldAxis(newfieldaxis);
 
           } else {
              Log.errorln("FieldAxis object:"+newfieldaxis+" lacks either axisId or axisIdRef, ignoring!");
@@ -3245,8 +3245,15 @@ Log.errorln(" TValue:"+valueString);
 
               // yes, axis is correct here, cant add units to a fieldAxis 
               // (only to fields!)
-              Axis lastAxisObject = (Axis) CurrentArray.getAxisList().get(CurrentArray.getAxisList().size()-1);
-              newunit = lastAxisObject.addUnit(newunit);
+              List axisList = (List) CurrentArray.getAxes();
+              AxisInterface lastAxisObject = (AxisInterface) axisList.get(axisList.size()-1);
+//              Axis lastAxisObject = (Axis) CurrentArray.getAxes().get(CurrentArray.getAxes().size()-1);
+              if(lastAxisObject instanceof Axis) {
+                 newunit = ((Axis) lastAxisObject).addUnit(newunit);
+              } else {
+                 Log.errorln("Tried to add Unit to FieldAxis!! Aborting!");
+                 System.exit(-1);
+              }
 
           } else if ( gParentNodeName.equals(XDFNodeName.ARRAY) )
           {
@@ -3325,7 +3332,7 @@ Log.errorln(" TValue:"+valueString);
                  } else if ( parentNodeName.equals(XDFNodeName.AXIS) )
                  {
 
-                    List axisList = (List) CurrentArray.getAxisList();
+                    List axisList = (List) CurrentArray.getAxes();
                     Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
                     newvalue = lastAxisObject.addAxisValue(newvalue);
 
@@ -3422,7 +3429,7 @@ Log.errorln(" TValue:"+valueString);
           } else if ( parentNodeName.equals(XDFNodeName.AXIS) ) 
           {
 
-              List axisList = (List) CurrentArray.getAxisList();
+              List axisList = (List) CurrentArray.getAxes();
               Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
               newvalue = lastAxisObject.addAxisValue(newvalue);
 
@@ -3471,7 +3478,7 @@ Log.errorln(" TValue:"+valueString);
           {
 
               // get the last axis
-              List axisList = (List) CurrentArray.getAxisList();
+              List axisList = (List) CurrentArray.getAxes();
               Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
               newvalueGroup = lastAxisObject.addValueGroup(newvalueGroup);
 
@@ -3584,7 +3591,7 @@ Log.errorln(" TValue:"+valueString);
           {
 
              // get the last axis
-             List axisList = (List) CurrentArray.getAxisList();
+             List axisList = (List) CurrentArray.getAxes();
              Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
 
              // now create value objects, add them to groups 
@@ -3723,7 +3730,7 @@ Log.errorln(" TValue:"+valueString);
              {
 
                     // get the last axis
-                    List axisList = (List) CurrentArray.getAxisList();
+                    List axisList = (List) CurrentArray.getAxes();
                     Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
 
                     Iterator iter = values.iterator();
@@ -3808,6 +3815,9 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.30  2001/05/02 18:16:39  thomas
+ * Minor changes related to API standardization effort.
+ *
  * Revision 1.29  2001/02/07 18:46:25  thomas
  * Enabled append array and binary writing. Fixed up
  * the binary r/w code somewhat but it needs to be
