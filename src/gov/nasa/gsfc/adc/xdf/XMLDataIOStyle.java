@@ -53,7 +53,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    private static final String ID_XML_ATTRIBUTE_NAME = new String("readId");
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("readIdRef");
 
-   private List axesIOList = Collections.synchronizedList(new ArrayList());
+   protected List axesIOList = Collections.synchronizedList(new ArrayList());
 
    /* attribute defaults */
    public final static String DEFAULT_ENCODING = Constants.IO_ENCODING_ISO_8859_1;
@@ -159,7 +159,12 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String getEndian()
   {
-    return (String) ((Attribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).getAttribValue();
+
+     String endian = (String) ((Attribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).getAttribValue();
+     // a safety just in case someone asks a stupid question
+     // if (endian == null) endian = DEFAULT_ENDIAN;
+
+     return endian;
   }
 
 
@@ -274,12 +279,8 @@ public abstract class XMLDataIOStyle extends BaseObject {
           return;
       } else {
 
-         synchronized (axesIOList) {
-            axesIOList = Collections.synchronizedList(new ArrayList());
-            for (int i = 0; i < parentSize; i++) {
-               axesIOList.add(axisOrderList.get(i));
-            }
-         }
+         privateSetIOAxesOrder(axisOrderList);
+
       }
 
    }
@@ -306,12 +307,13 @@ public abstract class XMLDataIOStyle extends BaseObject {
       attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
 
       //set up the attribute hashtable key with the default initial value
-      attribHash.put(ENDIAN_XML_ATTRIBUTE_NAME, new Attribute(DEFAULT_ENDIAN, Constants.STRING_TYPE));
+      attribHash.put(ENDIAN_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
       attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new Attribute(DEFAULT_ENCODING, Constants.STRING_TYPE));
       attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
       attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
-      setIOAxesOrder(parentArray.getAxes());
+      // setIOAxesOrder(parentArray.getAxes());
+      privateSetIOAxesOrder(parentArray.getAxes());
 
    };
 
@@ -328,11 +330,31 @@ public abstract class XMLDataIOStyle extends BaseObject {
   protected abstract void specificIOStyleToXDF(Writer out, String indent)
   throws java.io.IOException; 
 
+  //
+  // Private Methods
+  //
+
+  // for when you are absolutely sure its the right list..
+   private void privateSetIOAxesOrder (List axisOrderList)
+   {
+
+         synchronized (axesIOList) {
+            axesIOList = Collections.synchronizedList(new ArrayList());
+            for (int i = 0, size = axesIOList.size(); i < size; i++) {
+               axesIOList.add(axisOrderList.get(i));
+            }
+         }
+
+   }
+
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.28  2001/09/18 17:43:51  thomas
+ * small change to prevent endian attrib from writing out if undefined
+ *
  * Revision 1.27  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
