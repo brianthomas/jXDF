@@ -376,7 +376,6 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
-     XMLDeclAttribs.put("version", (String) sXMLSpecVersion);
 
      toXMLFile(filename, XMLDeclAttribs);
 
@@ -591,7 +590,6 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
-     XMLDeclAttribs.put("version", (String) sXMLSpecVersion);
      toXMLOutputStream(outputstream, XMLDeclAttribs, indent);
   }
 
@@ -605,7 +603,6 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
      XMLDeclAttribs.put("standalone", new String("no"));
-     XMLDeclAttribs.put("version", (String) sXMLSpecVersion);
 
      toXMLOutputStream(outputstream, XMLDeclAttribs);
 
@@ -894,20 +891,24 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
     // initial statement
     writeOut(outputstream, "<?xml");
+    writeOut(outputstream, " version=\"" + sXMLSpecVersion + "\"");
 
     // print attributes
     Enumeration keys = XMLDeclAttribs.keys();
     while ( keys.hasMoreElements() )
     {
-      Object key = keys.nextElement();
-      writeOut(outputstream, " " + (String) key + "=\"" + XMLDeclAttribs.get((String) key) + "\"");
+      String attribName = (String) keys.nextElement();
+      if (attribName.equals("version") ) 
+         Log.errorln("XMLDeclAttrib hash has version attribute, not allowed and ignoring.");
+      else 
+         writeOut(outputstream, " " + attribName + "=\"" + XMLDeclAttribs.get(attribName) + "\"");
     }
     writeOut(outputstream, " ?>");
     if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
 
     // print the DOCTYPE DECL IF its a structure node
     if(classXDFNodeName != null && classXDFNodeName.equals(sXDFStructureNodeName) ) {
-      writeOut(outputstream, "<!DOCTYPE " + sXDFRootNodeName + " SYSTEM " + sXDFDTDName + ">");
+      writeOut(outputstream, "<!DOCTYPE " + sXDFRootNodeName + " SYSTEM \"" + sXDFDTDName + "\">");
       if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
     }
 
@@ -918,6 +919,15 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.29  2000/11/09 05:32:35  thomas
+ * Print out of XML declaration attributes isnt ordered
+ * (as you might expect since they are stored in a hash)
+ * This causes problems for Java XML parsers if "version"
+ * isnt the first attribute (which we cant insure w/ hashtable).
+ * I have made "version" a special attribute, which the
+ * user may not set or override in order to insure that it
+ * is the first on the line <? xml ?>. -b.t.
+ *
  * Revision 1.28  2000/11/09 04:24:11  thomas
  * Implimented small efficiency improvements to traversal
  * loops. -b.t.
