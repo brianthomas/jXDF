@@ -1,9 +1,6 @@
+
 // XDF StringDataFormat Class
 // CVS $Id$
-
-package gov.nasa.gsfc.adc.xdf;
-
-import java.util.*;
 
 // StringDataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -26,6 +23,9 @@ import java.util.*;
 */
 
 
+package gov.nasa.gsfc.adc.xdf;
+import java.util.Hashtable;
+import java.io.OutputStream;
 
 /**
  * StringDataFormat.java:describes string data.
@@ -39,6 +39,7 @@ public class StringDataFormat extends DataFormat {
   //
   public static final String PerlSprintfFieldString = "s";
   public static final String PerlRegexFieldString = ".";
+  private String parentClassXDFNodeName;
 
 
   /** The no argument constructor.
@@ -52,7 +53,9 @@ public class StringDataFormat extends DataFormat {
    *  conviently build the XML attribute list for a given class.
    */
   private void init() {
-    classXDFNodeName = super.getClassXDFNodeName()+ "||" + "string";
+
+    parentClassXDFNodeName = super.getClassXDFNodeName(); 
+    classXDFNodeName = "string";
     attribOrder.add(0, "length");  //add length as the first attribute;
 
     attribHash.put("lessThanValue", new XMLAttribute(null, Constants.STRING_TYPE));
@@ -63,6 +66,7 @@ public class StringDataFormat extends DataFormat {
     attribHash.put("infiniteNegativeValue", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("noDataValue", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("length", new XMLAttribute(new Integer(0), Constants.NUMBER_TYPE));
+
   }
 
   //
@@ -222,11 +226,52 @@ public class StringDataFormat extends DataFormat {
     return "A"+ numOfBytes();
   }
 
+  /** override the base object method to add a little tailoring
+   */
+  public void toXDFOutputStream (  OutputStream outputstream,
+                                   Hashtable XMLDeclAttribs,
+                                   String indent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
+  ) {
+
+     boolean wasPretty = false;
+     //String dataFormatNodeName = super.getClassXDFNodeName(); 
+     String dataFormatNodeName = parentClassXDFNodeName;
+
+Log.errorln("\n\n STINRG DATAFORMAT PARENT XDF NODENAME: ["+dataFormatNodeName+"]");
+
+     if (sPrettyXDFOutput) writeOut(outputstream, indent); // indent node if desired
+
+     // open a "dataformat" tag
+     writeOut(outputstream, "<" + dataFormatNodeName + ">"); 
+     // now use normal method, but no pretty output
+     if (sPrettyXDFOutput) 
+        wasPretty = true;
+     // turn off pretty output so no newline, or indenting
+     this.setPrettyXDFOutput(false);
+     super.toXDFOutputStream( outputstream, XMLDeclAttribs, 
+                              indent, dontCloseNode,
+                              newNodeNameString, noChildObjectNodeName );
+     // return to pretty output if that was what we had before
+     if (wasPretty) 
+        this.setPrettyXDFOutput(true);
+     // close the "dataformat" tag
+     writeOut(outputstream, "</" + dataFormatNodeName + ">"); 
+
+     if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
+
+  }
 
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/26 15:55:25  thomas
+ * Fixed up the toXDFOutputStream method to print
+ * out node compiant wi/ DTD. -b.t.
+ *
  * Revision 1.2  2000/10/16 14:49:11  kelly
  * pretty much completed the class.  --k.z.
  *
