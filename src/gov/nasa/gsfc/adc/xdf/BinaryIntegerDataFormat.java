@@ -58,7 +58,7 @@ public class BinaryIntegerDataFormat extends DataFormat {
     //add attributes
     attribOrder.add(0,"bits");
     attribOrder.add(0, "signed");
-    attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryIntegerBits), Constants.NUMBER_TYPE));
+    attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryIntegerBits), Constants.INTEGER_TYPE));
     attribHash.put("signed", new XMLAttribute("yes", Constants.STRING_TYPE));
 
   }
@@ -111,16 +111,16 @@ public class BinaryIntegerDataFormat extends DataFormat {
 
   /** set the *bits* attribute
    */
-  public void setBits(Number numBits) {
+  public void setBits(Integer numBits) {
      ((XMLAttribute) attribHash.get("bits")).setAttribValue(numBits);
 
   }
   /**
-   * @return the current *bits* attribute
+   * @return the current *bits* attribute.  
    */
-  public Number getBits()
+  public Integer getBits()
   {
-    return (Number) ((XMLAttribute) attribHash.get("bits")).getAttribValue();
+    return (Integer) ((XMLAttribute) attribHash.get("bits")).getAttribValue();
   }
 
   /** set the *signed* attribute
@@ -207,6 +207,13 @@ public class BinaryIntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/20 22:05:50  thomas
+ * plit up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.6  2000/11/16 19:51:59  kelly
  * fixed documentation.  -k.z.
  *

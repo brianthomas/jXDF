@@ -105,7 +105,7 @@ private void init()
     //set up the attribute hashtable key with the default initial value
     attribHash.put("compression", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("encoding", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("checksum", new XMLAttribute(null, Constants.NUMBER_TYPE));
+    attribHash.put("checksum", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("href", new XMLAttribute(null, Constants.STRING_TYPE));
 
   };
@@ -134,8 +134,8 @@ private void init()
   /**
    * @return the current *checksum* attribute
    */
-  public Number getChecksum () {
-     return (Number) ((XMLAttribute) attribHash.get("checksum")).getAttribValue();
+  public String getChecksum () {
+     return (String) ((XMLAttribute) attribHash.get("checksum")).getAttribValue();
   }
 
    /** set the *encoding* attribute
@@ -1011,8 +1011,8 @@ protected boolean  removeData (Locator locator) {
     if (href !=null)
       writeOut(outputstream, " href = \"" + href + "\"");
 
-    Number checksum = getChecksum();
-    if (checksum !=null)
+    String checksum = getChecksum();
+    if (checksum != null)
       writeOut(outputstream, " checksum = \"" + checksum.toString() + "\"");
 
     writeOut(outputstream, ">");  //end of opening code
@@ -1375,6 +1375,13 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.16  2000/11/20 22:06:08  thomas
+  * plit up XMLAttribute type NUMBER_TYPE into
+  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+  * some needed handling in the SaxDocHandler when
+  * parsing data for the formatted read. Put prior NUMBER_TYPE
+  * attributes into appropriate new category. -b.t.
+  *
   * Revision 1.15  2000/11/16 19:51:25  kelly
   * fixed documentation.  -k.z.
   *

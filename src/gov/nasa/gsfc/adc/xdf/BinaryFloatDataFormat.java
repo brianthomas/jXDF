@@ -56,7 +56,7 @@ public class BinaryFloatDataFormat extends DataFormat {
     specificDataFormatName = "binaryFloat";
     attribOrder.add(0, "bits");  //add bits as the first attribute;
 
-    attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryFloatBits), Constants.NUMBER_TYPE));
+    attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryFloatBits), Constants.INTEGER_TYPE));
   }
 
   //
@@ -111,7 +111,7 @@ public class BinaryFloatDataFormat extends DataFormat {
 
   /** set the *bits* attribute
    */
-  public void setBits(Number numBits) {
+  public void setBits(Integer numBits) {
 
     int bits = numBits.intValue();
     if ((bits == 32) || (bits == 64)) //check that bits are either 32 or 64
@@ -125,9 +125,9 @@ public class BinaryFloatDataFormat extends DataFormat {
   /**
    * @return the current *bits* attribute
    */
-  public Number getBits()
+  public Integer getBits()
   {
-    return (Number) ((XMLAttribute) attribHash.get("bits")).getAttribValue();
+    return (Integer) ((XMLAttribute) attribHash.get("bits")).getAttribValue();
   }
 
   //
@@ -178,6 +178,13 @@ public class BinaryFloatDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/20 22:05:50  thomas
+ * plit up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.5  2000/11/16 19:51:46  kelly
  * fixed documentation.  -k.z.
  *
