@@ -93,7 +93,7 @@ import java.io.OutputStream;
 
     attribHash.put("unitList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("system", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("factor", new XMLAttribute(null, Constants.NUMBER_TYPE));
+    attribHash.put("factor", new XMLAttribute(null, Constants.DOUBLE_TYPE));
   }
   //
   //Get/Set Methods
@@ -110,16 +110,15 @@ import java.io.OutputStream;
    * @param Number
    * @return the current *factor* attribute
    */
-  public void setFactor (Number factor) {
-    Log.info("in Units.setFactor()");
+  public void setFactor (Double factor) {
     ((XMLAttribute) attribHash.get("factor")).setAttribValue(factor);
   }
 
   /**
    * @return the current *factor* attribute
    */
-  public Number getFactor () {
-    return (Number) ((XMLAttribute) attribHash.get("factor")).getAttribValue();
+  public Double getFactor () {
+    return (Double) ((XMLAttribute) attribHash.get("factor")).getAttribValue();
   }
 
   /**set the *system* attribute
@@ -252,6 +251,13 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/20 22:03:48  thomas
+ * Split up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.9  2000/11/16 20:09:57  kelly
  * fixed documentation.  -k.z.
  *

@@ -70,7 +70,7 @@ public class IntegerDataFormat extends DataFormat {
 
 
     attribHash.put("type", new XMLAttribute(new String(Constants.INTEGER_TYPE_DECIMAL), Constants.STRING_TYPE));
-    attribHash.put("width", new XMLAttribute(new Integer(0), Constants.NUMBER_TYPE));
+    attribHash.put("width", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
 
   }
 
@@ -147,16 +147,16 @@ public class IntegerDataFormat extends DataFormat {
 
   /** set the *width* attribute
    */
-  public void setWidth(Number width) {
+  public void setWidth(Integer width) {
      ((XMLAttribute) attribHash.get("width")).setAttribValue(width);
   }
 
   /**
    * @return the current *width* attribute
    */
-  public Number getWidth()
+  public Integer getWidth()
   {
-    return (Number) ((XMLAttribute) attribHash.get("width")).getAttribValue();
+    return (Integer) ((XMLAttribute) attribHash.get("width")).getAttribValue();
   }
   //
   //Other PUBLIC Methods
@@ -243,6 +243,13 @@ public class IntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/20 22:03:48  thomas
+ * Split up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.6  2000/11/16 20:01:07  kelly
  * fixed documentation.  -k.z.
  *

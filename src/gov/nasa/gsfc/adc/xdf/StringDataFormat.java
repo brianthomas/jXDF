@@ -56,7 +56,7 @@ public class StringDataFormat extends DataFormat {
   private void init() {
     specificDataFormatName = "string";
     attribOrder.add(0, "length");  //add length as the first attribute;
-    attribHash.put("length", new XMLAttribute(new Integer(0), Constants.NUMBER_TYPE));
+    attribHash.put("length", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
   }
 
   //
@@ -107,15 +107,16 @@ public class StringDataFormat extends DataFormat {
 
   /**setlength: set the *length* attribute
    */
-  public void setLength(Number numLength) {
+  public void setLength(Integer numLength) {
      ((XMLAttribute) attribHash.get("length")).setAttribValue(numLength);
   }
+
   /**getLength
    * @return the current *length* attribute
    */
-  public Number getLength()
+  public Integer getLength()
   {
-    return (Number) ((XMLAttribute) attribHash.get("length")).getAttribValue();
+    return (Integer) ((XMLAttribute) attribHash.get("length")).getAttribValue();
   }
   //
   //Other PUBLIC Methods
@@ -164,6 +165,13 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/20 22:03:48  thomas
+ * Split up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.8  2000/11/16 20:09:02  kelly
  * fixed documentation.  -k.z.
  *

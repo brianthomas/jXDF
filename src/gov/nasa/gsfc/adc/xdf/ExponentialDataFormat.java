@@ -68,8 +68,8 @@ public class ExponentialDataFormat extends DataFormat {
      */
     attribOrder.add(0, "width");
 
-    attribHash.put("width", new XMLAttribute( null, Constants.NUMBER_TYPE));
-    attribHash.put("precision", new XMLAttribute(null, Constants.NUMBER_TYPE));
+    attribHash.put("width", new XMLAttribute( null, Constants.INTEGER_TYPE));
+    attribHash.put("precision", new XMLAttribute(null, Constants.INTEGER_TYPE));
 
   }
 
@@ -122,30 +122,30 @@ public class ExponentialDataFormat extends DataFormat {
 
   /** set the *width* attribute
    */
-  public void setWidth(Object numWidth) {
+  public void setWidth(Integer numWidth) {
      ((XMLAttribute) attribHash.get("width")).setAttribValue(numWidth);
 
   }
   /**
    * @return the current *width* attribute
    */
-  public Number getWidth()
+  public Integer getWidth()
   {
-    return (Number) ((XMLAttribute) attribHash.get("width")).getAttribValue();
+    return (Integer) ((XMLAttribute) attribHash.get("width")).getAttribValue();
   }
 
   /** set the *precision* attribute
    */
-  public void setPrecision(Number precision) {
+  public void setPrecision(Integer precision) {
      ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
 
   }
   /**
    * @return the current *precision* attribute
    */
-  public Number getPrecision()
+  public Integer getPrecision()
   {
-    return (Number) ((XMLAttribute) attribHash.get("precision")).getAttribValue();
+    return (Integer) ((XMLAttribute) attribHash.get("precision")).getAttribValue();
   }
 
   //
@@ -203,6 +203,13 @@ public class ExponentialDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/20 22:03:48  thomas
+ * Split up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.6  2000/11/16 19:58:12  kelly
  * fixed documentation.  -k.z.
  *

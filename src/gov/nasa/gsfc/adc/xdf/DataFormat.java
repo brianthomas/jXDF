@@ -50,38 +50,10 @@ import java.util.Hashtable;
     init();
   }
 
-  /** init -- special private method used by constructor methods to
-   *  conviently build XML attribute Order list
-   */
-  private void init()
-  {
-
-    classXDFNodeName = "dataFormat";
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    //the order of the attributes that all sub-classses should have
-    attribOrder.add(0,"noDataValue");
-    attribOrder.add(0,"infiniteNegativeValue");
-    attribOrder.add(0,"infiniteValue");
-    attribOrder.add(0,"greaterThanOrEqualValue");
-    attribOrder.add(0,"greaterThanValue");
-    attribOrder.add(0,"lessThanOrEqualValue");
-    attribOrder.add(0,"lessThanValue");
-
-    attribHash.put("lessThanValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
-    attribHash.put("lessThanOrEqualValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
-    attribHash.put("greaterThanValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
-    attribHash.put("greaterThanOrEqualValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
-    attribHash.put("infiniteValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
-    attribHash.put("infiniteNegativeValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
-    attribHash.put("noDataValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
-
-  }
-
   //
   //ABSTRACT methods
   //
+
   //return the number of bytes
   public abstract int numOfBytes();
 
@@ -92,7 +64,6 @@ import java.util.Hashtable;
   public  abstract void setInfiniteValue(Object Obj) ;
   public  abstract void setInfiniteNegativeValue(Object Obj) ;
   public  abstract void setNoDataValue(Object Obj) ;
-
 
   /**
    * @return the current *lessThanValue* attribute
@@ -121,25 +92,25 @@ import java.util.Hashtable;
    /**
    * @return the current *greaterThanOrEqualValue* attribute
    */
-  public Number getGreaterThanOrEqualValue()
+  public Object getGreaterThanOrEqualValue()
   {
-    return (Number) ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).getAttribValue();
+    return ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).getAttribValue();
   }
 
    /**
    * @return the current *infiniteValue* attribute
    */
-  public Number getInfiniteValue()
+  public Object getInfiniteValue()
   {
-    return (Number) ((XMLAttribute) attribHash.get("infiniteValue")).getAttribValue();
+    return ((XMLAttribute) attribHash.get("infiniteValue")).getAttribValue();
   }
 
    /**
    * @return the current *infiniteNegativeValue* attribute
    */
-  public Number getInfiniteNegativeValue()
+  public Object getInfiniteNegativeValue()
   {
-    return (Number) ((XMLAttribute) attribHash.get("infiniteNegativeValue")).getAttribValue();
+    return ((XMLAttribute) attribHash.get("infiniteNegativeValue")).getAttribValue();
   }
 
 
@@ -196,11 +167,52 @@ import java.util.Hashtable;
 
   }
 
+   //
+   // Private Methods
+   //
+
+  /** Special private method used by constructor methods to
+   *  conviently build XML attribute Order list
+   */
+  private void init()
+  {
+
+    classXDFNodeName = "dataFormat";
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    //the order of the attributes that all sub-classses should have
+    attribOrder.add(0,"noDataValue");
+    attribOrder.add(0,"infiniteNegativeValue");
+    attribOrder.add(0,"infiniteValue");
+    attribOrder.add(0,"greaterThanOrEqualValue");
+    attribOrder.add(0,"greaterThanValue");
+    attribOrder.add(0,"lessThanOrEqualValue");
+    attribOrder.add(0,"lessThanValue");
+
+    // typing here is just filler for latter
+    attribHash.put("lessThanValue", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("lessThanOrEqualValue", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("greaterThanValue", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("greaterThanOrEqualValue", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("infiniteValue", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("infiniteNegativeValue", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("noDataValue", new XMLAttribute(null, Constants.STRING_TYPE));
+
+  }
+
  }  //end of DataFormat class
 
  /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/20 22:03:48  thomas
+ * Split up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.8  2000/11/16 19:56:48  kelly
  * fixed documentation.  -k.z.
  *

@@ -107,15 +107,22 @@ public class  ErroredValue extends Value {
 
 
        //set up the attribute hashtable key with the default initial value
-       attribHash.put("upperErrorValue", new XMLAttribute(null, Constants.NUMBER_TYPE));
-       attribHash.put("lowerErrorValue", new XMLAttribute(null, Constants.NUMBER_TYPE));
-       attribHash.put("errorValue", new XMLAttribute(null, Constants.NUMBER_TYPE));
+       attribHash.put("upperErrorValue", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put("lowerErrorValue", new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put("errorValue", new XMLAttribute(null, Constants.STRING_TYPE));
 
    }
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/11/20 22:03:48  thomas
+ * Split up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.2  2000/11/16 19:57:29  kelly
  * fixed documentation.  -k.z.
  *

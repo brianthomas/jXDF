@@ -35,17 +35,21 @@ public abstract class Constants {
   public static final String STRING_TYPE = "String";
   public static final String LIST_TYPE   = "List";
   public static final String OBJECT_TYPE = "Object";
-  public static final String NUMBER_TYPE = "Number";
-  public static final String STRING_OR_NUMBER_TYPE = "StringOrNumber";
+  public static final String INTEGER_TYPE = "Integer";
+  public static final String DOUBLE_TYPE  = "Double";
+  // public static final String STRING_OR_NUMBER_TYPE = "StringOrNumber";
+
   //store the enum list of XMLattributeTypes
   public static final String[] XMLATTRIBUTE_TYPE_LIST = new String[5];
+
   static {
     XMLATTRIBUTE_TYPE_LIST[0]=STRING_TYPE;
     XMLATTRIBUTE_TYPE_LIST[1]= LIST_TYPE;
     XMLATTRIBUTE_TYPE_LIST[2] = OBJECT_TYPE ;
-    XMLATTRIBUTE_TYPE_LIST[3] = NUMBER_TYPE;
-    XMLATTRIBUTE_TYPE_LIST [4] = STRING_OR_NUMBER_TYPE;
+    XMLATTRIBUTE_TYPE_LIST[3] = INTEGER_TYPE;
+    XMLATTRIBUTE_TYPE_LIST[4] = DOUBLE_TYPE;
   }
+    //XMLATTRIBUTE_TYPE_LIST[4] = STRING_OR_NUMBER_TYPE;
 
   public static final String NEW_LINE = System.getProperty("line.separator");
   public static final int INIT_ATTRIBUTE_HASH_SIZE = 20;
@@ -150,6 +154,13 @@ public abstract class Constants {
 /* Modification History
  * 
  * $Log$
+ * Revision 1.10  2000/11/20 22:03:48  thomas
+ * Split up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.9  2000/11/16 19:53:03  kelly
  * fixed documentation.  -k.z.
  *

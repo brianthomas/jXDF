@@ -85,7 +85,7 @@ import java.util.Hashtable;
     attribOrder.add(0,"power");
 
     attribHash.put("value", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("power", new XMLAttribute(null, Constants.NUMBER_TYPE));
+    attribHash.put("power", new XMLAttribute(null, Constants.DOUBLE_TYPE));
 
   };
 
@@ -97,15 +97,15 @@ import java.util.Hashtable;
    *
    * @return the current *power* attribute
    */
-  public void setPower(Number power) {
+  public void setPower (Double power) {
      ((XMLAttribute) attribHash.get("power")).setAttribValue(power);
   }
 
   /**
    * @return the current *power* attribute
    */
-  public Number getPower() {
-    return (Number) ((XMLAttribute) attribHash.get("power")).getAttribValue();
+  public Double getPower() {
+    return (Double) ((XMLAttribute) attribHash.get("power")).getAttribValue();
   }
 
   /**set the *value* attribute
@@ -137,6 +137,13 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/20 22:03:48  thomas
+ * Split up XMLAttribute type NUMBER_TYPE into
+ * INTEGER_TYPE and DOUBLE_TYPE. This allows for
+ * some needed handling in the SaxDocHandler when
+ * parsing data for the formatted read. Put prior NUMBER_TYPE
+ * attributes into appropriate new category. -b.t.
+ *
  * Revision 1.7  2000/11/16 20:09:50  kelly
  * fixed documentation.  -k.z.
  *
