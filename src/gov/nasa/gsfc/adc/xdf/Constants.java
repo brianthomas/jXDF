@@ -14,7 +14,6 @@ public abstract class Constants {
   public static final String LIST_TYPE   = "List";
   public static final String OBJECT_TYPE = "Object";
   public static final String NUMBER_TYPE = "Number";
-  public static final String BOOLEAN_TYPE = "Boolean";
   //store the enum list of XMLattributeTypes
   public static final List XMLATTRIBUTE_TYPE_LIST = new ArrayList();
   static {
@@ -22,7 +21,6 @@ public abstract class Constants {
     XMLATTRIBUTE_TYPE_LIST.add(LIST_TYPE);
     XMLATTRIBUTE_TYPE_LIST.add(OBJECT_TYPE );
     XMLATTRIBUTE_TYPE_LIST.add(NUMBER_TYPE);
-    XMLATTRIBUTE_TYPE_LIST.add(BOOLEAN_TYPE);
   }
 
   public static final String NEW_LINE = System.getProperty("line.separator");
