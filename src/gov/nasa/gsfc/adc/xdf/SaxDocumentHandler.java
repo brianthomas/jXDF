@@ -30,18 +30,16 @@
 package gov.nasa.gsfc.adc.xdf;
 
 // Import Java stuff
-import java.io.File;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Iterator;
 
 // Import needed SAX stuff
-//import org.w3c.dom.*; // W3c SAX standard bits
 import org.xml.sax.AttributeList;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
-//import org.xml.sax.helpers.ParserFactory;
-//import com.sun.xml.parser.Resolver;
 
 /** 
  */
@@ -51,8 +49,14 @@ class SaxDocumentHandler implements DocumentHandler {
     // Fields
     //
 
+    // designate the version of the XDF DTD that this doc handler
+    // is written for, it should match up with the BaseObject sXDFDTDName
+    // Not clear that checking between other than baseobject DTDName and
+    // the declared document version is needed (so eliminate this field..)
+    private static final String sHandlerXDFDTDName = "XDF_0.17.dtd";
+
     // The XDF structure that is populated by the XDF DocumentHandler
-    private gov.nasa.gsfc.adc.xdf.Structure XDF; 
+    private Structure XDF; 
 
     // Options for the document handler
     private Hashtable Options;
@@ -63,13 +67,42 @@ class SaxDocumentHandler implements DocumentHandler {
     private Hashtable endElementHandlerHashtable;   // end node handler
 
     // References to the current working structure/array
-    private gov.nasa.gsfc.adc.xdf.Structure CurrentStructure;   
-    private gov.nasa.gsfc.adc.xdf.Array     CurrentArray;   
-    private String CurrentDatatypeObject;
+    private Structure CurrentStructure;   
+    private Array     CurrentArray;   
+    private String    CurrentDatatypeObject;
     private ArrayList CurrentNodePath = new ArrayList();
+    private ArrayList CurrentParameterGroupList = new ArrayList();
+    private ArrayList CurrentValueGroupList = new ArrayList();
+
+    // References recording the last object of these types created while
+    // parsing the document
+    private Parameter LastParameterObject;
+    private Note      LastNoteObject;
+    // private Notes     LastNotesObject;
+    private Unit      LastUnitObject;
+    private Units     LastUnitsObject;
+
+    private Object LastParameterGroupParentObject;
+    private Object LastValueGroupParentObject;
+
+    // keeping track of valueList settings
+    private Hashtable CurrentValueListParameter;
+
+    // Data writing stuff
+    private int DataNodeLevel = 0; // how deeply nested we are within data nodes 
 
     // lookup tables holding objects that have id/idref stuff
     private Hashtable AxisObj = new Hashtable();
+
+    // DEFAULT settings. We really should be getting these 
+    // from the XDF DTD, NOT setting them here.
+    private String DefaultValueListDelimiter = " ";
+    private String DefaultValueListRepeatable = "yes";
+    private int DefaultValueListSize = 1;
+    private int DefaultValueListStart = 1;
+    private int DefaultValueListStep = 1;
+
+
 
     //
     // Constuctors
@@ -80,7 +113,7 @@ class SaxDocumentHandler implements DocumentHandler {
        init();
     }
 
-    public SaxDocumentHandler (gov.nasa.gsfc.adc.xdf.Structure structure)
+    public SaxDocumentHandler (Structure structure)
     {
        init();
        setReaderStructureObj(structure);
@@ -98,15 +131,14 @@ class SaxDocumentHandler implements DocumentHandler {
 
     /** Set the structure object that the Reader will parse an InputSource into. 
     */
-    public gov.nasa.gsfc.adc.xdf.Structure getReaderStructureObj () 
+    public Structure getReaderStructureObj () 
     {
       return XDF;
     }
 
     /** Get the structure object that the Reader will parse an InputSource into. 
     */
-    public gov.nasa.gsfc.adc.xdf.Structure setReaderStructureObj
-           (gov.nasa.gsfc.adc.xdf.Structure structure)
+    public Structure setReaderStructureObj (Structure structure)
     {
 
        XDF = structure; // set the structure to read into to be passed ref. 
@@ -151,14 +183,6 @@ class SaxDocumentHandler implements DocumentHandler {
     // SAX methods
     //
 
-    // what is this for?? Required by the DocumentHandler interface. feh. 
-    public void setDocumentLocator (org.xml.sax.Locator l)
-    {
-        // we'd record this if we needed to resolve relative URIs
-        // in content or attributes, or wanted to give diagnostics.
-        // Right now, do nothing here.
-    }
-
     /** startElement handler.
      */
     public void startElement (String element, AttributeList attrs)
@@ -196,7 +220,7 @@ class SaxDocumentHandler implements DocumentHandler {
         // if a handler exists, run it, else give a warning
         if ( endElementHandlerHashtable.containsKey(element) ) {
 
-           // run the appropriate start handler
+           // run the appropriate end handler
            EndElementHandlerAction event = (EndElementHandlerAction) 
                    endElementHandlerHashtable.get(element);
            event.action();
@@ -208,16 +232,76 @@ class SaxDocumentHandler implements DocumentHandler {
         }
     }
 
+    /**  character Data handler
+     */
+    public void characters (char buf [], int offset, int len)
+    throws SAXException
+    {
+        // NOTE:  this doesn't escape '&' and '<', but it should
+        // do so else the output isn't well formed XML.  To do this
+        // right, scan the buffer and write '&amp;' and '&lt' as
+        // appropriate.
+        // Log.debugln("H_CharData:["+new String(buf,offset,len)+"]");
+
+        /* we need to know what the current node is in order to 
+           know what to do with this data, however, 
+           early on when reading the DOCTYPE, other nodes we can get 
+           text nodes which are not meaningful to us. Ignore all
+           character data until we open the root node.
+         */
+
+        String currentNodeName = (String) CurrentNodePath.get(CurrentNodePath.size()-1); 
+
+        if ( charDataHandlerHashtable.containsKey(currentNodeName) ) {
+
+          // run the appropriate character data handler
+           CharDataHandlerAction event = (CharDataHandlerAction)
+                   charDataHandlerHashtable.get(currentNodeName);
+           event.action(buf,offset,len);
+
+        } else {
+
+           // perhaps we are reading in data at the moment??
+
+           if (DataNodeLevel > 0) {
+
+       //        &data_node_charData($string)
+               Log.errorln("Data Character Data NOT yet implemented");
+
+           } else {
+
+               // do nothing with other character data
+
+           }
+
+        }
+
+    }
+
+    // 
+    // Public SAX methods we dont use
+    //
+
+    // what is this for?? hurm.. 
+    public void setDocumentLocator (org.xml.sax.Locator l)
+    {
+        // we'd record this if we needed to resolve relative URIs
+        // in content or attributes, or wanted to give diagnostics.
+        // Right now, do nothing here.
+
+        // do nothing, method required by interface 
+    }
+
     public void startDocument()
     throws SAXException
     {
-        Log.debugln("<?xml version='1.0' encoding='UTF-8'?>");
+        // do nothing, method required by interface 
     }
 
     public void endDocument()
     throws SAXException
     {
-        // this space left intentionally blank
+        // do nothing, method required by interface 
     }
 
     public void ignorableWhitespace(char buf [], int offset, int len)
@@ -229,25 +313,16 @@ class SaxDocumentHandler implements DocumentHandler {
         // use it, and currently most SAX nonvalidating ones will
         // also; but nonvalidating parsers might hardly use it,
         // depending on the DTD structure.
-       // Log.debugln("Whitespace BUF:["+buf+"] OFFSET:["+ offset+"] LEN:["+len+"]");
+        // Log.debugln("Whitespace:["+new String(buf,offset,len)+"]");
+
+        // do nothing, method required by interface 
     }
 
     public void processingInstruction(String target, String data)
     throws SAXException
     {
-        Log.debugln("<?"+target+" "+data+"?>");
-    }
-
-    /**  character Data handler
-     */
-    public void characters (char buf [], int offset, int len)
-    throws SAXException
-    {
-        // NOTE:  this doesn't escape '&' and '<', but it should
-        // do so else the output isn't well formed XML.  To do this
-        // right, scan the buffer and write '&amp;' and '&lt' as
-        // appropriate.
-        Log.debugln("CharData BUF:["+buf+"] OFFSET:["+ offset+"] LEN:["+len+"]");
+        // Log.debugln("<?"+target+" "+data+"?>");
+        // do nothing, method required by interface 
     }
 
     //
@@ -262,7 +337,7 @@ class SaxDocumentHandler implements DocumentHandler {
       Log.configure("XDFLogConfig");
       
       // assign/init 'globals' (e.g. object fields)
-      XDF = new gov.nasa.gsfc.adc.xdf.Structure();
+      XDF = new Structure();
       Options = new Hashtable();  
       startElementHandlerHashtable = new Hashtable(); // start node handler
       charDataHandlerHashtable = new Hashtable(); // charData handler
@@ -328,7 +403,7 @@ class SaxDocumentHandler implements DocumentHandler {
        startElementHandlerHashtable.put(XDFNodeName.TD8, new dataTagStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.TEXTDELIMITER, new asciiDelimiterStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.UNIT, new unitStartElementHandlerFunc());
-       startElementHandlerHashtable.put(XDFNodeName.UNITS, new unitsStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.UNITS, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.UNITLESS, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUE, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupStartElementHandlerFunc());
@@ -396,6 +471,47 @@ class SaxDocumentHandler implements DocumentHandler {
 
     }
 
+    // For the case where valueList is storing values in 
+    // algorithmic fashion
+    private ArrayList getValueListNodeValues (AttributeList attrs) {
+
+       ArrayList values = new ArrayList();
+
+       // parameters for the algorithm
+       int size  = DefaultValueListSize;
+       int start = DefaultValueListStart;
+       int step  = DefaultValueListStep;
+
+       // Capture any overridding Valuelist attributes
+       // into algorithm parameters
+       for (int i = 0; i < attrs.getLength(); i++)
+       {
+           String name = attrs.getName(i);
+           if ( name.equals("size") ) { 
+               Integer tmp = new Integer (attrs.getValue(i));
+               size = tmp.intValue();
+           } else if ( name.equals("step")) {
+               Integer tmp = new Integer (attrs.getValue(i));
+               step = tmp.intValue();
+           } else if ( name.equals("start")) {
+               Integer tmp = new Integer (attrs.getValue(i));
+               start = tmp.intValue();
+           }
+       }
+
+       // do the algorithm to populate the values in the ArrayList 
+       int numberOfValues = 0;
+       int currentValue = start;
+       while (numberOfValues < size) 
+       {
+          values.add(String.valueOf(currentValue));
+          currentValue += step;
+          numberOfValues++;
+       }
+       
+       return values;
+    }
+          
     //
     // Internal Classes
     //
@@ -459,6 +575,9 @@ class SaxDocumentHandler implements DocumentHandler {
     // 
     // Dispatch Table Handlers 
     //
+  
+    // These classes are here because they are used by the SaxDocumentHandler
+    // dispatch tables. See interface files for more info.
 
     // ASCII DELIMITER NODE HANDLERS
     //
@@ -547,7 +666,7 @@ class SaxDocumentHandler implements DocumentHandler {
              // add this axis to the current array object
              CurrentArray.addAxis(newaxis);
 
-             CurrentDatatypeObject = "lastAxis";
+             CurrentDatatypeObject = "LastAxis";
 
           } else {
              Log.errorln("Axis object:"+newaxis+" lacks either axisId or axisIdRef, ignoring!");
@@ -767,8 +886,46 @@ class SaxDocumentHandler implements DocumentHandler {
     
     class parameterStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          String parentName = getParentNodeName();
-          Log.errorln("PARAMETER Start handler not implemented yet. Parent:"+parentName);
+
+          // grab parent node name
+          String parentNodeName = getParentNodeName();
+
+          // create new object appropriately 
+          Parameter newparameter = new Parameter();
+          newparameter.setXMLAttributes(attrs); // set XML attributes from passed list 
+
+          // determine where this goes and then insert it 
+          if( parentNodeName.equals(XDFNodeName.ARRAY) ) 
+          {
+
+            newparameter = CurrentArray.addParameter(newparameter);
+
+          } else if ( parentNodeName.equals(XDFNodeName.ROOT) 
+              || parentNodeName.equals(XDFNodeName.STRUCTURE) )
+          {
+
+            newparameter = CurrentStructure.addParameter(newparameter);
+
+          } else if ( parentNodeName.equals(XDFNodeName.PARAMETERGROUP) ) 
+
+          {
+            // for now, just add as regular parameter 
+           // newparameter = LastParameterGroupParentObject.addParameter(newparameter);
+
+          } else {
+            Log.errorln("Error: weird parent node "+parentNodeName+" for parameter");
+            System.exit(-1); // fatal error, shut down 
+          }
+
+          // add this object to all open groups
+          Iterator iter = CurrentParameterGroupList.iterator();
+          while (iter.hasNext()) {
+             ParameterGroup nextParamGroupObj = (ParameterGroup) iter.next();
+             newparameter.addToGroup(nextParamGroupObj);
+          }
+
+          LastParameterObject = newparameter;
+
        }
     }
 
@@ -777,13 +934,60 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class parameterGroupEndElementHandlerFunc implements EndElementHandlerAction {
        public void action () {
-          Log.errorln("PARAMETERGROUP End handler not implemented yet.");
+          // peel off the last object in the parametergroup list
+          CurrentParameterGroupList.remove(CurrentParameterGroupList.size()-1);
        }
     }
 
     class parameterGroupStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("PARAMETERGROUP Start handler not implemented yet.");
+
+         // grab parent node name
+          String parentNodeName = getParentNodeName();
+
+          // create new object appropriately 
+          ParameterGroup newparamGroup = new ParameterGroup();
+          newparamGroup.setXMLAttributes(attrs); // set XML attributes from passed list 
+
+          // determine where this goes and then insert it 
+          if( parentNodeName.equals(XDFNodeName.ARRAY) )
+          {
+
+              newparamGroup = CurrentArray.addParamGroup(newparamGroup);
+              LastParameterGroupParentObject = CurrentArray;
+
+          } else if ( parentNodeName.equals(XDFNodeName.ROOT)
+              || parentNodeName.equals(XDFNodeName.STRUCTURE) )
+          {
+
+              newparamGroup = CurrentStructure.addParamGroup(newparamGroup);
+              LastParameterGroupParentObject = CurrentStructure;
+
+          } else if ( parentNodeName.equals(XDFNodeName.PARAMETERGROUP) )
+
+          {
+
+              ParameterGroup LastParamGroupObject = (ParameterGroup) 
+                   CurrentParameterGroupList.get(CurrentParameterGroupList.size()-1); 
+              newparamGroup = LastParamGroupObject.addParamGroup(newparamGroup);
+
+          } else {
+
+              Log.errorln(" weird parent node $parent_node_name for parameterGroup");
+              System.exit(-1); // dump core :)
+
+          }
+
+          // add this object to all open groups
+          Iterator iter = CurrentParameterGroupList.iterator(); 
+          while (iter.hasNext()) {
+             ParameterGroup nextParamGroupObj = (ParameterGroup) iter.next();
+             newparamGroup.addToGroup(nextParamGroupObj);
+          }
+
+          // now add it to the list
+          CurrentParameterGroupList.add(newparamGroup);
+
        }
     }
 
@@ -898,21 +1102,52 @@ class SaxDocumentHandler implements DocumentHandler {
        }
     }
 
-    // UNITS
-    //
-
-    class unitsStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
-          Log.errorln("UNITS Start handler not implemented yet.");
-       }
-    }
-
     // VALUE 
     //
 
     class valueCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (char buf [], int offset, int len) {
-          System.out.println("VALUE Char Data Handler NOT implemented yet.");
+
+          // 1. grab parent node name
+          String parentNodeName = getParentNodeName();
+          
+          // 2. create new object appropriately 
+          Value newvalue = new Value();
+          // reconsitute the value node PCdata from passed information.
+          // and add value to object
+          newvalue.setValue( new String (buf, offset, len) );
+
+          // 3. determine where this goes and then insert it 
+          if( parentNodeName.equals(XDFNodeName.PARAMETER) )
+          {
+
+              newvalue = LastParameterObject.addValue(newvalue);
+
+          } else if ( parentNodeName.equals(XDFNodeName.AXIS) ) 
+          {
+
+              List axisList = (List) CurrentArray.getAxisList();
+              Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+              newvalue = lastAxisObject.addAxisValue(newvalue);
+
+          } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
+
+          {
+
+             // nothing here yet
+
+          } else {
+             Log.errorln("Error: weird parent node "+parentNodeName+" for value.");
+             System.exit(-1); // fatal error, shut down 
+          }
+
+          // 4. add this object to all open groups
+          Iterator iter = CurrentValueGroupList.iterator();
+          while (iter.hasNext()) {
+             ValueGroup nextValueGroupObj = (ValueGroup) iter.next();
+             newvalue.addToGroup(nextValueGroupObj);
+          }
+
        }
     }
 
@@ -921,13 +1156,60 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class valueGroupEndElementHandlerFunc implements EndElementHandlerAction {
        public void action () {
-          Log.errorln("VALUEGROUP End handler not implemented yet.");
+          CurrentValueGroupList.remove(CurrentValueGroupList.size()-1);
        }
     }
 
     class valueGroupStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("VALUEGROUP Start handler not implemented yet.");
+
+          // 1. grab parent node name
+          String parentNodeName = getParentNodeName();
+
+          // 2. create new object appropriately 
+          ValueGroup newvalueGroup = new ValueGroup();
+          newvalueGroup.setXMLAttributes(attrs); // set XML attributes from passed list 
+
+          // 3. determine where this goes and then insert it 
+          if( parentNodeName.equals(XDFNodeName.AXIS) )
+          {
+
+              // get the last axis
+              List axisList = (List) CurrentArray.getAxisList();
+              Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+              newvalueGroup = lastAxisObject.addValueGroup(newvalueGroup);
+
+              LastValueGroupParentObject = lastAxisObject;
+
+          } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
+          {
+
+              newvalueGroup = LastParameterObject.addValueGroup(newvalueGroup);
+              LastValueGroupParentObject = LastParameterObject;
+
+          } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
+
+          {
+
+             ValueGroup lastValueGroup = (ValueGroup) 
+                    CurrentValueGroupList.get(CurrentValueGroupList.size()-1);
+             newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
+
+          } else {
+             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUEGROUP);
+             System.exit(-1); // fatal error, shut down 
+          }
+
+          // 4. add this object to all open groups
+          Iterator iter = CurrentValueGroupList.iterator();
+          while (iter.hasNext()) {
+             ValueGroup nextValueGroupObj = (ValueGroup) iter.next();
+             newvalueGroup.addToGroup(nextValueGroupObj);
+          }
+
+          // now add it to the list
+          CurrentValueGroupList.add(newvalueGroup);
+
        }
     }
 
@@ -936,13 +1218,136 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class valueListCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (char buf [], int offset, int len) {
-          System.out.println("VALUELIST Char Data Handler NOT implemented yet.");
+
+          String valueListString = new String (buf, offset, len);
+
+          // split up string based on declared delimiter
+/*
+  my $delimiter = '/' . $CURRENT_VALUELIST{'delimiter'};
+  if ($CURRENT_VALUELIST{'repeatable'} eq 'yes') {
+    $delimiter .= '+/';
+  } else {
+    $delimiter .= '/';
+  }
+  my @values;
+  eval " \@values = split $delimiter, \$string ";
+*/
+
        }
     }
 
     class valueListStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("VALUELIST Start handler not implemented yet.");
+ 
+           // 1. grab parent node name
+           String parentNodeName = getParentNodeName();
+
+           // 2. try to determine values from attributes (e.g. algorithm method)
+           ArrayList values =  getValueListNodeValues(attrs);
+
+           // IT could be that no values exist because they are stored
+           // in PCDATA rather than as algorithm (treat in char data handler
+           // in this case).
+           if(values.size() > 0 ) { // algoritm case 
+ 
+              ArrayList valueObjList = new ArrayList();
+
+              if( parentNodeName.equals(XDFNodeName.AXIS) )
+              {
+
+                    // get the last axis
+                    List axisList = (List) CurrentArray.getAxisList();
+                    Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+
+                    Iterator iter = values.iterator();
+                    while (iter.hasNext()) {
+                        String valuePCDATA = (String) iter.next();
+                        Value value = new Value (valuePCDATA);
+                        valueObjList.add(lastAxisObject.addAxisValue(value));
+Log.errorln("ADD AXIS VALUE:["+valuePCDATA+"]");
+                    }
+
+              } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
+              {
+
+                   /*
+                    ValueGroup lastValueGroup = (ValueGroup)
+                         CurrentValueGroupList.get(CurrentValueGroupList.size()-1);
+                     newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
+                   */
+
+/*
+        my $method;
+        if (ref($LAST_VALUEGROUP_PARENT_OBJECT) eq 'XDF::Parameter') {
+           $method = "addValue";
+        } elsif (ref($LAST_VALUEGROUP_PARENT_OBJECT) eq 'XDF::Axis') {
+           $method = "addAxisValue";
+        } else {
+           my $name = ref($LAST_VALUEGROUP_PARENT_OBJECT);
+           die " ERROR: UNKNOWN valueGroupParent object ($name), can't treat for valueList.\n";
+        }
+
+        foreach my $val (@values) {
+           push @valueObjList, $LAST_VALUEGROUP_PARENT_OBJECT->$method($val);
+        }
+
+*/
+
+              } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
+              { 
+
+                 Iterator iter = values.iterator();
+                 while (iter.hasNext()) 
+                 {
+                    String valuePCDATA = (String) iter.next();
+                    Value value = new Value (valuePCDATA);
+                    valueObjList.add(LastParameterObject.addValue(value));
+                 }
+
+
+              } else {
+                 Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST);
+                 System.exit(-1); // fatal error, shut down 
+              }
+
+              // add these new value objects to all open groups
+              Iterator iter1 = CurrentValueGroupList.iterator();
+              Iterator iter2 = valueObjList.iterator();
+              while (iter1.hasNext()) 
+              {
+                 ValueGroup nextValueGroupObj = (ValueGroup) iter1.next();
+                 while (iter2.hasNext()) 
+                 {
+                    Value nextValueObj = (Value) iter2.next();
+                    nextValueObj.addToGroup(nextValueGroupObj);
+                 }
+                 // reset iter2
+                 iter2 = valueObjList.iterator();
+              }
+
+           } else { // PCDATA case
+
+              String delimiter = DefaultValueListDelimiter;
+              String repeatable = DefaultValueListRepeatable;
+
+              // pickup overriding values from attribute list
+              for (int i = 0; i < attrs.getLength(); i++)
+              {
+                   String name = attrs.getName(i); 
+                  if ( name.equals("delimiter") ) { 
+                     delimiter = attrs.getValue(i);
+                  } else if ( name.equals("repeatable")) {
+                     repeatable = attrs.getValue(i);
+                  }
+              }
+
+              CurrentValueListParameter = new Hashtable(); // re-init
+
+              CurrentValueListParameter.put("parentNode", parentNodeName);
+              CurrentValueListParameter.put("delimiter", delimiter);
+              CurrentValueListParameter.put("repeatable", repeatable);
+
+           }
        }
     }
 
@@ -961,6 +1366,10 @@ class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/10/26 20:42:33  thomas
+ * Another interim version. Putting into CVS so I can
+ * sync w/ kellys other changes easier. -b.t.
+ *
  * Revision 1.1  2000/10/25 17:57:00  thomas
  * Initial Version. -b.t.
  *
