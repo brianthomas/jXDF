@@ -1144,6 +1144,11 @@ public class DataCube extends BaseObject {
    throws SetDataException
    {
 
+      if (shortIndex < 0 || longIndex < 0) 
+      {
+         throw new SetDataException("Cant set data: passed locator/axes dont belong to this array?");
+      }
+
       // Does the location exist yet? If not, create the primative arrays 
       // that lie along the short axis
       // int shortAxisSize = getShortAxis().getLength();
@@ -2000,6 +2005,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.50  2001/09/20 20:59:36  thomas
+  * checkBounds now checks for neg. short/long internal axes values
+  *
   * Revision 1.49  2001/09/20 15:07:48  thomas
   * added some float handling
   *
