@@ -230,7 +230,7 @@ public class Reader
 
         } catch (SAXParseException err) {
             String message = "** Parsing error"+", line "+err.getLineNumber()
-                +", uri "+err.getSystemId()+"   " + err.getMessage();
+                +", uri "+err.getSystemId()+" error msg:" + err.getMessage();
             throw new java.io.IOException(message);
 
         } catch (SAXException e) {
