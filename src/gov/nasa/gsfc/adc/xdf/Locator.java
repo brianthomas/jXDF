@@ -43,6 +43,7 @@ import java.util.List;
   //
   protected Array parentArray;
   protected List axisOrderList;
+  private boolean HasNext;
 
   //hashtable to store the (axis, index) pair
   protected Hashtable locations;
@@ -69,11 +70,13 @@ import java.util.List;
 
   }
 
-  /** set the index of an axis
+  /** Set the index of an axis.
    * @param axisObj - the axis Object
             index - the index of the axis
    */
-  public void setAxisLocation (AxisInterface axisObj, int index) throws AxisLocationOutOfBoundsException {
+  public void setAxisIndex (AxisInterface axisObj, int index) 
+  throws AxisLocationOutOfBoundsException 
+  {
     if ((!parentArray.getAxisList().contains(axisObj)) ||
         (index < 0) ||
         (index > axisObj.getLength()-1) ) {
@@ -83,78 +86,124 @@ import java.util.List;
     locations.put(axisObj, new Integer(index));
   }
 
-  /** get the index of an Axis in the Locator object
-   *
-   * @return index if successful, -1 if not
+  /** Get the current index (for a particular Axis) in this Locator object. 
+      @return the current index if successful, -1 if no such Axis exists in this locator.
    */
-  public int getAxisLocation (AxisInterface axisObj) {
-     if ((!parentArray.getAxisList().contains(axisObj)) ) {
-        Log.error("axisObj is not an Axis ref contained in Locator's parentArray");
-        Log.error("regnore request");
-        return -1;
-     }
-     Integer loc = (Integer) locations.get(axisObj);
-     if (loc !=null)
-      return loc.intValue();
-     else {
-      Log.error("error, parentArray constains the axisObj, but Location doens't");
-      return -1;
-    }
-  }
+   public int getAxisIndex (AxisInterface axisObj) 
+   {
+
+       Integer loc = (Integer) locations.get(axisObj);
+ 
+       if (loc !=null)
+          return loc.intValue();
+
+       return -1;
+
+   }
+
+   /** Get the current index (for a particular Axis) in this Locator object. 
+       @return the current value if successful, null if no such Axis exists in this locator.
+   */
+   public Value getAxisValue (Axis axisObj)
+   {
+
+       Integer loc = (Integer) locations.get(axisObj);
+ 
+       if (loc != null)
+          return (Value) axisObj.getValueList().get(loc.intValue());
+
+       return (Value) null;
+
+   }
 
 
-  /** set the index of an axis to the index of a value
-   * along that axis
-   * @return index if successful, -1 if not
+
+
+   /** Set the index of an axis to the index of a value
+       along that axis
+    */
+   public void setAxisIndexByAxisValue(Axis axisObj, Value valueObj) 
+   throws AxisLocationOutOfBoundsException
+   {
+
+      if ((!parentArray.getAxisList().contains(axisObj)) ||
+          valueObj == null ) {
+          Log.error("Either axisObj is not an Axis ref contained in Locator's parentArray or Value is null");
+          Log.errorln("Ignoring request.");
+       }
+
+       try {
+          setAxisIndex(axisObj, axisObj.getIndexFromAxisValue(valueObj));
+       } catch (AxisLocationOutOfBoundsException e) {
+          throw e;
+       }
+
+   }
+
+  /** @return true if there are more elements, false if no more elements
    */
-  public void setAxisLocationByAxisValue(Axis axisObj, Value valueObj) throws AxisLocationOutOfBoundsException{
-    if ((!parentArray.getAxisList().contains(axisObj)) ||
-        valueObj == null ) {
-        Log.error("either axisObj is not an Axis ref contained in Locator's parentArray or Value is null");
-        Log.error("regnore request");
-     }
-    try {
-       setAxisLocation(axisObj, axisObj.getIndexFromAxisValue(valueObj));
-    }
-    catch (AxisLocationOutOfBoundsException e) {
-       throw e;
-    }
+  public boolean hasNext() 
+  {
+     return HasNext;
   }
-  /**@return true if there are more element, false if no more elements
-   */
-  public boolean hasNext() {
+
+/*
+  public boolean hasNext() 
+  {
+
     int size = axisOrderList.size();
+
     for (int i = 0; i < size ; i++) {
       AxisInterface axis = (AxisInterface) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
-      if (index < axis.getLength()-1) {
-        return true;
-      }
+      if (index < (axis.getLength()-1)) {
+        return true; // because index not at last position
+                     // on that axis it must be true there is a next location 
+                     // within the dataCube
+      } //else if (index == (axis.getLength()-1)) {
+        // at limit of the position 
+      //}
     }
+
     return false;
+
   }
+*/
 
   /** Change the locator coordinates to the next datacell as
-   * determined from the locator iteration order.
-   *  Returns '0' if it must cycle back to the first datacell
-   *  to set a new 'next' location.
+      determined from the locator iteration order.
+      Returns false if it must cycle back to the first datacell
+      to set a new 'next' location.
    */
+
   public boolean next() {
-    boolean outofDataCells = true;
+
+    boolean outOfDataCells = true;
+
+    HasNext = true;
 
     int size = axisOrderList.size();
     for (int i = 0; i < size ; i++) {
       AxisInterface axis = (AxisInterface) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
+      // are we still within the axis?
       if (index < axis.getLength()-1) {
-        outofDataCells = false;
+        outOfDataCells = false;
+        // advance current index by one 
         index++;
-        locations.put(axis, new Integer(index));
+        locations.put(axis, new Integer(index)); 
         break;  //get out of the for loop
       }
-      locations.put(axis, new Integer(0));
+
+      locations.put(axis, new Integer(0)); // reset index back to the origin of this axis 
     }
-    return !outofDataCells;
+
+    // we cycled back to the origin. Set the global
+    // to let us know
+    if (outOfDataCells) HasNext = false;
+
+    return !outOfDataCells;
+
   }
 
   /** Change the locator coordinates to the previous datacell as
@@ -162,7 +211,9 @@ import java.util.List;
    * Returns '0' if it must cycle to the last datacell.
    */
   public boolean prev() {
-    boolean outofDataCell = true;
+    boolean outOfDataCells = true;
+
+    HasNext = true;
 
     int size = axisOrderList.size();
     for (int i = 0; i < size ; i++) {
@@ -174,43 +225,18 @@ import java.util.List;
       }
       else {
         locations.put(axis, new Integer(index));
-        outofDataCell = false;
+        outOfDataCells = false;
         break;  //get out of the for loop
       }
     }
 
-    return !outofDataCell;
+    if (outOfDataCells) HasNext = false;
+
+    return !outOfDataCells;
   }
-
-  // Umm. Not sure what Kelly is doing here. Bizarre. -b.t.
-/*
-  public void setIterationOrder(List axisOrderListRef) {
-
-    //have to check the list elements are of type Axis, double check
-    List oldList = axisOrderList;
-    axisOrderList = Collections.synchronizedList(new ArrayList());
-    int index = 0;
-    int size = axisOrderListRef.size();
-    for (int i = 0; i < size; i++) {
-      AxisInterface axis = (AxisInterface) axisOrderListRef.get(i);
-      int oldsize = oldList.size();
-      for (int j = 0; j < oldsize; j++) {
-        AxisInterface oldAxis = (AxisInterface) oldList.get(j);
-        if (oldAxis.equals(axis)) {
-          axisOrderList.add(axis);
-          break;
-        }
-      }  //end of inner for loop
-    } //end of outer for loop
-
-    oldList = null;  //force garbage collection
-    return;
-
-  }
-*/
 
   /**
-   * @return an array of Axises, whose order in the array correspondes to
+   * @return an array of Axes, whose order in the array correspondes to
    * the iteration order
    */
   public List getIterationOrder() {
@@ -309,8 +335,10 @@ import java.util.List;
     // Private Methods
     //
 
-
     private void init (Array array) {
+
+       // just created, must be a next cell
+       HasNext = true;
 
        // set the parentArray
        parentArray = array;
@@ -341,6 +369,10 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2001/02/07 18:32:33  thomas
+ * Fixed "hasNext" to correct meaning. Was dropping
+ * last value within the array from consideration. -b.t
+ *
  * Revision 1.18  2001/01/22 22:10:28  thomas
  * Added removeAxis method. Fixed bug in addAxis, making
  *  bad assumption about readAxisordering. -b.t.
