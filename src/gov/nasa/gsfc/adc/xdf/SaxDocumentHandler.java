@@ -86,7 +86,7 @@ public class SaxDocumentHandler implements DocumentHandler {
 
     // GLOBALs for saving these between dataFormat/read node and later when we 
     // know what kind of DataFormat/DataIOStyle object we really have
-    private AttributeList DataIOStyleAttribs;
+    private Hashtable DataIOStyleAttribs;
     private AttributeList DataFormatAttribs;
 
     // for tagged reads only. Keeps track of which data tags are open
@@ -826,7 +826,8 @@ public class SaxDocumentHandler implements DocumentHandler {
            readObj.setXMLAttributes(attrs);
            CurrentArray.setXMLDataIOStyle(readObj);
 
-           CurrentFormatObjectList.add(readObj);
+         // is this needed??
+         //  CurrentFormatObjectList.add(readObj);
 
            return readObj;
 
@@ -836,8 +837,10 @@ public class SaxDocumentHandler implements DocumentHandler {
     // asciiDelimiter node end
     class asciiDelimiterEndElementHandlerFunc implements EndElementHandlerAction {
        public void action (SaxDocumentHandler handler) { 
+
            // pop off last value
-           CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
+           // CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
+
        }
     }
 
@@ -1113,6 +1116,9 @@ public class SaxDocumentHandler implements DocumentHandler {
       $data_has_special_integers = $formatObj->hasSpecialIntegers;
 
 */
+
+                 Log.errorln("FORMATTED DATA READ Template:"+formatObj.getTemplateNotation());
+
                  Log.errorln("FORMATTED DATA READ NOT SUPPORTED");
 
               } else {
@@ -1848,7 +1854,15 @@ public class SaxDocumentHandler implements DocumentHandler {
        public Object action (SaxDocumentHandler handler, AttributeList attrs) {
 
           // save these for later, when we know what kind of dataIOstyle we got
-          DataIOStyleAttribs = attrs;
+          // Argh we really need a clone on AttributeList. Just dumb copy for now.
+          DataIOStyleAttribs = new Hashtable();
+          int size = attrs.getLength(); 
+          for (int i = 0; i < size; i++) { 
+             String name = attrs.getName(i); 
+             String value = attrs.getValue(i);
+             if (value != null) 
+                DataIOStyleAttribs.put(name, value);
+          }
 
           // clear out the format command object array
           // (its used by Formatted reads only, but this is reasonable 
@@ -1869,7 +1883,36 @@ public class SaxDocumentHandler implements DocumentHandler {
 
     class readCellStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, AttributeList attrs) {
-          Log.errorln("READCELL Start handler not implemented yet.");
+
+          // if this is still defined, we havent init'd an
+          //  XMLDataIOStyle object for this array yet, do it now. 
+          if ( !(DataIOStyleAttribs.isEmpty()) ) {
+
+             FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
+             // readObj.setXMLAttributes(DataIOStyleAttribs);
+             CurrentArray.setXMLDataIOStyle(readObj); 
+
+             DataIOStyleAttribs = new Hashtable();  // clear table 
+             CurrentFormatObjectList.add(readObj);
+
+          }
+
+          // okey, now that that is taken care off, we will go
+          // get the current format (read) object, and add the readCell
+          // command to it.
+          Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
+
+          ReadCellFormattedIOCmd readCellObj = new ReadCellFormattedIOCmd();
+          readCellObj.setXMLAttributes(attrs);
+
+          if (formatObj instanceof FormattedXMLDataIOStyle) {
+             return ((FormattedXMLDataIOStyle) formatObj).addFormatCommand(readCellObj);
+          } else if ( formatObj instanceof RepeatFormattedIOCmd ) {
+             return ((RepeatFormattedIOCmd) formatObj).addFormatCommand(readCellObj);
+          } else {
+             Log.warnln("Warning: cant add ReadCellFormattedIOCmd object to parent, ignoring request ");
+          }
+
           return (Object) null;
        }
     }
@@ -1886,8 +1929,41 @@ public class SaxDocumentHandler implements DocumentHandler {
 
     class repeatStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, AttributeList attrs) {
-          Log.errorln("REPEAT Start handler not implemented yet.");
+
+          // if this is still defined, we havent init'd an
+          //  XMLDataIOStyle object for this array yet, do it now. 
+          if ( !DataIOStyleAttribs.isEmpty()) {
+
+             // FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle(CurrentArray);
+             FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
+             // readObj.setXMLAttributes(DataIOStyleAttribs);
+             CurrentArray.setXMLDataIOStyle(readObj);
+
+             DataIOStyleAttribs = new Hashtable ();
+             CurrentFormatObjectList.add(readObj);
+
+          }
+
+          // okey, now that that is taken care off, we will go
+          // get the current format (read) object, and add the readCell
+          // command to it.
+          Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
+
+          RepeatFormattedIOCmd repeatObj = new RepeatFormattedIOCmd();
+          repeatObj.setXMLAttributes(attrs);
+
+          if (formatObj instanceof FormattedXMLDataIOStyle) {
+             CurrentFormatObjectList.add(repeatObj);
+             return ((FormattedXMLDataIOStyle) formatObj).addFormatCommand(repeatObj);
+          } else if ( formatObj instanceof RepeatFormattedIOCmd ) {
+             CurrentFormatObjectList.add(repeatObj);
+             return ((RepeatFormattedIOCmd) formatObj).addFormatCommand(repeatObj);
+          } else {
+             Log.warnln("Warning: cant add RepeatFormattedIOCmd object to parent, ignoring request ");
+          }
+
           return (Object) null;
+
        }
     }
 
@@ -1918,8 +1994,39 @@ public class SaxDocumentHandler implements DocumentHandler {
 
     class skipCharStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
-          Log.errorln("SKIPCHAR Start handler not implemented yet.");
+
+          // if this is still defined, we havent init'd an
+          //  XMLDataIOStyle object for this array yet, do it now. 
+          if ( !DataIOStyleAttribs.isEmpty()) {
+
+             // FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle(CurrentArray);
+             FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
+             // readObj.setXMLAttributes(DataIOStyleAttribs);
+             CurrentArray.setXMLDataIOStyle(readObj);
+
+             DataIOStyleAttribs = new Hashtable(); // clear out table 
+             CurrentFormatObjectList.add(readObj);
+
+          }
+
+          // okey, now that that is taken care off, we will go
+          // get the current format (read) object, and add the readCell
+          // command to it.
+          Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
+
+          SkipCharFormattedIOCmd skipObj = new SkipCharFormattedIOCmd();
+          skipObj.setXMLAttributes(attrs);
+
+          if (formatObj instanceof FormattedXMLDataIOStyle) {
+             return ((FormattedXMLDataIOStyle) formatObj).addFormatCommand(skipObj);
+          } else if ( formatObj instanceof RepeatFormattedIOCmd ) {
+             return ((RepeatFormattedIOCmd) formatObj).addFormatCommand(skipObj);
+          } else {
+             Log.warnln("Warning: cant add SkipCharFormattedIOCmd object to parent, ignoring request ");
+          }
+
           return (Object) null;
+
        }
     }
 
@@ -2366,6 +2473,10 @@ public class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2000/11/17 22:29:23  thomas
+ * Some changes to allow formattedIO, not finished with
+ * the data handler yet tho. -b.t.
+ *
  * Revision 1.15  2000/11/17 16:01:43  thomas
  * Minor bug fix, needed to switch to using Specification
  * class. -b.t.
