@@ -228,7 +228,8 @@ public class ExponentialDataFormat extends DataFormat {
    */
   private void init() {
 
-     specificDataFormatName = "exponent";
+    specificDataFormatName = "exponential";
+
     //add attributes
     attribOrder.add(0,"exponent");
     attribOrder.add(0,"precision");
@@ -247,6 +248,9 @@ public class ExponentialDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/01/22 22:09:53  thomas
+ * Node name was wrong(!) fixed to "exponential" as DTD likes it. -b.t.
+ *
  * Revision 1.10  2001/01/17 18:29:19  thomas
  * Brought class up to 0.17 standard of width,
  * precision AND exponent attributes. -b.t.
