@@ -158,6 +158,26 @@ public abstract class BaseObject implements Serializable, Cloneable {
     return attribHash;
   }
 
+  /** Get a specific XMLAttribute by its name
+   */
+  public XMLAttribute getXMLAttribute (String attribName) {
+     XMLAttribute obj = (XMLAttribute) attribHash.get(attribName);
+     return obj;
+  }
+
+  /** Get the value of a specific XMLAttribute. Only returns non-null
+      if the XMLAttribute exists and is of STRING_TYPE.
+   */
+  public String getXMLAttributeStringValue(String attribName) 
+  {
+      String value = null;
+      XMLAttribute attrib = getXMLAttribute(attribName); 
+      if (attrib != null && attrib.getAttribType() == Constants.STRING_TYPE) {
+        value = (String) attrib.getAttribValue();
+      }
+      return value;
+  }
+
   //
   // Other Public Methods
   //
@@ -284,8 +304,22 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   }
 
+  public void toXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+  throws java.io.IOException
+  {
 
-  public void toXMLWriter ( 
+     basicXMLWriter(outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+     if (Specification.getInstance().isPrettyXDFOutput()) //  && nodeNameString != null)
+          outputWriter.write(Constants.NEW_LINE);
+  }
+
+  private void basicXMLWriter ( 
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -426,8 +460,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
       }
 
-      if (Specification.getInstance().isPrettyXDFOutput()  && nodeNameString != null) 
-	  outputWriter.write(Constants.NEW_LINE);
+//      if (Specification.getInstance().isPrettyXDFOutput()  && nodeNameString != null) 
+//	  outputWriter.write(Constants.NEW_LINE);
 
     }//synchronize
 
@@ -553,7 +587,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
      // hurm. Cant figure out how to use BufferedWriter here. fooey.
      Writer outputWriter = (Writer) new StringWriter();
      try {
-        toXMLWriter(outputWriter, "", false, null, null);
+        // we use this so that newline *isnt* appended onto the last element node
+        basicXMLWriter(outputWriter, "", false, null, null);
      } catch (java.io.IOException e) { 
         // weird. Out of memorY?
         Log.errorln("Cant got IOException for toXMLWriter() method within toXMLString().");
@@ -924,6 +959,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.54  2001/08/31 19:58:52  thomas
+ * fix to toXMLString, wont append newline
+ *
  * Revision 1.53  2001/07/31 21:09:46  thomas
  * toXMLString no longer throws ioexception.
  *
