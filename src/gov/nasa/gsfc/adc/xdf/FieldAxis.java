@@ -3,19 +3,22 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 
 // FieldAxis.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
 
-
-
 public class FieldAxis extends BaseObject implements AxisInterface{
 
   //
- //Fields
- //
+  //Fields
+  //
 
   //length of the FieldAxis
   protected int length;
@@ -48,39 +51,6 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     hashtableInitXDFAttributes(InitXDFAttributeTable);
 
   }
-
-
- /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init()
-  {
-
-    classXDFNodeName = "fieldAxis";
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"fieldList");
-    attribOrder.add(0,"axisIdRef");
-    attribOrder.add(0,"axisId");
-    attribOrder.add(0,"align");  //not sure what it is???
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
-
-     //set up the attribute hashtable key with the default initial value
-
-     //set the minimum array size(essentially the size of the axis)
-    attribHash.put("fieldList", new XMLAttribute(Collections.synchronizedList(new ArrayList(super.sDefaultDataArraySize)), Constants.LIST_TYPE));
-    attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("aligh", new XMLAttribute(null, Constants.STRING_TYPE));  //double check??
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
-
-    length = 0;
-
-  }
-
 
   //
   //Get/Set Methods
@@ -246,10 +216,12 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     Log.error("in FieldAxis, removeField, method empty");
     return null;
   }
+
   public Field removeField(Field field) {
     Log.error("in FieldAxis, removeField, method empty");
     return null;
   }
+
   public DataFormat[] getDataFormatList() {
     DataFormat[] dataFormatList = new DataFormat[length];
     List fieldList = getFieldList();
@@ -257,11 +229,79 @@ public class FieldAxis extends BaseObject implements AxisInterface{
       dataFormatList[i]=(((Field) fieldList.get(i)).getDataFormat());
     return dataFormatList;
   }
+
+
+  /**Insert a FieldGroup object into this object.
+   * @param: FieldGroup to be added
+   * @return:an FieldGroup object reference on success, null on failure.
+   */
+  public FieldGroup addFieldGroup (FieldGroup group) {
+     if (group !=null) {
+         //add the group to the groupOwnedHash
+         fieldGroupOwnedHash.add(group);
+         return group;
+      }
+      else {
+          Log.warn("in FieldAxis.addParamGroup(). FieldGroup passed in is null");
+          return null;
+      }
+  }
+
+  /** Remove a FieldGroup object from this object.
+   * @param: FieldGroup to be removed
+   * @return: true on success, false on failure
+   */
+  public boolean removeFieldGroup(FieldGroup group) {
+    if (group == null) {
+      Log.warn("in Structure.removeFieldGroup(). FieldGroup passed in is null");
+      return false;
+    }
+    return fieldGroupOwnedHash.remove(group);
+  }
+
+  //
+  // Private Methods
+  //
+
+  /** a special private method used by constructor methods to
+   *  conviently build the XML attribute list for a given class.
+   */
+  private void init()
+  {
+
+    classXDFNodeName = "fieldAxis";
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0,"fieldList");
+    attribOrder.add(0,"axisIdRef");
+    attribOrder.add(0,"axisId");
+    attribOrder.add(0,"align");  //not sure what it is???
+    attribOrder.add(0,"description");
+    attribOrder.add(0,"name");
+
+     //set up the attribute hashtable key with the default initial value
+
+     //set the minimum array size(essentially the size of the axis)
+    attribHash.put("fieldList", new XMLAttribute(Collections.synchronizedList(new ArrayList(super.sDefaultDataArraySize)), Constants.LIST_TYPE));
+    attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("aligh", new XMLAttribute(null, Constants.STRING_TYPE));  //double check??
+    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+
+    length = 0;
+
+  }
+
 }
 
  /**
   * Modification History:
   * $Log$
+  * Revision 1.6  2000/11/01 21:59:58  thomas
+  * Added add/removeFieldGroup methods. -b.t.
+  *
   * Revision 1.5  2000/10/31 22:09:58  kelly
   * getDataFormatList() now returns DataFormat[], faster.  -k.z.
   *
