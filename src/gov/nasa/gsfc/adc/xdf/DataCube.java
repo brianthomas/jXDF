@@ -25,6 +25,7 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.List;
+import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Collections;
@@ -497,6 +498,8 @@ public void setData (Locator locator, double numValue)
 throws SetDataException
 {
 
+// Log.debugln("double setData["+numValue+"]");
+
   List axisList = parentArray.getAxisList();
   List prev = data;
   List current = data;
@@ -597,6 +600,9 @@ throws SetDataException
     current.set(newCoordinate, new byte[length]);
     current.set(newCoordinate+1, new double[length]);
   }
+
+//Log.debugln("Current is"+current.getClass().toString());
+//Log.debugln("retrieve item is"+ current.get(newCoordinate+1));
 
   int arrayLength = ((double[]) current.get(newCoordinate+1)).length;
   if ( arrayLength< index1+1) {  ////have to expand the array
@@ -785,6 +791,9 @@ throws SetDataException
 public void setData (Locator locator, String strValue) 
 throws SetDataException
 {
+
+// Log.debugln("setData["+strValue+"]");
+
   List axisList = parentArray.getAxisList();
   List prev = data;
   List current = data;
@@ -1134,13 +1143,24 @@ protected boolean  removeData (Locator locator) {
     String[] NoDataValues;
 
     if (parentArray.hasFieldAxis()) {
-      NoDataValues = new String[fastestAxis.getLength()];
+      NoDataValues = new String[parentArray.getFieldAxis().getLength()];
+      List fields = parentArray.getFieldAxis().getFields();
+      Iterator iter = fields.iterator();
+      int i = 0;
+      while (iter.hasNext()) {
+          Field field = (Field) iter.next();
+          if (field != null && field.getNoDataValue() != null) 
+              NoDataValues[i]=field.getNoDataValue().toString();
+          i++;
+      } 
+/*
       DataFormat[] dataFormatList = parentArray.getDataFormatList();
       for (int i = 0; i < NoDataValues.length; i++) {
         DataFormat d =  dataFormatList[i];
         if (d != null && d.getNoDataValue() != null) 
           NoDataValues[i]=d.getNoDataValue().toString();
       }
+*/
     }
     else {
           NoDataValues = new String[1];
@@ -1833,6 +1853,10 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.26  2001/04/27 21:27:50  thomas
+  * Small change to accomodate moving get/set LessThan, etc methods
+  * from dataformat to Field class.
+  *
   * Revision 1.25  2001/03/28 21:55:43  thomas
   * Doh! Perl code doesnt run in Java file. Fixed.
   *
