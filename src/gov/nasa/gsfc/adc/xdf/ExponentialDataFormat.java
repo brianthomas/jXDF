@@ -39,8 +39,6 @@ public class ExponentialDataFormat extends DataFormat {
   //
   //Fields
   //
-  public static final int ExponentSize = 2;  //double check
-
 
   /** The no argument constructor.
    */
@@ -114,7 +112,7 @@ public class ExponentialDataFormat extends DataFormat {
   }
 
   /** Set the precision of this exponential field from the portion to the  
-      right of the '.' to the exponent that follows the 'E'.
+      right of the '.' and to the left of the 'E'.
    */
   public void setPrecision(Integer precision) {
      ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
@@ -122,13 +120,30 @@ public class ExponentialDataFormat extends DataFormat {
   }
 
   /** Get the precision of this exponential field from the portion to the  
-      right of the '.' to the exponent that follows the 'E'.
+      right of the '.' to the left of the 'E'.
       @return the current *precision* attribute
    */
   public Integer getPrecision()
   {
     return (Integer) ((XMLAttribute) attribHash.get("precision")).getAttribValue();
   }
+
+  /** Set the exponent size of this exponential field. In other words the size of
+      the number which is to the right of the 'E'.
+   */
+  public void setExponent(Integer size) {
+     ((XMLAttribute) attribHash.get("exponent")).setAttribValue(size);
+     generateFormatPattern();
+  }
+
+  /** Get the size of the exponent of this exponential field.
+      @return the current *exponent* attribute
+   */
+  public Integer getExponent()
+  {
+    return (Integer) ((XMLAttribute) attribHash.get("exponent")).getAttribValue();
+  }
+
 
   //
   //Other PUBLIC Methods
@@ -155,10 +170,12 @@ public class ExponentialDataFormat extends DataFormat {
      StringBuffer rightpattern = new StringBuffer();
      StringBuffer etemplate = new StringBuffer();
 
+/*
+     // Old method
      // precision is the size of the exponent excluding 'E'
-     int esize = getPrecision().intValue();
+     int psize = getPrecision().intValue();
      // width including 'E' and exponent
-     int wsize = getWidth().intValue() - esize - 1;
+     int wsize = getWidth().intValue() - psize - 1;
 
      if(wsize > 2) 
         etemplate.append("#");
@@ -169,14 +186,38 @@ public class ExponentialDataFormat extends DataFormat {
         leftpattern.append("0");
 
      rightpattern.append("E0");
-     while (esize-- > 1)
+     while (psize-- > 1)
+        rightpattern.append("0");
+*/
+
+     // precision is the size of the exponent excluding 'E'
+     int psize = getPrecision().intValue();
+     int esize = getExponent().intValue();
+     // the width left of the '.'
+     int leftsize = getWidth().intValue() - psize - esize - 1;
+
+     while (leftsize-- > 2)
+        etemplate.append("#");
+
+     if (leftsize == 1)
+        leftpattern.append("0");
+
+     leftpattern.append(".");
+
+     while (psize-- > 0)
+        leftpattern.append("0");
+
+     rightpattern.append("E");
+
+     while (esize-- > 0)
         rightpattern.append("0");
 
      // finish building the template
      etemplate.append(leftpattern.toString()+rightpattern.toString());
      etemplate.append(";-"+leftpattern.toString()+rightpattern.toString());
-
+   
      formatPattern = etemplate.toString();
+
   }
 
   //
@@ -189,11 +230,13 @@ public class ExponentialDataFormat extends DataFormat {
 
      specificDataFormatName = "exponent";
     //add attributes
+    attribOrder.add(0,"exponent");
     attribOrder.add(0,"precision");
     attribOrder.add(0, "width");
 
-    attribHash.put("width", new XMLAttribute( new Integer(0), Constants.INTEGER_TYPE));
+    attribHash.put("exponent", new XMLAttribute( new Integer(0), Constants.INTEGER_TYPE));
     attribHash.put("precision", new XMLAttribute(new Integer(0), Constants.INTEGER_TYPE));
+    attribHash.put("width", new XMLAttribute( new Integer(0), Constants.INTEGER_TYPE));
 
     generateFormatPattern();
 
@@ -204,6 +247,10 @@ public class ExponentialDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/01/17 18:29:19  thomas
+ * Brought class up to 0.17 standard of width,
+ * precision AND exponent attributes. -b.t.
+ *
  * Revision 1.9  2000/11/22 22:05:21  thomas
  * Oops. forgot to remove debugging statement. done. =-b.t.
  *
