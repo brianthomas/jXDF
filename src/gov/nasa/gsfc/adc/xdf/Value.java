@@ -2,14 +2,29 @@
 // XDF Value
 // CVS $Id$
 
+/*
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*/
+
 package gov.nasa.gsfc.adc.xdf;
 
 /** Value.java
- * @version $Revision$
+   @version $Revision$
   */
-
-public class Value extends BaseObject{
-
+public class Value extends BaseObject {
 
    //
    // Constructors
@@ -18,6 +33,7 @@ public class Value extends BaseObject{
    /** Passed string sets the *value* attribute (PCDATA) 
        of this object.
     */
+
    public Value (String strValue) {
       init();
       setValue(strValue); // set value attribute from passed argument 
@@ -45,9 +61,9 @@ public class Value extends BaseObject{
    /**setValue: set the *value* attribute. 
       @return: the current *value* attribute (PCDATA) 
    */
-   public String setValue (String strValue)
+   public void setValue (String strValue)
    {
-      return (String) ((XMLAttribute) attribHash.get("value")).setAttribValue(strValue);
+      ((XMLAttribute) attribHash.get("value")).setAttribValue(strValue);
    }
 
    // 
@@ -76,6 +92,9 @@ public class Value extends BaseObject{
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/02 18:39:24  thomas
+ * Made changes. forget what.. -b.t.
+ *
  * Revision 1.4  2000/10/26 20:41:30  thomas
  * Inserted needed code to bring this to initial version. -b.t.
  *
