@@ -137,11 +137,12 @@ implements LexicalHandler
 
     // References recording the last object of these types created while
     // parsing the document
-    public Parameter LastParameterObject;
-    public Field     LastFieldObject;
-    public Note      LastNoteObject;
-    public Unit      LastUnitObject;
-    public Units     LastUnitsObject;
+    public Parameter  LastParameterObject;
+    public Field      LastFieldObject;
+    public Note       LastNoteObject;
+    public Unit       LastUnitObject;
+    public Units      LastUnitsObject;
+    public Polynomial LastPolynomialObject;
 
     // store some of the parent objects for various nodes
     public Object LastParameterGroupParentObject;
@@ -153,7 +154,7 @@ implements LexicalHandler
 
     // Keeping track of working valueList node (attributes) settings
     private ValueList CurrentValueList;
-    private String valueListString;
+    private Object    CurrentValueListParent;
 
     // Data writing stuff
     private int CurrentDataTagLevel = 0; // how nested we are within d0/d1/d2 data tags
@@ -443,10 +444,60 @@ implements LexicalHandler
        return CurrentStructure;
     }
 
+    protected Object componentObjectHandler(ConversionComponentInterface componentObj)
+    {
+
+          Object lastObject = getLastObject();
+
+          if (lastObject instanceof Conversion) {
+             ((Conversion) lastObject).addComponent(componentObj);
+             return componentObj;
+          } else {
+             Log.warnln("Warning: cant add component object:"+componentObj+" to parent:"+lastObject.getClass().toString()+"), not a valid object. Ignoring request ");
+          }
+
+          return null;
+    }
+
     private ElementNode createNewElementNode (String elementNodeName, Attributes attrs) {
        ElementNode myElement = new ElementNode(elementNodeName);
        myElement.setAttributes(attrs);
        return myElement;
+    }
+
+    protected ValueList addValueListToParent (ValueList newValueListObj) {
+ 
+          if( CurrentValueListParent instanceof Axis )  {
+
+                ((Axis)CurrentValueListParent).addAxisValueList(newValueListObj);
+
+          } else if( CurrentValueListParent instanceof Parameter ) {
+
+                ((Parameter)CurrentValueListParent).addValueList(newValueListObj);
+
+          } else if( CurrentValueListParent instanceof ValueGroup ) {
+
+                if (LastValueGroupParentObject instanceof Parameter) {
+
+                   ((Parameter) LastValueGroupParentObject).addValueList(newValueListObj);
+
+                } else if (LastValueGroupParentObject instanceof Axis) {
+
+                   ((Axis) LastValueGroupParentObject).addAxisValueList(newValueListObj);
+
+                } else {
+                   Log.errorln("Error: UNKNOWN valueGroupParent object "+LastValueGroupParentObject.toString()+
+                             " cant treat for "+newValueListObj+", Ignoring.");
+                   return null;
+                }
+          } else {
+
+              Log.errorln("Error: weird parent node "+CurrentValueListParent.toString()+
+                             " for "+newValueListObj+", Ignoring.");
+              return null;
+          }
+
+          return newValueListObj;
     }
 
     //
@@ -892,6 +943,7 @@ implements LexicalHandler
 
     }
 
+/*
     private Value createValueListValueObj (ValueList thisValueList, String valueString) {
 
        Value valueObj = new Value ();
@@ -940,6 +992,7 @@ implements LexicalHandler
 
        return valueObj;
     }
+*/
 
     // This is NOT the best implimentation. In fact, I freely 
     // admit that I dont understand what the entityResolver is 
@@ -1644,16 +1697,20 @@ Log.errorln("");
     //
     private void initStartHandlerHashtable () {
 
+       startElementHandlerHashtable.put(XDFNodeName.ADD, new addStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.ARRAY, new arrayStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.AXIS, new axisStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.AXISUNITS, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.BINARYFLOAT, new binaryFloatFieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.BINARYINTEGER, new binaryIntegerFieldStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.CONVERSION, new conversionStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.CHARS, new charsStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.DATA, new dataStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.DATAFORMAT, new dataFormatStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.DELIMITER, new delimiterStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.DO_READ_INSTRUCTIONS, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.EXPONENT, new exponentStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.EXPONENTON, new exponentOnStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELD, new fieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELDAXIS, new fieldAxisStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.FIELDRELATIONSHIP, new fieldRelationshipStartElementHandlerFunc());
@@ -1663,11 +1720,15 @@ Log.errorln("");
        startElementHandlerHashtable.put(XDFNodeName.INDEX, new noteIndexStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.INTEGER, new integerFieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.LOCATIONORDER, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.LOGARITHM, new logarithmStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.MULTIPLY, new multiplyStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.NATURALLOGARITHM, new naturalLogStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.NEWLINE, new newLineStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.NOTE, new noteStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.NOTES, new notesStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.PARAMETER, new parameterStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.PARAMETERGROUP, new parameterGroupStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.POLYNOMIAL, new polynomialStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.READ, new readStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.READ_DELIMITED_STYLE, new delimitedStyleStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.READ_FIXEDWIDTH_STYLE, new fixedStyleStartElementHandlerFunc());
@@ -1696,7 +1757,8 @@ Log.errorln("");
        startElementHandlerHashtable.put(XDFNodeName.UNITLESS, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUE, new valueStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupStartElementHandlerFunc());
-       startElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListDelimitedStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.VALUELIST_ALGORITHM, new valueListAlgorithmStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VECTOR, new vectorStartElementHandlerFunc());
 
     }
@@ -1705,6 +1767,7 @@ Log.errorln("");
     private void initCharDataHandlerHashtable () {
 
        charDataHandlerHashtable.put(XDFNodeName.DATA, new untaggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.POLYNOMIAL, new polynomialCharDataHandlerFunc());
        charDataHandlerHashtable.put(XDFNodeName.TD0, new taggedDataCharDataHandlerFunc());
        charDataHandlerHashtable.put(XDFNodeName.TD1, new taggedDataCharDataHandlerFunc());
        charDataHandlerHashtable.put(XDFNodeName.TD2, new taggedDataCharDataHandlerFunc());
@@ -1746,6 +1809,7 @@ Log.errorln("");
        endElementHandlerHashtable.put(XDFNodeName.VALUE, new valueEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.VALUELIST, new valueListEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.VALUELIST_ALGORITHM, new valueListEndElementHandlerFunc());
 
     }
 
@@ -1835,25 +1899,6 @@ Log.infoln(") ["+CurrentDataFormat+"]");
        }
 */
     }
-
-    private ArrayList splitStringIntoValueObjects ( String valueListString, ValueList thisValueList )
-    {
-
-        ArrayList valueList = new ArrayList();
-        ArrayList strList = splitStringIntoStringObjects( valueListString, thisValueList.getDelimiter(),
-                                                          thisValueList.getRepeatable(), null
-                                                        );
-
-        Iterator iter = strList.iterator();
-        while (iter.hasNext()) {
-           String strValue = (String) iter.next();
-           Value newvalue = createValueListValueObj(thisValueList, strValue);
-           valueList.add(newvalue);
-        }
-
-        return valueList;
-    }
-
 
     // *sigh* lack of regular expression support makes this 
     // more difficult to do. I expect that it will be possible to 
@@ -2340,6 +2385,7 @@ Log.errorln(" TValue:"+valueString);
     //
 
     // internal valueList class for holding info about various kinds.
+/*
     private class ValueList implements Cloneable {
 
        // needed for the algorithm description
@@ -2425,6 +2471,7 @@ Log.errorln(" TValue:"+valueString);
 
 
     }
+*/
 
     /*
        Now, Some defines based on XDF DTD.
@@ -2433,16 +2480,20 @@ Log.errorln(" TValue:"+valueString);
     public static class XDFNodeName 
     {
        // *sigh* cant decide if making this hashtable is better or not.
+       public static final String ADD = "add";
        public static final String ARRAY = "array";
        public static final String AXIS = "axis";
        public static final String AXISUNITS= "axisUnits";
        public static final String BINARYFLOAT = "binaryFloat";
        public static final String BINARYINTEGER = "binaryInteger";
+       public static final String CONVERSION = "conversion";
        public static final String CHARS= "chars";
        public static final String DATA = "data";
        public static final String DATAFORMAT = "dataFormat";
        public static final String DELIMITER = "delimiter";
        public static final String DO_READ_INSTRUCTIONS = "doInstruction";
+       public static final String EXPONENT = "exponent";
+       public static final String EXPONENTON = "exponentOn";
        public static final String FIELD = "field";
        public static final String FIELDAXIS = "fieldAxis";
        public static final String FIELDRELATIONSHIP = "relation";
@@ -2452,11 +2503,15 @@ Log.errorln(" TValue:"+valueString);
        public static final String INDEX = "index";
        public static final String INTEGER = "integer";
        public static final String LOCATIONORDER = "locationOrder";
+       public static final String LOGARITHM = "logarithm";
+       public static final String NATURALLOGARITHM = "naturalLogarithm";
+       public static final String MULTIPLY = "multiply";
        public static final String NEWLINE = "newLine";
        public static final String NOTE = "note";
        public static final String NOTES = "notes";
        public static final String PARAMETER = "parameter";
        public static final String PARAMETERGROUP = "parameterGroup";
+       public static final String POLYNOMIAL = "polynomial";
        public static final String ROOT = "XDF"; // beware setting this to the same name as structure 
        public static final String READ = "dataStyle";
        public static final String RECORDTERMINATOR = "recordTerminator";
@@ -2484,6 +2539,7 @@ Log.errorln(" TValue:"+valueString);
        public static final String UNITS = "units";
        public static final String UNITLESS = "unitless";
        public static final String VALUELIST = "valueList";
+       public static final String VALUELIST_ALGORITHM = "valueListAlgorithm";
        public static final String VALUE = "value";
        public static final String VALUEGROUP = "valueGroup";
        public static final String VECTOR = "unitDirection";
@@ -2598,6 +2654,21 @@ Log.errorln(" TValue:"+valueString);
 
        }
     }
+
+    // ADD COMPONENT
+    //
+    
+    class addStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+          Add addObj = new Add();
+          addObj.setAttributes(attrs);
+
+          return componentObjectHandler(addObj);
+       }
+    }     
 
     // ARRAY NODE
     //
@@ -2790,6 +2861,40 @@ Log.errorln(" TValue:"+valueString);
        }
     }
 
+
+    // CONVERSION
+    //
+
+    class conversionStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+          Conversion conversionObj = new Conversion();
+          conversionObj.setAttributes(attrs);
+
+          Object lastObject = getLastObject();
+
+          if (lastObject instanceof Array) {
+             ((Array) lastObject).setConversion(conversionObj);
+             return conversionObj;
+          } else if (lastObject instanceof Axis) {
+             ((Axis) lastObject).setConversion(conversionObj);
+             return conversionObj;
+          } else if (lastObject instanceof Parameter) {
+             ((Parameter) lastObject).setConversion(conversionObj);
+             return conversionObj;
+          } else if (lastObject instanceof Field) {
+             ((Field) lastObject).setConversion(conversionObj);
+             return conversionObj;
+          } else {
+             Log.warnln("Warning: cant set Conversion object in parent:"+lastObject.getClass().toString()+"), not a valid object. Ignoring request ");
+          }
+
+          return null;
+
+       }
+    }
 
     // CHARS
     //
@@ -3391,6 +3496,36 @@ while (iter.hasNext()) {
        }
     }
 
+    // EXPONENT COMPONENT
+    //
+
+    class exponentStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+          Exponent expObj = new Exponent();
+          expObj.setAttributes(attrs);
+
+          return componentObjectHandler(expObj);
+       }
+    }
+
+    // EXPONENTON COMPONENT
+    //
+
+    class exponentOnStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+          ExponentOn expObj = new ExponentOn();
+          expObj.setAttributes(attrs);
+
+          return componentObjectHandler(expObj);
+       }
+    }
+
 
     // FIELD
     //
@@ -3754,6 +3889,52 @@ while (iter.hasNext()) {
           return integerFormat;
        }
     }
+
+    // LOGARITHM COMPONENT
+    //
+
+    class logarithmStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+       
+          Logarithm logObj = new Logarithm();
+          logObj.setAttributes(attrs);
+          
+          return componentObjectHandler(logObj);
+       }
+    }     
+
+    // MULTIPLY COMPONENT
+    //
+    
+    class multiplyStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+          Multiply multiObj = new Multiply();
+          multiObj.setAttributes(attrs);
+
+          return componentObjectHandler(multiObj);
+       }
+    } 
+
+    // NATURALLOGARITHM COMPONENT
+    //
+
+    class naturalLogStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+          NaturalLogarithm natLogObj = new NaturalLogarithm();
+          natLogObj.setAttributes(attrs);
+
+          return componentObjectHandler(natLogObj);
+       }
+    }
+
 
     // NEWLINE
     //
@@ -4122,6 +4303,44 @@ while (iter.hasNext()) {
 
           return newparamGroup; 
 
+       }
+    }
+
+ 
+    // POLYNOMIAL
+    //
+
+    class polynomialCharDataHandlerFunc implements CharDataHandlerAction {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len)
+       throws SAXException
+       {
+
+          LastPolynomialObject.setCoeffPCDATA(new String(buf,offset,len));
+
+       }
+    }
+
+    class polynomialStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+           Object lastObject = getLastObject();
+           Polynomial polyObj = new Polynomial();
+           polyObj.setAttributes(attrs);
+
+           if (lastObject instanceof ValueListAlgorithm ) {
+              ((ValueListAlgorithm) lastObject).addAlgorithm(polyObj);
+ 
+              LastPolynomialObject = polyObj;
+
+              return polyObj;
+
+           } else {
+              Log.warnln("Warning: cant add Polynomial object to parent, not a valid object. Ignoring request ");
+           }
+
+           return null; 
        }
     }
 
@@ -4890,6 +5109,7 @@ while (iter.hasNext()) {
           ValueGroup newvalueGroup = new ValueGroup();
           newvalueGroup.setAttributes(attrs); // set XML attributes from passed list 
 
+
           // 3. determine where this goes and then insert it 
           if( parentNodeName.equals(XDFNodeName.AXIS) )
           {
@@ -4941,39 +5161,15 @@ while (iter.hasNext()) {
        public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
        throws SAXException
        {
-	   if (valueListString != null)
-	       valueListString += new String (buf, offset, len);
-	   else
-	       valueListString = new String (buf, offset, len);
-       }
-    }
 
-    // there is undoubtably some code-reuse spots missed in this function.
-    // get it later when Im not being lazy. -b.t.
-    class valueListStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) 
-       throws SAXException
-       {
- 
-           // 1. re-init
-           CurrentValueList = new ValueList();
+           if(CurrentValueList instanceof ValueListDelimitedList) {
 
-           // 2. populate ValueListparameters from attribute list 
-           Hashtable attribs = attribListToHashtable(attrs);
-           CurrentValueList.init(attribs);
+              ((ValueListDelimitedList) CurrentValueList).setValues(new String(buf,offset,len));
 
-           // 3. populate ValueListparameters w/ parent name 
-           String parentNodeName = getParentNodeName(XDFNodeName.VALUEGROUP);
-           CurrentValueList.setParentNodeName(parentNodeName);
+           } else {
 
-           // 4. set this parameter to false to indicate the future is not
-           // yet determined for this :)
-           if (attribs.containsKey("size"))
-              CurrentValueList.setIsDelimitedCase(false);
-           else
-              CurrentValueList.setIsDelimitedCase(true);
-
-           return (Object) null;
+              Log.errorln("ERROR: got char data handler for current valuelist object:"+CurrentValueList);
+           }
 
        }
     }
@@ -4983,32 +5179,28 @@ while (iter.hasNext()) {
        throws SAXException
        {
 
+          // 1. grab current valuelist
           ValueList thisValueList = CurrentValueList;
 
-          // generate valuelist values from algoritm IF we need to
-          // (e.g. values where'nt in a delimited cdata list)
-          // check to see if we didnt alrealy parse from a delmited string.
-          if ( thisValueList.getIsDelimitedCase() ) {
-	      String parentNodeName = thisValueList.getParentNodeName();
+          // 2. add these values to the lookup table, if the original valueList had an ID
+          String valueListId = thisValueList.getValueListId();
+          if (valueListId != null) {
 
-	      // add these values to the lookup table, if the original valueList had an ID
-	      String valueListId = thisValueList.getValueListId();
-	      if (valueListId != null) {
+             // a warning check, just in case 
+             if (ValueListObj.containsKey(valueListId))
+                 Log.warnln("More than one valueList node with valueListId=\""+
+                             valueListId+"\", using latest node." );
 
-		  // a warning check, just in case 
-		  if (ValueListObj.containsKey(valueListId))
-		      Log.warnln("More than one valueList node with valueListId=\""+valueListId+"\", using latest node." );
-
-		  // add the valueList array into the list of valueList objects
-		  ValueListObj.put(valueListId, thisValueList);
+             // add the valueList array into the list of valueList objects
+             ValueListObj.put(valueListId, thisValueList);
 		  
-	      }
+	  }
 
-	      // If there is a reference object, clone it to get the new valueList
-	      String valueListIdRef = thisValueList.getValueListIdRef();
-	      if (valueListIdRef != null) {
+	  // 3. If there is a reference object, clone it to get the new valueList
+	  String valueListIdRef = thisValueList.getValueListIdRef();
+	  if (valueListIdRef != null) {
 
-		  if (ValueListObj.containsKey(valueListIdRef)) {
+		if (ValueListObj.containsKey(valueListIdRef)) {
 
 		      // Just a simple clone since we have stored the ArrayList rather than the
 		      // ValueList object (which actually doesnt exist. :P
@@ -5020,184 +5212,72 @@ while (iter.hasNext()) {
 			  System.exit(-1);
 		      }
 		      
-		  } else {
+		} else {
 		      Log.warnln("Error: Reader got an valueList with ValueListIdRef=\""+valueListIdRef+"\" but no previous valueList has that id! Ignoring add valueList request.");
 		      return;
-		  }
-	      }
+		}
+	  }
 	      
-	      // split up string into Value Objects based on declared delimiter
-	      ArrayList myValueList = splitStringIntoValueObjects(valueListString, thisValueList);
+          // 4. add to parent object
+          addValueListToParent(thisValueList);
 
-
-	      // determine where these values go and then insert them
-	      ValueListDelimitedList newValueListObj = new ValueListDelimitedList (myValueList,
-										   thisValueList.getDelimiter(),
-										   thisValueList.getNoData(),
-										   thisValueList.getInfinite(),
-										   thisValueList.getInfiniteNegative(),
-										   thisValueList.getNotANumber(),
-										   thisValueList.getOverflow(),
-										   thisValueList.getUnderflow()
-										   );
-
-	      if( parentNodeName.equals(XDFNodeName.AXIS) )  {
-
-		  // get the last axis
-		  List axisList = (List) CurrentArray.getAxes();
-		  Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-		  
-		  lastAxisObject.addAxisValueList(newValueListObj);
-		  
-	      } else if( parentNodeName.equals(XDFNodeName.PARAMETER) ) {
-
-		  LastParameterObject.addValueList( newValueListObj);
-		  
-	      } else {
-		  Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST+", Ignoring.");
-	      } 
-
-	      // now add valueObjects to groups 
-	      Iterator iter = myValueList.iterator();
-	      while (iter.hasNext()) {
-
-		  Value newvalue = (Value) iter.next();
-		  // add this object to all open value groups
-		  Iterator groupIter = CurrentValueGroupList.iterator();
-		  while (groupIter.hasNext()) {
+	  // 5. now add valueObjects to groups 
+          List values = thisValueList.getValues();
+	  Iterator iter = values.iterator();
+	  while (iter.hasNext()) 
+          {
+		Value newvalue = (Value) iter.next();
+		// add this object to all open value groups
+		Iterator groupIter = CurrentValueGroupList.iterator();
+		while (groupIter.hasNext()) {
 		      ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
 		      newvalue.addToGroup(nextValueGroupObj);
-		  }
-	      }
+		}
+	   }
 
-	      //CurrentValueList.setIsDelimitedCase(true); // notify that we did the list 
-	      CurrentValueList = null;
-	      valueListString = null;
-	      return; // done with it
+           // 6. cleanup 
+	   CurrentValueList = null;
 
-	  }
-
-          // 1. grab parent node name
-          String parentNodeName = thisValueList.getParentNodeName();
-
-          // 2. Find the list of values. If there is a reference object, clone it to get
-          //    the new values list, otherwise, determine values from attributes 
-          //    (e.g. algorithm method)
-          String valueListIdRef = thisValueList.getValueListIdRef();
-          if (valueListIdRef != null) {
-             if (ValueListObj.containsKey(valueListIdRef)) {
-
-                 // Just a simple clone since we have stored the ArrayList rather than the
-                 // ValueList object (which actually doesnt exist. :P
-                 /*
-                 ArrayList refValueListObj = (ArrayList) ValueListObj.get(valueListIdRef);
-                 values  = (ArrayList) refValueListObj.clone();
-                 */
-                 ValueList refValueListObj = (ValueList) ValueListObj.get(valueListIdRef);
-                 try {
-                    thisValueList = (ValueList) refValueListObj.clone();
-                 } catch (java.lang.CloneNotSupportedException e) {
-                    Log.errorln("Weird error, cannot clone valueList object. Aborting read.");
-                    System.exit(-1);
-                 }
-
-             } else {
-                 Log.warnln("Error: Reader got an valueList with ValueListIdRef=\""+valueListIdRef+"\" but no previous valueList has that id! Ignoring add valueList request.");
-                 return;
-              }
-
-          } 
-
-          // 3. add this valueList to the lookup table, if the original valueList had an ID
-          String valueListId = thisValueList.getValueListId();
-          if (valueListId != null) {
-
-              // a warning check, just in case 
-              if (ValueListObj.containsKey(valueListId))
-                 Log.warnln("More than one valueList node with valueListId=\""+valueListId+"\", using latest node." );
-
-              // add the valueList array into the list of valueList objects
-              ValueListObj.put(valueListId, thisValueList);
-
-          }
-
-          // 4. Populate correct parent node w/ values 
-          ValueListAlgorithm valueListObj = new ValueListAlgorithm ( thisValueList.getStart(),
-                                                                     thisValueList.getStep(),
-                                                                     thisValueList.getSize(),
-                                                                     thisValueList.getNoData(),
-                                                                     thisValueList.getInfinite(),
-                                                                     thisValueList.getInfiniteNegative(),
-                                                                     thisValueList.getNotANumber(),
-                                                                     thisValueList.getOverflow(),
-                                                                     thisValueList.getUnderflow()
-                                                                   );
-
-          if( parentNodeName.equals(XDFNodeName.AXIS) )
-          {
-
-             // get the last axis
-             List axisList = (List) CurrentArray.getAxes();
-             Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-
-             lastAxisObject.addAxisValueList( valueListObj);
-
-          } 
-          else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
-          {
-
-             LastParameterObject.addValueList( valueListObj);
-
-          } 
-          else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
-          {
-
-             if ( LastValueGroupParentObject instanceof Parameter )
-             {
-
-                Parameter myParamObject = (Parameter) LastValueGroupParentObject;
-   
-                myParamObject.addValueList( valueListObj);
-
-             } else if ( LastValueGroupParentObject instanceof Axis )
-             {
-
-                // get the last axis
-                Axis myAxisObject = (Axis) LastValueGroupParentObject;
-
-                myAxisObject.addAxisValueList( valueListObj);
-
-             } else {
-                Log.warnln("Error: unknown valueGroupParent "+LastValueGroupParentObject+
-                           " cant treat for "+XDFNodeName.VALUELIST);
-                return; // bail 
-
-             }
-
-          } else {
-
-             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST+". Ignoring");
-
-          }
-
-          // 5. now add valueObjects to groups 
-          List values = valueListObj.getValues();
-          Iterator iter = values.iterator();
-          while (iter.hasNext())
-          {
-
-             Value newvalue = (Value) iter.next();
-             // add this object to all open value groups
-             Iterator groupIter = CurrentValueGroupList.iterator();
-             while (groupIter.hasNext())
-             {
-                ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
-                newvalue.addToGroup(nextValueGroupObj);
-             }
-          }
-
+           return;
        }
     }
+
+
+    // VALUELIST ALGORITHM
+    //
+
+    class valueListAlgorithmStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
+
+           CurrentValueList = (ValueList) new ValueListAlgorithm();
+Log.errorln("Got current valueList"+CurrentValueList);
+           CurrentValueList.setAttributes(attrs); // set XML attributes from passed list 
+
+           CurrentValueListParent = getLastObject();
+
+           return CurrentValueList;
+       }
+    }
+
+    // VALUELIST DELIMITED
+    //
+
+    class valueListDelimitedStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs)
+       throws SAXException
+       {
+
+           CurrentValueList = (ValueList) new ValueListDelimitedList();
+           CurrentValueList.setAttributes(attrs); // set XML attributes from passed list 
+
+           CurrentValueListParent = getLastObject();
+
+           return CurrentValueList;
+       }
+    }
+
 
     // VECTOR
     //
