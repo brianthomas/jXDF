@@ -61,6 +61,8 @@ ALL_CLASSES = $(ALL_SOURCES:%.java=%.class)
 
 all: compile archive doc
 
+jar: compile archive
+
 compile: 
 	@echo "compiling sources in $(XDF_SRC_DIR)..."; 
 	( cd $(XDF_SRC_DIR); $(MAKE) $(MFLAGS) 'MFLAGS=$(MFLAGS)' all; ) 
