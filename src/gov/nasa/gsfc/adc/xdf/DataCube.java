@@ -25,7 +25,7 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.List;
-import java.util.Iterator;
+// import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Collections;
