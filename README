@@ -28,13 +28,35 @@
 	For more details on missing features/problems that remain in 
 	the package please refer to the TODO file.
 
-	Please report bugs, comments and feature requests to xdf-dev@xdf.gsfc.nasa.gov.
+	Please report bugs, patches, comments and feature requests to 
+        xdf-dev@xdf.gsfc.nasa.gov.
 
 	See the samples directory for sample code, a DTD and xml files.
 
 	See the XDF homepage for more information about XDF:
 
 	http://tarantella.gsfc.nasa.gov/xml/XDFhome.html
+
+
+  CVS Repository Access
+  ---------------------
+
+	Read only access to the nightly snapshot is allowed for people who
+	have downloaded this code once from the main site. The CVS account
+	is "guest" which has a password "gu3stacc3ss". The XDF java package
+     	directory is "xml/XDF/Java_Package" and the CVSROOT directory is 
+	"/home/cvsadmin/src". Here is an example of how you can use this 
+	information to obtain a nightly CVS snapshot (UNIX tcsh):
+
+	> setenv CVSROOT :pserver:guest@xdf.gsfc.nasa.gov:/home/cvsadmin/src
+
+ 	> cvs login
+	    (this will ask for a password, which is "gu3stacc3ss")
+
+	> cvs checkout xml/XDF/Java_Package 
+
+	Note that you only have to use "cvs login" step ONCE. Thereafter, only
+	the last step is needed to obtain a copy from CVS.
 
 
    Credits
