@@ -4,7 +4,10 @@
 	this package "BETA"
         ------------------------------------------------------------
 
-        - Kelly has Datablock output is inverted!!
+        - Axis Id/IdRef problems in SaxDocHandler (try using XDF_sample4.xml)
+
+        - Delimited data needs whitespace, formatted read wants it discarded. Why?
+          Cant these forms get along with the same whitespace handling? Investigate. 
 
 	- Implement Formatted reads.
           Dataformat classes have regex, templateNotation, sprintFNotation methods.
@@ -91,6 +94,8 @@
         ============================================================
 
 	- Allow for uneven precision in data. 
+
+        - Append functionality on Arrays needs to be implemented.
 
 	- MathML units.
 
