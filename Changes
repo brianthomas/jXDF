@@ -60,6 +60,9 @@
                       - Added XDF base object structure class. This class represents the top
                         level structure in an XDF object and (hopefully) clarifies some 
                         confusion over the nature of structure objects in general.
+                        As part of this change I did away with XMLNotationHash garbage and implemented
+                        several new child classes for the XDF class: DocumentTYpe, XMLDeclaration.
+                      - Href class name changed to "Entity".
                       - Added get/set Long/Short Data methods in DataCube.
                       - Higher dimesional arrays not implemented correctly (!! in 3+ dimensions). Fixed.
                       - Added get/setIOAxesOrder in XMLDataIOStyle.
