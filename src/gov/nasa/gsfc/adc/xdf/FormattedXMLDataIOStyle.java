@@ -63,8 +63,10 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
        Hashtable key/value pairs coorespond to the class XDF attribute
        names and their desired values.
     */
-  public void FormattedXMLDataIOStyle ( Hashtable InitXDFAttributeTable )
+  public FormattedXMLDataIOStyle ( Array parentArray, Hashtable InitXDFAttributeTable )
   {
+
+    this.parentArray = parentArray;
 
     // init the XML attributes (to defaults)
     init();
@@ -199,6 +201,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/17 22:29:55  thomas
+ * Some minor changes to code layout. -b.t.
+ *
  * Revision 1.6  2000/11/16 20:00:19  kelly
  * fixed documentation.  -k.z.
  *
