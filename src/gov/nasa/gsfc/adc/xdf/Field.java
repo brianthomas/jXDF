@@ -127,7 +127,7 @@ public class Field extends BaseObject {
      //set up the attribute hashtable key with the default initial value
     attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("relation", new XMLAttribute(null, Constants.OBJECT_TYPE));  //double check
-    attribHash.put("units", new XMLAttribute(null, Constants.OBJECT_TYPE));
+    attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
     attribHash.put("dataFormat", new XMLAttribute(null, Constants.OBJECT_TYPE));
     attribHash.put("class", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("fieldIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
@@ -348,6 +348,9 @@ public class Field extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/02 16:48:19  kelly
+ * units is init as new Units() now.  -k.z.
+ *
  * Revision 1.6  2000/10/30 18:55:53  thomas
  * Attrib order in init had entry for "paramId" instead
  * of "fieldId". Corrected. -b.t.
