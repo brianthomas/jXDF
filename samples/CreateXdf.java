@@ -40,9 +40,15 @@ public class CreateXdf
     public static void main (String [] args) 
 	throws SetDataException, IOException
     {
+
 	XDF xdf = new XDF();
-	Structure structure = new Structure();
+        XMLDeclaration xmlDecl = new XMLDeclaration(); 
+        DocumentType doctype = new DocumentType(xdf); 
 	Array array = new Array();
+
+        doctype.setSystemId("http://xml.gsfc.nasa.gov/DTD/XDF_017.dtd");
+        xdf.setXMLDeclaration(xmlDecl);
+        xdf.setDocumentType(doctype);
 	
 	FieldAxis fieldAxis = new FieldAxis();
 	fieldAxis.setName("Column");
@@ -99,7 +105,7 @@ public class CreateXdf
 	// a seperate file, xdf_table;
 	Entity href = new Entity();
 	href.setName("xdf_table");
-	href.setSystemId("xdf_table");
+	href.setSystemId("xdf_table.dat");
 	array.setHref(href);
 
 	// the following 6 lines to set write out style: formatted style
@@ -113,10 +119,9 @@ public class CreateXdf
 	array.setXMLDataIOStyle(xmlIOStyle);
 	*/
 
-	structure.addArray(array);
-	xdf.addStructure(structure);
+	xdf.addArray(array);
 
-	System.out.println("-----\nPRINT OUT STRUCTURE\n-----");
+	// System.err.println("-----\nPRINT OUT STRUCTURE\n-----");
 
 	Specification.getInstance().setPrettyXDFOutput(true);
 	Specification.getInstance().setPrettyXDFOutputIndentation("  ");
