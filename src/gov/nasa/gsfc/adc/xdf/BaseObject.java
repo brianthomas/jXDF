@@ -39,7 +39,7 @@ import org.xml.sax.AttributeList;
     members of Group objects. Key parts to the BaseObject class include the
     XMLAttributes and the toXDF* methods it provides.
  */
-public abstract class BaseObject implements Serializable {
+public abstract class BaseObject implements Serializable, Cloneable {
 
   //
   // Fields
@@ -450,7 +450,7 @@ public abstract class BaseObject implements Serializable {
       // close the opening tag
       if (nodeNameString != null) {
         writeOut(outputstream, ">");
-        if ((sPrettyXDFOutput) && (pcdata == null)) 
+        if ((sPrettyXDFOutput) && (pcdata == null))
            writeOut(outputstream, Constants.NEW_LINE);
       }
 
@@ -524,10 +524,10 @@ public abstract class BaseObject implements Serializable {
 
          indent = dealWithClosingGroupNodes((BaseObject) this, outputstream, indent);
 
-         if (sPrettyXDFOutput && pcdata == null) 
+         if (sPrettyXDFOutput && pcdata == null)
                 writeOut(outputstream, indent);
 
-         if (!dontCloseNode) 
+         if (!dontCloseNode)
             writeOut(outputstream, "</"+nodeNameString+">");
 
       }
@@ -600,11 +600,10 @@ public abstract class BaseObject implements Serializable {
 
   /** Clone an XDF object.
    */
-  protected Object clone () throws CloneNotSupportedException{
+  public Object clone () throws CloneNotSupportedException{
 
-     BaseObject cloneObj = null;
      //shallow copy for fields
-     cloneObj = (BaseObject) super.clone();
+     BaseObject cloneObj = (BaseObject) super.clone();
 
      // Clone the fields
       cloneObj.attribOrder = Collections.synchronizedList(new ArrayList());
@@ -908,6 +907,9 @@ public abstract class BaseObject implements Serializable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.22  2000/11/02 17:55:11  kelly
+ * implements Cloneable now.
+ *
  * Revision 1.21  2000/11/01 22:14:41  thomas
  * Reversed changes to toXDFOutputStream. Fixed grouping
  * code (mostly in dealWith*nodes mthods). -b.t.
