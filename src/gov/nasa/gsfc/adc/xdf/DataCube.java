@@ -1260,8 +1260,8 @@ protected void writeTaggedData(OutputStream outputstream,
           }
           catch (NoDataException e) {
             String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
-            if (noData != null) {
-            writeOut(outputstream, noData);
+            if (noData != null) 
+               writeOut(outputstream, noData);
           }
           String output=((SkipCharFormattedIOCmd) command).getOutput();
           if (output == null) {
@@ -1357,6 +1357,9 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.13  2000/11/10 04:32:44  thomas
+  * Updated to fix compile problems. -b.t.
+  *
   * Revision 1.12  2000/11/09 23:22:59  kelly
   * handles formatted read now.  -k.z.
   *
