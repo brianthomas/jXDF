@@ -40,12 +40,14 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/Parameter.java \
 	$(XDF_SOURCE_PATH)/ParameterGroup.java \
 	$(XDF_SOURCE_PATH)/Structure.java \
-	$(XDF_SOURCE_PATH)/XMLAttribute.java 
+	$(XDF_SOURCE_PATH)/Unit.java \
+	$(XDF_SOURCE_PATH)/Units.java \
+	$(XDF_SOURCE_PATH)/Value.java
+#	$(XDF_SOURCE_PATH)/XMLAttribute.java 
 
 #	$(XDF_SOURCE_PATH)/SaxDocHandler.java \
 #	$(XDF_SOURCE_PATH)/Reader.java \
 #	$(XDF_SOURCE_PATH)/Locator.java \
-#	$(XDF_SOURCE_PATH)/Value.java
  
 #	$(XDF_SOURCE_PATH)/BinaryFloatDataFormat.java \
 #	$(XDF_SOURCE_PATH)/BinaryFloatStyle.java \
@@ -73,9 +75,7 @@ XDF_SOURCES = \
 #	$(XDF_SOURCE_PATH)/StringDataFormat.java \
 #	$(XDF_SOURCE_PATH)/StringStyle.java \
 #	$(XDF_SOURCE_PATH)/TaggedXMLDataIOStyle.java \
-#	$(XDF_SOURCE_PATH)/Unit.java \
 # 	$(XDF_SOURCE_PATH)/UnitDirection.java \
-#	$(XDF_SOURCE_PATH)/Units.java \
 #	$(XDF_SOURCE_PATH)/ValueGroup.java \
 #	$(XDF_SOURCE_PATH)/XMLDataIOStyle.java \
 
