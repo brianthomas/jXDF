@@ -32,8 +32,8 @@ import java.util.List;
 /**
    Identifies a specific datum location within the n-dimensional data space.
    An instance of Locator is always tied to a particular instance of
-   DataModel, which determines the range of the valid axis indexes and
-   the range of valid datum indexes.
+   DataModel, which determines the range of the valid axis indices and
+   the range of valid datum indices.
  */
 
  public class Locator implements Cloneable {
@@ -319,6 +319,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2000/12/13 18:31:26  thomas
+ * Minor spelling change. -b.t.
+ *
  * Revision 1.16  2000/11/20 22:01:50  thomas
  * Bad bug in setIterationOrder method. Commented
  * out prior method. Instituted init() method and
