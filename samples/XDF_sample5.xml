@@ -1,5 +1,5 @@
 <?xml version="1.0" standalone="no"?>
-<!DOCTYPE XDF SYSTEM "XDF_017.dtd">
+<!DOCTYPE XDF SYSTEM "XDF_018.dtd">
 <XDF name="A sample XDF document" description="This shows how to put any data into XDF format">
       <parameter name="obsdate"><units><unitless/></units><value>01-12-99</value></parameter>
       <array name="Raw Data">
@@ -17,11 +17,17 @@
              <valueList delimiter=" " repeatable="yes">10  9 8 7 6 5 4 3 2 1</valueList>
           </axis>
           <read encoding="ISO-8859-1">
-             <for axisIdRef="y-axis">
-                <for axisIdRef="x-axis">
-                   <textDelimiter repeatable="yes" recordTerminator="&#10;" />
+             <delimitedText>
+                <delimitedReadInstructions>
+                   <delimiter repeatable="yes" value=" "/>
+                   <recordTerminator><newLine/></recordTerminator>
+                </delimitedReadInstructions>
+                <for axisIdRef="y-axis">
+                   <for axisIdRef="x-axis">
+                      <doReadInstructions/>
+                   </for>
                 </for>
-             </for>
+             </delimitedText>
           </read>
 <!-- This data should throw an error, as repeatable is set to "no"  e.g. "  2.48"
      indicates 2 values, the first which is "null" and the second which is 2.48, 

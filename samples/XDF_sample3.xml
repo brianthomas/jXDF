@@ -1,10 +1,8 @@
 <?xml version="1.0" standalone="no"?>
-<!DOCTYPE XDF SYSTEM "XDF_017.dtd" [
-  <!ENTITY newline "&#10;">
+<!DOCTYPE XDF SYSTEM "XDF_018.dtd" [
+  <!ENTITY myNewLine "&#10;">
 ]>
-<XDF name="A sample XDF document" 
-     description="This shows how to put any data into XDF format using tagged data."
->
+<XDF name="A sample XDF document" description="This shows how to put any data into XDF format using tagged data.">
    <!-- A little table about 3 nearby galaxies -->
    <parameterGroup name="Structure Properties">
      <parameter name="date" datatype="string">
@@ -70,8 +68,10 @@
       </axis>
       <!-- declare the ordering of how to read this in, assoc. of axis to data -->
       <read encoding="UTF-8" >
-        <tagToAxis tag="d1" axisIdRef="columns" />
-        <tagToAxis tag="d0" axisIdRef="rows" />
+        <taggedText>
+           <tagToAxis tag="d1" axisIdRef="columns" />
+           <tagToAxis tag="d0" axisIdRef="rows" />
+        </taggedText>
       </read>
       <data>
          <d0>
@@ -89,7 +89,7 @@
           <index axisIdRef="columns"/>
           <index axisIdRef="rows"/>
         </locationOrder>
-        <note location="1 1">This is table 3 from the Zezajck article. Newline:[&newline;].</note>
+        <note location="1 1">This is table 3 from the Zezajck article. Newline:[&myNewLine;].</note>
         <note location="0 2">This is table 3 from the Zezajck article.</note>
         <note noteId="note1" location="0 1" >No data because of a cosmic ray hit</note>
         <note noteIdRef="note1" location="0 2" />
