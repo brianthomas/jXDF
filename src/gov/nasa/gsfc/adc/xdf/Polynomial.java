@@ -26,6 +26,12 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
 /**
    An XDF::Polynomial is a class that describes a type of algorithm. 
    It is used in other XDF objects to describe/generate numerical values.
@@ -33,7 +39,7 @@ package gov.nasa.gsfc.adc.xdf;
  */
 
 
-public class Polynomial extends BaseObject {
+public class Polynomial extends BaseObject implements AlgorithmInterface {
 
    //
    // Fields
@@ -44,6 +50,8 @@ public class Polynomial extends BaseObject {
    private static final String VALUE_XML_ATTRIBUTE_NAME = new String("value");
    private static final String LOG_XML_ATTRIBUTE_NAME = new String("logarithm");
    private static final String REVERSE_XML_ATTRIBUTE_NAME = new String("reverse");
+
+   private List values;
 
    //
    // Constructors
@@ -62,13 +70,20 @@ public class Polynomial extends BaseObject {
 
    /** get the *size* attribute.
     */
-   public String getSize() {
-      return (String) ((Attribute) attribHash.get(SIZE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   public Integer getSize() {
+      return (Integer) ((Attribute) attribHash.get(SIZE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *size* attribute.
     */
-   public void setSize (String size)
+   public void setSize (int size)
+   {
+      setSize(new Integer(size));
+   }
+
+   /** set the *size* attribute.
+    */
+   public void setSize (Integer size)
    {
       ((Attribute) attribHash.get(SIZE_XML_ATTRIBUTE_NAME)).setAttribValue(size);
    }
@@ -100,28 +115,73 @@ public class Polynomial extends BaseObject {
    }
 
    /** Get the *coefficients* attribute.
-       This is a space delimited string.
+       Allows the user to retrieve the coefficents of this polynomial as a List
+       of Double objects. Order of coefficents is lowest order first, to 
+       highest order last.
     */
-   public String getCoefficients() {
-      return (String) ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+   public List getCoefficients() {
+      String strCoeff = (String) ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      String[] coeffs = strCoeff.split("\\s+");
+      List coefficents = new Vector();
+
+      //String reverse = getReverse(); 
+      //boolean isReversed = (reverse != null) && reverse.equals("true") ? true : false;
+      for(int i = 0; i < coeffs.length; i++) {
+         try {
+           Double number = new Double(coeffs[i]);
+           coefficents.add(number);
+         } catch (java.lang.NumberFormatException e) {
+           Log.errorln("ERROR: bad polynomial coefficent data, cant parse string:"+coeffs[i]+" into double, ignoring");
+         }
+      }
+      return coefficents;
    }
 
    /** Set the *coefficients* attribute.
-       This is a space delimited string.
+       Allows the user to set the coefficents by passing a List of
+       Double objects. Order of coefficents is lowest order first, to 
+       highest order last.
+
     */
-   public void setCoefficients (String value)
+   public void setCoefficients (List coefficientList)
    {
-      ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(value);
+
+       Iterator iter = coefficientList.iterator();
+       StringBuffer buf = new StringBuffer();
+       while (iter.hasNext()) {
+          Object value = (Object) iter.next();
+          try {
+             Double dvalue = (Double) value;
+             buf.append(dvalue.toString());
+             buf.append(" ");
+          } catch (ClassCastException e) {
+             Log.errorln("ERROR: bad polynomial coefficent data, cant parse string:"+value.toString()+" into double, ignoring");
+          }
+       }
+
+       setCoeffPCDATA(buf.toString());
+//      ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(value);
    }
 
+   public List getValues() {
+      return values;
+   }
 
    //
    // Other PUBLIC Methods
    //
 
-   //
-   // Private Methods 
-   //
+   /** Allows the user to set the coefficents by passing a string of
+       numbers delimited by a space. Order of coefficents is lowest order first, to 
+       highest order last.
+    */
+   public void setCoeffPCDATA (String value)
+   {
+      ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(value);
+ 
+      // now re-init our list of values
+      initValuesFromParams();
+   }
 
    //
    // Protected Methods 
@@ -146,12 +206,75 @@ public class Polynomial extends BaseObject {
 
      //set up the attribute hashtable key with the default initial value
      attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
-     attribHash.put(SIZE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(SIZE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.INTEGER_TYPE));
      attribHash.put(REVERSE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
      attribHash.put(LOG_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
-     setCoefficients("0");
-     setSize("1");
+     // set size BEFORE PCDATA
+     setSize(new Integer(1));
+     setCoeffPCDATA("0");
+
+   }
+
+   // 
+   // Private Methods
+   //
+
+   // Hmm. is it REALLY needed that these be value objects now??
+   // I doubt it...need to double check. Lots of memory being wasted
+   // on storing value objects
+   // ugh. This method is ugly and slow.
+   private Value getValueAtStep (int step, double[] coeffs, String logarithm)
+   {
+      List coefficients = getCoefficients();
+
+      double value = 0.0;
+      for(int i=0; i < coeffs.length; i++) {
+        value += coeffs[i] * Math.pow(step,i);
+      }
+
+      if(logarithm != null) 
+         if(logarithm.equals("natural"))
+           value = Math.log(value); // take the natural log 
+         else 
+           value = (Math.log(value)/Math.log(10)); // base 10 log 
+
+      return new Value(value);
+   }
+
+   private void initValuesFromParams()
+   {
+
+      values = (List) new Vector(); 
+      List coefficients = getCoefficients();
+      int nrofCoeffs = coefficients.size();
+
+      // safety
+      if(nrofCoeffs < 1) 
+      {
+         return;
+      }
+
+      // initialize primative array of coefficents for faster calculation
+      double[] coeffs = new double [nrofCoeffs];
+      for( int i=0 ; i <nrofCoeffs; i++) {
+        coeffs[i] = ((Double) coefficients.get(i)).doubleValue();
+      }
+
+      // now populate values list
+      String reverse = getReverse();
+      boolean isReversed = (reverse != null) && reverse.equals("true") ? true : false;
+      int size = getSize().intValue();
+      String logarithm = getLogarithm();
+
+      for(int i = 0; i < size; i++) {
+ 
+         Value thisValue = getValueAtStep(i, coeffs, logarithm);
+         if(isReversed)
+              values.add(0,thisValue);
+         else
+              values.add(thisValue);
+      }
 
    }
 
