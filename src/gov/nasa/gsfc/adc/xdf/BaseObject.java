@@ -119,20 +119,29 @@ public abstract class BaseObject implements Serializable, Cloneable {
     return classXDFNodeName;
   }
 
-  /** Return the hashtable of XMLAttribute names and their values.
+//
+// I cant believe that these 2 methods are needed. 
+// Removing it for the time being. -b.t. 
+//
+
+  /* Return the hashtable of XMLAttribute names and their values.
       @return Hashtable on success, an empty hashtable is passed back if their
                are no XMLAttributes within a given XDF object class.
   */
+/*
   public Hashtable getAttribHash() {
     return attribHash;
   }
+*/
 
-  /**set the attributes of this object from the passed attribute Hash reference
+  /*set the attributes of this object from the passed attribute Hash reference
    *
    */
+/*
   public void setAttribHash(Hashtable hash) {
     attribHash = hash;
   }
+*/
 
    
   /** Set the NotationHash for this object. Each entry in the passed HashSet
@@ -163,13 +172,16 @@ public abstract class BaseObject implements Serializable, Cloneable {
   // Other Public Methods
   //
 
-  /**set the attributes of this object from the passed attribute Hash reference
+// This isnt quite what I want. Removing for now. -b.t.
+  /*set the attributes of this object from the passed attribute Hash reference
    * the same as setAttribHash()
    */
-  public Hashtable update(Hashtable hash) {
+/*
+  public Hashtable update (Hashtable hash) {
     setAttribHash(hash);
     return getAttribHash();
   }
+*/
 
   /** Add this object to the indicated Group object.
       @return Group added to on success, null (Group Object) on failure.
@@ -957,6 +969,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.37  2001/01/19 22:32:42  thomas
+ * Removed setAttribHash, getAttribHash methods.
+ * Dont seem to be needed. Also, removed update
+ * method, it doenst seem to be used. -b.t.
+ *
  * Revision 1.36  2001/01/19 17:25:08  thomas
  * Added ability to set the XML parser. Added ability to
  * save a hashtable of Notation that output XML will use.
