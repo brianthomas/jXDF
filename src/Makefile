@@ -32,52 +32,48 @@ XDF_BIN_PATH = ../
 XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/Array.java \
 	$(XDF_SOURCE_PATH)/Axis.java \
+	$(XDF_SOURCE_PATH)/AxisLocationOutOfBoundsException.java \
 	$(XDF_SOURCE_PATH)/BaseObject.java \
+	$(XDF_SOURCE_PATH)/BinaryFloatDataFormat.java \
+	$(XDF_SOURCE_PATH)/BinaryIntegerDataFormat.java \
 	$(XDF_SOURCE_PATH)/Constants.java \
+	$(XDF_SOURCE_PATH)/DataFormat.java \
+	$(XDF_SOURCE_PATH)/DataCube.java \
+	$(XDF_SOURCE_PATH)/DelimitedXMLDataIOStyle.java \
+	$(XDF_SOURCE_PATH)/ExponentDataFormat.java \
 	$(XDF_SOURCE_PATH)/Field.java \
+	$(XDF_SOURCE_PATH)/FieldAxis.java \
+	$(XDF_SOURCE_PATH)/FixedDataFormat.java \
 	$(XDF_SOURCE_PATH)/Group.java \
+	$(XDF_SOURCE_PATH)/IntegerDataFormat.java \
+	$(XDF_SOURCE_PATH)/Locator.java \
+	$(XDF_SOURCE_PATH)/Log.java \
+	$(XDF_SOURCE_PATH)/NoDataException.java \
 	$(XDF_SOURCE_PATH)/Note.java \
 	$(XDF_SOURCE_PATH)/Parameter.java \
 	$(XDF_SOURCE_PATH)/ParameterGroup.java \
+	$(XDF_SOURCE_PATH)/Reader.java \
+	$(XDF_SOURCE_PATH)/SaxDocumentHandler.java \
+	$(XDF_SOURCE_PATH)/SetDataException.java \
+	$(XDF_SOURCE_PATH)/StringDataFormat.java \
 	$(XDF_SOURCE_PATH)/Structure.java \
+	$(XDF_SOURCE_PATH)/TaggedXMLDataIOStyle.java \
 	$(XDF_SOURCE_PATH)/Unit.java \
+ 	$(XDF_SOURCE_PATH)/UnitDirection.java \
 	$(XDF_SOURCE_PATH)/Units.java \
-	$(XDF_SOURCE_PATH)/Value.java
-#	$(XDF_SOURCE_PATH)/XMLAttribute.java 
+	$(XDF_SOURCE_PATH)/Utility.java \
+	$(XDF_SOURCE_PATH)/Value.java \
+	$(XDF_SOURCE_PATH)/ValueGroup.java \
+	$(XDF_SOURCE_PATH)/XMLDataIOStyle.java
 
-#	$(XDF_SOURCE_PATH)/SaxDocHandler.java \
-#	$(XDF_SOURCE_PATH)/Reader.java \
-#	$(XDF_SOURCE_PATH)/Locator.java \
- 
-#	$(XDF_SOURCE_PATH)/BinaryFloatDataFormat.java \
-#	$(XDF_SOURCE_PATH)/BinaryFloatStyle.java \
-#	$(XDF_SOURCE_PATH)/BinaryIntegerDataFormat.java \
-#	$(XDF_SOURCE_PATH)/BinaryIntegerStyle.java \
-#	$(XDF_SOURCE_PATH)/DataCube.java \
-#	$(XDF_SOURCE_PATH)/DataFormat.java \
-#	$(XDF_SOURCE_PATH)/DelimitedXMLDataIOStyle.java \
 #	$(XDF_SOURCE_PATH)/ErroredValue.java \
-#	$(XDF_SOURCE_PATH)/ExponentDataFormat.java \
-#	$(XDF_SOURCE_PATH)/ExponentStyle.java \
-#	$(XDF_SOURCE_PATH)/FieldAxis.java \
 #	$(XDF_SOURCE_PATH)/FieldGroup.java \
 #	$(XDF_SOURCE_PATH)/FieldRelation.java \
-#	$(XDF_SOURCE_PATH)/FixedDataFormat.java \
-#	$(XDF_SOURCE_PATH)/FixedStyle.java \
 #	$(XDF_SOURCE_PATH)/FormattedIOCmd.java \
 #	$(XDF_SOURCE_PATH)/FormattedXMLDataIOStyle.java \
-#	$(XDF_SOURCE_PATH)/IntegerDataFormat.java \
-#	$(XDF_SOURCE_PATH)/IntegerStyle.java \
-#	$(XDF_SOURCE_PATH)/MsgHandler.java \
 #	$(XDF_SOURCE_PATH)/ReadCellFormattedIOCmd.java \
 #	$(XDF_SOURCE_PATH)/RepeatFormattedIOCmd.java \
 #	$(XDF_SOURCE_PATH)/SkipCharFormattedIOCmd.java \
-#	$(XDF_SOURCE_PATH)/StringDataFormat.java \
-#	$(XDF_SOURCE_PATH)/StringStyle.java \
-#	$(XDF_SOURCE_PATH)/TaggedXMLDataIOStyle.java \
-# 	$(XDF_SOURCE_PATH)/UnitDirection.java \
-#	$(XDF_SOURCE_PATH)/ValueGroup.java \
-#	$(XDF_SOURCE_PATH)/XMLDataIOStyle.java \
 
 
 XDF_CLASSES = $(XDF_SOURCES:%.java=%.class)
