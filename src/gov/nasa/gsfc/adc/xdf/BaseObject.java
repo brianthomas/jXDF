@@ -98,12 +98,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   */
   public BaseObject() {
 
-    // The heart of the baseObject is that it manages the storage, retrieval
-    // and writing out the Attributes for the XDF objects.
-    // There are 2 parts to making the Attributes of the base Object
-    // work properly: a lookup table of key/value pairs in attribHash and a
-    // list containing the  proper order of the attributes.
-    resetAttributes();
+    init();
 
   }
 
@@ -981,6 +976,22 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
     return indent;
   }
+
+  protected void init()
+  {
+
+     // The heart of the baseObject is that it manages the storage, retrieval
+     // and writing out the Attributes for the XDF objects.
+     // There are 2 parts to making the Attributes of the base Object
+     // work properly: a lookup table of key/value pairs in attribHash and a
+     // list containing the  proper order of the attributes.
+
+     resetAttributes();
+
+     classXDFNodeName = "UNDEFINED";
+
+  }
+
 
 } // end of BaseObject Class
 

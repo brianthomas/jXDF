@@ -148,7 +148,8 @@ public class RecordTerminator extends BaseObject {
   protected void init()
   {
 
-     resetAttributes();
+     super.init();
+
      classXDFNodeName = "recordTerminator";
 
      attribOrder.add(0, VALUE_OBJ_XML_ATTRIBUTE_NAME);

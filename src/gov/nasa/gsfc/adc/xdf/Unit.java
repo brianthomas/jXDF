@@ -133,7 +133,7 @@ public class Unit extends BaseObject {
   protected void init()
   {
 
-    resetAttributes();
+    super.init();
 
     classXDFNodeName = "unit";  //XDF node name
 

@@ -177,7 +177,7 @@ public class Value extends BaseObject {
    protected void init()
    {
 
-       resetAttributes();
+       super.init();
 
        classXDFNodeName = "value";
 

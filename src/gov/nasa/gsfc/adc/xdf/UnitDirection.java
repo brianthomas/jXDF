@@ -32,11 +32,13 @@ package gov.nasa.gsfc.adc.xdf;
 public class UnitDirection extends BaseObject {
 
    public UnitDirection () {
-
+      init();
    }
 
    protected void init() {
-      resetAttributes();
+
+      super.init();
+
    }
 
 }

@@ -213,7 +213,7 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
   protected void init()
   {
 
-    resetAttributes();
+    super.init();
 
     classXDFNodeName = "repeat";
 

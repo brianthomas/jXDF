@@ -158,7 +158,7 @@ import java.util.Hashtable;
    protected void init()
    {
  
-     resetAttributes();
+     super.init();
 
      classXDFNodeName = "dataFormat";
  

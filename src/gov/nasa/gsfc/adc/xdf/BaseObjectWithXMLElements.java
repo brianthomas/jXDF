@@ -294,7 +294,9 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
    protected void init()
    {
 
-        resetAttributes();
+        super.init();
+
+//        resetAttributes();
 
         // NO! not XML attributes.. should be protected field
         // attribOrder.add(0, XML_ELEMENTLIST_XML_ATTRIBUTE_NAME);

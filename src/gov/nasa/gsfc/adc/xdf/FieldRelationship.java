@@ -131,7 +131,7 @@ public class FieldRelationship extends BaseObject {
    protected void init()
    {
 
-       resetAttributes();
+       super.init();
 
        classXDFNodeName = "relation";
 

@@ -299,7 +299,7 @@
      protected void init()
      {
   
-        resetAttributes();
+        super.init();
   
         classXDFNodeName = "read";
        

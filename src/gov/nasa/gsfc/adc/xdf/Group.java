@@ -159,7 +159,7 @@ public class Group extends BaseObject {
   protected void init()
   {
 
-    resetAttributes();
+    super.init();
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD

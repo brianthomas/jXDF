@@ -134,7 +134,7 @@ import java.io.OutputStreamWriter;
   protected void init()
   {
 
-    resetAttributes();
+    super.init();
 
     classXDFNodeName = "";  //XDF node name (none)
 

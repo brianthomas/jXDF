@@ -242,7 +242,7 @@ import java.io.IOException;
   protected void init()
   {
 
-    resetAttributes();
+    super.init();
 
     classXDFNodeName = "units";
     XDFNodeName = classXDFNodeName;

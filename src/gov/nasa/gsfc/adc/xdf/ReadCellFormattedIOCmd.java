@@ -69,7 +69,8 @@ public class ReadCellFormattedIOCmd extends BaseObject implements FormattedIOCmd
    */
   protected void init()
   {
-     resetAttributes();
+     super.init();
+
      classXDFNodeName = "readCell";
   }
 

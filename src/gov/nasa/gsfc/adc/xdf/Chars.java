@@ -134,7 +134,8 @@ public class Chars extends BaseObject implements OutputCharDataInterface {
   protected void init()
   {
 
-     resetAttributes();
+     super.init();
+
      classXDFNodeName = "chars";
 
      attribOrder.add(0, VALUE_XML_ATTRIBUTE_NAME);

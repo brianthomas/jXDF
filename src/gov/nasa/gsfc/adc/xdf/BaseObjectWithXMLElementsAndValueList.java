@@ -353,7 +353,8 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
    protected void init()
    {
 
-        resetAttributes();
+        super.init();
+
         hasValueListCompactDescription = false;
 
    }

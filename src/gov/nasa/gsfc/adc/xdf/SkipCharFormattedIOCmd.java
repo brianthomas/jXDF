@@ -175,7 +175,8 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
   protected void init()
   {
 
-     resetAttributes();
+     super.init();
+
      classXDFNodeName = "skip";
 
      attribOrder.add(0, OUTPUT_XML_ATTRIBUTE_NAME);

@@ -95,7 +95,8 @@ public class NewLine extends BaseObject implements OutputCharDataInterface {
   protected void init()
   {
 
-     // resetAttributes();
+     super.init();
+
      classXDFNodeName = "newLine";
 
   }

@@ -32,10 +32,11 @@ import java.io.Writer;
 
 public interface ConversionComponentInterface {
 
-   public Number evaluate(Number value);
+   public Double evaluate(Double value);
+   public double evaluate(double value);
    public void toXMLWriter (Writer outputWriter, String indent) throws java.io.IOException;
    public void toXMLOutputStream (OutputStream o, String indent) throws java.io.IOException;
-   public Object clone() throws CloneNotSupportedException;
+   //public Object clone() throws CloneNotSupportedException;
 
 }
 

@@ -178,7 +178,8 @@ public class Delimiter extends BaseObject {
   protected void init()
   {
 
-     resetAttributes();
+     super.init();
+
      classXDFNodeName = "delimiter";
 
      attribOrder.add(0, VALUE_OBJ_XML_ATTRIBUTE_NAME);

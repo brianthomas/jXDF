@@ -345,7 +345,8 @@ public abstract class BaseObjectWithValueList extends BaseObject
    protected void init()
    {
 
-        resetAttributes();
+	super.init();
+
         hasValueListCompactDescription = false;
 
    }

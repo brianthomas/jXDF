@@ -178,7 +178,7 @@ public class Notes extends BaseObject {
    protected void init()
    {
 
-      resetAttributes();
+      super.init();
 
       classXDFNodeName = "notes";
 
