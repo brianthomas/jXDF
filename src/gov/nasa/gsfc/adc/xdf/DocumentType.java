@@ -113,7 +113,7 @@ import java.io.StringWriter;
       return notationList;
    }
 
-   public XDF getOwner (XDF obj) {
+   public XDF getOwner () {
       return owner;
    }
 
