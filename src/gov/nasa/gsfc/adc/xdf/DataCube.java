@@ -78,6 +78,8 @@ public class DataCube extends BaseObject {
    private int POINTER_DATA_TYPE = 7;
    private int UNDEFINED_DATA_TYPE = -1;
 
+   private boolean writeCDATASection = true; // output data section as CDATA? 
+
    //  to store the n-dimensional data, it is an ArrayList of ArrayList, whose
    //  innermost layer contains two kinds of arrays:
    //  --an array of bytes to indicate if its corresponding cell contains valid data
@@ -250,6 +252,20 @@ public class DataCube extends BaseObject {
      return maxDataIndices;
   }
 
+
+  /** set whether the object will write out CDATASection or not (writes PCDATA instead).
+      The value of true indicates CDATASection will be written (this is the default value).
+   */
+  public void setCDATASection (boolean value)
+  {
+     writeCDATASection = value;
+  }
+
+  /** Returns whether the object will write out CDATASection.
+   */
+  public boolean willWriteCDATASection () {
+     return writeCDATASection;
+  }
 
   public Array getParentArray() {
      return parentArray;
@@ -1129,6 +1145,9 @@ public class DataCube extends BaseObject {
          else 
          {
    
+            // even IF we specify writing CDATASection, we dont do it for external files
+            boolean needsCDATASection = writeHrefAttribute ? false : this.willWriteCDATASection();
+
             if (readObj instanceof DelimitedXMLDataIOStyle) {
 
                AxisInterface fastestAxis = (AxisInterface) axisList.get(0);
@@ -1141,7 +1160,7 @@ public class DataCube extends BaseObject {
                                    negExponentialPattern,
                                    endian,
                                    intFlag,
-                                   writeHrefAttribute ? false : true
+                                   needsCDATASection
                                  );
      
             } else {
@@ -1154,8 +1173,9 @@ public class DataCube extends BaseObject {
                                    negExponentialPattern,
                                    endian,
                                    intFlag, 
-                                   writeHrefAttribute ? false : true
+                                   needsCDATASection
                                  );
+                                   // writeHrefAttribute ? false : true
             }
    
             if (writeHrefAttribute) {
