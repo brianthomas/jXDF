@@ -1,0 +1,79 @@
+
+
+	A list of things that have to be done before we can consider
+	this package "ALPHA"
+        ------------------------------------------------------------
+
+        - XMLDataIOStyle has clone method in it, correct? (I did this, not kelly?)
+
+	- Efficiency issues. Don't use sth. like attrib.size() in the for loop
+
+        - Dataformat classes have regex, templateNotation, sprintFNotation methods.
+          Are these needed? Closely evaluate these classes.
+       
+        - Are Utility, Constants classes truely independant? Shunt methods to
+          places they are used.
+
+	- Use singleton for PrettyOutput, etc.
+
+	- In some cases, passing null of not reasonable. We dont have 
+          to check null to save some time. 
+
+	- always use constants (sPCDATAAttribute = "value") 
+
+	- if the attribute is primitive number, *get* function overloading, two
+ 	 *set* functions--one returning primitive number, one returning Number object
+
+	- Syncronization may be violated for ArrayList? look into changing 
+	  these to Vector (resolved?).
+
+	- implement Formatted reads.
+
+        - Field and Value ID/IDREF stuff in SaxDocumentHandler. 
+
+	- Update all derived locators when axis is add/removed from an array.
+
+	- Check synchronization issues on all code (develop threaded tests). 
+
+	- Remove unnecessary methods like setDimension, etc.
+
+	- number of significant digits being written out in XML is not
+          controlled by dataFormat at this time. Also, Exponential format
+	  may print out wi/o the 'E'.  
+
+	- Impliment binary data read/write.
+
+	- Impliment octal/hex data read/write.
+
+
+	A list of things that have to be done before we can consider
+	this package "BETA"
+        ------------------------------------------------------------
+   
+
+	- Improve efficiency of data reading. Direct char->number converstion
+	  (faster) rather than convert to String, then to a number object,
+          then to a primative (in SaxDocumentHandler:addData.. private method).
+
+	- Correct Notes/Location attribute maddness. Notes should carry around
+	  locator object ref's rather than nasty space delimited strings.
+
+	- Treatment of special characters (like NEWLINE) should be entities 
+          (&newline;) in element attributes of output XML. 
+
+	- Make methods/classes as consistent as possible with Perl package.
+
+        Things for the next big version upgrade to XDF version 0.19
+        ============================================================
+
+	- Allow for uneven precision in data. 
+
+	- MathML units.
+
+	- XDF functions.
+
+	- Face up to the setData/dataFormat problem. What happens when a user
+          sets the first data? Check that it conforms to the declared dataFormat
+	  before allocating the primitive array that will hold the datum.
+
+
