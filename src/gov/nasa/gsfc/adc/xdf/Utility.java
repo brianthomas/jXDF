@@ -147,7 +147,7 @@ package gov.nasa.gsfc.adc.xdf;
       String[] valueSpecialList = Constants.VALUE_SPECIAL_LIST;
       int stop = valueSpecialList.length;
       for (int i = 0; i < stop; i++) {
-        if (valueSpecialList.equals(valueSpecialList[i]))
+        if (strValueSpecial.equals(valueSpecialList[i]))
           return true;
       }
       return false;
@@ -176,6 +176,9 @@ package gov.nasa.gsfc.adc.xdf;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/07/02 18:01:36  thomas
+ * fixed bug in isValidValueSPecial : wouldnt allow any value to be set!
+ *
  * Revision 1.7  2001/02/07 18:44:38  thomas
  * Added new methods for binary write/read.
  *
