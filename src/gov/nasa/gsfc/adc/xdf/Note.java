@@ -152,13 +152,20 @@ public class Note extends BaseObject implements Cloneable {
 
    /** append text into this Note instance.
     */
+  
+  // wish I could use String.concat(String) here, but it doesnt seem
+  // to work. Ho hum, perhaps investigate why later on. -b.t.
    public void addText (String text) {
 
-      String currentValue = getValue();
-      if(currentValue == null) 
-         currentValue = new String (); // yes, this can happen
-      currentValue.concat(text);
-      setValue(currentValue);
+      StringBuffer newValue = new StringBuffer ();
+
+      String currentValue;
+      if ( (currentValue = getValue()) != null ) // yes, this can happen
+         newValue.append(currentValue);
+
+      newValue.append(text); // append in new text 
+
+      setValue(newValue.toString()); // (re)set the PCDATA string 
 
    }
   
