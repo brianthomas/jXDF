@@ -56,7 +56,7 @@ import java.util.List;
    @version $Revision$
  */
 
-public class Field extends BaseObject {
+public class Field extends BaseObjectWithXMLElements implements FieldInterface {
 
    //
    // Fields
@@ -183,7 +183,7 @@ public class Field extends BaseObject {
 
      /** set the *lessThanValue* attribute
       */
-     public void setLessThanValue (String strDesc)
+     public void setLessThanValue (Object strDesc)
      {
         ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      }
@@ -191,13 +191,13 @@ public class Field extends BaseObject {
       /*
       * @return the current *lessThanValue* attribute
       */
-     public String getLessThanValue() {
-       return (String) ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getLessThanValue() {
+       return ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
 
      /** set the *lessThanOrEqualValue* attribute
       */
-     public void setLessThanOrEqualValue (String strDesc)
+     public void setLessThanOrEqualValue (Object strDesc)
      {
         ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      }
@@ -205,20 +205,27 @@ public class Field extends BaseObject {
       /*
       * @return the current *lessThanOrEqualValue* attribute
       */
-     public String getLessThanOrEqualValue() {
-       return (String) ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getLessThanOrEqualValue() {
+       return ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     }
+
+     /*
+      * @return the current *lessThanValue* attribute
+      */
+     public Object getGreaterThanValue() {
+       return ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
 
      /** set the *greaterThanValue* attribute
       */
-     public void setGreaterThanValue (String strDesc)
+     public void setGreaterThanValue (Object strDesc)
      {
         ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      }
 
      /** set the *greaterThanOrEqualValue* attribute
       */
-     public void setGreaterThanOrEqualValue (String strDesc)
+     public void setGreaterThanOrEqualValue (Object strDesc)
      {
         ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      }
@@ -226,13 +233,13 @@ public class Field extends BaseObject {
      /*
       * @return the current *greaterThanOrEqualValue* attribute
       */
-     public String getGreaterThanOrEqualValue() {
-       return (String) ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getGreaterThanOrEqualValue() {
+       return ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
 
      /** set the *infiniteValue* attribute
       */
-     public void setInfiniteValue (String strDesc)
+     public void setInfiniteValue (Object strDesc)
      {
         ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      }
@@ -240,13 +247,13 @@ public class Field extends BaseObject {
      /*
       * @return the current *infiniteValue* attribute
       */
-     public String getInfiniteValue() {
-       return (String) ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getInfiniteValue() {
+       return ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
 
      /** set the *infiniteNegativeValue* attribute
       */
-     public void setInfiniteNegativeValue (String strDesc)
+     public void setInfiniteNegativeValue (Object strDesc)
      {
         ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      }
@@ -254,13 +261,13 @@ public class Field extends BaseObject {
      /*
       * @return the current *infiniteNegativeValue* attribute
       */
-     public String getInfiniteNegativeValue() {
-       return (String) ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getInfiniteNegativeValue() {
+       return ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
 
      /** set the *noDataValue* attribute
       */
-     public void setNoDataValue (String strDesc)
+     public void setNoDataValue (Object strDesc)
      {
         ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      }
@@ -268,8 +275,8 @@ public class Field extends BaseObject {
      /*
       * @return the current *noDataValue* attribute
       */
-     public String getNoDataValue() {
-       return (String) ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getNoDataValue() {
+       return ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
 
    /**
@@ -336,7 +343,7 @@ public class Field extends BaseObject {
    * @param Note
    * @return an Note object
    */
-  public Note addNote(Note n) {
+  public NoteInterface addNote(NoteInterface n) {
     getNoteList().add(n);
     return n;
   }
@@ -345,7 +352,7 @@ public class Field extends BaseObject {
    * @param Note to be removed
    * @return true on success, false on failure
    */
-   public boolean removeNote(Note what) {
+   public boolean removeNote(NoteInterface what) {
      return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -363,6 +370,13 @@ public class Field extends BaseObject {
   public List getNotes() {
     return getNoteList();
   }
+
+  /**Convenience method which sets the list of the notes held by
+   * this object.
+   */
+  public void setNotes(List noteList) {
+    setNoteList(noteList);
+  }   
 
   /**Insert a Unit object into the Units object
    * held in this object.
@@ -425,6 +439,8 @@ public class Field extends BaseObject {
    protected void init()
    {
 
+     super.init();
+
      classXDFNodeName = "field";
 
      // order matters! these are in *reverse* order of their
@@ -473,6 +489,12 @@ public class Field extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/05/04 20:25:13  thomas
+ * changed super class to BaseObjectWIthXMLElements.
+ * Added Interface stuff.
+ * changed lessthan, etc methods to take Object rather than String.
+ * added super.init() to init() method.
+ *
  * Revision 1.14  2001/04/27 21:29:39  thomas
  * moved get/set methods for lessTHan, greatherThan, etc
  * attributes out of DataFormat and into Field, Array classes.
