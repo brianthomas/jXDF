@@ -1,11 +1,11 @@
-// XDF ExponentDataFormat Class
+// XDF ExponentialDataFormat Class
 // CVS $Id$
 
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.*;
 
-// ExponentDataFormat.java Copyright (C) 2000 Brian Thomas,
+// ExponentialDataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
 /*
@@ -28,13 +28,13 @@ import java.util.*;
 
 
 /**
- * ExponentDataFormat.java:describes exponential (ASCII) floating point numbers
+ * ExponentialDataFormat.java:describes exponential (ASCII) floating point numbers
  * (e.g. scientific notation, IE10).
  * @version $Revision$
  */
 
 
-public class ExponentDataFormat extends DataFormat {
+public class ExponentialDataFormat extends DataFormat {
   //
   //Fields
   //
@@ -48,7 +48,7 @@ public class ExponentDataFormat extends DataFormat {
 
   /** The no argument constructor.
    */
-  public ExponentDataFormat ()  //DataFormat no-arg constructor should be been called
+  public ExponentialDataFormat ()  //DataFormat no-arg constructor should be been called
   {
     init();
   }
@@ -163,7 +163,7 @@ public class ExponentDataFormat extends DataFormat {
   //
 
   /**numOfBytes: A convenience method.
-   * @Return: the number of bytes this XDF::ExponentDataFormat holds.
+   * @Return: the number of bytes this XDF::ExponentialDataFormat holds.
    */
   public int numOfBytes() {
     return getWidth().intValue();
@@ -213,8 +213,11 @@ public class ExponentDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/10/26 20:34:13  kelly
+ * fixed the class name, etc. -k.z.
+ *
  * Revision 1.1  2000/10/26 20:23:10  kelly
- * was ExponentDataFormat.java before. rename it.  -k.z.
+ * was ExponentDataFormat.java before. renamed it.  -k.z.
  *
  * Revision 1.2  2000/10/26 20:19:55  kelly
  *
