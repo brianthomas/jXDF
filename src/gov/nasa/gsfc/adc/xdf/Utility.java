@@ -65,8 +65,8 @@ import java.util.*;
       return false;
     }
 
-     public static boolean isValidEncoding(String strEncoding) {
-      String[] encodingList = Constants.ENCODINGS_LIST;
+     public static boolean isValidIOEncoding(String strEncoding) {
+      String[] encodingList = Constants.IO_ENCODINGS_LIST;
       int stop = encodingList.length;
       for (int i = 0; i< stop; i++) {
         if (strEncoding.equals(encodingList[i]))
@@ -85,12 +85,36 @@ import java.util.*;
       return false;
     }
 
+    public static boolean isValidDataEncoding(String strDataEncoding) {
+      String[] dataEncodingList = Constants.DATA_ENCODING_LIST;
+      int stop = dataEncodingList.length;
+      for (int i = 0; i < stop; i++) {
+        if (strDataEncoding.equals(dataEncodingList[i]))
+          return true;
+      }
+      return false;
+    }
+
+    public static boolean isValidDataCompression(String strDataCompression) {
+      String[] dataCompressionList = Constants.DATA_COMPRESSION_LIST;
+      int stop = dataCompressionList.length;
+      for (int i = 0; i < stop; i++) {
+        if (strDataCompression.equals(dataCompressionList[i]))
+          return true;
+      }
+      return false;
+    }
+
+
 
   }  //end of Utility class
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/10/27 21:24:02  kelly
+ * changes made in correspondence with Constants.java  -k.z.
+ *
  * Revision 1.3  2000/10/26 20:11:27  kelly
  * changes related to Constants are made
  *
