@@ -1146,8 +1146,8 @@ public class SaxDocumentHandler extends DefaultHandler {
                   DataFormat currentDataFormat = DataFormatList[CurrentDataFormatIndex];
                   int bytes_to_add = currentDataFormat.numOfBytes();
    
-//   String strValue = new String(data, bytes_added, bytes_to_add);
-//   Log.errorln("AddByteData READCELL string(off:"+bytes_added+" len:"+bytes_to_add+") => ["+strValue+"]");
+   String strValue = new String(data, bytes_added, bytes_to_add);
+   Log.debugln("AddByteData READCELL string(off:"+bytes_added+" len:"+bytes_to_add+") => ["+strValue+"]");
    
                   if ( currentDataFormat instanceof IntegerDataFormat
                        || currentDataFormat instanceof FloatDataFormat
