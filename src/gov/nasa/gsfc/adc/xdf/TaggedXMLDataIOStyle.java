@@ -48,10 +48,16 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //
 
   //no-arg contructor
-  public TaggedXMLDataIOStyle(ArrayInterface parentArray) {
-    this.parentArray = parentArray;
+  public TaggedXMLDataIOStyle(ArrayInterface parentArray) 
+  {
+    super(parentArray);
   }
 
+  public TaggedXMLDataIOStyle(ArrayInterface parentArray, Hashtable InitXDFAttributeTable) 
+  {
+    super(parentArray,InitXDFAttributeTable);
+  }
+  
   //
   //Get/Set Methods
   //
@@ -137,8 +143,13 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, " tag = \"");
         writeOutAttribute(outputstream, tag);
         writeOut(outputstream, "\"/>");
-
       }
+
+      // wrap up newline 
+      if (niceOutput) {
+          writeOut(outputstream, Constants.NEW_LINE);
+      }
+
     }
   }
 
@@ -156,6 +167,11 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/05/10 21:41:52  thomas
+ * minor change to specificStyletoXDF. Small
+ * change to constructors realated to inheritance
+ * scheme.
+ *
  * Revision 1.12  2001/05/04 20:23:40  thomas
  * Added Interface stuff.
  *
