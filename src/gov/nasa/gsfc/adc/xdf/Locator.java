@@ -76,7 +76,7 @@ import java.util.List;
       locations.put(axisObj, new Integer(0));
     }
 
-    dimension = axisIterationList.size();
+    dimension = axisOrderList.size();
 
     Log.infoln("Locator.setIterationOrder() has reset the current location to the dataCube origin.");
 
@@ -169,7 +169,7 @@ import java.util.List;
    * @return an integer array, each element is the position along
    * the corresponding axis
    */
-  public int [] getDataCellPosition() {
+  public int [] getLocation() {
       int [] position = new int [dimension];
       for (int i=0; i<dimension; i++) {
 	  AxisInterface axis = (AxisInterface) axisOrderList.get(i);
