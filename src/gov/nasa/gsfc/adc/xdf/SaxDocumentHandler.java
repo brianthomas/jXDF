@@ -162,6 +162,7 @@ public class SaxDocumentHandler extends DefaultHandler {
     // lookup tables holding objects that have id/idref stuff
     public Hashtable ArrayObj = new Hashtable();
     public Hashtable AxisObj = new Hashtable();
+    public Hashtable AxisAliasId = new Hashtable();
     public Hashtable FieldObj = new Hashtable();
     public Hashtable NoteObj = new Hashtable();
     public Hashtable ParamObj = new Hashtable();
@@ -306,17 +307,26 @@ public class SaxDocumentHandler extends DefaultHandler {
        return (String) CurrentNodePath.get((pathSize-1));
     }
 
-    // find unique id name within a list of objects 
-    public String findUniqueIdName( Hashtable list, String baseIdName) {
+    // find unique id name within a idtable of objects 
+    public String findUniqueIdName( Hashtable idTable, String baseIdName) 
+    {
 
        StringBuffer testName = new StringBuffer(baseIdName);
 
-       while (list.containsKey(testName.toString())) {
+       while (idTable.containsKey(testName.toString())) {
            testName.append("0"); // isnt there something better to append here?? 
        }
 
        return testName.toString();
 
+    }
+
+    // as above but will store alias in table
+    public String findUniqueIdName( Hashtable idTable, String baseIdName, Hashtable aliasTable ) 
+    {
+       String newId = findUniqueIdName(idTable, baseIdName);
+       aliasTable.put(newId, baseIdName); // record the alias 
+       return newId;
     }
 
     // return the element before last 
@@ -1251,7 +1261,6 @@ Log.errorln("");
     {
 
 
-/*
 Log.debug("Add Data:["+thisString+"] (");
 List axes = dataLocator.getIterationOrder();
 Iterator liter = axes.iterator();
@@ -1260,7 +1269,6 @@ while (liter.hasNext()) {
    Log.debug(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
 }
 Log.debugln(") ");
-*/
 
        // Note that we dont treat binary data at all here 
        try {
@@ -2183,17 +2191,6 @@ Log.errorln(" TValue:"+valueString);
              ) 
           { 
 
-             // add this object to the lookup table, if it has an ID
-             if (axisId != null) {
-
-                 // a warning check, just in case 
-                 if (AxisObj.containsKey(axisId)) 
-                    Log.warnln("More than one axis node with axisId=\""+axisId+"\", using latest node." ); 
-
-                 // add this into the list of axis objects
-                 AxisObj.put(axisId, newaxis);
-
-             }
 
              //  If there is a reference object, clone it to get
              //  the new axis
@@ -2212,7 +2209,7 @@ Log.errorln(" TValue:"+valueString);
                     // override attrs with those in passed list
                     newaxis.setXMLAttributes(attrs);
                     // give the clone a unique Id and remove IdRef 
-                    newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId())); 
+                    newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId(), AxisAliasId)); 
                     newaxis.setAxisIdRef(null);
 
                     // add this into the list of axis objects
@@ -2222,6 +2219,18 @@ Log.errorln(" TValue:"+valueString);
                     Log.warnln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
                     return (Object) null;
                  }
+             }
+
+            // add this object to the lookup table, if it has an ID
+             if (axisId != null) {
+
+                 // a warning check, just in case 
+                 if (AxisObj.containsKey(axisId))
+                    Log.warnln("More than one axis node with axisId=\""+axisId+"\", using latest node." );
+
+                 // add this into the list of axis objects
+                 AxisObj.put(axisId, newaxis);
+
              }
 
              // add this axis to the current array object
@@ -2480,7 +2489,6 @@ Log.errorln(" TValue:"+valueString);
 
               Locator myLocator = CurrentArray.createLocator();
               myLocator.setIterationOrder(AxisReadOrder);
-              formatObj.setIOAxesOrder(AxisReadOrder);
 
 /*
 Iterator thisIter = AxisReadOrder.iterator();
@@ -2814,7 +2822,7 @@ while(thisIter.hasNext()) {
                     newfieldaxis.setXMLAttributes(attrs);
 
                     // give the clone a unique Id and remove IdRef 
-                    newfieldaxis.setAxisId(findUniqueIdName(AxisObj, newfieldaxis.getAxisId())); 
+                    newfieldaxis.setAxisId(findUniqueIdName(AxisObj, newfieldaxis.getAxisId(), AxisAliasId)); 
                     newfieldaxis.setAxisIdRef(null);
 
                     // add this into the list of axis objects
@@ -3328,7 +3336,10 @@ while(thisIter.hasNext()) {
                       (readObj instanceof FormattedXMLDataIOStyle) )
           {
 
-              // do nothing 
+              // set axis write order
+              if (AxisReadOrder.size() > 0) {
+                 readObj.setIOAxesOrder(AxisReadOrder);
+              } 
 
           } else {
              Log.errorln("ERROR: Dont know what do with this read style ("+readObj+"), aborting read.");
@@ -3382,6 +3393,28 @@ while(thisIter.hasNext()) {
 
                 // add this into the list of Read objects
                 ReadObj.put(readObj.getReadId(), readObj);
+
+                // we need to put in the local axes refs here, not use cloned ones
+                // otherwise, references will be all screwy and nothing will work for
+                // adding/getting data :). I suppose we should somehow put this code
+                // inside the clone method of the readObject, but its difficult to do, 
+                // as well questionable utility. 
+                ArrayList newAxisOrderList = new ArrayList();
+                Iterator iter = CurrentArray.getAxes().iterator();
+                while (iter.hasNext()) {
+                   AxisInterface arrayAxisObj = (AxisInterface) iter.next();
+                   String refAxisId = (String) AxisAliasId.get(arrayAxisObj.getAxisId()); 
+                   Iterator iter2 = readObj.getIOAxesOrder().iterator();
+                   while (iter2.hasNext()) {
+                      AxisInterface readAxisObj = (AxisInterface) iter2.next();
+                      if (readAxisObj.getAxisId().equals(refAxisId)) {
+                          newAxisOrderList.add(arrayAxisObj);
+                          break; // got a match, go to next axis object 
+                      } 
+                   }
+                }
+                // now set the new IO Axes order with correct axis refs 
+                readObj.setIOAxesOrder(newAxisOrderList);
 
              } else {
                 Log.warnln("Error: Reader got a read node with ReadIdRef=\""+readIdRef+"\"");
@@ -4287,6 +4320,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.44  2001/07/30 18:28:11  thomas
+ * Fix for XDF_sample4 reading: cloned read object child axes need to be the ones in the parent array, not default cloned ones.
+ *
  * Revision 1.43  2001/07/26 15:57:24  thomas
  * changes related to name change in XMLElementNode class.
  *
