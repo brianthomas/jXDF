@@ -5,7 +5,11 @@
 	not the case.
 	
 	You will need a SAX level 1 parser and the org.xml.sax package
-	to run this software.
+	to run this software.  Perhaps there are other locations to 
+	acquire this, but I know of but one at SUN: 
+
+	Java API for XML Parsing 1.0.1 may be downloaded at the URL 
+        http://java.sun.com/xml/download.html 
 
 	Instructions on install: well, we are planning to better instruct
 	you than what is given below, however, I just havent had the time 
