@@ -27,6 +27,7 @@ package gov.nasa.gsfc.adc.xdf;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 /** 
@@ -166,13 +167,31 @@ public class Conversion extends BaseObject {
      return removeFromList(index, getComponentList(), COMPONENTLIST_XML_ATTRIBUTE_NAME);
   }
 
+  /** Evaluate the passed value using the components held by this conversion. Components
+      are evaluated in Reverse Polish Notation order.
+      @return evaluated value.
+   */
   public double evaluate (double value) {
-     //NOT IMPLEMENTED YET
-     return value;
+     Double result = this.evaluate(new Double(value));
+     return result.doubleValue();
   }
 
+  /** Evaluate the passed value using the components held by this conversion. Components
+      are evaluated in Reverse Polish Notation order.
+      @return evaluated value.
+   */
   public Double evaluate (Double value) {
-     //NOT IMPLEMENTED YET
+     
+     List components = getComponents();
+     if (components.size() > 0) {
+        Iterator iter = components.iterator();
+        while (iter.hasNext())
+        {
+            ConversionComponentInterface component = (ConversionComponentInterface) iter.next();
+            value = component.evaluate(value);
+        }
+     }
+
      return value;
   }
 

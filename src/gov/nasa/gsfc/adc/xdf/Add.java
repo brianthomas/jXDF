@@ -86,13 +86,20 @@ public class Add extends BaseObject implements ConversionComponentInterface {
    // Other PUBLIC Methods
    //
 
+   /** Evaluate a value using this conversion object. 
+       @return the converted value.
+    */
    public double evaluate (double value) {
        double addValue = getValue().doubleValue();
-       return addValue;
+       return value + addValue;
    }
 
+   /** Evaluate a value using this conversion object. 
+       @return the converted value.
+    */
    public Double evaluate (Double value) {
-       return new Double(0.0);
+       // yech. Isnt there a better way to do this??
+       return new Double(this.evaluate(value.doubleValue()));
    }
 
 
