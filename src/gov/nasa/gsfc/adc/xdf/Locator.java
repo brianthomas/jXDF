@@ -41,7 +41,7 @@ import java.util.List;
   //
   //Fields
   //
-  protected Array parentArray;
+  protected ArrayInterface parentArray;
   protected List axisOrderList;
   private boolean HasNext;
 
@@ -374,6 +374,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.22  2001/05/04 20:32:41  thomas
+ * Implement Interface stuff.
+ *
  * Revision 1.21  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
  *
