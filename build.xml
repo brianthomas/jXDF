@@ -7,6 +7,7 @@ CVS $Id$
 
   <!-- set global properties for this build -->
 
+  <property name="DTD_VERSION" value="017"/>
   <property name="path" value="gov/nasa/gsfc/adc/xdf"/>
   <property name="src" value="src/${path}"/>
   <property name="build" value="."/>
@@ -37,7 +38,7 @@ CVS $Id$
     <!-- crimson parser isnt smart enough to follow the cheese. We have to 
          copy the DTD up to the present directory in order to play ball
       -->
-    <copy file="samples/XDF_017.dtd" todir="."/>
+    <copy file="samples/XDF_${DTD_VERSION}.dtd" todir="."/>
     <echo message="Running tests..." />
 
     <antcall target="runTests"><param name="file" value="samples/XDF_sample1.xml"/></antcall>
@@ -80,7 +81,7 @@ CVS $Id$
     <echo message="Cleaning up test files.." />
     <delete file="test1.xml"/>
     <delete file="test2.xml"/>
-    <delete file="XDF_017.dtd"/>
+    <delete file="XDF_${DTD_VERSION}.dtd"/>
   </target>
 
 
@@ -103,7 +104,8 @@ CVS $Id$
 
   <target name="jar" depends="compile">
     <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar jarfile="xdf-${DSTAMP}.jar" basedir="${path}"/>
+    <!-- <jar jarfile="xdf-${DSTAMP}.jar" basedir="${path}"/> --> 
+    <jar jarfile="xdf-${DTD_VERSION}.jar" basedir="${path}"/>
   </target>
 
   <target name="doc" depends="init">
@@ -130,7 +132,7 @@ CVS $Id$
 
   </target>
 
-  <target name="all" depends="compile,doc,test"/>
+  <target name="all" depends="jar,doc,test"/>
 
   <target name="help">
     <echo message="Invoke 'ant' with one of the following options:" />
@@ -155,8 +157,9 @@ CVS $Id$
        <fileset dir="test" includes="*.class"/>
     </delete>
     <delete dir="gov"/>
-    <delete file="xdf-*.jar"/>
+    <delete file="xdf-${DTD_VERSION}.jar"/>
     <delete dir="${docApi}"/>
+    <antcall target="cleanRunTests"/>
   </target>
 
 </project>
