@@ -69,7 +69,7 @@ public class SaxDocumentHandler extends HandlerBase {
     private static final String sHandlerXDFDTDName = "XDF_0.17.dtd";
 
     // The XDF structure that is populated by the XDF DocumentHandler
-    private Structure XDF; 
+    private XDFInterface XDF; 
 
     // Options for the document handler
     private Hashtable Options;
@@ -80,8 +80,8 @@ public class SaxDocumentHandler extends HandlerBase {
     private Hashtable endElementHandlerHashtable;   // end node handler
 
     // References to the current working structure/array
-    private Structure CurrentStructure;   
-    private Array     CurrentArray;   
+    private StructureInterface CurrentStructure;   
+    private ArrayInterface     CurrentArray;   
     private Object    CurrentDatatypeObject;
     private ArrayList CurrentNodePath = new ArrayList();
     private ArrayList CurrentFormatObjectList = new ArrayList ();
@@ -177,10 +177,10 @@ public class SaxDocumentHandler extends HandlerBase {
        init();
     }
 
-    public SaxDocumentHandler (Structure structure)
+    public SaxDocumentHandler (XDFInterface XDFstructure)
     {
        init();
-       setReaderStructureObj(structure);
+       setReaderXDFStructureObj(XDFstructure);
     }
 
     public SaxDocumentHandler (Hashtable options)
@@ -195,16 +195,16 @@ public class SaxDocumentHandler extends HandlerBase {
 
     /** Get the structure object that the Reader will parse an InputSource into. 
     */
-    public Structure getReaderStructureObj () 
+    public XDFInterface getReaderXDFStructureObj () 
     {
       return XDF;
     }
 
     /** Set the structure object that the Reader will parse an InputSource into. 
     */
-    public void setReaderStructureObj (Structure structure)
+    public void setReaderXDFStructureObj (XDFInterface XDFstructure)
     {
-       XDF = structure; // set the structure to read into to be passed ref. 
+       XDF = XDFstructure; // set the structure to read into to be passed ref. 
     }
 
     /** Merge in external map to the internal startElement handler Hashtable. 
@@ -328,7 +328,7 @@ public class SaxDocumentHandler extends HandlerBase {
        return (String) null;
     }
 
-    public void setCurrentDatatypeObject(Object object) {
+    private void setCurrentDatatypeObject(Object object) {
         CurrentDatatypeObject = object;
     }
 
@@ -336,19 +336,19 @@ public class SaxDocumentHandler extends HandlerBase {
        return CurrentDatatypeObject;
     }
 
-    public void setCurrentArray(Array array) {
+    private void setCurrentArray(ArrayInterface array) {
        CurrentArray = array;
     }
 
-    public Array getCurrentArray () {
+    public ArrayInterface getCurrentArray () {
        return CurrentArray;
     }
 
-    public void setCurrentStructure (Structure structure) {
+    private void setCurrentStructure (StructureInterface structure) {
        CurrentStructure = structure;
     }
 
-    public Structure getCurrentStructure () {
+    public StructureInterface getCurrentStructure () {
        return CurrentStructure;
     }
 
@@ -579,7 +579,7 @@ public class SaxDocumentHandler extends HandlerBase {
       Log.configure("XDFLogConfig");
       
       // assign/init 'globals' (e.g. object fields)
-      XDF = new Structure();
+      XDF = new XDF();
       Options = new Hashtable();  
       startElementHandlerHashtable = new Hashtable(); // start node handler
       charDataHandlerHashtable = new Hashtable(); // charData handler
@@ -1487,8 +1487,9 @@ Log.errorln(" TValue:"+valueString);
        return values;
     }
           
-    private Array appendArrayToArray (Array arrayToAppendTo, Array arrayToAdd) {
-
+    private ArrayInterface appendArrayToArray ( ArrayInterface arrayToAppendTo, 
+                                                ArrayInterface arrayToAdd ) 
+    {
 
        if (arrayToAppendTo != null) 
        {
@@ -2023,7 +2024,6 @@ Log.errorln(" TValue:"+valueString);
               Locator myLocator = CurrentArray.createLocator();
               myLocator.setIterationOrder(AxisReadOrder);
 
-
               // CurrentIOCmdIndex = 0; 
               CurrentDataFormatIndex = 0; 
               ArrayList strValueList;
@@ -2488,7 +2488,7 @@ Log.errorln(" TValue:"+valueString);
           {
              String name = attrs.getName(i);
              if (name.equals("axisIdRef") ) {
-                AxisReadOrder.add(AxisObj.get(attrs.getValue(i)));
+                AxisReadOrder.add(0, AxisObj.get(attrs.getValue(i)));
              } else 
                  Log.warnln("Warning: got weird attribute:"+name+" on for node");
           } 
@@ -2730,22 +2730,22 @@ Log.errorln(" TValue:"+valueString);
           if( parentNodeName.equals(XDFNodeName.ARRAY) ) 
           {
 
-            newparameter = CurrentArray.addParameter(newparameter);
+            newparameter = (Parameter) CurrentArray.addParameter(newparameter);
 
           } else if ( parentNodeName.equals(XDFNodeName.ROOT) 
               || parentNodeName.equals(XDFNodeName.STRUCTURE) )
           {
 
-            newparameter = CurrentStructure.addParameter(newparameter);
+            newparameter = (Parameter) CurrentStructure.addParameter(newparameter);
 
           } else if ( parentNodeName.equals(XDFNodeName.PARAMETERGROUP) ) 
 
           {
             // for now, just add as regular parameter 
             if(LastParameterGroupParentObject instanceof Array) {
-               newparameter = ((Array) LastParameterGroupParentObject).addParameter(newparameter);
+               newparameter = (Parameter) ((Array) LastParameterGroupParentObject).addParameter(newparameter);
             } else if(LastParameterGroupParentObject instanceof Structure) {
-               newparameter = ((Structure) LastParameterGroupParentObject).addParameter(newparameter);
+               newparameter = (Parameter) ((Structure) LastParameterGroupParentObject).addParameter(newparameter);
             }
 
           } else {
@@ -3063,7 +3063,7 @@ Log.errorln(" TValue:"+valueString);
           // The root node is just a "structure" node,
           // but is always the first one.
           XDF.setXMLAttributes(attrs); // set XML attributes from passed list 
-          CurrentStructure = XDF;      // current working structure is now the root 
+          setCurrentStructure(XDF);    // current working structure is now the root 
                                        // structure
 
           // if this global option is set in the reader, we use it
@@ -3815,6 +3815,10 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.31  2001/05/04 21:00:07  thomas
+ * Implemented interface stuff. ReadAxisOrder stuff was
+ * not really right, fixed. More fixes on that topic needed still.
+ *
  * Revision 1.30  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
  *
