@@ -81,6 +81,7 @@ public class SaxDocumentHandler implements DocumentHandler {
     // the last object created by a startElementNodeActionHandler
     private Object ParentObject; 
     private Object CurrentObject; 
+    private ArrayList CurrentObjectList = new ArrayList(); 
     private boolean UpdateCurrentObject = false; 
 
     // GLOBALs for saving these between dataFormat/read node and later when we 
@@ -215,13 +216,12 @@ public class SaxDocumentHandler implements DocumentHandler {
     // Methods that describe the current parsing
     //
 
-    public Object getCurrentObject() {
-       return CurrentObject;
-    }
-
-    // return the element before last 
-    public Object getParentObject () {
-       return ParentObject;
+    // get the last object we worked on
+    public Object getLastObject() {
+       Object lastObject = (Object) null;
+       if (CurrentObjectList.size() > 0)
+          lastObject = CurrentObjectList.get(CurrentObjectList.size()-1);
+       return lastObject;
     }
 
     public String getCurrentNodeName () {
@@ -273,6 +273,7 @@ public class SaxDocumentHandler implements DocumentHandler {
 
         Log.debugln("H_START:["+element+"]");
         
+        Object thisObject = (Object) null;
 
         // add "element" to current path (??) 
         CurrentNodePath.add(element); 
@@ -285,17 +286,14 @@ public class SaxDocumentHandler implements DocumentHandler {
            // run the appropriate start handler
            StartElementHandlerAction event = 
               (StartElementHandlerAction) startElementHandlerHashtable.get(element); 
-           Object thisObject = event.action(this,attrs);
-
-           if(thisObject != null) { 
-              ParentObject = CurrentObject;
-              CurrentObject = thisObject;
-              UpdateCurrentObject = true; 
-           }
+           thisObject = event.action(this,attrs);
 
         } else {
            Log.warnln("Warning: UNKNOWN NODE ["+element+"] encountered.");
         }
+
+        CurrentObjectList.add(thisObject);
+
     }
 
     public void endElement (String element)
@@ -315,15 +313,15 @@ public class SaxDocumentHandler implements DocumentHandler {
                    endElementHandlerHashtable.get(element);
            event.action(this);
 
-           if (UpdateCurrentObject) { 
-              CurrentObject = ParentObject;
-           }
-
         } else {
 
            // do nothing
 
         }
+
+        // peel off last object in object list
+        CurrentObjectList.remove(CurrentObjectList.size()-1);
+
     }
 
     /**  character Data handler
@@ -2348,6 +2346,11 @@ public class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2000/11/10 05:49:44  thomas
+ * Updated start/end element handlers to update
+ * CUrrentObjectList appropriately. Added getLastObject
+ * method. -b.t.
+ *
  * Revision 1.12  2000/11/09 23:04:56  thomas
  * Updated version, made changes to allow extension
  * to other dataformats (e.g. FITSML). -b.t.
