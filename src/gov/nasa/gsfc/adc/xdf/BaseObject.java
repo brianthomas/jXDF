@@ -165,13 +165,13 @@ public abstract class BaseObject implements Serializable, Cloneable {
      return obj;
   }
 
-  /** Get the value of a specific Attribute. 
-   *  if not string type, get the object's String value
+  /** Get the value of a specific Attribute. Only returns non-null
+      if the Attribute exists and is of STRING_TYPE.
    */
   public String getAttributeStringValue(String attribName) 
   {
       String value = null;
-      Attribute attrib = getAttribute(attribName); 
+      Attribute attrib = getAttribute(attribName);
 
       /*
       if (attrib != null && attrib.getAttribType() == Constants.STRING_TYPE) {
@@ -179,13 +179,14 @@ public abstract class BaseObject implements Serializable, Cloneable {
       }
       */
       if (attrib != null) {
-	  value = attrib.getAttribValue().toString();
+          value = attrib.getAttribValue().toString();
       }
 
       return value;
   }
 
-  /** Get the value of a specific Attribute. 
+  /** Get the value of a specific Attribute. Only returns non-null
+      if the Attribute exists and is of STRING_TYPE.
       @deprecated Use the getAttributeStringValue method instead.
    */
   public String getXMLAttributeStringValue(String attribName) 
