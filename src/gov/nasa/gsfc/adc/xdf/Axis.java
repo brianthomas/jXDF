@@ -5,9 +5,17 @@
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
 
 package gov.nasa.gsfc.adc.xdf;
-import java.util.*;
 
-/** Axis.java: There must be one axis (or fieldAxis) for every dimension
+import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
+
+
+/** There must be one axis (or fieldAxis) for every dimension
  *  in the datacube. There are n indices for every axis (n>= 1).
  * Each axis declaration defines the values of ALL the indices
  * along that dimension. Values of the indices in that axis need
@@ -15,7 +23,7 @@ import java.util.*;
  * within the axis. A unit may be assocated with the axis.
  * Note that the unit specified for the axis indices is not the
  * same as the unit of the data held within the data cube.
-     @version $Revision$
+   @version $Revision$
 */
 
 public class Axis extends BaseObject implements AxisInterface {
@@ -505,6 +513,9 @@ public class Axis extends BaseObject implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2000/11/08 19:24:56  thomas
+ * Trimmed import statements to just needed classes. -b.t.
+ *
  * Revision 1.10  2000/11/06 21:17:42  kelly
  * added clone()  -k.z.
  *
