@@ -161,7 +161,9 @@ public class Value extends BaseObject {
    public void setSpecial (String strSpecial)
    {
       if (Utility.isValidValueSpecial(strSpecial))
-       ((XMLAttribute) attribHash.get(SPECIAL_XML_ATTRIBUTE_NAME)).setAttribValue(strSpecial);
+         ((XMLAttribute) attribHash.get(SPECIAL_XML_ATTRIBUTE_NAME)).setAttribValue(strSpecial);
+      else 
+         Log.warnln("Warning: can't set special attribute in value object to:"+strSpecial);
    }
 
 
@@ -200,6 +202,9 @@ public class Value extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/07/02 18:02:08  thomas
+ * added warning message if setSpecial wont allow value to be set.
+ *
  * Revision 1.12  2001/06/19 15:38:01  thomas
  * added convience constructor methods
  *
