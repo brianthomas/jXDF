@@ -30,6 +30,8 @@ import java.util.Hashtable;
 import java.util.Collections;
 import java.lang.reflect.*;
 import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**DataCube.java:
  * @version $Revision$
@@ -52,13 +54,7 @@ public class DataCube extends BaseObject {
   //(Java fills all int[] and double[] with 0 once constructed )
   //--an array of primative types or an array of Strings depending depending on
   //the actual data
-protected List data = Collections.synchronizedList(new ArrayList());
-
-protected Locator currentLocator;
-
-  List tags; //store the tags for writeTaggedData
-
-
+  protected List data = Collections.synchronizedList(new ArrayList());
 
   //
   // Constructor and related methods
@@ -212,6 +208,10 @@ public Array getParentArray() {
   return parentArray;
 }
 
+protected void setParentArray(Array parentArray) {
+  this.parentArray = parentArray;
+}
+
 
 
 
@@ -252,6 +252,7 @@ public int incrementDimension(Axis axis) {
 /**incrementDimension: increase the dimension by 1
    * @return: the current dimension ( which is incremented)
    * this is called after the Array the DataCube belongs to adds an Axis
+   * FieldAxis should always be the first axis to add
    */
 public int incrementDimension(FieldAxis fieldAxis) {
   if (dimension==0) {  //add first dimension
@@ -875,30 +876,118 @@ public String  setData (Locator locator, String strValue) throws SetDataExceptio
   }
 }
 
-  /**removeData : Remove the requested data from the indicated datacell
-   * (via L<XDF::DataCube> LOCATOR REF) in the XDF::DataCube held in this Array.
-   * B<NOT CURRENTLY IMPLEMENTED>.
+  /**removeData : Remove data from the indicated datacell
+   * @param: locator that indicates the location of the cell
+   * @return: true if indicated cell constains data,
+   * false if indicated cell doesn't contain data
    */
 
-public double  removeData (Locator locator, double numValue) {
-  Log.error("in DataCube, removeData(), function body empty, returning 0");
-  return 0;
+protected boolean  removeData (Locator locator) {
+  List axisList = parentArray.getAxisList();
+  List current = data;
+  int numOfAxis = axisList.size();
+  if (numOfAxis == 1) {
+    int index = locator.getAxisLocation((Axis) axisList.get(0));
+    try {
+      if (java.lang.reflect.Array.getByte(data.get(0), index) ==1) {
+        //there is the data in the requested cell
+        //remove the data
+        Class arrayEltType = data.get(1).getClass().getComponentType();
+        if (arrayEltType.equals(Integer.TYPE)) {
+          java.lang.reflect.Array.setInt(data.get(1), index, 0);
+        }
+        else {
+          if (arrayEltType.equals(Double.TYPE)) {
+            java.lang.reflect.Array.setDouble(data.get(1), index, 0);
+          }
+          else {  //it is String
+            java.lang.reflect.Array.set(data.get(1), index, null);
+          }
+        }
+        //indicate the requested cell constains no data
+        //put 0 in the byte array cell
+        java.lang.reflect.Array.setByte(data.get(0), index, (byte) 0);
+        return true;
+      }
+      else { //the datacell is allocated, but contains no data
+        return false;
+      }
+    }
+    catch (Exception e) {  //the location we try to access is not allocated,
+      //i.e., no data in the cell
+      return false;
+    }
+  } //end of if when numOfAxis =1
+
+  for (int i = numOfAxis-1 ; i >= 2; i--) {
+    Axis axis = (Axis) axisList.get(i);
+    int index =  locator.getAxisLocation(axis);
+    current = (List) current.get(index);
+    if (current == null) {
+      //the location we try to access is not allocated, no data
+      return false;
+    }
+  }
+
+  //special handling for the innermost two layers
+  int index0;
+  int index1;
+  if (parentArray.hasFieldAxis()) {
+    //FieldAxis is always the second to last innermost layer
+    index0 = locator.getAxisLocation((FieldAxis) axisList.get(0));
+    index1 = locator.getAxisLocation((Axis) axisList.get(1));
+  }
+  else {
+    index0 = locator.getAxisLocation((Axis) axisList.get(1));
+    index1 = locator.getAxisLocation((Axis) axisList.get(0));
+  }
+
+  try {
+    //byte array that indicates if corresponding cell contains data;
+    Object byteArray = current.get(2*index0);
+    //array that stores the actual data
+    Object dataArray =  current.get(2*index0+1);
+
+    if (java.lang.reflect.Array.getByte(byteArray, index1) ==1) {
+     //there is the data in the requested cell
+     //remove the data
+     Class arrayEltType = dataArray.getClass().getComponentType();
+      if (arrayEltType.equals(Integer.TYPE)) {
+        java.lang.reflect.Array.setInt(dataArray, index1, 0);
+      }
+      else {
+        if (arrayEltType.equals(Double.TYPE)) {
+          java.lang.reflect.Array.setDouble(dataArray, index1, 0);
+        }
+        else {
+          java.lang.reflect.Array.set(dataArray, index1, null);
+        }
+      }
+        //indicate the requested cell constains no data
+      java.lang.reflect.Array.setByte(byteArray, index1, (byte) 0);
+      return true;
+    }
+    else { //the datacell is allocated, but contains no data
+      return false;
+    }
+  }
+  catch (Exception e) {  //the location we try to access is not allocated,
+    //i.e., no data in the cell
+    return false;
+  }
 }
 
-  /**removeData : Remove the requested data from the indicated datacell
-   * (via L<XDF::DataCube> LOCATOR REF) in the XDF::DataCube held in this Array.
-   * B<NOT CURRENTLY IMPLEMENTED>.
-   */
-public String  removeData (Locator locator, String strValue) {
-  Log.error("in DataCube, setData(), function body empty, returning null");
-  return null;
-}
 
-public void toXDFOutputStream (
-			       OutputStream outputstream,
-			       Hashtable XMLDeclAttribs,
-			       String strIndent
-			       )
+
+
+  public void toXDFOutputStream (
+                                   OutputStream outputstream,
+                                   Hashtable XMLDeclAttribs,
+                                   String strIndent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
+                                )
   {
     boolean niceOutput = sPrettyXDFOutput;
     String indent = "";
@@ -923,9 +1012,22 @@ public void toXDFOutputStream (
 
     //write out just the data
     XMLDataIOStyle readObj = parentArray.getXMLDataIOStyle();
-    if (href !=null) {  //write out to another file, double check
+    OutputStream dataOutputStream;
+    if (href !=null) {  //write out to another file,
+      try {
+        dataOutputStream = new FileOutputStream(getHref());
+      }
+      catch (IOException e) {
+        //oops, sth. is wrong, writ out to the passed in OutputStream
+        dataOutputStream = outputstream;
+      }
     }
-    currentLocator = parentArray.createLocator();
+    else {
+      // no *href* attribute specified, write out to the passed in OutputStream
+      dataOutputStream = outputstream;
+    }
+
+    Locator currentLocator = parentArray.createLocator();
 
     AxisInterface fastestAxis = (AxisInterface) parentArray.getAxisList().get(0);
     //stores the NoDataValues for the parentArray,
@@ -942,7 +1044,7 @@ public void toXDFOutputStream (
     else {
       DataFormat d = parentArray.getDataFormat();
       for (int i = 0; i < NoDataValues.length; i++) {
-        if (d!=null)
+        if (d!=null && d.getNoDataValue() != null)
           NoDataValues[i] = d.getNoDataValue().toString();
       }
     }
@@ -963,19 +1065,26 @@ public void toXDFOutputStream (
       for (int i = 0; i < stop; i++) {
         axisLength[i] =axes[stop - 1 - i];
       }
-      writeTaggedData(outputstream, currentLocator, indent, axisLength, tags, 0, fastestAxis, NoDataValues);
+      writeTaggedData(dataOutputStream,
+                      currentLocator,
+                      indent,
+                      axisLength,
+                      tags,
+                      0,
+                      fastestAxis,
+                      NoDataValues);
 
     }  //done dealing with with TaggedXMLDataIOSytle
     else {
        if (readObj instanceof DelimitedXMLDataIOStyle) {
-           writeDelimitedData( outputstream, currentLocator, 
-                               (DelimitedXMLDataIOStyle) readObj, 
+           writeDelimitedData( dataOutputStream, currentLocator,
+                               (DelimitedXMLDataIOStyle) readObj,
                                fastestAxis, NoDataValues );
 
        }
     }
 
-    //close the data section appropriately 
+    //close the data section appropriately
     if (niceOutput) {
       writeOut(outputstream, Constants.NEW_LINE);
       writeOut(outputstream, indent);
@@ -988,10 +1097,9 @@ public void toXDFOutputStream (
   }
 
 
-  /**  write data with no less than 3D, using recursion, expansive, data with no more
-       than 3D has special methods, data retrieval is ok,
-    */
-
+  /**writeTaggedData: write out tagged data
+   *
+   */
 protected void writeTaggedData(OutputStream outputstream,
 			       Locator locator,
 			       String indent,
@@ -1033,11 +1141,11 @@ protected void writeTaggedData(OutputStream outputstream,
           catch (NoDataException e) {
              // opps! no data in that location. Print out accordingly
              String noDataValueString = noDataValues[locator.getAxisLocation(fastestAxis)];
-             if (noDataValueString != null) 
-             { 
+             if (noDataValueString != null)
+             {
                 writeOut(outputstream, ">" + noDataValueString );
                 writeOut( outputstream, "</" + tag1 + ">");
-             } else 
+             } else
                 writeOut( outputstream, "/>");
 	  }
 
@@ -1072,6 +1180,9 @@ protected void writeTaggedData(OutputStream outputstream,
     }
   }
 
+  /**writeDelimitedData:
+   *
+   */
   protected void writeDelimitedData(OutputStream outputstream,
                                     Locator locator,
                                     DelimitedXMLDataIOStyle readObj,
@@ -1090,9 +1201,12 @@ protected void writeTaggedData(OutputStream outputstream,
       }
       catch (NoDataException e) {  //double check, a bug here, "yes" is already printed
         String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
-        if (noData == null)
+        if (noData == null) {
           readObj.setRepeatable("no");
-        writeOut(outputstream, noData);
+        }
+        else {
+          writeOut(outputstream, noData);
+        }
         writeOut(outputstream, delimiter);
       }
       if (dataNum == fastestAxisLength) {
@@ -1104,11 +1218,74 @@ protected void writeTaggedData(OutputStream outputstream,
     writeOut(outputstream, "]]>");
   }
 
+  /**clone for DataCube should not be invoked externally.  it has to be invoken
+   * by its parentArray.  left to work
+   */
+  protected Object clone() throws CloneNotSupportedException {
+    DataCube cloneObj = (DataCube) super.clone();
+    synchronized (this) {
+      synchronized (cloneObj) {
+        cloneObj.data= deepCopy(this.data, dimension);
+      }
+    }
+    return cloneObj;
+  }
+
+  private List deepCopy(List data, int currentLayer) {
+    List tempData = new ArrayList();
+    if (data == null)
+      return null;
+    int stop = data.size();
+    //we have reached the inner most 2 layers
+    if ( currentLayer == 2) {
+      for (int i = 0; i < stop; i++) {
+        Object obj = data.get(i);
+        if (obj == null)
+          tempData.add(null);
+        else {
+          int length = java.lang.reflect.Array.getLength(obj);
+          Object tempArray = java.lang.reflect.Array.newInstance(obj.getClass().getComponentType(), length);
+          Class arrayComponentType = obj.getClass().getComponentType();
+          for (int index = 0; index<length; index++) {
+            if (arrayComponentType.equals(Byte.TYPE)){
+              java.lang.reflect.Array.setByte(tempArray, index, java.lang.reflect.Array.getByte(obj, index));
+            }
+            else {
+              if (arrayComponentType.equals(Integer.TYPE)){
+                java.lang.reflect.Array.setInt(tempArray, index, java.lang.reflect.Array.getInt(obj, index));
+              }
+              else {
+                if (arrayComponentType.equals(Double.TYPE)){
+                  java.lang.reflect.Array.setDouble(tempArray, index, java.lang.reflect.Array.getDouble(obj, index));
+                }
+                else
+                  java.lang.reflect.Array.set(tempArray, index, java.lang.reflect.Array.get(obj, index));
+              }
+            }
+
+          }  //  end of inner for loop
+          tempData.add(tempArray);
+        } //end of outer for loop
+      }
+
+    }
+    else {
+      for (int i = 0; i< stop; i++) {
+        tempData.add(deepCopy((List) data.get(i), currentLayer-1));
+      }
+    }
+    return tempData;
+  }
+
 }
 
  /**
   * Modification History:
   * $Log$
+  * Revision 1.8  2000/11/06 21:11:01  kelly
+  * --added removeData method
+  * --added deep cloning
+  *
   * Revision 1.7  2000/11/01 16:28:25  thomas
   * Updated taggedIOsection to write out noDataValued
   * data that has no noDataValue defined to be an empty
