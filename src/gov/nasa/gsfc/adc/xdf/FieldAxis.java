@@ -250,11 +250,11 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     Log.error("in FieldAxis, removeField, method empty");
     return null;
   }
-  public List getDataFormatList() {
-    List dataFormatList = new ArrayList();
+  public DataFormat[] getDataFormatList() {
+    DataFormat[] dataFormatList = new DataFormat[length];
     List fieldList = getFieldList();
     for (int i = 0; i < length; i++)
-      dataFormatList.add(((Field) fieldList.get(i)).getDataFormat());
+      dataFormatList[i]=(((Field) fieldList.get(i)).getDataFormat());
     return dataFormatList;
   }
 }
@@ -262,6 +262,9 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.5  2000/10/31 22:09:58  kelly
+  * getDataFormatList() now returns DataFormat[], faster.  -k.z.
+  *
   * Revision 1.4  2000/10/30 18:47:23  thomas
   * Quick bug fix. AddField method should be "addField"-b.t.
   *
