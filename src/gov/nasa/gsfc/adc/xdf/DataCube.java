@@ -1037,8 +1037,8 @@ public class DataCube extends BaseObject {
             numOfBytes[0]    = dataFormat[0].numOfBytes();
 
             String value = (String) null;
-            if (parentArray.getNoDataValue() != null) {
-               value = parentArray.getNoDataValue().toString(); // this is a HACK 
+            if (parentArray.getDataFormat().getNoDataValue() != null) {
+               value = parentArray.getDataFormat().getNoDataValue().toString(); // this is a HACK 
             }
             noDataValues[0] = value;
 

@@ -46,15 +46,7 @@ import java.util.Hashtable;
    //
 
    /* XML attribute names */
-/*
-   protected static final String LESSTHANVALUE_XML_ATTRIBUTE_NAME = new String("lessThanValue");
-   protected static final String LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME = new String("lessThanOrEqualValue");
-   protected static final String GREATERTHANVALUE_XML_ATTRIBUTE_NAME = new String("greaterThanValue");
-   protected static final String GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME = new String("greaterThanOrEqualValue");
-   protected static final String INFINITEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteValue");
-   protected static final String INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteNegativeValue");
    protected static final String NODATAVALUE_XML_ATTRIBUTE_NAME = new String("noDataValue");
-*/
 
    //
    //Fields
@@ -80,15 +72,7 @@ import java.util.Hashtable;
    //
  
    public abstract int numOfBytes(); //return the number of bytes
-/*
-   public  abstract void setLessThanValue(Object Obj);
-   public  abstract void setLessThanOrEqualValue(Object Obj);
-   public  abstract void setGreaterThanValue(Object Obj) ;
-   public  abstract void setGreaterThanOrEqualValue(Object Obj) ;
-   public  abstract void setInfiniteValue(Object Obj) ;
-   public  abstract void setInfiniteNegativeValue(Object Obj) ;
-   public  abstract void setNoDataValue(Object Obj) ;
-*/
+   public abstract void setNoDataValue(Object Obj);
 
    //
    // Public Get/Set Methods
@@ -104,69 +88,12 @@ import java.util.Hashtable;
    }
  
    /**
-    * @return the current *lessThanValue* attribute
-    */
-/*
-   public Object getLessThanValue()
-   {
-      return ((Attribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-   }
- 
-   /**
-    * @return the current *lessThanOrEqualValue* attribute
-    */
-/*
-   public Object getlessThanOrEqualValue()
-   {
-     return ((Attribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-   }
- 
-   /**
-    * @return the current *greaterThanValue* attribute
-    */
-/*
-   public Object getGreaterThanValue()
-   {
-     return ((Attribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-   }
- 
-    /**
-    * @return the current *greaterThanOrEqualValue* attribute
-    */
-/*
-   public Object getGreaterThanOrEqualValue()
-   {
-     return ((Attribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-   }
- 
-    /**
-    * @return the current *infiniteValue* attribute
-    */
-/*
-   public Object getInfiniteValue()
-   {
-     return ((Attribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-   }
- 
-    /**
-    * @return the current *infiniteNegativeValue* attribute
-    */
-/*
-   public Object getInfiniteNegativeValue()
-   {
-     return ((Attribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
-   }
-*/
- 
-   /**
     * @return the current *noDataValue* attribute
     */
-/*
    public Object getNoDataValue()
    {
-     return ((Attribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
-*/
  
    //
    // Other Public Methods

@@ -62,55 +62,6 @@ public class StringDataFormat extends DataFormat {
   //Set Methods
   //
 
-  /**set the *lessThanValue* attribute
-   */
-/*
-  public void setLessThanValue(Object strLessThanValue) {
-     ((Attribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanValue);
-  }
-
-  /**set the *lessThanValueOrEqualValue* attribute
-   */
-/*
-  public void setLessThanOrEqualValue(Object strLessThanOrEqualValue) {
-     ((Attribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanOrEqualValue);
-  }
-
-  /**set the *greaterThanValue* attribute
-   */
-/*
-  public void setGreaterThanValue(Object strGreaterThanValue) {
-    ((Attribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanValue);
-  }
-
-  /**set the *greaterThanOrEqualValue* attribute
-   */
-/*
-  public void setGreaterThanOrEqualValue(Object strGreaterThanOrEqualValue) {
-    ((Attribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanOrEqualValue);
-  }
-
-  /** set the *infiniteValue* attribute
-   */
-/*
-  public void setInfiniteValue(Object strInfiniteValue) {
-    ((Attribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteValue);
-  }
-
-  /**set the *infiniteNegativeValue* attribute
-   */
-/*
-  public void setInfiniteNegativeValue(Object strInfiniteNegativeValue) {
-    ((Attribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteNegativeValue);
-  }
-
-  /**set the *noDataValue* attribute
-   */
-/*
-  public void setNoDataValue(Object strNoDataValue) {
-     ((Attribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strNoDataValue);
-  }
-
   /**setlength: set the *length* attribute
    */
   public void setLength(Integer numLength) {
@@ -127,6 +78,17 @@ public class StringDataFormat extends DataFormat {
   {
     return (Integer) ((Attribute) attribHash.get(LENGTH_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
+
+   /** set the *noDataValue* attribute
+    */
+   public void setNoDataValue (Object string) {
+
+        if (string instanceof String)
+           ((Attribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(string);
+        else
+           Log.warnln("Could'nt set the noDataValue as it is not a String object. Ignoring request.");
+
+   }
 
    //
    // Other PUBLIC Methods
