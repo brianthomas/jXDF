@@ -240,8 +240,6 @@ public class StringDataFormat extends DataFormat {
      //String dataFormatNodeName = super.getClassXDFNodeName(); 
      String dataFormatNodeName = parentClassXDFNodeName;
 
-Log.errorln("\n\n STINRG DATAFORMAT PARENT XDF NODENAME: ["+dataFormatNodeName+"]");
-
      if (sPrettyXDFOutput) writeOut(outputstream, indent); // indent node if desired
 
      // open a "dataformat" tag
@@ -268,6 +266,9 @@ Log.errorln("\n\n STINRG DATAFORMAT PARENT XDF NODENAME: ["+dataFormatNodeName+"
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/10/26 16:31:45  thomas
+ * removed silly errorln in toXDFOutput method. -b.t.
+ *
  * Revision 1.3  2000/10/26 15:55:25  thomas
  * Fixed up the toXDFOutputStream method to print
  * out node compiant wi/ DTD. -b.t.
