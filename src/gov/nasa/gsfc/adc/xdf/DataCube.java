@@ -1267,10 +1267,15 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
         int nrofDataFormats = dataFormat.length;
         int currentDataFormat = 0;
         String[] pattern = new String[nrofDataFormats];
+        String[] negExponentialPattern = new String[nrofDataFormats];
         String[] intFlag = new String[nrofDataFormats];
         int[] numOfBytes = new int[nrofDataFormats];
         for (int i=0; i< nrofDataFormats; i++) { 
            pattern[i] = dataFormat[i].getFormatPattern();
+           if (dataFormat[i] instanceof FloatDataFormat) 
+              negExponentialPattern[i] = ((FloatDataFormat) dataFormat[i]).getNegativeExponentFormatPattern();
+           else 
+              negExponentialPattern[i] = null;
            numOfBytes[i] = dataFormat[i].numOfBytes();
            if (dataFormat[i] instanceof IntegerDataFormat) 
               intFlag[i] = ((IntegerDataFormat) dataFormat[i]).getType();
@@ -1299,6 +1304,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                                                    dataFormat[currentDataFormat],
                                                    numOfBytes[currentDataFormat],
                                                    pattern[currentDataFormat],
+                                                   negExponentialPattern[currentDataFormat],
                                                    endian,
                                                    intFlag[currentDataFormat],
                                                    locator );
@@ -1383,6 +1389,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                                                  DataFormat thisDataFormat, 
                                                  int formatsize,
                                                  String pattern,
+                                                 String negExponentialPattern,
                                                  String endian,
                                                  String intFlagType,
                                                  Locator locator
@@ -1444,16 +1451,30 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
             // exponent size on exponential numbers. This means that the output
             // can violate the declared fix width of the field if the expontent
             // on a number is negative (for example).
-            DecimalFormat formatter = new DecimalFormat(pattern);
-            Double thisDatum = new Double(getDoubleData(locator));
+            double value = getDoubleData(locator);
+            Double thisDatum = new Double(value);
+            DecimalFormat formatter;
+
+            // get the right pattern. 
+            if (value < 0.0 && value > -1.0 && negExponentialPattern != null) { 
+                // negative exponent number 
+                formatter = new DecimalFormat(negExponentialPattern);
+            } else { 
+               // all other floats
+               formatter = new DecimalFormat(pattern);
+            }
+
             output = formatter.format(thisDatum);
 
-            // Our quick 'fix': trim down the size of the output if its exceeded.
+/*
+            // NOT NEEDED ANY MORE: Our quick 'fix': trim down the size of the output if its exceeded.
             if (output.length() > formatsize) { 
+               Log.warnln("");
                Log.warn("Warning: formatted floating point number width exceeds spec, trimming ["+output+"] to ");
                output = output.substring(0,formatsize);
-               Log.warnln("["+output+"]");
+               Log.warnln("["+output+"] pattern: ["+pattern+"]");
             }
+*/
 
          } 
          else if ( thisDataFormat instanceof BinaryFloatDataFormat)
@@ -1672,6 +1693,10 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.34  2001/06/25 15:13:56  thomas
+  * implimented negativeExponentFormatPatterns in floats as an alt.
+  * pattern when N <0 && N>-1 and an exponent is specified.
+  *
   * Revision 1.33  2001/06/19 19:04:16  thomas
   * bug fix on getInt, getShort, getLongData methods.
   *
