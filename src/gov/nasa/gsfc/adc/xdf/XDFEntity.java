@@ -41,6 +41,7 @@ import java.io.OutputStreamWriter;
    //
    // Fields
    //
+   private static final String ENTITY_NODE_NAME = new String("!ENTITY");
 
    /* XML attribute names */
    private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
@@ -160,7 +161,7 @@ import java.io.OutputStreamWriter;
     return (String) ((XMLAttribute) attribHash.get(NDATA_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  protected void basicXMLWriter (
+  protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -178,7 +179,7 @@ import java.io.OutputStreamWriter;
       String value = getValue();
       String ndata = getNdata();
 
-      outputWriter.write("<!ENTITY "+getName());
+      outputWriter.write("<"+ENTITY_NODE_NAME+" "+getName());
       if (value != null)
          outputWriter.write(value);
       if (pubId != null)
@@ -190,6 +191,7 @@ import java.io.OutputStreamWriter;
 
       outputWriter.write(">");
 
+      return ENTITY_NODE_NAME;
   }
 
   //
@@ -228,6 +230,9 @@ import java.io.OutputStreamWriter;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/09/06 15:57:42  thomas
+ * changed basicXMLWriter to return String (nodeName); made nodeName private,static field in class
+ *
  * Revision 1.1  2001/09/05 21:57:26  thomas
  * Initial Version
  *

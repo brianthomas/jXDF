@@ -44,6 +44,7 @@ import java.io.StringWriter;
    //
    // Fields
    //
+   private static final String DOCTYPE_NODE_NAME = new String ("!DOCTYPE");
    private XDF owner;
 
    /* XML attribute names */
@@ -144,7 +145,7 @@ import java.io.StringWriter;
    // Protected methods
    //
 
-   protected void basicXMLWriter (
+   protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -160,7 +161,7 @@ import java.io.StringWriter;
       String sysId = getSystemId(); 
       String pubId = getPublicId(); 
 
-      outputWriter.write("<!DOCTYPE "+getName());
+      outputWriter.write("<"+DOCTYPE_NODE_NAME+" "+getName());
       if (pubId != null) 
          outputWriter.write(" PUBLIC \"" + getPublicId() +"\"");
       if (sysId != null) 
@@ -217,6 +218,8 @@ import java.io.StringWriter;
 
       outputWriter.write(">");
 
+      return DOCTYPE_NODE_NAME;
+
     } 
 
  }
@@ -224,6 +227,9 @@ import java.io.StringWriter;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/09/06 15:57:42  thomas
+ * changed basicXMLWriter to return String (nodeName); made nodeName private,static field in class
+ *
  * Revision 1.1  2001/09/05 21:57:41  thomas
  * Initial Version
  *

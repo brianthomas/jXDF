@@ -42,6 +42,8 @@ import java.io.OutputStreamWriter;
    // Fields
    //
 
+   private static final String NOTATION_NODE_NAME = new String("!NOTATION");
+
    /* XML attribute names */
    private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
 //   private static final String BASE_XML_ATTRIBUTE_NAME = new String("base");
@@ -131,7 +133,7 @@ import java.io.OutputStreamWriter;
   // Protected Methods
   //
 
-   protected void basicXMLWriter (
+   protected String basicXMLWriter (
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -147,13 +149,15 @@ import java.io.OutputStreamWriter;
       String sysId = getSystemId();
       String pubId = getPublicId();
 
-      outputWriter.write("<!NOTATION "+getName());
+      outputWriter.write("<"+NOTATION_NODE_NAME+" "+getName());
       if (pubId != null)
          outputWriter.write(" PUBLIC \"" + pubId +"\"");
       if (sysId != null)
          outputWriter.write(" SYSTEM \"" + sysId +"\"");
 
       outputWriter.write(">");
+
+      return NOTATION_NODE_NAME;
 
   }
 
@@ -186,6 +190,9 @@ import java.io.OutputStreamWriter;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/09/06 15:57:42  thomas
+ * changed basicXMLWriter to return String (nodeName); made nodeName private,static field in class
+ *
  * Revision 1.1  2001/09/05 21:57:06  thomas
  * Initial Version
  *
