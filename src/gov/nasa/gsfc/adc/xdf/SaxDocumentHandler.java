@@ -904,63 +904,15 @@ public class SaxDocumentHandler extends DefaultHandler {
         return in;
     }
 
-    private String getHrefData (Entity hrefObj, String compressionType) 
-    {
-
-       StringBuffer buffer = new StringBuffer();
-
-       // well, we should be doing something with base here, 
-       // but arent because it isnt captured by this API. feh.
-       // $file = $href->getBase() if $href->getBase();
-
-       InputStream in = null;
-       try {
-
-          in = getInputStreamFromHref(hrefObj, compressionType);
-
-          // now, read the info
-          // *sigh*, we could be better off (faster) IF we actually populated the dataCube from
-          // here rather than insert it in a string Buffer and then re-parse it later on. *Pfhht*
-          if (in != null) 
-          {
-
-             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-             int size = BASEINPUTREADSIZE;
-             char[] data = new char[size];
-
-             int chars_this_read = 0;
-             int offset = 0;
-             while ( (chars_this_read = reader.read(data)) >= 0)
-             {
-                buffer.append(data, 0, chars_this_read);
-                if (chars_this_read < size) {
-                   break; // short read? then thats all
-                } 
-                offset += chars_this_read;
-
-             }
-  
-          } else {
-              Log.errorln("Cant open href resource for reading, aborting read.");
-              return (String) null;
-          } 
-  
-       } catch (IOException e) {
-          Log.printStackTrace(e);
-          return (String) null;
-       }
-
-       return buffer.toString();
-    } 
-
     // This and its sub-routines are Not currently used
     private void loadHrefDataIntoCurrentArray ( Entity hrefObj,
+                                                XMLDataIOStyle readObj,
                                                 String compressionType
                                               ) 
     throws SAXException
     {
  
+
        // well, we should be doing something with base here, 
        // but arent because it isnt captured by this API. feh.
        // $file = $href->getBase() if $href->getBase();
@@ -994,48 +946,25 @@ public class SaxDocumentHandler extends DefaultHandler {
 
                 in = (InputStream) new BufferedInputStream (in);
 
+                if (readObj instanceof FormattedXMLDataIOStyle) 
+                {
 
-                // probably could treat endian as a global too, since thats
-                // how we treat the rest of the array parameters
-                String endian = CurrentArray.getXMLDataIOStyle().getEndian();
+                    // probably could treat endian as a global too, since thats
+                    // how we treat the rest of the array parameters
+                    Locator locator = CurrentArray.createLocator();
+                    String endian = readObj.getEndian();
+                    readFormattedInputStreamIntoArray(in, locator, endian);
 
-                byte[] data = new byte[CurrentInputReadSize]; // new byte[BASEINPUTREADSIZE]; 
-                int bytes_read = 0;
+                } 
+                else if (readObj instanceof TaggedXMLDataIOStyle) 
+                {
 
-                Locator locator = CurrentArray.createLocator();
+                    readTaggedInputStreamIntoArray(in);
 
-                while ( true ) {
-
-                  // int readAmount = in.read(data, bytes_read, BASEINPUTREADSIZE-bytes_read);
-                  int readAmount = in.read(data, bytes_read, CurrentInputReadSize-bytes_read);
-
-                  if ( readAmount == -1 )
-                  {
-                      // pour out remaining buffer into the current array
-                      try {
-                         addByteDataToCurrentArray(locator, data, bytes_read, endian );
-                      } catch (SetDataException e) { 
-                         throw new SAXException("Failed to load external data at start byte:"+bytes_read);
-                      }
-                      break; // EOF reached
-                  }
-
-                  bytes_read += readAmount;
-
-                  // we exceeded the size of the buffer, dump to list
-                  // if ( bytes_read == BASEINPUTREADSIZE) 
-                  if ( bytes_read == CurrentInputReadSize) 
-                  { 
-
-                     // pour out buffer into array
-                     try {
-                         addByteDataToCurrentArray(locator, data, bytes_read, endian );
-                     } catch (SetDataException e) {
-                         throw new SAXException("Failed to load external data at start byte:"+bytes_read);
-                     }
-                     bytes_read = 0;
-                  }
-
+                } 
+                else 
+                { 
+                   throw new SAXException("Cant load external data of XMLDataIOStyle type:"+readObj.getClass());
                 }
 
              }
@@ -1046,6 +975,110 @@ public class SaxDocumentHandler extends DefaultHandler {
 
        } else {
           Log.warnln("Can't read Entity data, undefined systemId!");
+       }
+
+    }
+
+    private void readTaggedInputStreamIntoArray (
+                                                   InputStream in
+                                                )
+    throws IOException,SAXException 
+    {
+
+        // ok, we do something cute now -- we invoke a new XML reader 
+        // with the existing document handler (and all its current attributes
+        // set as they are) to read the external, tagged data. This *should*
+        // work just fine as the document handler *should* be configured at this
+        // point to do everything for data that is *internal* to the XML file.
+        // (e.g. CurrentStructure, CurrentArray, etc. are all correct)
+        Reader taggedDataReader = new Reader(this);
+
+        // The ONLY thing we need to do is to set the href aside for the reading
+        // to make it appear to the parser that the data actually is *internal* to
+        // the file. IF we dont do this, we may head into an infinite loop.  
+        Entity currentHref = CurrentArray.getDataCube().getHref();
+        CurrentArray.getDataCube().setHref(null);
+
+        // not sure we need to reset the XDF object, could just call this in 
+        // the void context I think, but do it anyways for safety sake.
+        XDF = taggedDataReader.parseString(getCharacterDataFromInputStream(in));
+
+        // finished reading the data, now restore the Href Entity
+        CurrentArray.getDataCube().setHref(currentHref);
+    }
+
+    private String getCharacterDataFromInputStream (InputStream in)
+    throws IOException
+    {
+
+       StringBuffer buffer = new StringBuffer();
+
+       BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+       int size = BASEINPUTREADSIZE;
+       char[] data = new char[size];
+
+       int chars_this_read = 0;
+       int offset = 0;
+       while ( (chars_this_read = reader.read(data)) >= 0)
+       {
+                buffer.append(data, 0, chars_this_read);
+                if (chars_this_read < size) {
+                   break; // short read? then thats all
+                }
+                offset += chars_this_read;
+
+       }
+
+       return buffer.toString();
+    }
+
+
+    private void readFormattedInputStreamIntoArray (
+                                                      InputStream in,
+                                                      Locator locator,
+                                                      String endian
+                                                   )
+    throws IOException,SAXException 
+    {
+
+       byte[] data = new byte[CurrentInputReadSize];
+       int bytes_read = 0;
+
+       while ( true ) {
+
+          int readAmount = in.read(data, bytes_read, CurrentInputReadSize-bytes_read);
+
+          if ( readAmount == -1 )
+          {
+             // pour out remaining buffer into the current array
+             try 
+             {
+                addByteDataToCurrentArray(locator, data, bytes_read, endian );
+             } 
+             catch (SetDataException e) 
+             { 
+                throw new SAXException("Failed to load external data at start byte:"+bytes_read);
+             }
+             break; // EOF reached
+          }
+
+          bytes_read += readAmount;
+
+          // we exceeded the size of the buffer, dump to list
+          // if ( bytes_read == BASEINPUTREADSIZE) 
+          if ( bytes_read == CurrentInputReadSize)
+          {
+
+              // pour out buffer into array
+              try {
+                 addByteDataToCurrentArray(locator, data, bytes_read, endian );
+              } catch (SetDataException e) {
+                 throw new SAXException("Failed to load external data at start byte:"+bytes_read);
+              }
+              bytes_read = 0;
+          }
+
        }
 
     }
@@ -2367,6 +2400,7 @@ Log.errorln(" TValue:"+valueString);
        throws SAXException
        {
 
+// Log.errorln("DefaultCharDataHandler called for :"+new String(buf,offset,len)+", Ignoring item.");
                // do nothing with other character data
 
 //           if (DataNodeLevel > 0) {
@@ -2613,7 +2647,6 @@ Log.errorln(" TValue:"+valueString);
        public Object action (SaxDocumentHandler handler, Attributes attrs) 
        throws SAXException
        {
-
           CurrentDataTagLevel++;
           return (Object) null;
        }
@@ -2626,10 +2659,13 @@ Log.errorln(" TValue:"+valueString);
        {
 
           if (CurrentDataTagLevel == DataTagLevel)
+          {
              TaggedLocatorObj.next();
+          }
 
           // bump up DataFormat appropriately
           if (CurrentArray.hasFieldAxis()) { 
+
 
              int currentFieldAxisCoordinate = TaggedLocatorObj.getAxisIndex(CurrentArray.getFieldAxis());
              if ( currentFieldAxisCoordinate != LastFieldAxisCoordinate ) 
@@ -2686,8 +2722,7 @@ Log.errorln(" TValue:"+valueString);
                 }
 
              } else {
-                Log.errorln("ERROR: got tagged data w/o tagged data XMLIOStyle, instead got:"+readObj.toString()+", Aborting!\n");
-                System.exit(-1);
+                throw new SAXException("got tagged data w/o tagged data XMLIOStyle, instead got:"+readObj.toString()+", Aborting!");
              }
           }
        }
@@ -2997,7 +3032,9 @@ while (iter.hasNext()) {
 
           if ( readObj instanceof TaggedXMLDataIOStyle) {
 
-             TaggedLocatorObj = CurrentArray.createLocator();
+             // is this needed?
+             if (DataNodeLevel == 0) 
+                 TaggedLocatorObj = CurrentArray.createLocator();
 
           } else {
 
@@ -3007,7 +3044,13 @@ while (iter.hasNext()) {
 
           }
 
-          // tack in href data 
+          // entered a datanode, raise the count 
+          // this (partially helps) declare we are now reading data, 
+          DataNodeLevel++; 
+
+          // Ok, we actually may need to read data immediately here.
+          // This happens when the data node specifies that data lies in an external file
+          // (viz the href entity mechanism)
           Entity href = CurrentArray.getDataCube().getHref();
           if (href != null) 
               // The first method is the 'old' way.
@@ -3015,11 +3058,8 @@ while (iter.hasNext()) {
               //    if (CurrentArray.getDataCube().getHref() != null) return;
               // in the end dataElementHandler
               // DATABLOCK.append(getHrefData(href, CurrentArray.getDataCube().getCompression()));
-              loadHrefDataIntoCurrentArray(href, CurrentArray.getDataCube().getCompression());
+              loadHrefDataIntoCurrentArray(href, readObj, CurrentArray.getDataCube().getCompression());
 
-          // entered a datanode, raise the count 
-          // this (partially helps) declare we are now reading data, 
-          DataNodeLevel++; 
 
           return readObj;
        }
@@ -4720,6 +4760,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.63  2001/09/27 17:22:33  thomas
+ * added ability to write tagged data to an external file
+ *
  * Revision 1.62  2001/09/24 19:50:32  thomas
  * fixed bug: reads tagged data again(!)
  *
