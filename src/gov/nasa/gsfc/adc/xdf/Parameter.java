@@ -476,6 +476,8 @@ public class Parameter extends BaseObjectWithValueList {
   protected void init()
   {
 
+    super.init();
+
     classXDFNodeName = "parameter";
 
     // order matters! these are in *reverse* order of their
@@ -529,6 +531,9 @@ public class Parameter extends BaseObjectWithValueList {
  /* Modification History
   *
   * $Log$
+  * Revision 1.19  2001/07/19 22:01:57  thomas
+  * needed super.init() in init() statement.
+  *
   * Revision 1.18  2001/07/11 22:38:33  thomas
   * Changes related to ValueList objects
   *
