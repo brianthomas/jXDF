@@ -232,8 +232,8 @@ public class DataCube extends BaseObject {
    public Object getData (Locator locator) throws NoDataException
    {
    
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
    
       try {
          if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
@@ -273,8 +273,8 @@ public class DataCube extends BaseObject {
    throws NoDataException
    {
    
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
    
       try {
          if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
@@ -295,8 +295,8 @@ public class DataCube extends BaseObject {
    throws NoDataException
    {
    
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
    
       try {
          if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
@@ -317,8 +317,8 @@ public class DataCube extends BaseObject {
    throws NoDataException
    {
    
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
    
       try {
          if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
@@ -340,8 +340,8 @@ public class DataCube extends BaseObject {
    throws NoDataException
    {
 
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
 
       try {
          if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
@@ -427,8 +427,8 @@ public class DataCube extends BaseObject {
       // data are stored in a huge 2D array. The long array axis
       // mirrors all dimensions but the 2nd axis. The 2nd axis gives
       // the index on the 'short' internal array.
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
 
       // Bounds checking
       checkDataArrayBounds(longIndex, shortIndex, DOUBLE_DATA_TYPE);
@@ -459,8 +459,8 @@ public class DataCube extends BaseObject {
       // data are stored in a huge 2D array. The long array axis
       // mirrors all dimensions but the 2nd axis. The 2nd axis gives
       // the index on the 'short' internal array.
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
 
       // Bounds checking
       checkDataArrayBounds(longIndex, shortIndex, INT_DATA_TYPE);
@@ -491,8 +491,8 @@ public class DataCube extends BaseObject {
       // data are stored in a huge 2D array. The long array axis
       // mirrors all dimensions but the 2nd axis. The 2nd axis gives
       // the index on the 'short' internal array.
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
 
       // Bounds checking
       checkDataArrayBounds(longIndex, shortIndex, LONG_DATA_TYPE);
@@ -523,8 +523,8 @@ public class DataCube extends BaseObject {
       // data are stored in a huge 2D array. The long array axis
       // mirrors all dimensions but the 2nd axis. The 2nd axis gives
       // the index on the 'short' internal array.
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
 
       // Bounds checking
       checkDataArrayBounds(longIndex, shortIndex, SHORT_DATA_TYPE);
@@ -556,8 +556,8 @@ public class DataCube extends BaseObject {
       // data are stored in a huge 2D array. The long array axis
       // mirrors all dimensions but the 2nd axis. The 2nd axis gives
       // the index on the 'short' internal array.
-      int longIndex = getLongArrayIndex(locator);
-      int shortIndex = getShortArrayIndex(locator);
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
 
       // Bounds checking
       checkDataArrayBounds(longIndex, shortIndex, STRING_DATA_TYPE);
@@ -849,7 +849,10 @@ public class DataCube extends BaseObject {
 
       // Does the location exist yet? If not, create the primative arrays 
       // that lie along the short axis
-      int shortAxisSize = getShortAxis().getLength();
+      // int shortAxisSize = getShortAxis().getLength();
+      int shortAxisSize = parentArray.getShortAxisSize();
+      if (shortAxisSize < 1) { shortAxisSize = 1; }
+
       // is the long array too small?
       if (longDataArray.size() < (longIndex+1)) {
          int maxDeclLongArraySize = getMaxLongArraySize(); // should be held in private var
@@ -969,77 +972,6 @@ public class DataCube extends BaseObject {
 
    }
 
-
-   // Should be hardwired w/ private variable. Only
-   // updates when addAxis is called by parentArray.
-   private int getShortArrayIndex (Locator locator) {
-     int shortIndex = 0;
-
-     AxisInterface shortaxis = getShortAxis();
-     if (shortaxis != null) {
-        shortIndex = locator.getAxisIndex(shortaxis);
-     }
-
-     return shortIndex;
-   }
-
-   // get the axis that represents the short axis
-   // short axis is axis "1" (not "0"; causes complications when
-   // we have a fieldAxis, which is at 0).
-   private AxisInterface getShortAxis () {
-     AxisInterface shortAxis = null;
-
-     List axisList = parentArray.getAxes();
-     if (axisList.size() > 1) {
-        shortAxis = (AxisInterface) axisList.get(1);
-     }
-     return shortAxis;
-   }
-
-   // This whole routine should probably be in the locator.
-   // and update ONLY when the current location is changed.
-   // Note that because of complications in storing values from fieldAxis
-   // which is always the at the 0 index position (if it exists)
-   // we can't simply treat index0 as the short axis. Instead, we
-   // have to use the axis at index1 (if it exists).
-   private int getLongArrayIndex (Locator locator) {
-
-     int longIndex = 0;
-
-     List axisList = parentArray.getAxes();
-     int numOfAxes = axisList.size(); // should be internal variable updated on add/removeAxis in Array 
-
-     if (numOfAxes > 0) {
-        AxisInterface axis = (AxisInterface) axisList.get(0);
-        longIndex = locator.getAxisIndex(axis);
-
-        // we skip over axis at index 1, that is the "short axis"
-        // each of the higher axes contribute 2**(i-1) * index
-        // to the overall long axis value.
-        for (int i = 2; i < numOfAxes; i++) {
-           axis = (AxisInterface) axisList.get(i);
-           int mult = intExponentOf(2,(i-1));
-           longIndex += locator.getAxisIndex(axis) * mult;
-        }
-     }
-
-     return (longIndex*2); // double value to allow for shadow byte array 
-
-   }
-
-   // this is stupid, no exponential operator (**) in Java???
-   private int intExponentOf( int num, int exponent) {
-     int value = 1;
-
-     if (exponent > 0) {
-        value = num;
-     }
-     for (int i = 1; i < exponent; i++) {
-        value *= num;
-     }
-
-     return value;
-   }
 
    // make the present longArray bigger
    private void expandLongArray (int newsize) {
@@ -1693,6 +1625,11 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.35  2001/06/26 19:46:08  thomas
+  * moved calculation of long, short axis up to
+  * the Array. Probably will be moved again (to locator?)
+  * in the near future.
+  *
   * Revision 1.34  2001/06/25 15:13:56  thomas
   * implimented negativeExponentFormatPatterns in floats as an alt.
   * pattern when N <0 && N>-1 and an exponent is specified.
