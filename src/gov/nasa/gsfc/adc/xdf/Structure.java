@@ -403,12 +403,53 @@ public class Structure extends BaseObjectWithXMLElements {
 
   };
 
+  /** Find all of the child href objects in this structure.
+   */
+  protected ArrayList findAllChildHrefObjects () {
+
+     ArrayList list = new ArrayList();
+
+     if (this instanceof Structure) {
+
+        List arrayList = ((Structure) this).getArrayList();
+        synchronized (arrayList) {
+           Iterator iter = arrayList.iterator(); // Must be in synchronized block
+           while (iter.hasNext()) {
+               Array childArray = (Array) iter.next();
+               XDFEntity hrefObj = childArray.getDataCube().getHref();
+               if (hrefObj != null)
+                  list.add(hrefObj);
+           }
+        } // sychronized arrayList 
+
+        // a temporary fix for recursive href searching
+        List structList = ((Structure) this).getStructList();
+        synchronized (structList) {
+           Iterator iter = structList.iterator(); // Must be in synchronized block
+           while (iter.hasNext()) {
+               Structure childStruct = (Structure) iter.next();
+               if (childStruct != null) {
+                   ArrayList childList = childStruct.findAllChildHrefObjects();
+                   if (childList != null && childList.size() > 0) {
+                       Iterator childIter = childList.iterator();
+                       while (childIter.hasNext())
+                           list.add(childIter.next());
+                   }
+               }
+           }
+        } // sychronized structList 
+     }
+     return list;
+  }
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.22  2001/09/05 22:02:49  thomas
+ * moved findAllHrefObjects to her from baseObject class
+ *
  * Revision 1.21  2001/07/11 22:35:21  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *
