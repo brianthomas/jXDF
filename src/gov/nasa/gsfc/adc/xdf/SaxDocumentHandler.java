@@ -78,6 +78,7 @@ public class SaxDocumentHandler extends HandlerBase {
     private Hashtable startElementHandlerHashtable; // start node handler
     private Hashtable charDataHandlerHashtable;     // charData handler
     private Hashtable endElementHandlerHashtable;   // end node handler
+    private Hashtable defaultHandlerHashtable;      // default handlers 
 
     // References to the current working structure/array
     private StructureInterface CurrentStructure;   
@@ -94,7 +95,7 @@ public class SaxDocumentHandler extends HandlerBase {
     private Object ParentObject; 
     private Object CurrentObject; 
     private ArrayList CurrentObjectList = new ArrayList(); 
-    private boolean UpdateCurrentObject = false; 
+//    private boolean UpdateCurrentObject = false; 
 
     // needed to capture internal entities.
     private HashSet Notation = new HashSet();
@@ -151,14 +152,14 @@ public class SaxDocumentHandler extends HandlerBase {
     private ArrayList AxisReadOrder;
 
     // lookup tables holding objects that have id/idref stuff
-    private Hashtable ArrayObj = new Hashtable();
-    private Hashtable AxisObj = new Hashtable();
-    private Hashtable FieldObj = new Hashtable();
-    private Hashtable NoteObj = new Hashtable();
-    private Hashtable ParamObj = new Hashtable();
-    private Hashtable ReadObj = new Hashtable();
-    private Hashtable ValueObj = new Hashtable();
-    private Hashtable ValueListObj = new Hashtable();
+    public Hashtable ArrayObj = new Hashtable();
+    public Hashtable AxisObj = new Hashtable();
+    public Hashtable FieldObj = new Hashtable();
+    public Hashtable NoteObj = new Hashtable();
+    public Hashtable ParamObj = new Hashtable();
+    public Hashtable ReadObj = new Hashtable();
+    public Hashtable ValueObj = new Hashtable();
+    public Hashtable ValueListObj = new Hashtable();
 
     // this is a BAD thing. I have been having troubles distinguishing between
     // important whitespace (e.g. char data within a data node) and text nodes
@@ -239,6 +240,37 @@ public class SaxDocumentHandler extends HandlerBase {
     public void addEndElementHandlers (Map m) {
        endElementHandlerHashtable.putAll(m);
     }
+
+    /**
+        Set the default Start Element Handler. This specifies what happens to nodes
+        which are not explicitly defined in the startElementHandler table. When this
+        method is called, the original default handler is replaced with the passed
+        handler.
+    */
+    public void setDefaultStartElementHandler (StartElementHandlerAction handler) {
+       defaultHandlerHashtable.put("startElement", handler);
+    }
+
+   /**
+        Set the default End Element Handler. This specifies what happens to nodes
+        which are not explicitly defined in the endElementHandler table. When this
+        method is called, the original default handler is replaced with the passed
+        handler.
+    */ 
+    public void setDefaultEndElementHandler (EndElementHandlerAction handler) {
+       defaultHandlerHashtable.put("endElement", handler);
+    }
+
+   /**
+        Set the default Character Data Handler. This specifies what happens to nodes
+        which are not explicitly defined in the charDataElementHandler table. When this
+        method is called, the original default handler is replaced with the passed
+        handler.
+    */
+    public void setDefaultCharDataHandler (CharDataHandlerAction handler) {
+       defaultHandlerHashtable.put("charData", handler);
+    }
+
 
     //
     // Methods that describe the current parsing
@@ -328,7 +360,7 @@ public class SaxDocumentHandler extends HandlerBase {
        return (String) null;
     }
 
-    private void setCurrentDatatypeObject(Object object) {
+    public void setCurrentDatatypeObject(Object object) {
         CurrentDatatypeObject = object;
     }
 
@@ -336,7 +368,7 @@ public class SaxDocumentHandler extends HandlerBase {
        return CurrentDatatypeObject;
     }
 
-    private void setCurrentArray(ArrayInterface array) {
+    public void setCurrentArray(ArrayInterface array) {
        CurrentArray = array;
     }
 
@@ -344,12 +376,18 @@ public class SaxDocumentHandler extends HandlerBase {
        return CurrentArray;
     }
 
-    private void setCurrentStructure (StructureInterface structure) {
+    public void setCurrentStructure (StructureInterface structure) {
        CurrentStructure = structure;
     }
 
     public StructureInterface getCurrentStructure () {
        return CurrentStructure;
+    }
+
+    private XMLElement createNewXMLElement (String elementNodeName, AttributeList attrs) {
+       XMLElement myElement = new XMLElement(elementNodeName);
+       myElement.setXMLAttributes(attrs);
+       return myElement;
     }
 
     //
@@ -372,7 +410,7 @@ public class SaxDocumentHandler extends HandlerBase {
         // if a handler exists, run it, else give a warning
         if ( startElementHandlerHashtable.containsKey(element) ) {
 
-           UpdateCurrentObject = false;
+//           UpdateCurrentObject = false;
 
            // run the appropriate start handler
            StartElementHandlerAction event = 
@@ -380,7 +418,11 @@ public class SaxDocumentHandler extends HandlerBase {
            thisObject = event.action(this,attrs);
 
         } else {
-           Log.warnln("Warning: UNKNOWN NODE ["+element+"] encountered.");
+
+           // run the default start handler
+           StartElementHandlerAction defaultEvent =
+              (StartElementHandlerAction) defaultHandlerHashtable.get("startElement");
+           thisObject = defaultEvent.action(this, attrs);
         }
 
         CurrentObjectList.add(thisObject);
@@ -406,7 +448,10 @@ public class SaxDocumentHandler extends HandlerBase {
 
         } else {
 
-           // do nothing
+           // run the default handler
+           EndElementHandlerAction defaultEvent =
+              (EndElementHandlerAction) defaultHandlerHashtable.get("endElement");
+           defaultEvent.action(this);
 
         }
 
@@ -444,18 +489,10 @@ public class SaxDocumentHandler extends HandlerBase {
 
         } else {
 
-           // perhaps we are reading in data at the moment??
-
-           if (DataNodeLevel > 0) {
-
-              CharDataHandlerAction event = new dataCharDataHandlerFunc();
-              event.action(this,buf,offset,len);
-
-           } else {
-
-               // do nothing with other character data
-
-           }
+           // run the default handler
+           CharDataHandlerAction defaultEvent =
+              (CharDataHandlerAction) defaultHandlerHashtable.get("charData");
+           defaultEvent.action(this,buf,offset,len);
 
         }
 
@@ -584,11 +621,13 @@ public class SaxDocumentHandler extends HandlerBase {
       startElementHandlerHashtable = new Hashtable(); // start node handler
       charDataHandlerHashtable = new Hashtable(); // charData handler
       endElementHandlerHashtable = new Hashtable(); // end node handler
+      defaultHandlerHashtable = new Hashtable(); // table of default handlers 
 
       // initialize the default XDF parser dispatch tables
       initStartHandlerHashtable();
       initCharDataHandlerHashtable();
       initEndHandlerHashtable();
+      initDefaultHandlerHashtable();
 
     }
 
@@ -983,6 +1022,12 @@ Log.errorln("");
       return false;
     }
 
+    private void initDefaultHandlerHashtable () {
+       defaultHandlerHashtable.put("startElement", new defaultStartElementHandlerFunc());
+       defaultHandlerHashtable.put("endElement", new defaultEndElementHandlerFunc());
+       defaultHandlerHashtable.put("charData", new defaultCharDataHandlerFunc());
+    }
+
     //
     private void initStartHandlerHashtable () {
 
@@ -1037,6 +1082,16 @@ Log.errorln("");
     // 
     private void initCharDataHandlerHashtable () {
 
+       charDataHandlerHashtable.put(XDFNodeName.DATA, new untaggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.TD0, new taggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.TD1, new taggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.TD2, new taggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.TD3, new taggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.TD4, new taggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.TD5, new taggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.TD6, new taggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.TD7, new taggedDataCharDataHandlerFunc());
+       charDataHandlerHashtable.put(XDFNodeName.TD8, new taggedDataCharDataHandlerFunc());
        charDataHandlerHashtable.put(XDFNodeName.NOTE, new noteCharDataHandlerFunc());
        charDataHandlerHashtable.put(XDFNodeName.UNIT, new unitCharDataHandlerFunc());
        charDataHandlerHashtable.put(XDFNodeName.VALUE, new valueCharDataHandlerFunc());
@@ -1487,8 +1542,8 @@ Log.errorln(" TValue:"+valueString);
        return values;
     }
           
-    private ArrayInterface appendArrayToArray ( ArrayInterface arrayToAppendTo, 
-                                                ArrayInterface arrayToAdd ) 
+    public ArrayInterface appendArrayToArray ( ArrayInterface arrayToAppendTo, 
+                                               ArrayInterface arrayToAdd ) 
     {
 
        if (arrayToAppendTo != null) 
@@ -1703,6 +1758,101 @@ Log.errorln(" TValue:"+valueString);
   
     // These classes are here because they are used by the SaxDocumentHandler
     // dispatch tables. See interface files for more info.
+
+    // Define the Default Handlers
+
+    // default start handler
+    class defaultStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, AttributeList attrs) {
+
+           String parentNodeName = getParentNodeName();
+           String elementNodeName = getCurrentNodeName();
+           XMLElement newElement = null;
+
+           if ( parentNodeName == null) {
+              Log.warnln("Warning: ILLEGAL non-XDF NODE:["+elementNodeName+"]. Ignoring.");
+              return newElement;
+           }
+
+           // the DTD sez that if we get non-xdf defined nodes, it IS 
+           // allowed as long as these are children of the following 
+           // XDF defined nodes, OR are children of a non-XDF defined node
+           // (e.g. the child of one of these nodes, which we call 'XDF::XMLElement')
+           if( parentNodeName.equals(XDFNodeName.STRUCTURE) 
+               || parentNodeName.equals(XDFNodeName.ROOT)
+             )
+           {
+
+              newElement = createNewXMLElement(elementNodeName, attrs);
+              getCurrentStructure().addXMLElement(newElement);
+
+           } else if( parentNodeName.equals(XDFNodeName.ARRAY) ) {
+
+              newElement = createNewXMLElement(elementNodeName, attrs);
+              getCurrentArray().addXMLElement(newElement);
+
+           } else if( parentNodeName.equals(XDFNodeName.FIELDAXIS) ) {
+
+              newElement = createNewXMLElement(elementNodeName, attrs);
+              getCurrentArray().getFieldAxis().addXMLElement(newElement);
+
+           } else if( parentNodeName.equals(XDFNodeName.AXIS) ) {
+
+              newElement = createNewXMLElement(elementNodeName, attrs);
+              List axisList = (List) CurrentArray.getAxes();
+              AxisInterface lastAxisObject = (AxisInterface) axisList.get(axisList.size()-1);
+              lastAxisObject.addXMLElement(newElement);
+
+           } else if( parentNodeName.equals(XDFNodeName.FIELD) ) {
+
+              newElement = createNewXMLElement(elementNodeName, attrs);
+              LastFieldObject.addXMLElement(newElement);
+
+           } else {
+
+              Object lastObj = getLastObject();
+              if (lastObj != null && lastObj instanceof XMLElement) {
+
+                  newElement = createNewXMLElement(elementNodeName, attrs);
+                  ((XMLElement) lastObj).addXMLElement(newElement);
+
+              } else {
+                  Log.warnln("Warning: ILLEGAL NODE:["+elementNodeName+"] (child of "+parentNodeName
+                              +") encountered. Ignoring");
+              }
+          }
+
+          return newElement;
+
+       }
+    }
+
+    // default end handler
+    class defaultEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action (SaxDocumentHandler handler) {
+          // do nothing
+       }
+    }
+
+    // default character data handler
+    class defaultCharDataHandlerFunc implements CharDataHandlerAction {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
+
+               // do nothing with other character data
+
+//           if (DataNodeLevel > 0) {
+
+//              CharDataHandlerAction event = new dataCharDataHandlerFunc();
+//              event.action(this,buf,offset,len);
+
+//           } else {
+
+               // do nothing with other character data
+
+//           }
+
+       }
+    }
 
     // ASCII DELIMITER NODE HANDLERS
     //
@@ -1948,8 +2098,82 @@ Log.errorln(" TValue:"+valueString);
     // DATA
     //
 
+    class taggedDataCharDataHandlerFunc implements CharDataHandlerAction {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
+       {
+
+          // only do something here IF we are reading in data at the moment
+          // is this needed?? 
+          if (DataNodeLevel > 0) {
+
+             XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
+             String thisString = new String(buf,offset,len);
+
+             if ( readObj instanceof TaggedXMLDataIOStyle ) {
+
+                // dont add this data unless it has more than just whitespace
+                if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(thisString) ) {
+
+                   Log.debugln("ADDING TAGGED DATA to ("+TaggedLocatorObj+") : ["+thisString+"]");
+
+                   DataTagLevel = CurrentDataTagLevel;
+
+                   DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
+
+                   // adding data based on what type..
+                   addDataToCurrentArray(TaggedLocatorObj, thisString, CurrentDataFormat, IntRadix[CurrentDataFormatIndex]);
+
+                }
+
+             } else {
+                Log.errorln("ERROR: got tagged data w/o tagged data XMLIOStyle, instead got:"+readObj.toString()+", Aborting!\n");
+                System.exit(-1);
+             }
+          }
+       }
+    }
+
+    class untaggedDataCharDataHandlerFunc implements CharDataHandlerAction {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
+       {
+
+          // only do something here IF we are reading in data at the moment
+          // is this needed?? 
+          if (DataNodeLevel > 0) {
+
+             XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
+             String thisString = new String(buf,offset,len);
+
+             if ( readObj instanceof DelimitedXMLDataIOStyle ||
+                  readObj instanceof FormattedXMLDataIOStyle )
+             {
+
+                // add it to the datablock if it isnt all whitespace ?? 
+                if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(thisString) ) 
+                    DATABLOCK.append(thisString);
+
+             } else {
+
+                // may be whitespace from a tagged read. For the sake of speed
+                // lets do nothing right now
+
+                /*
+                Log.errorln("ERROR: got untagged data w/o tagged data XMLIOStyle, instead got:"+readObj.toString()+", Aborting!\n");
+                System.exit(-1);
+                */
+             }
+          }
+       }
+    }
+
+
+/*
     class dataCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
+
+       // only do something here IF we are reading in data at the moment
+       // is this needed??
+       if (DataNodeLevel > 0) {
 
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
           String thisString = new String(buf,offset,len);
@@ -1983,8 +2207,10 @@ Log.errorln(" TValue:"+valueString);
                System.exit(-1);
            }
 
+         }
        }
     }
+*/
 
     class dataEndElementHandlerFunc implements EndElementHandlerAction {
        public void action (SaxDocumentHandler handler) { 
@@ -3163,8 +3389,15 @@ Log.errorln(" TValue:"+valueString);
 
     class structureStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, AttributeList attrs) { 
-          Log.errorln("STRUCTURE Start handler not implemented yet.");
-          return (Object) null;
+
+          Structure structObj = new Structure();
+          structObj.setXMLAttributes(attrs); // set XML attributes from passed list 
+
+          getCurrentStructure().addStructure(structObj);
+          setCurrentStructure(structObj);
+
+          return structObj;
+
        }
     }
 
@@ -3815,6 +4048,14 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.32  2001/05/10 21:40:02  thomas
+ * AxisObj, ArrayObj, etc. fields public. Several methods
+ * made public. split character data handler into tagged
+ * and untagged handlers, added as appropriate to the
+ * character data handler table. Added default handlers
+ * for start/end/charData. Added abilbity to set these
+ * handlers.
+ *
  * Revision 1.31  2001/05/04 21:00:07  thomas
  * Implemented interface stuff. ReadAxisOrder stuff was
  * not really right, fixed. More fixes on that topic needed still.
