@@ -38,6 +38,7 @@ public interface ValueListInterface
 {
    public void toXMLWriter (Writer outputWriter, String indent) throws java.io.IOException;
    public void toXMLOutputStream (OutputStream o, String indent) throws java.io.IOException;
+   public String toXMLString();
    public List getValues();
    public Object clone() throws CloneNotSupportedException;
 }
@@ -45,6 +46,9 @@ public interface ValueListInterface
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/09/05 22:03:15  thomas
+ * added toXMLString method
+ *
  * Revision 1.3  2001/09/04 21:18:44  thomas
  * added to XMLOutputStream method
  *
