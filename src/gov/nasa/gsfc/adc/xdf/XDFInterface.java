@@ -33,13 +33,16 @@ public interface XDFInterface extends StructureInterface {
 
    public String getType ();
 
-   public void loadFromXDFFile (String filename);
+   public void loadFromXMLFile (String filename);
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/05/10 21:44:45  thomas
+ * loadFromXDFFile => loadFromXMLFile
+ *
  * Revision 1.1  2001/05/04 20:05:53  thomas
  * Initial version
  *
