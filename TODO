@@ -11,10 +11,13 @@
 
         - UTF16 not implemented (at least not checked, reading *may* work).
 
+        - resolve issue with writing float/exponential data (e.g. the "-.9" to
+  	  "-0.9" issue. Does Java XDF have this problem?)
+
         - Clean up debugging messages. Improve and make consistent error messaging
           within the package. Missing any Exception classes?
 
-        - Interface for setting relation roles in FIeld is cumbersome. Is a 
+        - Interface for setting relation roles in Field is cumbersome. Is a 
           separate FIeldRelationship object needed? Do we really need to set
           it?
 
@@ -65,14 +68,11 @@
 	   to be is difficult for me to understand, but thats another matter..).
 	   ) so we need to review if current implementation is correct.
 
-	- Check synchronization issues on all code (develop threaded tests). 
+	- Check synchronization issues on all code (develop threaded tests) 
+          (or, as mentioned above, lunk threaded code and remove sync blocks)
 
         - Need Code review, issues:
-            1. Are Utility, Constants (and other) classes truely independant? 
-               Shunt methods to places they are used.
-	    2. Remove unnecessary methods like setDimension, etc.
-
-	- Overflow, Underflow, NaN issues for data. Define what does "null" cell really mean?.
+	    1. Remove unnecessary methods like setDimension, etc.
 
 	- Version control for the Reader. Check that we have right DTD for software.
 
@@ -81,6 +81,8 @@
         ============================================================
 
 	- Allow for uneven precision in data. 
+
+	- Overflow, Underflow, NaN issues for data. Define what does "null" cell really mean?.
 
         - Append functionality on Arrays needs to be implemented.
 
