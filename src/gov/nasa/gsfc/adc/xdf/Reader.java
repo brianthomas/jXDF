@@ -114,6 +114,24 @@ public class Reader
        myDocumentHandler.addEndElementHandlers(m);
     }
 
+    /** set the default handler for the start elements in the document handler.  
+     */
+    public void setDefaultStartElementHandler (StartElementHandlerAction handler) {
+       myDocumentHandler.setDefaultStartElementHandler(handler);
+    }
+
+   /** set the default handler for the end elements in the document handler.  
+     */
+    public void setDefaultEndElementHandler (EndElementHandlerAction handler) {
+       myDocumentHandler.setDefaultEndElementHandler(handler);
+    }
+
+    /** set the default handler for character data in the document handler.  
+     */
+    public void setDefaultCharDataHandler (CharDataHandlerAction handler) {
+       myDocumentHandler.setDefaultCharDataHandler(handler);
+    }
+
     /** Set the structure object that the Reader will parse an InputSource into. 
     */
     public XDFInterface getReaderXDFStructureObj () 
@@ -271,6 +289,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/05/10 21:37:38  thomas
+ * added start/end set methods for handlers in sax document.
+ *
  * Revision 1.12  2001/05/04 20:59:23  thomas
  * put in interface stuff.
  *
