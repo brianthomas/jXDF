@@ -384,10 +384,19 @@ public class Structure extends BaseObject {
    * @return: the structure read in on success, null on failure.
    */
 
-   //Brian, we need to fill in
+   // This will make a call to the XDF::Reader class one day.
    public void read() {
      Log.error("Structure.read() is called, but the function is empty.");
    }
+
+/* Modification History:
+ *
+ * $Log$
+ * Revision 1.8  2000/10/10 19:15:22  cvs
+ * Added History section to end of file. -b.t.
+ *
+ *
+ */
 
 
 }
