@@ -443,7 +443,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
     ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
     // is synchronized here correct?
     synchronized(attribs) {
-      for (int i = 0; i < attribs.size(); i++) {
+      int size = attribs.size();
+      for (int i = 0; i < size; i++) {
         Hashtable item = (Hashtable) attribs.get(i);
         writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
       }
@@ -466,7 +467,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
       }
 
       // deal with object/list XML attributes, if any in our list
-      for (int i = 0; i < childObjs.size(); i++) {
+      int size = childObjs.size();
+      for (int i = 0; i < size; i++) {
         Hashtable item = (Hashtable) childObjs.get(i);
 
         if (item.get("type") == Constants.LIST_TYPE)
@@ -658,7 +660,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
     Object attribute;
     Object obj;
 
-    for (int i = 0; i < attribOrder.size(); i++)
+    int size = attribOrder.size(); 
+    for (int i = 0; i < size; i++)
     {
       attribute  = attribOrder.get(i);
       obj = InitAttributeTable.get(attribute);
@@ -742,7 +745,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
     ArrayList attribList = new ArrayList();
     ArrayList objRefList = new ArrayList();
 
-    for (int i = 0; i < attribHash.size(); i++) {
+    int size = attribHash.size();
+    for (int i = 0; i < size; i++) {
       String attribName = (String) attribOrder.get(i);
       XMLAttribute obj = (XMLAttribute) attribHash.get(attribName);
       if (obj != null && obj.attribValue != null) {
@@ -914,6 +918,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.28  2000/11/09 04:24:11  thomas
+ * Implimented small efficiency improvements to traversal
+ * loops. -b.t.
+ *
  * Revision 1.27  2000/11/08 22:30:12  thomas
  * Changed set methods to return void. -b.t.
  *

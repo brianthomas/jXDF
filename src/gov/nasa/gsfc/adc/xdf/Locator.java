@@ -131,7 +131,8 @@ import java.util.List;
   public boolean next() {
     boolean outofDataCells = true;
 
-    for (int i = 0; i <axisOrderList.size() ; i++) {
+    int size = axisOrderList.size();
+    for (int i = 0; i < size ; i++) {
       AxisInterface axis = (AxisInterface) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
       if (index < axis.getLength()-1) {
@@ -152,7 +153,8 @@ import java.util.List;
   public boolean prev() {
     boolean outofDataCell = true;
 
-    for (int i = 0; i <axisOrderList.size() ; i++) {
+    int size = axisOrderList.size();
+    for (int i = 0; i < size ; i++) {
       AxisInterface axis = (AxisInterface) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
       index--;
@@ -178,9 +180,11 @@ import java.util.List;
     List oldList = axisOrderList;
     axisOrderList = Collections.synchronizedList(new ArrayList());
     int index = 0;
-    for (int i = 0; i < axisOrderListRef.size(); i++) {
+    int size = axisOrderListRef.size();
+    for (int i = 0; i < size; i++) {
       AxisInterface axis = (AxisInterface) axisOrderListRef.get(i);
-      for (int j = 0; j < oldList.size(); j++) {
+      int oldsize = oldList.size();
+      for (int j = 0; j < oldsize; j++) {
         AxisInterface oldAxis = (AxisInterface) oldList.get(j);
         if (oldAxis.equals(axis)) {
           axisOrderList.add(axis);
@@ -275,6 +279,10 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2000/11/09 04:24:12  thomas
+ * Implimented small efficiency improvements to traversal
+ * loops. -b.t.
+ *
  * Revision 1.11  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *

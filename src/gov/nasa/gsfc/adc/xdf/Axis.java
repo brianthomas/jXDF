@@ -467,7 +467,8 @@ public class Axis extends BaseObject implements AxisInterface {
       }
 
       List values = getValueList();
-      for (int i = 0; i< values.size(); i++){
+      int size = values.size();
+      for (int i = 0; i< size; i++){
         if (((Value) values.get(i)).getValue().equals(valueObj.getValue())) //if found
           return i;
 
@@ -500,6 +501,10 @@ public class Axis extends BaseObject implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2000/11/09 04:24:11  thomas
+ * Implimented small efficiency improvements to traversal
+ * loops. -b.t.
+ *
  * Revision 1.12  2000/11/08 22:30:12  thomas
  * Changed set methods to return void. -b.t.
  *

@@ -247,7 +247,8 @@ public abstract class XMLDataIOStyle extends BaseObject {
     List readList = new ArrayList();
     List axisList = getParentArray().getAxisList();
     AxisInterface axisObj;
-    for (int i = 0; i< axisList.size(); i++) {
+    int size =  axisList.size();
+    for (int i = 0; i < size; i++) {
       axisObj = (AxisInterface) axisList.get(i);
       readList.add(axisObj.getAxisId());
     }
@@ -260,6 +261,10 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/09 04:24:12  thomas
+ * Implimented small efficiency improvements to traversal
+ * loops. -b.t.
+ *
  * Revision 1.9  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *

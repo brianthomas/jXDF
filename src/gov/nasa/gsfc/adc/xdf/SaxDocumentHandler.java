@@ -123,6 +123,7 @@ class SaxDocumentHandler implements DocumentHandler {
     private ArrayList AxisReadOrder;
 
     // lookup tables holding objects that have id/idref stuff
+    private Hashtable FieldObj = new Hashtable();
     private Hashtable AxisObj = new Hashtable();
     private Hashtable NoteObj = new Hashtable();
 
@@ -850,6 +851,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
                     // override attrs with those in passed list
                     newaxis.setXMLAttributes(attrs);
+                    newaxis.setAxisId(null); // shouldnt have the axisId from refObj
            
                  } else {
                     Log.warnln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
@@ -1199,7 +1201,46 @@ class SaxDocumentHandler implements DocumentHandler {
           FieldAxis fieldAxis = CurrentArray.getFieldAxis();
           fieldAxis.addField(newfield);
 
-/* ID REF cloning STUFF MISSING@!!! -b.t. */
+          String fieldId = newfield.getFieldId();
+          String fieldIdRef = newfield.getFieldIdRef();
+
+          // add this object to the lookup table, if it has an ID
+          if (fieldId != null) {
+
+             // a warning check, just in case
+             if (FieldObj.containsKey(fieldId))
+                    Log.warnln("More than one field node with fieldId=\""+fieldId+"\", using latest node." );
+
+             // add this into the list of field objects
+             FieldObj.put(fieldId, newfield);
+
+          }
+
+          //  If there is a reference object, clone it to get
+          //  the new field
+          if (fieldIdRef != null) {
+
+             if (FieldObj.containsKey(fieldIdRef)) {
+
+                BaseObject refFieldObj = (BaseObject) FieldObj.get(fieldIdRef);
+                try 
+                {
+                    newfield = (Field) refFieldObj.clone();
+                } catch (java.lang.CloneNotSupportedException e) {
+                    Log.errorln("Weird error, cannot clone field object. Aborting read.");
+                    System.exit(-1);
+                }
+
+                // override attrs with those in passed list
+                newfield.setXMLAttributes(attrs);
+                newfield.setFieldId(null); // shouldnt have fieldId from the refObj 
+
+             } else {
+                Log.warnln("Error: Reader got an field with FieldIdRef=\""+fieldIdRef+"\" but no previous field has that id! Ignoring add field request.");
+                    return;
+             }
+          }
+
 
           // add this object to all open field groups
           Iterator iter = CurrentFieldGroupList.iterator();
@@ -1387,7 +1428,8 @@ class SaxDocumentHandler implements DocumentHandler {
           // for node sets the iteration order for how we will setData
           // in the datacube (important for delimited and formatted reads).
       
-          for (int i = 0; i < attrs.getLength(); i++)
+          int size = attrs.getLength();
+          for (int i = 0; i < size; i++)
           {
              String name = attrs.getName(i);
              if (name.equals("axisIdRef") ) {
@@ -1458,24 +1500,6 @@ class SaxDocumentHandler implements DocumentHandler {
 
            }
 
-           // add this object to parent object
-
-           if( parentNodeName.equals(XDFNodeName.NOTES) )
-           {
-              // only NOTES objects appear in arrays, so we can 
-              // just add to the current array
-              CurrentArray.addNote(newnote);
-           } else if ( parentNodeName.equals(XDFNodeName.FIELD) )
-           {
-              LastFieldObject.addNote(newnote);
-           } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
-           {
-              LastParameterObject.addNote(newnote);
-           } else 
-           {
-              Log.warnln( "Unknown parent node: "+parentNodeName+" for note. Ignoring.");
-           }
-
            //  If there is a reference object, clone it to get
            //  the new axis
            if (noteIdRef != null) {
@@ -1494,11 +1518,29 @@ class SaxDocumentHandler implements DocumentHandler {
 
                  // override attrs with those in passed list
                  newnote.setXMLAttributes(attrs);
+                 newnote.setNoteId(null); // note shouldnt have noteId from the parent
 
               } else {
                  Log.warnln("Error: Reader got a note with NoteIdRef=\""+noteIdRef+"\" but no previous note has that id! Ignoring add note request.");
                  return;
               }
+           }
+
+           // add this object to parent object
+           if( parentNodeName.equals(XDFNodeName.NOTES) )
+           {
+              // only NOTES objects appear in arrays, so we can 
+              // just add to the current array
+              CurrentArray.addNote(newnote);
+           } else if ( parentNodeName.equals(XDFNodeName.FIELD) )
+           {
+              LastFieldObject.addNote(newnote);
+           } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
+           {
+              LastParameterObject.addNote(newnote);
+           } else 
+           {
+              Log.warnln( "Unknown parent node: "+parentNodeName+" for note. Ignoring.");
            }
 
            LastNoteObject = newnote;
@@ -1515,7 +1557,8 @@ class SaxDocumentHandler implements DocumentHandler {
        public void action (AttributeList attrs) {
 
           String axisIdRef = (String) null;
-          for (int i = 0 ; i < attrs.getLength(); i++) {
+          int size = attrs.getLength(); 
+          for (int i = 0 ; i < size; i++) {
               if (attrs.getName(i).equals("axisIdRef")) { // bad. hardwired axisIdRef name
                  axisIdRef = attrs.getValue(i);
                  break;
@@ -1544,7 +1587,6 @@ class SaxDocumentHandler implements DocumentHandler {
 #     for (@NOTE_LOCATOR_ORDER) { $notesObj->addAxisIdToLocatorOrder($_); }
 #   }
 */
-
 
           // reset the location order
           NoteLocatorOrder = new ArrayList ();
@@ -1845,7 +1887,8 @@ class SaxDocumentHandler implements DocumentHandler {
           String axisIdRefname = new String();
 
           // pickup overriding values from attribute list
-          for (int i = 0; i < attrs.getLength(); i++)
+          int size = attrs.getLength(); 
+          for (int i = 0; i < size; i++)
           {
               String name = attrs.getName(i);
               if ( name.equals("tag") ) {
@@ -2091,12 +2134,17 @@ class SaxDocumentHandler implements DocumentHandler {
            String parentNodeName = getParentNodeName();
            CurrentValueListParameter.put("parentNodeName", parentNodeName);
 
-           // populate ValueListparameters from attribute list 
-           for (int i = 0; i < attrs.getLength(); i++)
+           // 3. populate ValueListparameters from attribute list 
+           int size = attrs.getLength(); 
+           for (int i = 0; i < size; i++)
            {
-               if (attrs.getValue(i) != null) 
-                  CurrentValueListParameter.put(attrs.getName(i), attrs.getValue(i));
+               String value; 
+               if ((value = attrs.getValue(i)) != null) 
+                  CurrentValueListParameter.put(attrs.getName(i), value);
            }
+
+           // 4. set this parameter to false to indicate the future is not
+           // yet determined for this :)
            CurrentValueListParameter.put("isDelimitedCase", "false"); 
 
        }
@@ -2216,6 +2264,10 @@ class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2000/11/09 04:24:12  thomas
+ * Implimented small efficiency improvements to traversal
+ * loops. -b.t.
+ *
  * Revision 1.10  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *

@@ -217,7 +217,8 @@ import java.io.OutputStream;
       strValue.append(factor.doubleValue());  //append *factor* value
     }
 
-    for ( int i = 0; i < units.size(); i ++ ) {
+    int size = units.size();
+    for ( int i = 0; i < size; i ++ ) {
       unit = (Unit) units.get(i);
       strValue.append(unit.getValue());  //append *value* attribute of Unit
       power = unit.getPower();
@@ -255,6 +256,10 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/09 04:24:12  thomas
+ * Implimented small efficiency improvements to traversal
+ * loops. -b.t.
+ *
  * Revision 1.7  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *
