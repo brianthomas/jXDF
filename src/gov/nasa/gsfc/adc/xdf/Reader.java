@@ -207,12 +207,12 @@ public class Reader
             try {
                parser.setProperty("http://xml.org/sax/properties/lexical-handler", myDocumentHandler);
             } catch (org.xml.sax.SAXNotSupportedException e) {
-               Log.warnln("This parser does not support LexicalHandlers and does not allow inspection of DTD events by the XDF reader.");
-               Log.warnln("This means that XDF objects returned by this parser may not have their XMLDeclaration and DocumentType objects set appropriately.");
+               Log.infoln("This parser does not support LexicalHandlers and does not allow inspection of DTD events by the XDF reader.");
+               Log.infoln("This means that XDF objects returned by this parser may not have their XMLDeclaration and DocumentType objects set appropriately.");
                myDocumentHandler.setForceSetXMLHeaderStuffOnXDFObject(true);
             } catch (org.xml.sax.SAXNotRecognizedException e) {
-               Log.warnln("This parser does not support LexicalHandlers and does not allow inspection of DTD events by the XDF reader.");
-               Log.warnln("This means that XDF objects returned by this parser may not have their XMLDeclaration and DocumentType objects set appropriately.");
+               Log.infoln("This parser does not support LexicalHandlers and does not allow inspection of DTD events by the XDF reader.");
+               Log.infoln("This means that XDF objects returned by this parser may not have their XMLDeclaration and DocumentType objects set appropriately.");
                myDocumentHandler.setForceSetXMLHeaderStuffOnXDFObject(true);
             } catch (Exception e) {
                e.printStackTrace();
@@ -358,6 +358,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/09/19 16:39:45  thomas
+ * changed level of warning message to 'info'
+ *
  * Revision 1.19  2001/09/14 18:20:11  thomas
  * Added Possible DTD handling for XDF object XMLheader stuff, requires parser supports LexicalHandler stuff
  *
