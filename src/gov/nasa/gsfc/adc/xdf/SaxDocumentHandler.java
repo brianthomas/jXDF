@@ -100,7 +100,6 @@ implements LexicalHandler
     // References to the current working structure/array
     protected Structure CurrentStructure;   
     protected Array CurrentArray;   
-    protected Object    CurrentDatatypeObject;
     protected ArrayList CurrentNodePath = new ArrayList();
     protected ArrayList CurrentFormatObjectList = new ArrayList ();
 
@@ -426,14 +425,6 @@ implements LexicalHandler
           }
        }
        return (String) null;
-    }
-
-    public void setCurrentDatatypeObject(Object object) {
-        CurrentDatatypeObject = object;
-    }
-
-    public Object getCurrentDatatypeObject() {
-       return CurrentDatatypeObject;
     }
 
     public void setCurrentArray(Array array) {
@@ -2649,6 +2640,7 @@ Log.errorln(" TValue:"+valueString);
           Array newarray = new Array();
           newarray.setAttributes(attrs); // set XML attributes from passed list 
 
+
           // add this array to our list of arrays if it has an ID
           if (newarray != null) { 
              String arrayId = newarray.getArrayId();
@@ -2657,7 +2649,6 @@ Log.errorln(" TValue:"+valueString);
           }
 
           CurrentArray = newarray;
-          setCurrentDatatypeObject(CurrentArray);
 
           return newarray;
        }
@@ -2729,9 +2720,6 @@ Log.errorln(" TValue:"+valueString);
              // add this axis to the current array object
              CurrentArray.addAxis(newaxis);
 
-             // I dont believe this is actually used
-             // CurrentDatatypeObject = newaxis;
-
           } else {
              Log.errorln("Axis object:"+newaxis+" lacks either axisId or axisIdRef, ignoring!");
           }
@@ -2755,10 +2743,14 @@ Log.errorln(" TValue:"+valueString);
           bfFormat.setAttributes(attrs);
           bfFormat.setAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
 
-          if (CurrentDatatypeObject instanceof Field) {
-              ((Field) CurrentDatatypeObject).setDataFormat(bfFormat);
-          } else if (CurrentDatatypeObject instanceof Array) {
-              ((Array) CurrentDatatypeObject).setDataFormat(bfFormat);
+          Object dataFormatParent = getParentOfLastObject();
+
+          if (dataFormatParent instanceof Field) {
+              ((Field) dataFormatParent).setDataFormat(bfFormat);
+          } else if (dataFormatParent instanceof Parameter) {
+              ((Parameter) dataFormatParent).setDataFormat(bfFormat);
+          } else if (dataFormatParent instanceof Array) {
+              ((Array) dataFormatParent).setDataFormat(bfFormat);
           } else {
               Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
           }
@@ -2782,10 +2774,13 @@ Log.errorln(" TValue:"+valueString);
           biFormat.setAttributes(attrs);
           biFormat.setAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
 
-          if (CurrentDatatypeObject instanceof Field) {
-              ((Field) CurrentDatatypeObject).setDataFormat(biFormat);
-          } else if (CurrentDatatypeObject instanceof Array) {
-              ((Array) CurrentDatatypeObject).setDataFormat(biFormat);
+          Object dataFormatParent = getParentOfLastObject();
+          if (dataFormatParent instanceof Field) {
+              ((Field) dataFormatParent).setDataFormat(biFormat);
+          } else if (dataFormatParent instanceof Parameter) {
+              ((Parameter) dataFormatParent).setDataFormat(biFormat);
+          } else if (dataFormatParent instanceof Array) {
+              ((Array) dataFormatParent).setDataFormat(biFormat);
           } else {
               Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
           }
@@ -3468,8 +3463,6 @@ while (iter.hasNext()) {
              newfield.addToGroup(nextFieldGroupObj);
           }
 
-          CurrentDatatypeObject = newfield;
-
           LastFieldObject = newfield;
 
           return newfield;
@@ -3685,10 +3678,16 @@ while (iter.hasNext()) {
           fixedFormat.setAttributes(attrs);
           fixedFormat.setAttributes(DataFormatAttribs);
 
-          if (CurrentDatatypeObject instanceof Field) { 
-              ((Field) CurrentDatatypeObject).setDataFormat(fixedFormat);
-          } else if (CurrentDatatypeObject instanceof Array) { 
-              ((Array) CurrentDatatypeObject).setDataFormat(fixedFormat);
+          Object dataFormatParent = getParentOfLastObject();
+
+          if (dataFormatParent instanceof Field) { 
+              ((Field) dataFormatParent).setDataFormat(fixedFormat);
+          } else if (dataFormatParent instanceof Axis) { 
+              ((Axis) dataFormatParent).setLabelDataFormat(fixedFormat);
+          } else if (dataFormatParent instanceof Parameter) { 
+              ((Parameter) dataFormatParent).setDataFormat(fixedFormat);
+          } else if (dataFormatParent instanceof Array) { 
+              ((Array) dataFormatParent).setDataFormat(fixedFormat);
           } else {
               Log.warnln("Unknown parent object, cant set string data type/format in dataTypeObj, ignoring.");
           }
@@ -3697,7 +3696,7 @@ while (iter.hasNext()) {
        }
     }
 
-    // FOR
+    // FORNODE
     //
 
     class forStartElementHandlerFunc implements StartElementHandlerAction {
@@ -3718,7 +3717,6 @@ while (iter.hasNext()) {
                 //AxisReadOrder.add(lastindex, AxisObj.get(attrs.getValue(i)));
                  String axisId = attrs.getValue(i);
                  AxisReadOrder.add(0, AxisObj.get(axisId));
-                 Log.debugln("Adding AxisId to AxisReadOrder:"+axisId);
              } else 
                  Log.warnln("Warning: got weird attribute:"+name+" on for node");
           } 
@@ -3740,10 +3738,15 @@ while (iter.hasNext()) {
           integerFormat.setAttributes(attrs);
           integerFormat.setAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
 
-          if (CurrentDatatypeObject instanceof Field) {
-              ((Field) CurrentDatatypeObject).setDataFormat(integerFormat);
-          } else if (CurrentDatatypeObject instanceof Array) {
-              ((Array) CurrentDatatypeObject).setDataFormat(integerFormat);
+          Object dataFormatParent = getParentOfLastObject();
+          if (dataFormatParent instanceof Field) {
+              ((Field) dataFormatParent).setDataFormat(integerFormat);
+          } else if (dataFormatParent instanceof Parameter) {
+              ((Parameter) dataFormatParent).setDataFormat(integerFormat);
+          } else if (dataFormatParent instanceof Axis) {
+              ((Axis) dataFormatParent).setLabelDataFormat(integerFormat);
+          } else if (dataFormatParent instanceof Array) {
+              ((Array) dataFormatParent).setDataFormat(integerFormat);
           } else {
               Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
           }
@@ -4470,10 +4473,15 @@ while (iter.hasNext()) {
           stringFormat.setAttributes(attrs);
           stringFormat.setAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
 
-          if (CurrentDatatypeObject instanceof Field) {
-              ((Field) CurrentDatatypeObject).setDataFormat(stringFormat);
-          } else if (CurrentDatatypeObject instanceof Array) {
-              ((Array) CurrentDatatypeObject).setDataFormat(stringFormat);
+          Object dataFormatParent = getParentOfLastObject();
+          if (dataFormatParent instanceof Field) {
+              ((Field) dataFormatParent).setDataFormat(stringFormat);
+          } else if (dataFormatParent instanceof Parameter) {
+              ((Parameter) dataFormatParent).setDataFormat(stringFormat);
+          } else if (dataFormatParent instanceof Axis) {
+              ((Axis) dataFormatParent).setLabelDataFormat(stringFormat);
+          } else if (dataFormatParent instanceof Array) {
+              ((Array) dataFormatParent).setDataFormat(stringFormat);
           } else {
               Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring");
           }
