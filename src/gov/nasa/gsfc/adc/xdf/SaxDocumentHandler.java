@@ -62,6 +62,7 @@ import java.io.InputStreamReader;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
+// import org.apache.crimson.tree.CDataNode;
 
 /** 
      Contains the SAX document handler for the XDF reader; it also contains
@@ -537,6 +538,12 @@ implements LexicalHandler
     throws SAXException
     {
 
+        // There is no need to do this IF there are no characters!!
+        // yet, some XML parsers will call this anyways, so we need this check.
+        if (len == 0) {
+           return;
+        }
+
         // Are we reading a CDATA section? IF NOT, then we should
         // replace all whitespace chars with just spaces. 
         if (!readingCDATASection) {
@@ -578,7 +585,7 @@ implements LexicalHandler
             len = newIndex;
         }
 
-        Log.debugln("H_CharData:["+new String(buf,offset,len)+"]");
+        Log.debugln("H_CharData: size="+len+" val:["+new String(buf,offset,len)+"]");
 
         /* we need to know what the current node is in order to 
            know what to do with this data, however, 
@@ -589,7 +596,8 @@ implements LexicalHandler
 
         String currentNodeName = (String) CurrentNodePath.get(CurrentNodePath.size()-1); 
 
-        if ( charDataHandlerHashtable.containsKey(currentNodeName) ) {
+        if ( charDataHandlerHashtable.containsKey(currentNodeName) ) 
+        {
 
           // run the appropriate character data handler
            CharDataHandlerAction event = (CharDataHandlerAction)
@@ -598,11 +606,34 @@ implements LexicalHandler
 
         } else {
 
-           // run the default handler
-           CharDataHandlerAction defaultEvent =
-              (CharDataHandlerAction) defaultHandlerHashtable.get("charData");
-           defaultEvent.action(this,buf,offset,len);
+           // Not defined in our table of items? well, check to see if the
+           // last object was an ElementNode, if so we can put the character
+           // data there. Otherwise, we have to use the default handler.
+           Object lastObject = getLastObject();
+           if (lastObject != null && lastObject instanceof ElementNode) 
+           {
 
+               // just set the pcdata to this character data
+               if (readingCDATASection) 
+               {
+                  // remember to preserve CDATA
+                  Log.warnln("XDF Reader cant store CDATA within XDF::ElementNode class, Crimson CDataNode not a public class. Storing as regular PCData instead, and this may cause problems.");
+//                  CDataNode data = new org.apache.crimson.tree.CDataNode(buf,offset,len);
+//                  ((ElementNode) lastObject).appendPCData(data);
+
+               }
+               // else {
+                  ((ElementNode) lastObject).appendPCData(new String(buf,offset,len));
+               //}
+
+           } else {
+
+               // run the default handler
+               CharDataHandlerAction defaultEvent =
+                   (CharDataHandlerAction) defaultHandlerHashtable.get("charData");
+               defaultEvent.action(this,buf,offset,len);
+
+           }
         }
 
     }
@@ -2560,7 +2591,7 @@ Log.errorln(" TValue:"+valueString);
        throws SAXException
        {
 
-// Log.errorln("DefaultCharDataHandler called for :"+new String(buf,offset,len)+", Ignoring item.");
+//  Log.errorln("DefaultCharDataHandler called for :"+new String(buf,offset,len)+", Ignoring item.");
                // do nothing with other character data
 
 //           if (DataNodeLevel > 0) {
