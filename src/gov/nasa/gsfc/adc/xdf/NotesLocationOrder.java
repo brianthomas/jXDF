@@ -116,7 +116,10 @@ public class NotesLocationOrder extends BaseObject {
          String axisIdRef = (String) iter.next();
 
          if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, newindent); // indent node if desired
-         writeOut(outputstream,"<" + indexNodeName + " axisIdRef=\""+axisIdRef+"\"/>");
+         writeOut(outputstream,"<" + indexNodeName + " axisIdRef=\"");
+         writeOutAttribute(outputstream, axisIdRef);
+         writeOut(outputstream, "\"/>");
+
          if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
       }
 
@@ -145,6 +148,12 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/27 22:39:25  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). -b.t.
+ *
  * Revision 1.4  2000/11/16 20:03:22  kelly
  * fixed documentation.  -k.z.
  *

@@ -189,14 +189,34 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
     synchronized(attribHash) {  //sync, prevent the attribHash' structure be changed
       String attrib;
-      if ( (attrib=getEncoding()) !=null)
-        writeOut(outputstream, " encoding=\"" + attrib+"\"");
+      if ( (attrib=getEncoding()) !=null)  
+      { 
+         writeOut(outputstream, " encoding=\"");
+         writeOut(outputstream, attrib);
+         writeOut(outputstream, "\"");
+      }
+
       if ( (attrib=getEndian()) !=null)
-        writeOut(outputstream, " endian=\"" + attrib + "\"");
+      { 
+         writeOut(outputstream, " endian=\"");
+         writeOut(outputstream, attrib);
+         writeOut(outputstream, "\"");
+      }
+
       if ( (attrib=getReadId()) !=null)
-        writeOut(outputstream, " readId=\"" + attrib + "\"");
+      { 
+         writeOut(outputstream, " readId=\"");
+         writeOut(outputstream, attrib);
+         writeOut(outputstream, "\"");
+      }
+
       if ( (attrib=getReadIdRef()) !=null)
-        writeOut(outputstream, " readIdRef=\"" + attrib + "\"");
+      { 
+         writeOut(outputstream, " readIdRef=\"");
+         writeOut(outputstream, attrib);
+         writeOut(outputstream, "\"");
+      }
+
 
     }
     writeOut(outputstream, ">");
@@ -260,6 +280,12 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2000/11/27 22:39:25  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). -b.t.
+ *
  * Revision 1.13  2000/11/27 20:07:11  thomas
  * Removed minor debuging statement. -b.t.
  *

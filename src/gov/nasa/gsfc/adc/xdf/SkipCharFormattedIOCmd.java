@@ -108,10 +108,19 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 
       //writeOutAttributes
       Object attrib=null;
-      if ( (attrib=getCount()) !=null)
-        writeOut( outputstream, " count=\"" + attrib + "\"");
+      if ( (attrib=getCount()) !=null) 
+      { 
+         writeOut( outputstream, " count=\"");
+         writeOutAttribute(outputstream, ((Integer) attrib).toString());
+         writeOut(outputstream, "\"");
+      }
+
       if ((attrib=getOutput()) !=null)
-        writeOut(outputstream, " output=\"" + attrib + "\"");
+      { 
+         writeOut(outputstream, " output=\"");
+         writeOutAttribute(outputstream, (String) attrib);
+         writeOut(outputstream, "\"");
+      }
 
       //close the node
       writeOut(outputstream, "/>");
@@ -143,6 +152,12 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/27 22:39:25  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). -b.t.
+ *
  * Revision 1.5  2000/11/20 22:07:58  thomas
  * Implimented some changes needed by SaxDocHandler
  * to allow formatted reads (e.g. these classes were not

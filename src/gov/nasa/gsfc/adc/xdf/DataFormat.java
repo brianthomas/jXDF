@@ -175,7 +175,9 @@ import java.util.Hashtable;
       int stop = attribs.size();
       for (int i = 0; i < stop; i++) {
         Hashtable item = (Hashtable) attribs.get(i);
-        writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
+        writeOut(outputstream, " "+ item.get("name") + "=\"");
+        writeOutAttribute(outputstream, (String)item.get("value"));
+        writeOut(outputstream, "\"");
       }
     }
 
@@ -228,6 +230,12 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2000/11/27 22:39:26  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). -b.t.
+ *
  * Revision 1.10  2000/11/22 20:42:00  thomas
  * beaucoup changes to make formatted reads work.
  * DataFormat methods now store the "template" or

@@ -160,7 +160,10 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   {
      //open the code
      writeOut(outputstream, "<" + classXDFNodeName);
-     writeOut(outputstream, " count=\"" + getCount() + "\"");
+     writeOut(outputstream, " count=\"");
+     writeOutAttribute(outputstream, getCount().toString());
+     writeOut(outputstream, "\"");
+
      writeOut(outputstream, ">");
 
      //write out nodes in formatCommandList
@@ -205,6 +208,12 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/27 22:39:25  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). -b.t.
+ *
  * Revision 1.4  2000/11/20 22:07:58  thomas
  * Implimented some changes needed by SaxDocHandler
  * to allow formatted reads (e.g. these classes were not

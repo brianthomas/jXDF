@@ -40,6 +40,9 @@ import java.io.OutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
+
 import org.xml.sax.AttributeList;
 
 /** The base class for most XDF objects.
@@ -298,6 +301,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
         for (int i = 0; i < size; i++) {
           Hashtable item = (Hashtable) attribs.get(i);
           writeOut(outputstream, " " + item.get("name") + "=\"");
+          // this slows things down, should we use?
+          //writeOutAttribute(outputstream, (String) item.get("value"));
           writeOut(outputstream, (String) item.get("value"));
           writeOut(outputstream, "\"" );
         }
@@ -641,13 +646,33 @@ public abstract class BaseObject implements Serializable, Cloneable {
     }
   }
 
-  /** write message, correcting characters in the text to match UTF-16
-      encoding as needed.
-   */
-  protected void writeOutUTF16 ( OutputStream outputstream, String text) {
+  protected void writeOut ( OutputStream outputstream, char c ) {
+    try {
+      outputstream.write(c);
+    } catch (IOException e) {
+      Log.error("Error: couldnt open OutputStream for writing");
+    }
+  }
 
-      Log.errorln("ERROR: writeOutUTF16 method NOT yet implemented.");
-      System.exit(-1); // die hard :P.
+  /** Write out string object formatted so it may be a proper XML 
+      (XDF) string in a node attribute. Basically, newLine and carriageReturn
+      entities are substituted in for appropriate characters. 
+   */
+  protected void writeOutAttribute ( OutputStream outputstream, String text) {
+
+     StringCharacterIterator iter = new StringCharacterIterator(text);
+
+     for(char c = iter.first(); c != CharacterIterator.DONE; c = iter.next()) 
+     {
+
+        if(c == '\n')
+           writeOut(outputstream, "&#010;");
+        else if(c == '\r')
+           writeOut(outputstream, "&#013;");
+        else
+           writeOut(outputstream, c);
+
+     }
 
   }
 
@@ -799,6 +824,12 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.35  2000/11/27 22:39:25  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). -b.t.
+ *
  * Revision 1.34  2000/11/27 20:48:37  thomas
  * *** empty log message ***
  *

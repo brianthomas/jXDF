@@ -1021,12 +1021,18 @@ protected boolean  removeData (Locator locator) {
 
     writeOut(outputstream, "<" + nodeName );
     String href = getHref();
-    if (href !=null)
-      writeOut(outputstream, " href = \"" + href + "\"");
+    if (href !=null) { 
+      writeOut(outputstream, " href = \"");
+      writeOutAttribute(outputstream, href);
+      writeOut(outputstream, "\"");
+    }
 
     String checksum = getChecksum();
-    if (checksum != null)
-      writeOut(outputstream, " checksum = \"" + checksum.toString() + "\"");
+    if (checksum != null) { 
+      writeOut(outputstream, " checksum = \"");
+      writeOutAttribute(outputstream, checksum.toString());
+      writeOut(outputstream, "\"");
+    }
 
     writeOut(outputstream, ">");  //end of opening code
 
@@ -1492,6 +1498,12 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.18  2000/11/27 22:39:25  thomas
+  * Fix to allow attribute text to have newline, carriage
+  * returns in them (print out as entities: &#010; and
+  * &#013;) This allows files printed out to be read back
+  * in again(yeah!). -b.t.
+  *
   * Revision 1.17  2000/11/22 20:42:00  thomas
   * beaucoup changes to make formatted reads work.
   * DataFormat methods now store the "template" or

@@ -49,7 +49,6 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 
   //no-arg contructor
   public TaggedXMLDataIOStyle(Array parentArray) {
-    Log.debug("in TaggedXMLDataIOStyle, constructor");
     this.parentArray = parentArray;
   }
 
@@ -132,7 +131,13 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
           writeOut(outputstream, Constants.NEW_LINE);
           writeOut(outputstream, indent);
         }
-        writeOut(outputstream, "<" + TagToAxisNodeName + " axisIdRef=\"" + axisId + "\"" + " tag = \"" + tag + "\"/>");
+        writeOut(outputstream, "<" + TagToAxisNodeName + " axisIdRef=\"");
+        writeOutAttribute(outputstream, axisId);
+        writeOut(outputstream, "\"");
+        writeOut(outputstream, " tag = \"");
+        writeOutAttribute(outputstream, tag);
+        writeOut(outputstream, "\"");
+
 
       }
     }
@@ -152,6 +157,12 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/27 22:39:25  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). -b.t.
+ *
  * Revision 1.8  2000/11/16 20:09:35  kelly
  * fixed documentation.  -k.z.
  *

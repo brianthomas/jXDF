@@ -152,7 +152,10 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
               writeOut(outputstream, indent);
               indent = indent + Specification.getInstance().getPrettyXDFOutputIndentation(); 
            }
-           writeOut(outputstream, "<for axisIdRef=\""+axis.getAxisId()+"\">");
+           writeOut(outputstream, "<for axisIdRef=\"");
+           writeOutAttribute(outputstream, axis.getAxisId());
+           writeOut(outputstream, "\">");
+
            numberOfAxes++;
         }
      }
@@ -255,6 +258,12 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/27 22:39:26  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). -b.t.
+ *
  * Revision 1.9  2000/11/22 21:56:03  thomas
  * Fix to print out for nodes in toXML* methods. -b.t.
  *

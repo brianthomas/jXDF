@@ -164,11 +164,22 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, indent);
       }
       writeOut(outputstream, "<" + classXDFNodeName);
-      if (delimiter !=null)
-        writeOut(outputstream, " delimiter =\"" + delimiter + "\"");
-      writeOut(outputstream, " repeatable=\"" + repeatable +  "\"");
-      if (recordTerminator !=null)
-        writeOut(outputstream, " recordTerminator=\"" + recordTerminator + "\"/>");
+      if (delimiter !=null) { 
+        writeOut(outputstream, " delimiter =\"");
+        writeOutAttribute(outputstream, delimiter);
+        writeOut(outputstream, "\"");
+      }
+
+      writeOut(outputstream, " repeatable=\"");
+      writeOutAttribute(outputstream, repeatable);
+      writeOut(outputstream, "\"");
+
+      if (recordTerminator !=null) {
+         writeOut(outputstream, " recordTerminator=\"");
+         writeOutAttribute(outputstream, recordTerminator);
+         writeOut(outputstream, "\"");
+      }
+
     }
     else {
       if (Specification.getInstance().isPrettyXDFOutput()) {
@@ -213,6 +224,12 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/27 22:39:26  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). -b.t.
+ *
  * Revision 1.7  2000/11/16 19:57:09  kelly
  * fixed documentation.  -k.z.
  *
