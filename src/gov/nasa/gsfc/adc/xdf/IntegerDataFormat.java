@@ -1,9 +1,6 @@
+
 // XDF IntegerDataFormat Class
 // CVS $Id$
-
-package gov.nasa.gsfc.adc.xdf;
-
-import java.util.*;
 
 // IntegerDataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -26,6 +23,7 @@ import java.util.*;
 */
 
 
+package gov.nasa.gsfc.adc.xdf;
 
 /**
  * IntegerDataFormat.java:IntegerDataFormat class describes the data format
@@ -249,6 +247,9 @@ public class IntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/08 19:55:07  thomas
+ * Trimmed import path to just needed classes (none!) -b.t.
+ *
  * Revision 1.3  2000/10/27 21:20:06  kelly
  * get rid of classXDFNodeName, added specificDataFormatName to suit its
  * supper class DataFormat *toXDF*.  -k.z.
