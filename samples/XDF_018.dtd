@@ -308,7 +308,7 @@ grouped together with name="position".
 -->
 <!ELEMENT dataFormat (float | integer | string | binaryInteger | binaryFloat)>
 
-<!ELEMENT read (taggedText | delimitedText | fixedWidthText | fixedWidthBinary ) >
+<!ELEMENT read (taggedStyle | delimitedStyle | fixedWidthStyle ) >
 <!ATTLIST read
         encoding (ANSI | ISO-8859-1 | UTF-8 | UTF-16) "ISO-8859-1"
         endian (BigEndian | LittleEndian) #IMPLIED
@@ -331,16 +331,14 @@ grouped together with name="position".
 <!ELEMENT fixedWidthReadInstructions (readCell | skip | repeat)+ >
 <!ELEMENT delimitedReadInstructions (delimiter, recordTerminator)>
 
-<!ELEMENT taggedText (tagToAxis+) > 
-<!ELEMENT fixedWidthText (fixedWidthReadInstructions, for)> 
-<!ELEMENT delimitedText  (delimitedReadInstructions, for) >
-<!ELEMENT fixedWidthBinary (fixedWidthReadInstructions, for) >
+<!ELEMENT taggedStyle (tagToAxis+) > 
+<!ELEMENT fixedWidthStyle (fixedWidthReadInstructions, for)> 
+<!ELEMENT delimitedStyle (delimitedReadInstructions, for) >
 
-<!ELEMENT recordTerminator (#PCDATA | newLine)* >
-<!ELEMENT delimiter EMPTY >
+<!ELEMENT recordTerminator ((chars | newLine)?) >
+<!ELEMENT delimiter ((chars | newLine)?) >
 <!ATTLIST delimiter
 	repeatable (yes | no) "yes"
-	value  CDATA #REQUIRED
 >
 
 <!-- repeatable attribute (above) means that one or more of the delimiter 
@@ -356,19 +354,22 @@ grouped together with name="position".
 	between data values and at the end of format statement
 	to skip over the new-Line character. The chars that are
 	skipped over are not kept. If a particular character output 
-        is desired, it may be specified using either the charOutput or
+        is desired, it may be specified using either the chars or
         newLine child elements (but not both).
 -->
-<!-- to avoid mixed content we have charOutput child -->
-<!ELEMENT skip ((charOutput | newLine)?) >
+<!-- to avoid mixed content we have chars child -->
+<!ELEMENT skip ((chars | newLine)?) >
 <!ATTLIST skip
 	count NMTOKEN "1"
 >
-<!-- note: all 'whitespace' isnt preserved by PCDATA (in charOutput). Use
-     'newLine' child element to have the newLine character (correct for the
-      archetechture) output.
+<!-- note: you cant put in a newline in any XML attribute (e.g. value for chars element). 
+     Use 'newLine' child element to have the newLine character (correct for the
+     platform) output.
 -->
-<!ELEMENT charOutput ( #PCDATA)>
+<!ELEMENT chars EMPTY>
+<!ATTLIST chars
+	value CDATA "&space;"
+>
 
 <!-- the 'logical' newline: may be '\r' or '\r\n' 
      or '\n' depending on the machine.
