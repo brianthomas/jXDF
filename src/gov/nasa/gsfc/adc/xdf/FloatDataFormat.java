@@ -73,6 +73,8 @@ public class FloatDataFormat extends NumberDataFormat {
    public static final int DEFAULT_PRECISION = 0;
    public static final int DEFAULT_EXPONENT = 0;
 
+   private String negativeExponentFormatPattern;
+
    //
    // Constructors
    //
@@ -163,6 +165,15 @@ public class FloatDataFormat extends NumberDataFormat {
       return (Integer) ((XMLAttribute) attribHash.get(EXPONENT_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
+   /** Get the DecimalFormat pattern for nice output of negative float numbers  
+       with exponents less than 0. This is needed because of the failings in the
+       java DecimalFormat class which doenst allow grouping pattern separators when
+       scientific format ('E') is used. 
+    */
+   public String getNegativeExponentFormatPattern() {
+      return negativeExponentFormatPattern;
+   }
+
    //
    // Other PUBLIC Methods
    //
@@ -188,8 +199,11 @@ public class FloatDataFormat extends NumberDataFormat {
   private void generateFormatPattern ( ) {
 
      StringBuffer leftpattern = new StringBuffer();
+     StringBuffer negleftpattern = new StringBuffer();
      StringBuffer rightpattern = new StringBuffer();
+     StringBuffer negrightpattern = new StringBuffer();
      StringBuffer etemplate = new StringBuffer();
+     StringBuffer negtemplate = new StringBuffer();
 
      // precision is the size of the exponent excluding 'E'
      int psize = getPrecision().intValue();
@@ -197,28 +211,46 @@ public class FloatDataFormat extends NumberDataFormat {
      // the width left of the '.'
      int leftsize = getWidth().intValue() - psize - esize - 1;
 
-     while (leftsize-- > 2)
-        etemplate.append("#");
+     // padding spaces? not needed I think..
+     // while (leftsize-- > 2)
+     //   etemplate.append("#");
 
      if (leftsize == 1)
         leftpattern.append("0");
 
      leftpattern.append(".");
+     negleftpattern.append(".");
 
-     while (psize-- > 0)
+     while (psize-- > 0) { 
         leftpattern.append("0");
+        negleftpattern.append("0");
+     }
 
-     if(esize > 0)
+     if(esize > 0) { 
         rightpattern.append("E");
-
-     while (esize-- > 0)
         rightpattern.append("0");
+        negrightpattern.append("E");
+     }
+
+     while (esize-- > 1)
+     {
+        rightpattern.append("0");
+        negrightpattern.append("0");
+     }
 
      // finish building the template
      etemplate.append(leftpattern.toString()+rightpattern.toString());
      etemplate.append(";-"+leftpattern.toString()+rightpattern.toString());
    
+     negtemplate.append(negleftpattern.toString()+negrightpattern.toString());
+
      formatPattern = etemplate.toString();
+
+     if (getExponent().intValue() > 0) {
+        negativeExponentFormatPattern = negtemplate.toString();
+     } else {
+        negativeExponentFormatPattern = null;
+     }
 
   }
 
@@ -261,6 +293,10 @@ public class FloatDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/06/25 15:14:34  thomas
+ * added negativeExponentPattern for N <0 && N > -1
+ * and an exponent specified.
+ *
  * Revision 1.3  2001/05/04 20:20:09  thomas
  * added super.init() in init() method. This may have to be undone
  * in the future.  Consider this to be a 'side-ways' change.
