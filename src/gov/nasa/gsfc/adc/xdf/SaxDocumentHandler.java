@@ -44,7 +44,7 @@ import java.lang.Character;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+//import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 // Java IO stuff
@@ -576,6 +576,7 @@ public class SaxDocumentHandler extends DefaultHandler {
     }
 
     // not really needed I think, as we have a separate documentError handler
+/*
     public void error (SAXParseException e)
     throws SAXException
     {
@@ -595,6 +596,7 @@ public class SaxDocumentHandler extends DefaultHandler {
     {
         Log.warnln(e.getMessage());
     }
+*/
 
     public void endDocument()
     throws SAXException
@@ -956,6 +958,7 @@ public class SaxDocumentHandler extends DefaultHandler {
     private void loadHrefDataIntoCurrentArray ( Entity hrefObj,
                                                 String compressionType
                                               ) 
+    throws SAXException
     {
  
        // well, we should be doing something with base here, 
@@ -1012,8 +1015,7 @@ public class SaxDocumentHandler extends DefaultHandler {
                       try {
                          addByteDataToCurrentArray(locator, data, bytes_read, endian );
                       } catch (SetDataException e) { 
-                         Log.errorln("Failed to load external data at start byte:"+bytes_read);
-                         e.printStackTrace();
+                         throw new SAXException("Failed to load external data at start byte:"+bytes_read);
                       }
                       break; // EOF reached
                   }
@@ -1029,8 +1031,7 @@ public class SaxDocumentHandler extends DefaultHandler {
                      try {
                          addByteDataToCurrentArray(locator, data, bytes_read, endian );
                      } catch (SetDataException e) {
-                         Log.errorln("Failed to load external data at start byte:"+bytes_read);
-                         e.printStackTrace();
+                         throw new SAXException("Failed to load external data at start byte:"+bytes_read);
                      }
                      bytes_read = 0;
                   }
@@ -1081,13 +1082,22 @@ public class SaxDocumentHandler extends DefaultHandler {
                    String thisData = new String(data,bytes_added,bytes_to_add);
 // Log.errorln("Got Href Formatted Number Data:["+thisData.trim()+ "]["+bytes_added+"]["+bytes_to_add+"]");
 
-                   addDataToCurrentArray(location, thisData.trim(), currentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                   try {
+                      addDataToCurrentArray(location, thisData.trim(), currentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                   } catch (SetDataException e) {
+                      throw new SetDataException("Unable to setData:["+thisData+"], ignoring request"+e.getMessage());
+                   }
 
                } else if (currentDataFormat instanceof StringDataFormat) {
 
                    String thisData = new String(data,bytes_added,bytes_to_add);
 // Log.errorln("Got Href Formatted Character Data:["+thisData+ "]["+bytes_added+"]["+bytes_to_add+"]");
-                   addDataToCurrentArray(location, thisData, currentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                   try {
+                      addDataToCurrentArray(location, thisData, currentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                   } catch (SetDataException e) {
+                      throw new SetDataException("Unable to setData:["+thisData+"], ignoring request"+e.getMessage());
+                   }
+
 
                } else if (currentDataFormat instanceof BinaryFloatDataFormat) {
 
@@ -1558,6 +1568,7 @@ Log.errorln("");
                                          DataFormat CurrentDataFormat, 
                                          int intRadix
                                        ) 
+    throws SetDataException
     {
 
 // this stuff slows down the parser too much to leave commented in.
@@ -1574,7 +1585,7 @@ Log.infoln(") ["+CurrentDataFormat+"]");
 */
 
        // Note that we dont treat binary data at all here 
-       try {
+       // try {
 
            if ( CurrentDataFormat instanceof StringDataFormat) {
 
@@ -1615,11 +1626,13 @@ Log.infoln(") ["+CurrentDataFormat+"]");
               Log.warnln("Unknown data format, unable to setData:["+thisString+"], ignoring request");
            }
 
+/*
        } catch (SetDataException e) {
            // bizarre error. Cant add data (out of memory??) :P
            Log.errorln("Unable to setData:["+thisString+"], ignoring request");
            Log.printStackTrace(e);
        }
+*/
     }
 
     private ArrayList splitStringIntoValueObjects ( String valueListString, ValueList thisValueList )
@@ -2274,7 +2287,9 @@ Log.errorln(" TValue:"+valueString);
 
     // default start handler
     class defaultStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
            String parentNodeName = getParentNodeName();
            String elementNodeName = getCurrentNodeName();
@@ -2340,14 +2355,18 @@ Log.errorln(" TValue:"+valueString);
 
     // default end handler
     class defaultEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
           // do nothing
        }
     }
 
     // default character data handler
     class defaultCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
+       throws SAXException
+       {
 
                // do nothing with other character data
 
@@ -2370,7 +2389,9 @@ Log.errorln(" TValue:"+valueString);
 
     // asciiDelimiter node start
     class asciiDelimiterStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
            DelimitedXMLDataIOStyle readObj = new DelimitedXMLDataIOStyle(CurrentArray);
            readObj.setAttributes(attrs);
@@ -2386,7 +2407,9 @@ Log.errorln(" TValue:"+valueString);
 
     // asciiDelimiter node end
     class asciiDelimiterEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) { 
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
 
            // pop off last value
            // CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
@@ -2400,7 +2423,9 @@ Log.errorln(" TValue:"+valueString);
 
     // Array node end
     class arrayEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
 
           // well, well, which array will we deal with here?
           // if an appendto is specified, then we will try to append this array
@@ -2426,7 +2451,9 @@ Log.errorln(" TValue:"+valueString);
 
     // Array node start 
     class arrayStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // create new object appropriately 
           Array newarray = new Array();
@@ -2450,7 +2477,9 @@ Log.errorln(" TValue:"+valueString);
     //
 
     class axisStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // create new object appropriately 
           Axis newaxis = new Axis();
@@ -2483,7 +2512,7 @@ Log.errorln(" TValue:"+valueString);
                     // override attrs with those in passed list
                     newaxis.setAttributes(attrs);
                     // give the clone a unique Id and remove IdRef 
-                    newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId(), AxisAliasId)); 
+//                    newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId(), AxisAliasId)); 
                     newaxis.setAxisIdRef(null);
 
                     // add this into the list of axis objects
@@ -2527,7 +2556,9 @@ Log.errorln(" TValue:"+valueString);
     //
 
     class binaryFloatFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
         // create the object
           BinaryFloatDataFormat bfFormat = new BinaryFloatDataFormat();
@@ -2552,7 +2583,9 @@ Log.errorln(" TValue:"+valueString);
     //
 
     class binaryIntegerFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
          // create the object
           BinaryIntegerDataFormat biFormat = new BinaryIntegerDataFormat();
@@ -2578,7 +2611,10 @@ Log.errorln(" TValue:"+valueString);
 
     // REMINDER: this function only gets called when tagged data is being read..
     class dataTagStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
+
           CurrentDataTagLevel++;
           return (Object) null;
        }
@@ -2586,7 +2622,9 @@ Log.errorln(" TValue:"+valueString);
 
     // REMINDER: this function only gets called when tagged data is being read..
     class dataTagEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) { 
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
 
           if (CurrentDataTagLevel == DataTagLevel)
              TaggedLocatorObj.next();
@@ -2617,6 +2655,7 @@ Log.errorln(" TValue:"+valueString);
 
     class taggedDataCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
+       throws SAXException
        {
 
           // only do something here IF we are reading in data at the moment
@@ -2636,7 +2675,14 @@ Log.errorln(" TValue:"+valueString);
                    DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
 
                    // adding data based on what type..
-                   addDataToCurrentArray(TaggedLocatorObj, thisString, CurrentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                   try {
+                      addDataToCurrentArray(TaggedLocatorObj, thisString, CurrentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                   } catch (SetDataException e) {
+                      // bizarre error. Cant add data (out of memory??) :P
+                      Log.errorln("Unable to setData:["+thisString+"], ignoring request");
+                      // Log.printStackTrace(e);
+                      throw new SAXException(e.getMessage());
+                   }
 
                 }
 
@@ -2650,6 +2696,7 @@ Log.errorln(" TValue:"+valueString);
 
     class untaggedDataCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
+       throws SAXException
        {
 
           // only do something here IF we are reading in data at the moment
@@ -2682,7 +2729,9 @@ Log.errorln(" TValue:"+valueString);
     }
 
     class dataEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) { 
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       { 
 
           // we stopped reading datanode, lower count by one
           DataNodeLevel--;
@@ -2723,7 +2772,7 @@ Log.errorln(" TValue:"+valueString);
               }
 
               Locator myLocator = CurrentArray.createLocator();
-              myLocator.setIterationOrder(AxisReadOrder); // shouldnt be needed now, havent checked tho 
+              // myLocator.setIterationOrder(AxisReadOrder); // shouldnt be needed now, havent checked tho 
 
               CurrentDataFormatIndex = 0; 
               ArrayList strValueList;
@@ -2760,7 +2809,14 @@ Log.errorln(" TValue:"+valueString);
 
                  // adding data based on what type..
                  String thisData = (String) iter.next();
-                 addDataToCurrentArray(myLocator, thisData, CurrentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                 try {
+                    addDataToCurrentArray(myLocator, thisData, CurrentDataFormat, IntRadix[CurrentDataFormatIndex]);
+                 } catch (SetDataException e) {
+                    // bizarre error. Cant add data (out of memory??) :P
+                    Log.errorln("Unable to setData:["+thisData+"], ignoring request");
+                    // Log.printStackTrace(e);
+                    throw new SAXException(e.getMessage());
+                 }
 
                  myLocator.next();
 
@@ -2798,7 +2854,9 @@ Log.errorln(" TValue:"+valueString);
     }
 
     class dataStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       { 
 
           // we only need to do these things for the first time we enter
           // a data node
@@ -2952,7 +3010,9 @@ while (iter.hasNext()) {
     //
 
     class dataFormatStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       { 
 
            // save attribs for latter
            DataFormatAttribs = attrs;
@@ -2966,7 +3026,9 @@ while (iter.hasNext()) {
     //
 
     class fieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // create new object appropriately 
           Field newfield = new Field();
@@ -3043,7 +3105,9 @@ while (iter.hasNext()) {
     //
 
     class fieldAxisStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // create new object appropriately 
           FieldAxis newfieldaxis = new FieldAxis();
@@ -3117,14 +3181,20 @@ while (iter.hasNext()) {
     //
 
     class fieldGroupEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
+
           // peel off the last object in the field group list
           CurrentFieldGroupList.remove(CurrentFieldGroupList.size()-1);
        }
     }
 
     class fieldGroupStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
+
 
           // grab parent node name
           String parentNodeName = getParentNodeName();
@@ -3172,7 +3242,9 @@ while (iter.hasNext()) {
     //
 
     class fieldRelationshipStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // create the object
           FieldRelationship newfieldrelation = new FieldRelationship();
@@ -3195,7 +3267,9 @@ while (iter.hasNext()) {
     //
 
     class floatFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // create the object
           FloatDataFormat fixedFormat = new FloatDataFormat();
@@ -3218,7 +3292,10 @@ while (iter.hasNext()) {
     //
 
     class forStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
+
 
           // for node sets the iteration order for how we will setData
           // in the datacube (important for delimited and formatted reads).
@@ -3245,7 +3322,9 @@ while (iter.hasNext()) {
     //
 
     class integerFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
          // create the object
           IntegerDataFormat integerFormat = new IntegerDataFormat();
@@ -3268,7 +3347,9 @@ while (iter.hasNext()) {
     //
 
     class noteCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
+       throws SAXException
+       {
 
           // add cdata as text to the last note object 
           String newText = new String(buf,offset,len);
@@ -3278,7 +3359,9 @@ while (iter.hasNext()) {
     }
 
     class noteStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
            String parentNodeName = getParentNodeName(); 
 
@@ -3360,7 +3443,9 @@ while (iter.hasNext()) {
     //
     
     class noteIndexStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           String axisIdRef = (String) null;
           int size = attrs.getLength(); 
@@ -3384,7 +3469,9 @@ while (iter.hasNext()) {
     //
     
     class notesEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
 
           // reset the location order
           NoteLocatorOrder = new ArrayList ();
@@ -3393,7 +3480,9 @@ while (iter.hasNext()) {
     }
 
     class notesStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // do nothing .. this node doenst have any attributes
           // only child nodes. 
@@ -3407,7 +3496,9 @@ while (iter.hasNext()) {
     //
 
     class nullStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
           // null means do nothing!!
           return (Object) null;
        }
@@ -3418,7 +3509,9 @@ while (iter.hasNext()) {
     //
     
     class parameterStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // grab parent node name
           String parentNodeName = getParentNodeName();
@@ -3516,14 +3609,18 @@ while (iter.hasNext()) {
     //
 
     class parameterGroupEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
           // peel off the last object in the parametergroup list
           CurrentParameterGroupList.remove(CurrentParameterGroupList.size()-1);
        }
     }
 
     class parameterGroupStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
          // grab parent node name
           String parentNodeName = getParentNodeName();
@@ -3581,7 +3678,9 @@ while (iter.hasNext()) {
     //
 
     class readEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
 
           // obtain the current XMLDataIOStyle Object
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
@@ -3615,7 +3714,9 @@ while (iter.hasNext()) {
     }
 
     class readStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // save these for later, when we know what kind of dataIOstyle we got
           // Argh we really need a clone on Attributes. Just dumb copy for now.
@@ -3663,7 +3764,7 @@ while (iter.hasNext()) {
                 // inside the clone method of the readObject, but its difficult to do, 
                 // as well questionable utility. 
                 // Note that this part is ONLY needed for Delmited/Formatted read Objects
-/*
+
                 ArrayList newAxisOrderList = new ArrayList();
                 Iterator iter = CurrentArray.getAxes().iterator();
                 while (iter.hasNext()) {
@@ -3680,7 +3781,6 @@ while (iter.hasNext()) {
                 }
                 // now set the new IO Axes order with correct axis refs 
                 readObj.setIOAxesOrder(newAxisOrderList);
-*/
 
                 // add read object to Current Array
                 CurrentArray.setXMLDataIOStyle(readObj);
@@ -3703,7 +3803,9 @@ while (iter.hasNext()) {
     //
 
     class readCellStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // if this is set to Tagged style, then we really havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
@@ -3745,14 +3847,18 @@ while (iter.hasNext()) {
     //
 
     class repeatEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
           // pop off last value
           CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
        }
     }
 
     class repeatStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // if this is set to Tagged style, then we really havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
@@ -3798,7 +3904,9 @@ while (iter.hasNext()) {
 
     // Root node start 
     class rootStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
           // The root node is just a "structure" node,
           // but is always the first one.
           XDF.setAttributes(attrs); // set XML attributes from passed list 
@@ -3819,7 +3927,9 @@ while (iter.hasNext()) {
     //
 
     class skipCharStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // if this is set to Tagged style, then we really havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
@@ -3862,7 +3972,9 @@ while (iter.hasNext()) {
     //
 
     class stringFieldStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
          // create the object
           StringDataFormat stringFormat = new StringDataFormat();
@@ -3887,7 +3999,9 @@ while (iter.hasNext()) {
     //
 
     class structureStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           Structure structObj = new Structure();
           structObj.setAttributes(attrs); // set XML attributes from passed list 
@@ -3901,7 +4015,9 @@ while (iter.hasNext()) {
     }
 
     class structureEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
           Object lastObject = getParentOfLastObject();
           if (lastObject != null && lastObject instanceof Structure) {
             setCurrentStructure((Structure) lastObject);
@@ -3918,7 +4034,9 @@ while (iter.hasNext()) {
 
     // Our purpose here: configure the TaggedXMLDataIOStyle with axis/tag associations.
     class tagToAxisStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // well, if we see tagToAxis nodes, must have tagged data, the 
           // default style. No need for initing further. 
@@ -3957,7 +4075,9 @@ while (iter.hasNext()) {
     //
 
     class unitCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
+       throws SAXException
+       {
 
           LastUnitObject.setValue(new String(buf,offset,len));
 
@@ -3965,7 +4085,9 @@ while (iter.hasNext()) {
     }
 
     class unitStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) { 
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           //  grab parent node name
           String gParentNodeName = getGrandParentNodeName();
@@ -4017,8 +4139,10 @@ while (iter.hasNext()) {
     // VALUE 
     //
 
-   class valueStartElementHandlerFunc implements StartElementHandlerAction {
-      public Object action (SaxDocumentHandler handler, Attributes attrs) {
+    class valueStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           ValueAttribs.clear(); // clear out old values, if any
           // save these for later, when we know what kind of dataIOstyle we got
@@ -4098,7 +4222,9 @@ while (iter.hasNext()) {
    }
 
    class valueCharDataHandlerFunc implements CharDataHandlerAction {
-      public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
+      public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
+      throws SAXException
+      {
 
           //  grab parent node name
           // this special call will find the first parent node name 
@@ -4188,13 +4314,17 @@ while (iter.hasNext()) {
     //
 
     class valueGroupEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
           CurrentValueGroupList.remove(CurrentValueGroupList.size()-1);
        }
     }
 
     class valueGroupStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
 
           // 1. grab parent node name
           String parentNodeName = getParentNodeName();
@@ -4251,7 +4381,9 @@ while (iter.hasNext()) {
     //
 
     class valueListCharDataHandlerFunc implements CharDataHandlerAction {
-       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
+       public void action (SaxDocumentHandler handler, char buf [], int offset, int len) 
+       throws SAXException
+       {
 
           // IF we get here, we have the delmited case for populating
           // a value list.
@@ -4385,7 +4517,9 @@ while (iter.hasNext()) {
     // there is undoubtably some code-reuse spots missed in this function.
     // get it later when Im not being lazy. -b.t.
     class valueListStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
  
            // 1. re-init
            CurrentValueList = new ValueList();
@@ -4411,7 +4545,9 @@ while (iter.hasNext()) {
     }
 
     class valueListEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action (SaxDocumentHandler handler) {
+       public void action (SaxDocumentHandler handler) 
+       throws SAXException
+       {
 
           ValueList thisValueList = CurrentValueList;
 
@@ -4547,7 +4683,9 @@ while (iter.hasNext()) {
     //
 
     class vectorStartElementHandlerFunc implements StartElementHandlerAction {
-       public Object action (SaxDocumentHandler handler, Attributes attrs) {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
           Log.errorln("VECTOR Start handler not implemented yet.");
           return (Object) null;
        }
@@ -4559,6 +4697,9 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.58  2001/09/20 21:00:58  thomas
+ * action handlers now throw SAXExceptions
+ *
  * Revision 1.57  2001/09/20 15:06:32  thomas
  * changed handling of addByteData method, fix to valueList non-whitespace char data for algorithm version
  *
