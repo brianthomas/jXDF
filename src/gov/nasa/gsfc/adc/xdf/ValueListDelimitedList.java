@@ -137,19 +137,17 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
          String specialValue = thisValue.getSpecial();
          if(specialValue != null) {
             if(specialValue.equals(Constants.VALUE_SPECIAL_INFINITE)) {
-               writeOut(outputstream, valueListInfinite);
+               doValuePrint (outputstream, specialValue, valueListInfinite);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_INFINITE_NEGATIVE)) {
-               writeOut(outputstream, valueListInfiniteNegative);
+               doValuePrint (outputstream, specialValue, valueListInfiniteNegative);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_NODATA)) {
-               writeOut(outputstream, valueListNoData);
+               doValuePrint (outputstream, specialValue, valueListNoData);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_NOTANUMBER)) {
-               writeOut(outputstream, valueListNotANumber);
+               doValuePrint (outputstream, specialValue, valueListNotANumber);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_UNDERFLOW)) {
-               writeOut(outputstream, valueListUnderflow);
+               doValuePrint (outputstream, specialValue, valueListUnderflow);
             } else if(specialValue.equals(Constants.VALUE_SPECIAL_OVERFLOW)) {
-               writeOut(outputstream, valueListOverflow);
-            } else {
-               Log.errorln("Error: valueList doesnt have "+specialValue+" defined but value does. Ignoring value.");
+               doValuePrint (outputstream, specialValue, valueListOverflow);
             }
 
          } else {
@@ -173,6 +171,16 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
    // Private Methods
    //
 
+   private void doValuePrint (OutputStream outputstream, String specialValue, String value) 
+   throws java.io.IOException
+   {
+      if (value != null) {
+         writeOut(outputstream, value);
+      } else {
+         Log.errorln("Error: valueList doesnt have "+specialValue+" defined but value does. Ignoring value.");
+      }
+   }
+
    private void setValues (List valueList) { values = valueList; }
    private void setInfinite (String value) { valueListInfinite = value; }
    private void setInfiniteNegative (String value) { valueListInfiniteNegative = value; }
@@ -193,6 +201,9 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/07/12 17:53:15  thomas
+ * minor bug fix, error handling incorrect in toXMLOutputStream
+ *
  * Revision 1.1  2001/07/11 22:40:36  thomas
  * Initial Version
  *
