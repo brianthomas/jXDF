@@ -25,6 +25,7 @@ CHECKOUT_FLAGS = -r$(MAJOR_VERSION) -l
 
 # sources
 XDF_SOURCE_PATH = gov/nasa/gsfc/adc/xdf
+XDF_DOM_SOURCE_PATH = gov/nasa/gsfc/adc/xdf/DOM
 XDF_BIN_PATH = ../
 XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/Array.java \
@@ -36,6 +37,8 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/Constants.java \
 	$(XDF_SOURCE_PATH)/DataFormat.java \
 	$(XDF_SOURCE_PATH)/DataCube.java \
+	$(XDF_SOURCE_PATH)/DOM/Document.java \
+	$(XDF_SOURCE_PATH)/DOM/XDFElementNode.java \
 	$(XDF_SOURCE_PATH)/DelimitedXMLDataIOStyle.java \
 	$(XDF_SOURCE_PATH)/Field.java \
 	$(XDF_SOURCE_PATH)/FieldAxis.java \
@@ -100,6 +103,8 @@ archive:
 compile: $(ALL_CLASSES)
 	@echo mv $(XDF_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_SOURCE_PATH)
 	@mv $(XDF_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_SOURCE_PATH)
+	@echo mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
+	@mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
 
 # checkin changes 
 checkin:
