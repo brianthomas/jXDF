@@ -153,12 +153,14 @@ public class Log {
 
   /** Log a information level message. 
   */
-  public static void info(String msg) {
+  public static void info (String msg) {
+
+    // check priority
     if (priority > Priority.INFO)
       return;
+
     try {
       output.write(msg.getBytes());
-      output.write(Constants.NEW_LINE.getBytes());
     }
     catch (IOException e) {
       System.err.println("error in Log.info()");
@@ -166,29 +168,66 @@ public class Log {
     }
   }
 
+  /** Log a information level message as a single line. 
+  */
+  public static void infoln (String msg) {
+
+    // check priority
+    if (priority > Priority.INFO)
+      return;
+
+    // write message
+    info(msg);
+
+    // now print the newline
+    printNewline();
+
+  }
+
   /** Log a debugging level message. 
    */
-  public static void debug(String msg) {
+  public static void debug (String msg) {
+
+    // check priority
     if (priority > Priority.DEBUG)
       return;
+
     try {
       output.write(msg.getBytes());
-      output.write(Constants.NEW_LINE.getBytes());
     }
     catch (IOException e) {
       System.err.println("error in Log.debug()");
       e.printStackTrace();
     }
+
   }
  
+  /** Log a debugging level message as single line.
+   */
+  public static void debugln (String msg) {
+
+    // check priority
+    if (priority > Priority.DEBUG)
+      return;
+
+    // print debugging message
+    debug(msg);
+
+    // now print the newline
+    printNewline();
+
+  }
+
   /** Log a warning level message. 
    */
-  public static void warn(String msg) {
+  public static void warn (String msg) {
+
+    // check priority
     if (priority > Priority.WARN)
       return;
+
     try {
       output.write(msg.getBytes());
-      output.write(Constants.NEW_LINE.getBytes());
     }
     catch (IOException e) {
       System.err.println("error in Log.warn()");
@@ -196,19 +235,56 @@ public class Log {
     }
   }
 
-  /** Log an error level message. 
+  /** Log a warning level message as a single line. 
    */
-  public static void error(String msg) {
+  public static void warnln (String msg) {
+
+    // check priority
+    if (priority > Priority.WARN)
+      return;
+
+    // print msg 
+    warn(msg);
+
+    // print newline
+    printNewline();
+
+  }
+
+  /** Log an error level message.
+   */
+  public static void error (String msg) {
+
+    // check priority
     if (priority > Priority.ERROR)
       return;
+
+    // print message
     try {
       output.write(msg.getBytes());
-      output.write(Constants.NEW_LINE.getBytes());
+      // output.write(Constants.NEW_LINE.getBytes());
     }
     catch (IOException e) {
       System.err.println("error in Log.error()");
       e.printStackTrace();
     }
+  }
+
+  /** Log an error level message as a single line. 
+   */
+
+  public static void errorln (String msg) {
+
+    // check priority
+    if (priority > Priority.ERROR)
+      return;
+
+    // print message
+    error(msg);
+
+    // print newline
+    printNewline();
+
   }
 
   /**close: release the resources held by Log
@@ -235,6 +311,23 @@ public class Log {
 
   public static void printStackTrace (Throwable t) {
       t.printStackTrace((PrintStream) output); 
+  }
+
+  //
+  // Private Methods
+  //
+
+  /** prints a newline to the output stream as appropriate
+      for the platform.
+   */
+  private static void printNewline () {
+    try {
+      output.write(Constants.NEW_LINE.getBytes());
+    }
+    catch (IOException e) {
+      System.err.println("error in Log.warn()");
+      e.printStackTrace();
+    }
   }
 
 }
