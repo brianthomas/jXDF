@@ -151,7 +151,6 @@ public class Notes extends BaseObject {
    // quick little change to prevent this node from printing out
    // IF there are no note objects in its notelist
    public void toXMLOutputStream ( OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
                                    String indent,
                                    boolean dontCloseNode,
                                    String newNodeNameString,
@@ -161,8 +160,7 @@ public class Notes extends BaseObject {
    {
 
       if( getNoteList().size() > 0 ) {
-          super.toXMLOutputStream ( outputstream, XMLDeclAttribs,
-                                    indent, dontCloseNode,
+          super.toXMLOutputStream ( outputstream, indent, dontCloseNode,
                                     newNodeNameString, noChildObjectNodeName
                                    );
       }
@@ -178,6 +176,8 @@ public class Notes extends BaseObject {
     */
    protected void init()
    {
+
+      resetXMLAttributes();
 
       classXDFNodeName = "notes";
 
@@ -196,6 +196,10 @@ public class Notes extends BaseObject {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.12  2001/07/19 21:57:04  thomas
+  * added resetXMLAttributes to init statement
+  * yanked XMLDecl from toXMLOutputstream mehtod.
+  *
   * Revision 1.11  2001/07/11 22:38:50  thomas
   * Changes related to Interface removeal
   *
