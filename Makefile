@@ -32,7 +32,7 @@ CHECKOUT_FLAGS="-r$(MAJOR_VERSION) -l"
 # documentation
 #  NOTE: DONT make DOC_LOCATION "." you can wind up deleting
 #  the source code (see below)
-ADC_XML_HOMEPAGE = http://tarantella.gsfc.nasa.gov/xml
+ADC_XML_HOMEPAGE = http://xml.gsfc.nasa.gov/XDF/XDF_home.html
 DOC_LOCATION = ./doc 
 DOC_BUILD_ARGS = -use -author -version -windowtitle "eXtensible Data Format API" \
                  -doctitle "<H2>DOC TITLE</H2>" \

@@ -39,13 +39,14 @@ public class loadXDF {
     // read in with the reader
     try {
        r.parsefile(argv[0]);
+       System.out.println("STRUCTURE loaded ok");
+    } catch (java.lang.NumberFormatException e ) { 
+       System.err.println("Failed to load XDF from file:"+argv[0]);
+       Log.printStackTrace(e);
     } catch (Exception e ) { 
-       System.err.println("loadXDF load XDF from file:"+argv[0]);
+       System.err.println("Failed to load XDF from file:"+argv[0]);
        Log.printStackTrace(e);
     }
-
-    // output
-    System.out.println("STRUCTURE loaded ok");
 
     // output arrays
     List arrays = s.getArrayList();

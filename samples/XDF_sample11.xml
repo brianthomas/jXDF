@@ -1,6 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE XDF SYSTEM "XDF_017.dtd" [ 
-   <!ENTITY ApJ "&#10;"> 
+   <!ENTITY table1 SYSTEM "XDF_sample11.dat.zip" NDATA xdf>
+   <!NOTATION xdf PUBLIC "application/xdf">
 ]> 
 <XDF name="A sample XDF document" 
      description="This shows how to put any data into XDF using formatted data IO Style."
@@ -50,7 +51,7 @@
          </field>
          <field fieldId="enumber" name="A Sci. Number">
             <units><unitless/></units>
-            <dataFormat><float width="8" precision="3" exponent="2" /></dataFormat>
+            <dataFormat><float width="9" precision="3" exponent="2"/></dataFormat>
          </field>
          <field name="Reference" >
             <units><unitless/></units>
@@ -80,11 +81,7 @@
          </for>
       </read>
 
-      <data><![CDATA[M31      230.1209877 -34.3424911 12.6  0.5 0 1.000E-3 ApJ Ref 1.
-M33      130.094     +36.0000001 14.6  1.5 3  0.100E3           
-M80      230.0442929 +74.2449499 12.8 10.5 8   3.3E33           
-]]>
-      </data>
+      <data href="table1" compression="zip"/>
 
       <notes>
         <locationOrder>

@@ -62,21 +62,14 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/Utility.java \
 	$(XDF_SOURCE_PATH)/Value.java \
 	$(XDF_SOURCE_PATH)/ValueGroup.java \
+	$(XDF_SOURCE_PATH)/XMLElementNode.java \
+	$(XDF_DOM_SOURCE_PATH)/Parser.java \
+	$(XDF_DOM_SOURCE_PATH)/XDFDocumentImpl.java \
 	$(XDF_SOURCE_PATH)/XDF.java \
 	$(XDF_SOURCE_PATH)/XMLDataIOStyle.java
 
-#	$(XDF_SOURCE_PATH)/DOM/Document.java \
-#	$(XDF_SOURCE_PATH)/DOM/XDFElementNode.java \
-#	$(XDF_SOURCE_PATH)/ExponentialDataFormat.java \
-#	$(XDF_SOURCE_PATH)/ErroredValue.java \
-#	$(XDF_SOURCE_PATH)/FieldGroup.java \
-#	$(XDF_SOURCE_PATH)/FieldRelation.java \
-#	$(XDF_SOURCE_PATH)/FormattedIOCmd.java \
-#	$(XDF_SOURCE_PATH)/FormattedXMLDataIOStyle.java \
-#	$(XDF_SOURCE_PATH)/ReadCellFormattedIOCmd.java \
-#	$(XDF_SOURCE_PATH)/RepeatFormattedIOCmd.java \
-#	$(XDF_SOURCE_PATH)/SkipCharFormattedIOCmd.java \
-
+#	$(XDF_DOM_SOURCE_PATH)/XDFElementNode.java \
+	#$(XDF_DOM_SOURCE_PATH)/Document.java \
 
 XDF_CLASSES = $(XDF_SOURCES:%.java=%.class)
 
@@ -103,8 +96,8 @@ archive:
 compile: $(ALL_CLASSES)
 	@echo mv $(XDF_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_SOURCE_PATH)
 	@mv $(XDF_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_SOURCE_PATH)
-#	@echo mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
-#	@mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
+	@echo mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
+	@mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
 
 # checkin changes 
 checkin:
@@ -135,5 +128,4 @@ xdfclean:
 xdfdistclean: xdfclean
 	# -rcsclean -u $(XDF_SOURCE_PATH)/*
 	@echo xdfdistclean doesnt do anything anymore
-
 
