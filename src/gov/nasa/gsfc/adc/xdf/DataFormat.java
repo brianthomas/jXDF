@@ -60,17 +60,96 @@ import java.util.*;
     attribOrder.add(0,"lessThanOrEqualValue");
     attribOrder.add(0,"lessThanValue");
 
+    attribHash.put("lessThanValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
+    attribHash.put("lessThanOrEqualValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
+    attribHash.put("greaterThanValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
+    attribHash.put("greaterThanOrEqualValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
+    attribHash.put("infiniteValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
+    attribHash.put("infiniteNegativeValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
+    attribHash.put("noDataValue", new XMLAttribute(null, Constants.STRING_OR_NUMBER_TYPE));
+
   }
 
-  //return the number of bytes, used to the the bytes() function in Perl
+  //
+  //ABSTRACT methods
+  //
+  //return the number of bytes
   public abstract int numOfBytes();
 
+  public  abstract Object setLessThanValue(Object Obj);
+  public  abstract Object setLessThanOrEqualValue(Object Obj);
+  public  abstract Object setGreaterThanValue(Object Obj) ;
+  public  abstract Object setGreaterThanOrEqualValue(Object Obj) ;
+  public  abstract Object setInfiniteValue(Object Obj) ;
+  public  abstract Object setInfiniteNegativeValue(Object Obj) ;
+  public  abstract Object setNoDataValue(Object Obj) ;
+
+
+  /**getLessThanValue
+   * @return: the current *lessThanValue* attribute
+   */
+  public Object getLessThanValue()
+  {
+    return ((XMLAttribute) attribHash.get("lessThanValue")).getAttribValue();
+  }
+
+  /**getlessThanOrEqualValue
+   * @return: the current *lessThanOrEqualValue* attribute
+   */
+  public Object getlessThanOrEqualValue()
+  {
+    return ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).getAttribValue();
+  }
+
+  /**getGreaterThanValue
+   * @return: the current *greaterThanValue* attribute
+   */
+  public Object getGreaterThanValue()
+  {
+    return ((XMLAttribute) attribHash.get("greaterThanValue")).getAttribValue();
+  }
+
+   /**getGreaterThanOrEqualValue
+   * @return: the current *greaterThanOrEqualValue* attribute
+   */
+  public Number getGreaterThanOrEqualValue()
+  {
+    return (Number) ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).getAttribValue();
+  }
+
+   /**getInfiniteValue
+   * @return: the current *infiniteValue* attribute
+   */
+  public Number getInfiniteValue()
+  {
+    return (Number) ((XMLAttribute) attribHash.get("infiniteValue")).getAttribValue();
+  }
+
+   /**getInfiniteNegativeValue
+   * @return: the current *infiniteNegativeValue* attribute
+   */
+  public Number getInfiniteNegativeValue()
+  {
+    return (Number) ((XMLAttribute) attribHash.get("infiniteNegativeValue")).getAttribValue();
+  }
+
+
+  /**getNoDataValue
+   * @return: the current *noDataValue* attribute
+   */
+  public Object getNoDataValue()
+  {
+    return ((XMLAttribute) attribHash.get("noDataValue")).getAttribValue();
+  }
 
  }  //end of DataFormat class
 
  /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/26 20:14:17  kelly
+ * major fix.  get methods are now in this abstract class.  all set methods are declared as abstract.  -k.z.
+ *
  * Revision 1.2  2000/10/16 14:48:18  kelly
  * pretty much completed the class.  --k.z.
  *
