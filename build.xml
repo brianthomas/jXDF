@@ -26,12 +26,101 @@
   <!-- set global properties for this build -->
 
   <property name="DTD_VERSION" value="018"/>
+  <!-- paths -->
+  <property name="docApi.dir"  value="docs/api"/>
   <property name="path" value="gov/nasa/gsfc/adc/xdf"/>
-  <property name="src" value="src/${path}"/>
-  <property name="build" value="."/>
-  <property name="docApi"  value="docs/api"/>
+  <property name="src" value="src/${path}/"/>
+  <property name="top" value="."/>
+  <property name="build" value="${top}/gov"/>
+  <property name="buildDir" value="${path}"/>
+  <!-- compiler directives -->
   <property name="build.compiler" value="modern"/>
+  <property name="useDeprecation" value="no"/> 
+  <property name="XDF.jarname" value="xdf.jar"/>
+  <property name="XDF.lastbuild" value="${path}/lastbuild"/>
+
+  <!-- derived properties for XDF DOM packages-->
+  <property name="JAXP.available" value="0"/>
+     <!-- Crimson -->
+  <property name="Crimson.DOMpkgname" value="DOMCrimson"/>
+  <property name="Crimson.jarname" value="xdfCrimsonDOM.jar"/>
+<!--  <property name="Crimson.available" value="false"/> --> 
+  <property name="Crimson.DOMpath" value="${path}/${Crimson.DOMpkgname}"/>
+  <property name="Crimson.lastbuild" value="${Crimson.DOMpath}/lastbuild"/>
+  <property name="Crimson.DOMsrc" value="src/${Crimson.DOMpath}"/>
+  <property name="Crimson.buildDir" value="${Crimson.DOMpath}"/>
+     <!-- Xerces-J version 1 -->
+  <property name="Xerces1.DOMpkgname" value="DOMXerces1"/>
+  <property name="Xerces1.jarname" value="xdfXerces1DOM.jar"/>
+<!--  <property name="Xerces1.available" value="false"/> --> 
+  <property name="Xerces1.DOMpath" value="${path}/${Xerces1.DOMpkgname}"/>
+  <property name="Xerces1.lastbuild" value="${Xerces1.DOMpath}/lastbuild"/>
+  <property name="Xerces1.DOMsrc" value="src/${Xerces1.DOMpath}"/>
+  <property name="Xerces1.buildDir" value="${Xerces1.DOMpath}"/>
+     <!-- Xerces-J version 2 -->
+  <property name="Xerces2.DOMpkgname" value="DOMXerces2"/>
+  <property name="Xerces2.jarname" value="xdfXerces2DOM.jar"/>
+<!--  <property name="Xerces2.available" value="false"/> --> 
+  <property name="Xerces2.DOMpath" value="${path}/${Xerces2.DOMpkgname}"/>
+  <property name="Xerces2.lastbuild" value="${Xerces2.DOMpath}/lastbuild"/>
+  <property name="Xerces2.DOMsrc" value="src/${Xerces2.DOMpath}"/>
+  <property name="Xerces2.buildDir" value="${Xerces2.DOMpath}"/>
+
+  <!-- misc properties -->
   <property name="adc_xml_homepage" value="http://xml.gsfc.nasa.gov"/>
+
+  <!-- filesets -->
+  <patternset id="jarfiles" >
+    <include name="${XDF.jarname}"/>
+    <include name="${Crimson.jarname}"/>
+    <include name="${Xerces1.jarname}"/>
+    <include name="${Xerces2.jarname}"/>
+  </patternset>
+
+  <patternset id="XDF.sources" >
+    <include name="${src}/**/*.java"/>
+    <exclude name="${Crimson.DOMpkgname}/**"/>
+    <exclude name="${Xerces1.DOMpkgname}/**"/>
+    <exclude name="${Xerces2.DOMpkgname}/**"/>
+  </patternset>
+
+  <patternset id="XDF.classes" >
+    <include name="${buildDir}/**/*.class"/>
+    <exclude name="${Crimson.DOMpkgname}/**"/>
+    <exclude name="${Xerces1.DOMpkgname}/**"/>
+    <exclude name="${Xerces2.DOMpkgname}/**"/>
+  </patternset>
+
+  <patternset id="Crimson.sources" >
+    <include name="${Crimson.DOMsrc}/**/*.java"/>
+  </patternset>
+
+  <patternset id="Crimson.classes" >
+    <include name="${Crimson.DOMpkgname}/**/*.class"/>
+  </patternset>
+
+  <patternset id="Xerces1.sources" >
+    <include name="${Xerces1.DOMsrc}/**/*.java"/>
+  </patternset>
+
+  <patternset id="Xerces1.classes" >
+    <include name="${Xerces1.DOMpkgname}/**/*.class"/>
+  </patternset>
+
+  <patternset id="Xerces2.sources" >
+    <include name="${Xerces2.DOMsrc}/**/*.java"/>
+  </patternset>
+
+  <patternset id="Xerces2.classes" >
+    <include name="${Xerces2.DOMpkgname}/**/*.class"/>
+  </patternset>
+
+  <!-- Common classpath -->
+  <path id="project-classpath">
+    <pathelement location="." />
+    <pathelement location="${XDF.jarname}" />
+  </path>
+
 
   <!-- Targets Start -->
 
@@ -39,20 +128,134 @@
     <!-- Create the time stamp -->
     <tstamp/>
     <!-- Create the build directory structure used by compile -->
-    <mkdir dir="${build}"/>
-    <mkdir dir="${docApi}"/>
+    <mkdir dir="${buildDir}"/>
+    <mkdir dir="${Crimson.buildDir}"/>
+    <mkdir dir="${Xerces1.buildDir}"/>
+    <mkdir dir="${Xerces2.buildDir}"/>
+    <mkdir dir="${docApi.dir}"/>
+
+
+    <!-- remove any class files from modified source files -->
+    <dependset>
+           <srcfileset dir="${top}"> 
+              <patternset refid="XDF.sources"/>
+           </srcfileset>
+           <srcfilelist
+               dir   = "${top}"
+               files = "build.xml"/>
+           <targetfileset dir="${top}"> 
+              <patternset refid="XDF.classes"/>
+           </targetfileset> 
+           <targetfilelist
+                dir="${top}" files = "${XDF.lastbuild}"/> 
+    </dependset>
+
+<!-- remove any class files from modified source files -->
+    <dependset>
+           <srcfileset dir="${top}">
+              <patternset refid="Crimson.sources"/>
+           </srcfileset>
+           <srcfilelist
+               dir   = "${top}"
+               files = "build.xml"/>
+           <targetfileset dir="${top}">
+              <patternset refid="Crimson.classes"/>
+           </targetfileset>
+           <targetfilelist
+                dir="${top}" files = "${Crimson.lastbuild}"/>
+    </dependset>
+
+<!-- remove any class files from modified source files -->
+    <dependset>
+           <srcfileset dir="${top}">
+              <patternset refid="Xerces1.sources"/>
+           </srcfileset>
+           <srcfilelist
+               dir   = "${top}"
+               files = "build.xml"/>
+           <targetfileset dir="${top}">
+              <patternset refid="Xerces1.classes"/>
+           </targetfileset>
+           <targetfilelist
+                dir="${top}" files = "${Xerces1.lastbuild}"/>
+    </dependset>
+
+
+    <condition property="JAXP.available">
+       <and>
+         <available classname="javax.xml.parsers.DocumentBuilderFactory"/>
+         <available classname="javax.xml.parsers.DocumentBuilder"/>
+         <available classname="javax.xml.parsers.ParserConfigurationException"/>
+       </and>
+    </condition>
+
+    <condition property="Crimson.available">
+       <and>
+         <available classname="org.apache.crimson.tree.DOMImplementationImpl"/>
+         <available classname="org.apache.crimson.tree.XmlDocument"/>
+       </and>
+    </condition>
+
+    <!-- this test is not quite right.. Xerces2 will also pass it, need
+         to write simple test class to check versioning -->
+    <condition property="Xerces1.available">
+      <and>
+         <available classname="org.apache.xerces.parsers.DOMParser" />
+         <available classname="org.apache.xerces.dom.CoreDocumentImpl" />
+      </and>
+    </condition>
+
+     <uptodate property="xdfjar.notRequired" targetfile="${XDF.jarname}">
+       <srcfiles dir= "${top}" >
+          <patternset refid="XDF.classes"/>
+       </srcfiles>
+     </uptodate>
+
+     <uptodate property="crimsonDOMjar.notRequired" targetfile="${Crimson.jarname}">
+       <srcfiles dir= "${top}" >
+          <patternset refid="Crimson.classes"/>
+       </srcfiles>
+     </uptodate>
+
+     <uptodate property="xerces1DOMjar.notRequired" targetfile="${Xerces1.jarname}">
+       <srcfiles dir= "${top}" >
+          <patternset refid="Xerces1.classes"/>
+       </srcfiles>
+     </uptodate>
+
+     <uptodate property="compileXDF.notRequired" targetfile="${XDF.lastbuild}">
+       <srcfiles dir="${src}">
+          <patternset refid="XDF.sources"/>
+       </srcfiles>
+     </uptodate>
+
+     <uptodate property="compileXerces1.notRequired" targetfile="${Xerces1.lastbuild}">
+       <srcfiles dir= "${top}" >
+          <patternset refid="Xerces1.sources"/>
+       </srcfiles>
+     </uptodate>
+
+     <uptodate property="compileCrimson.notRequired" targetfile="${Crimson.lastbuild}">
+        <srcfiles dir= "${top}" >
+           <patternset refid="Crimson.sources"/>
+        </srcfiles>
+     </uptodate>
+
   </target>
 
   <target name="initTest">
      <!-- build software -->
-     <javac debug="on" srcdir="test"/>
-     <taskdef name="createXDFTest" classname="test.CreateXdfTest" classpath="test"/>
+     <javac debug="on" srcdir="test">
+        <classpath refid="project-classpath" />
+     </javac>
+
+     <taskdef name="createTest" classname="test.CreateXdfTest" classpath="test"/>
      <taskdef name="loadXDFTest" classname="test.loadXDFTest" classpath="test"/>
      <taskdef name="validateTest" classname="test.ValidateTest" classpath="test"/>
   </target>
 
   <!-- <target name="test" depends="initTest"> -->
-  <target name="test" depends="compile,initTest">
+  <target name="test" depends="compileXDF,initTest">
 
     <!-- crimson parser isnt smart enough to follow the cheese. We have to 
          copy the DTD up to the present directory in order to play ball
@@ -60,31 +263,37 @@
     <copy file="samples/XDF_${DTD_VERSION}.dtd" todir="."/>
     <echo message="Running tests..." />
 
+    <!-- create tagged data, internal -->
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
          <param name="dataiostyle" value="tagged"/>
     </antcall>
 
+    <!-- create tagged data, external -->
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
          <param name="dataiostyle" value="tagged"/>
     </antcall>
 
+    <!-- create delimited data, internal -->
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
          <param name="dataiostyle" value="delimited"/>
     </antcall>
 
+    <!-- create delimited data, external -->
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
          <param name="dataiostyle" value="delimited"/>
     </antcall>
 
+    <!-- create formatted data, internal -->
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
          <param name="dataiostyle" value="formatted"/>
     </antcall>
 
+    <!-- create formatted data, external -->
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
          <param name="dataiostyle" value="formatted"/>
@@ -99,14 +308,17 @@
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample5.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample6.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample7.xml"/></antcall>
+
+    <!-- file 8 is very problematic: wont validate versus the DTD --> 
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
+    <antcall target="loadXDFTest"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample9.xml"/></antcall>
-
-    <!-- no bzip in Java (yet) :P -->
+    <!-- no bzip in Java (yet) -->
     <!-- <antcall target="loadingTests"><param name="file" value="samples/XDF_sample10.xml"/></antcall> -->
-
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample11.xml"/></antcall>
     <antcall target="loadingTests"><param name="file" value="samples/XDF_sample12.xml"/></antcall>
+
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample20.xml"/></antcall>
 
     <antcall target="cleanRunTests"/>
 
@@ -114,12 +326,12 @@
 
   <target name="creationTest" >
     <echo message="Checking creation of file XMLDataIOStyle=${dataiostyle} internalData=${internalFile} ..." />
-    <createXDFTest writedatatoseparatefile="${internalFile}" 
-                   dataiostyle="${dataiostyle}" 
-                   outputfile="test1.xml" 
-                   entityfilename="test1.dat" 
-                   entityname="table1" 
-                   showsuccess="true"/>
+    <createTest writedatatoseparatefile="${internalFile}" 
+                dataiostyle="${dataiostyle}" 
+                outputfile="test1.xml" 
+                entityfilename="test1.dat" 
+                entityname="table1" 
+                showsuccess="true"/>
     <validateTest inputfile="test1.xml" showsuccess="true"/>
   </target>
 
@@ -138,7 +350,6 @@
   <target name="cleanRunTests" >
     <echo message="Cleaning up test files.." />
     <delete file="test1.xml"/>
-    <delete file="test0.dat"/>
     <delete file="test1.dat"/>
     <delete file="test2.xml"/>
     <delete file="XDF_${DTD_VERSION}.dtd"/>
@@ -157,24 +368,92 @@
     <echo message="user.language=${user.language}" />
   </target>
 
-  <target name="compile" depends="init">
-    <!-- Compile the java code from ${src} into ${build} -->
-    <javac debug="on" srcdir="${src}" destdir="${build}"/> 
+  <target name="compileXDF" depends="init" unless="compileXDF.notRequired">
+    <!-- touch so we know when last build was -->
+    <touch file="${XDF.lastbuild}"/>
+    <!-- Compile the java code from ${src} into ${top} -->
+    <javac debug="on" 
+           excludes="${Crimson.DOMpkgname}/**,${Xerces1.DOMpkgname}/**,${Xerces2.DOMpkgname}/**" 
+           srcdir="${src}" 
+           destdir="${top}"
+           deprecation="${useDeprecation}" 
+    > 
+        <classpath refid="project-classpath" />
+    </javac>
   </target>
 
-  <target name="jar" depends="compile">
-    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <!-- <jar jarfile="xdf-${DSTAMP}.jar" basedir="${path}"/> --> 
-    <jar jarfile="xdf-${DTD_VERSION}.jar" includes="gov/**" basedir="."/>
+  <!-- CRIMSON based XDF DOM -->
+  <target name="compileCrimsonDOM" depends="compileXDF,check_crimson_classpath" unless="compileCrimson.notRequired">
+    <!-- touch so we know when last build was -->
+    <touch file="${Crimson.lastbuild}"/>
+    <!-- Compile the java code -->
+    <javac debug="on" 
+           srcdir="${Crimson.DOMsrc}" 
+           deprecation="${useDeprecation}" 
+           destdir="${top}"
+    /> 
+  </target>
+  <target name="check_crimson_classpath" depends="init" unless="Crimson.available">
+    <fail message="Cant proceed: Crimson-based classes are not in your classpath"/>
   </target>
 
+  <!-- Xerces1 based XDF DOM -->
+  <target name="compileXerces1DOM" depends="compileXDF,check_xerces1_classpath" unless="compileXerces1.notRequired">
+    <!-- touch so we know when last build was -->
+    <touch file="${Xerces1.lastbuild}"/>
+    <!-- Compile the java code -->
+    <javac debug="on" 
+           srcdir="${Xerces1.DOMsrc}" 
+           destdir="${top}"
+           deprecation="${useDeprecation}" 
+    /> 
+  </target>
+  <target name="check_xerces1_classpath" depends="init,compileXDF" unless="Xerces1.available">
+    <fail message="Cant proceed: Xerces1-based classes are not in your classpath"/>
+  </target>
+
+  <!-- Xerces2 based XDF DOM -->
+  <target name="compileXerces2DOM" depends="init,compileXDF">
+    <javac debug="on" 
+           srcdir="${Xerces2.DOMsrc}" 
+           destdir="${top}"
+           deprecation="${useDeprecation}" 
+    /> 
+  </target>
+
+
+  <!-- XDF jar -->
+  <target name="xdfjar" depends="compileXDF" unless="xdfjar.notRequired"> 
+    <jar jarfile="${XDF.jarname}">
+       <fileset dir="${top}">
+         <patternset refid="XDF.classes"/>
+       </fileset>
+    </jar>
+  </target>
+
+  <!-- Crimson DOM jar -->
+  <target name="crimsonDOMjar" depends="compileCrimsonDOM" unless="crimsonDOMjar.notRequired">
+    <jar jarfile="${Crimson.jarname}" basedir="${Crimson.buildDir}"/>
+  </target>
+
+  <!-- Xerces 1 DOM jar -->
+  <target name="xerces1DOMjar" depends="compileXerces1DOM" unless="Xerces1.notRequired">
+    <jar jarfile="${Xerces1.jarname}" basedir="${Xerces1.buildDir}"/>
+  </target>
+
+  <!-- Xerces 2 DOM jar -->
+  <target name="xerces2DOMjar" depends="compileXerces2DOM">
+    <jar jarfile="${Xerces2.jarname}" basedir="${Xerces2.buildDir}"/>
+  </target>
+
+  <!-- build Docs -->
   <target name="doc" depends="init">
-    <!-- <javadoc srcdir="${src}" destdir="${doc}"/> -->
-
     <javadoc packagenames="gov.nasa.gsfc.adc.xdf.*"
              sourcepath="src"
+             overview="docs/Overview.html"
              defaultexcludes="yes"
-             destdir="${docApi}"
+             destdir="${docApi.dir}"
+             Public="true"
              author="true"
              version="true"
              use="true"
@@ -187,41 +466,83 @@
 -->
         <footer></footer>
         <bottom><![CDATA[<i>Copyright &#169; 2001 Brian Thomas. All Rights Reserved.  This is free software, and you are welcome to redistribute it under certain conditions.  This software comes with ABSOLUTELY NO WARRANTY. For details on terms and conditions of use refer to the README and LICENCE files included in the software distribution.</i>]]></bottom>
-        <group title="Core Package" packages="gov.nasa.gsfc.adc.xdf.*"/>
-        <group title="XDF/DOM Package" packages="gov.nasa.gsfc.adc.xdf.DOM.*"/>
+        <group title="Core Package" packages="gov.nasa.gsfc.adc.xdf"/>
+        <group title="XDF/(Crimson) DOM Package" packages="gov.nasa.gsfc.adc.xdf.DOMCrimson:gov.nasa.gsfc.adc.xdf.DOMCrimson.*"/>
+        <group title="XDF/(Xerces v1.x) DOM Package" packages="gov.nasa.gsfc.adc.xdf.DOMXerces1:gov.nasa.gsfc.adc.xdf.DOMXerces1.*"/>
+        <group title="XDF/(Xerces v2.x) DOM Package" packages="gov.nasa.gsfc.adc.xdf.DOMXerces2:gov.nasa.gsfc.adc.xdf.DOMXerces2.*"/>
         <link offline="true" href="http://java.sun.com/products/jdk/1.2/docs/api/" packagelistLoc="C:\tmp"/>
         <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
     </javadoc>
-
   </target>
 
-  <target name="all" depends="jar,doc,test"/>
+  <!-- other aggregate methods -->
+  <target name="jars" depends="xdfjar,crimsonDOMjar,xerces1DOMjar"/>
+  <target name="all" depends="xdfjar,crimsonDOMjar,doc,test"/>
+
+  <!-- help -->
+  <target name="helpcompile">
+    <echo message="Compile options help list:" />
+    <echo message="Invoke 'ant' with one of the following compile options:" />
+    <echo message=" "/>
+    <echo message="   jars       - compile XDF, CrimsonDOM and Xerces1DOM classes into jars" />
+    <echo message="   compileXDF - compile main XDF classes only (no jar file)" />
+    <echo message="   xdfjar     - compile XDF jar file" />
+    <echo message="   compileCrimsonDOM - compile Crimson implementation of XDF DOM (no jar file)" />
+    <echo message="   crimsonDOMjar - compile Crimson implementation of XDF DOM into jar" />
+    <echo message="   compileXerces1DOM - compile Xerces-J (version 1) implementation of XDF DOM (no jar file)" />
+    <echo message="   xerces1DOMjar - compile Xerces-J (version 1) implementation of XDF DOM into jar" />
+    <echo message="   compileXerces2DOM - compile Xerces-J (version 1) implementation of XDF DOM (no jar file)" />
+    <echo message="   xerces2DOMjar - compile Xerces-J (version 1) implementation of XDF DOM into jar" />
+    <echo message=" "/>
+  </target>
 
   <target name="help">
+    <echo message="Short help list:" />
     <echo message="Invoke 'ant' with one of the following options:" />
     <echo message=" "/>
-    <echo message="   all       - do the 'jar', 'doc' and 'test' commands" />
-    <echo message="   compile   - compile XDF classes only (no jar file)" />
-    <echo message="   clean     - clean up temporary directories" />
-    <echo message="   doc       - compile XDF API documentation" />
-    <echo message="   dump-info - dump information about your machine" />
-    <echo message="   help      - print this help message and exit" />
-    <echo message="   jar       - compile XDF jar file" />
-    <echo message="   test      - runs tests of the build" />
+    <echo message="   all         - do the 'xdfjar', 'crimsonDOMJar', 'doc' and 'test' commands" />
+    <echo message="   compileXDF  - compile main XDF classes only (no jar file)" />
+    <echo message="   clean       - clean up temporary directories" />
+    <echo message="   distclean   - clean up temporary/build directories" />
+    <echo message="   doc         - compile XDF API documentation" />
+    <echo message="   dump-info   - dump information about your machine" />
+    <echo message="   help        - print this help message and exit" />
+    <echo message="   helpcompile - print out more help messages on compiling options" />
+    <echo message="   xdfjar      - compile XDF jar file" />
+    <echo message="   test        - runs tests of the build" />
     <echo message=" "/>
     <echo message=" "/>
     <echo message="Example usage: "/>
     <echo message=" "/>
     <echo message="> ant compile "/>
+    <echo message=" "/>
+  </target>
+
+  <!-- clean up methods -->
+  <target name="distclean" depends="clean">
+    <delete dir="${build}"/>
+    <delete dir="${docApi.dir}"/>
   </target>
 
   <target name="clean">
+    <delete file="${XDF.lastbuild}"/>
+    <delete file="${Crimson.lastbuild}"/>
+    <delete file="${Xerces1.lastbuild}"/>
+<!--
+    <delete file="${Xerces2.lastbuild}"/>
+-->
     <delete>
        <fileset dir="test" includes="*.class"/>
+       <fileset dir=".">
+         <patternset refid="jarfiles"/>
+       </fileset>
+       <fileset dir="${top}">
+         <patternset refid="XDF.classes"/>
+         <patternset refid="Crimson.classes"/>
+         <patternset refid="Xerces1.classes"/>
+         <patternset refid="Xerces2.classes"/>
+       </fileset>
     </delete>
-    <delete dir="gov"/>
-    <delete file="xdf-${DTD_VERSION}.jar"/>
-    <delete dir="${docApi}"/>
     <antcall target="cleanRunTests"/>
   </target>
 
