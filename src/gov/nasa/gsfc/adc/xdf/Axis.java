@@ -65,17 +65,12 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
   /** 
    *  Create an Axis with a desired dimension
-   *  with a list of null values
+   *  use setValueList() to set axis values
    */
   public Axis (int dimension)
   {
     init();
-    List valueList = new Vector(dimension);
-    for (int i=0; i<dimension; i++) {
-	Value value = new Value();
-	valueList.add(value);
-    }
-    this.setValueList(valueList);
+    length = dimension;
   }
 
 
@@ -543,6 +538,9 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2001/05/16 22:47:30  huang
+ * added/modified several conveniencemethods
+ *
  * Revision 1.20  2001/05/15 23:20:58  huang
  * added a few convenience methods
  *

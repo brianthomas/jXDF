@@ -72,6 +72,16 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
       init();
    }
 
+   /**
+    *  create a fieldAxis with desired dimension
+    *  use setFieldList() to set fields
+    */
+   public FieldAxis (int fieldDimension)
+   {
+      init();
+      length = fieldDimension;
+   }
+
    /**  This constructor takes a Java Hashtable as an initializer of
         the XML attributes of the object to be constructed. The
         Hashtable key/value pairs coorespond to the class XDF attribute
@@ -351,6 +361,9 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
  /**
   * Modification History:
   * $Log$
+  * Revision 1.16  2001/05/16 22:47:30  huang
+  * added/modified several conveniencemethods
+  *
   * Revision 1.15  2001/05/04 20:32:15  thomas
   * changed baseObject superclass to BaseObjectWithXMLElements.
   * added super.init() to init().

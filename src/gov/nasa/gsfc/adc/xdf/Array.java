@@ -39,9 +39,8 @@ import java.util.Vector;
   * scientific/mathematical data. Array is the basic container for the n-dimensional array data.
   * It gives access to the array data and its descriptors (such as the array axii, associated
   * parameters, notes, etc).
-  * /
-
-  /**
+  *
+  *
   * Here is a diagram showing the inter-relations between these components
   * of the Array in a 2-dimensional dataset with no fields.
   *
@@ -704,24 +703,34 @@ import java.util.Vector;
     *  set data for a general object
     *  which can be an array of primitive object; or wrapped data
     */
-   public void setData (Locator locator, Object dataObj) 
-       throws SetDataException {
-       if (dataObj instanceof Double )
-	   this.setData (locator, (Double) dataObj);
-       else if (dataObj instanceof Integer )
-	   this.setData (locator, (Integer) dataObj);
-       else if (dataObj instanceof int[])
-	   this.setData (locator, (int[])dataObj);
-       else if (dataObj instanceof float[])
-	   this.setData (locator, (float[])dataObj);
-       else if (dataObj instanceof double[])
-	   this.setData (locator, (double[])dataObj);
-       else if (dataObj instanceof String[])
-	   this.setData (locator, (String[])dataObj);
-       else {
-	   String msg = "Data type " + dataObj.getClass().getName() + " is not implemented";
-	   Log.errorln(msg);
-	   throw new SetDataException (msg);
+   public void setData (Locator locator, Object dataObj) throws SetDataException 
+   {
+       if (dataObj.getClass().isArray()) {
+	   if (dataObj instanceof int[] )
+	       this.setData (locator, (int[])dataObj);
+	   else if (dataObj instanceof long[])
+	       this.setData (locator, (long[])dataObj);
+	   else if (dataObj instanceof float[])
+	       this.setData (locator, (float[])dataObj);
+	   else if (dataObj instanceof double[])
+	       this.setData (locator, (double[])dataObj);
+	   else if (dataObj instanceof String[])
+	       this.setData (locator, (String[])dataObj);	
+	   else {
+	       String msg = "Data array: " + dataObj.getClass().getName() + " is not implemented";
+	       Log.errorln(msg);
+	       throw new SetDataException (msg);
+	   }
+       } else {
+	   if (dataObj instanceof Double )
+	       this.setData (locator, (Double) dataObj);
+	   else if (dataObj instanceof Integer )
+	       this.setData (locator, (Integer) dataObj);
+	   else {
+	       String msg = "Primiary data wrapper type: " + dataObj.getClass().getName() + " is not implemented";
+	       Log.errorln(msg);
+	       throw new SetDataException (msg);
+	   }
        }
    }
 
@@ -731,6 +740,9 @@ import java.util.Vector;
     */
    public void setData (Locator locator, double [] numValue) 
        throws SetDataException {
+
+System.out.println ("DEBUG: double []: " + numValue.length);
+
        for (int i = 0; i < numValue.length; i++) {
 	   this.setData(locator, numValue[i]);
 	   locator.next();
@@ -742,8 +754,25 @@ import java.util.Vector;
     */
    public void setData (Locator locator, int [] numValue) 
        throws SetDataException {
+
+System.out.println ("DEBUG: int []: " + numValue.length);
+
        for (int i = 0; i < numValue.length; i++) {
 	   this.setData(locator, numValue[i]);
+	   locator.next();
+       }
+   }
+
+  /** 
+    *  set Data from an integer data array 
+    */
+   public void setData (Locator locator, long [] numValue) 
+       throws SetDataException {
+
+System.out.println ("DEBUG: long []: " + numValue.length);
+
+       for (int i = 0; i < numValue.length; i++) {
+	   this.setData(locator, (int) numValue[i]);
 	   locator.next();
        }
    }
@@ -754,6 +783,9 @@ import java.util.Vector;
     */
    public void setData (Locator locator, float [] numValue) 
        throws SetDataException {
+
+System.out.println ("DEBUG: float []: " + numValue.length);
+
        for (int i = 0; i < numValue.length; i++) {
 	   this.setData(locator, (double) numValue[i]);
 	   locator.next();
@@ -766,6 +798,9 @@ import java.util.Vector;
     */
    public void setData (Locator locator, String [] numValue) 
        throws SetDataException {
+
+System.out.println ("DEBUG: String []: " + numValue.length);
+
        for (int i = 0; i < numValue.length; i++) {
 	   this.setData(locator, numValue[i]);
 	   locator.next();
@@ -1104,6 +1139,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.26  2001/05/16 22:47:30  huang
+  * added/modified several conveniencemethods
+  *
   * Revision 1.25  2001/05/15 23:20:49  huang
   * added a few convenience methods
   *
