@@ -76,27 +76,6 @@ public class Specification {
   //brian, do we need this? double check
   private int defaultDataArraySize = 1000;
 
-  /** The version of XML that will be output from a toXML* method call.
-  */
-  private String XMLSpecVersion = "1.0";
-
-  /** The root node name for any XDF document. The root node is an XDF
-      node.
-  */
-  private String XDFRootNodeName = "XDF";
-
-  /** The name of the relevant version of XDF DTD file for this package.
-  */
-  private String XDFDTDName = "XDF_017.dtd";
-
-  /** The name of the XMLAttribute which is written out as PCDATA rather than as
-      a node attribute (String/Number type XMLAttributes) or child node (Object
-      and List type XMLAttributes). At this time only String-type XMLAttributes
-      should be named 'value' (yes, it would be an interesting experiment to call
-      an Object-type XMLAttribute 'value'!).
-  */
-  private String PCDATAAttribute = "value";
-
   /**
    * This private constructor is defined so the compiler won't generate a
    * default public contructor
@@ -203,37 +182,14 @@ public class Specification {
     }
   }
 
-  /** Get the XML version of this package.
-      This cooresponds to the XML spec version that this package
-      uses to write out XDF.
-  */
-  public String getXMLSpecVersion() {
-    return XMLSpecVersion;
-  }
-
-  /** Get the root node name for XDF.
-  */
-  public String getXDFRootNodeName() {
-    return XDFRootNodeName;
-  }
-
-  /** Get the name of the XDF DTD to which this package corresponds.
-  */
-  public String getXDFDTDName() {
-    return XDFDTDName;
-  }
-
-  /** Get the name of the XMLAttribute which will be written out as PCDATA.
-  */
-  public String getPCDATAAttribute() {
-    return PCDATAAttribute;
-  }
-
 }
 
 /* Modification history
  *
  * $Log$
+ * Revision 1.7  2001/09/05 21:59:38  thomas
+ * moved PCDATA_ATTR, XDF_ROOT_NODE_NAME, XML_SPEC_VERSION, and XDF_DTD_NAME out to Constants
+ *
  * Revision 1.6  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
