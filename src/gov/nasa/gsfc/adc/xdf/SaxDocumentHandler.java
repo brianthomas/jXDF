@@ -51,6 +51,7 @@ import org.xml.sax.InputSource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 // import java.io.FileReader; // this can problably be dropped
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -400,8 +401,8 @@ public class SaxDocumentHandler extends DefaultHandler {
        return CurrentStructure;
     }
 
-    private XMLElement createNewXMLElement (String elementNodeName, Attributes attrs) {
-       XMLElement myElement = new XMLElement(elementNodeName);
+    private XMLElementNode createNewXMLElementNode (String elementNodeName, Attributes attrs) {
+       XMLElementNode myElement = new XMLElementNode(elementNodeName);
        myElement.setXMLAttributes(attrs);
        return myElement;
     }
@@ -737,12 +738,18 @@ public class SaxDocumentHandler extends DefaultHandler {
              } catch (SAXException e) {
                 Log.printStackTrace(e);
              } catch (NullPointerException e) {
+                Log.infoln("Trying to open href file resource:"+hrefObj.getSysId());
                 // in this case the InputSource object is null to request that 
                 // the parser open a regular URI connection to the system identifier.
                 // In our case, the sysId IS the filename.
                 File f = new File(hrefObj.getSysId());
 //                size = (int) f.length();
-                in = (java.io.InputStream) new FileInputStream(new File(hrefObj.getSysId()));
+                try {
+                   in = (java.io.InputStream) new FileInputStream(f);
+                } catch (java.io.FileNotFoundException fileNotFound) {
+                   fileNotFound.printStackTrace();
+                }
+
              }
 
              // ok, got an InputStream
@@ -1991,7 +1998,7 @@ Log.errorln(" TValue:"+valueString);
 
            String parentNodeName = getParentNodeName();
            String elementNodeName = getCurrentNodeName();
-           XMLElement newElement = null;
+           XMLElementNode newElement = null;
 
            if ( parentNodeName == null) {
               Log.warnln("Warning: ILLEGAL non-XDF NODE:["+elementNodeName+"]. Ignoring.");
@@ -2001,44 +2008,44 @@ Log.errorln(" TValue:"+valueString);
            // the DTD sez that if we get non-xdf defined nodes, it IS 
            // allowed as long as these are children of the following 
            // XDF defined nodes, OR are children of a non-XDF defined node
-           // (e.g. the child of one of these nodes, which we call 'XDF::XMLElement')
+           // (e.g. the child of one of these nodes, which we call 'XDF::XMLElementNode')
            if( parentNodeName.equals(XDFNodeName.STRUCTURE) 
                || parentNodeName.equals(XDFNodeName.ROOT)
              )
            {
 
-              newElement = createNewXMLElement(elementNodeName, attrs);
-              getCurrentStructure().addXMLElement(newElement);
+              newElement = createNewXMLElementNode(elementNodeName, attrs);
+              getCurrentStructure().addXMLElementNode(newElement);
 
            } else if( parentNodeName.equals(XDFNodeName.ARRAY) ) {
 
-              newElement = createNewXMLElement(elementNodeName, attrs);
-              getCurrentArray().addXMLElement(newElement);
+              newElement = createNewXMLElementNode(elementNodeName, attrs);
+              getCurrentArray().addXMLElementNode(newElement);
 
            } else if( parentNodeName.equals(XDFNodeName.FIELDAXIS) ) {
 
-              newElement = createNewXMLElement(elementNodeName, attrs);
-              getCurrentArray().getFieldAxis().addXMLElement(newElement);
+              newElement = createNewXMLElementNode(elementNodeName, attrs);
+              getCurrentArray().getFieldAxis().addXMLElementNode(newElement);
 
            } else if( parentNodeName.equals(XDFNodeName.AXIS) ) {
 
-              newElement = createNewXMLElement(elementNodeName, attrs);
+              newElement = createNewXMLElementNode(elementNodeName, attrs);
               List axisList = (List) CurrentArray.getAxes();
               AxisInterface lastAxisObject = (AxisInterface) axisList.get(axisList.size()-1);
-              lastAxisObject.addXMLElement(newElement);
+              lastAxisObject.addXMLElementNode(newElement);
 
            } else if( parentNodeName.equals(XDFNodeName.FIELD) ) {
 
-              newElement = createNewXMLElement(elementNodeName, attrs);
-              LastFieldObject.addXMLElement(newElement);
+              newElement = createNewXMLElementNode(elementNodeName, attrs);
+              LastFieldObject.addXMLElementNode(newElement);
 
            } else {
 
               Object lastObj = getLastObject();
-              if (lastObj != null && lastObj instanceof XMLElement) {
+              if (lastObj != null && lastObj instanceof XMLElementNode) {
 
-                  newElement = createNewXMLElement(elementNodeName, attrs);
-                  ((XMLElement) lastObj).addXMLElement(newElement);
+                  newElement = createNewXMLElementNode(elementNodeName, attrs);
+                  ((XMLElementNode) lastObj).addXMLElementNode(newElement);
 
               } else {
                   Log.warnln("Warning: ILLEGAL NODE:["+elementNodeName+"] (child of "+parentNodeName
@@ -4280,6 +4287,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.43  2001/07/26 15:57:24  thomas
+ * changes related to name change in XMLElementNode class.
+ *
  * Revision 1.42  2001/07/23 16:01:32  thomas
  * trivial chage to comments.
  *
