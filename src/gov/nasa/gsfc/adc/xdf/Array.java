@@ -998,8 +998,7 @@ import java.util.Vector;
    public void setData (Locator locator, float numValue) 
    throws SetDataException 
    {
-      // DEBUG
-      getDataCube().setData(locator, (double) numValue);
+      getDataCube().setData(locator, numValue);
    }
    
    /** Set the value of the requested datacell. 
@@ -1506,6 +1505,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.41  2001/09/20 15:07:30  thomas
+  *  merged differences between Ping/Brian code
+  *
   * Revision 1.40  2001/09/19 18:35:27  huang
   * added/modified setData(); also added setHref()
   *
