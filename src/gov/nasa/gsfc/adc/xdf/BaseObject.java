@@ -557,7 +557,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
                                   String indent
                                 )
   {
-     toXDFOutputStream(outputstream, XMLDeclAttribs, indent, false, (String) null, (String) null);
+     toXDFOutputStream(outputstream, XMLDeclAttribs, indent, false, null, null);
 
   }
 
@@ -567,7 +567,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   public void toXDFOutputStream (OutputStream outputstream, Hashtable XMLDeclAttribs)
   {
      //not reseanable to set the indent to sPrettyXDFOutputIndentation --k.z. 10/17
-     toXDFOutputStream(outputstream, XMLDeclAttribs, new String(""), false, (String) null, (String) null);
+     toXDFOutputStream(outputstream, XMLDeclAttribs, new String(""), false, null, null);
   }
 
   /** A different invokation style. It has defaults for the XML Declaration
@@ -600,40 +600,35 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   /** Clone an XDF object.
    */
-  public Object clone () throws CloneNotSupportedException{
+  protected Object clone () throws CloneNotSupportedException{
 
      //shallow copy for fields
      BaseObject cloneObj = (BaseObject) super.clone();
 
-     // Clone the fields
-      cloneObj.attribOrder = Collections.synchronizedList(new ArrayList());
-      int stop = this.attribOrder.size();
-      for (int i = 0; i < stop; i++) {
-        cloneObj.attribOrder.add(new String((String) this.attribOrder.get(i)));
+     // deep copy the attriOrder
+     synchronized (this.attribOrder) {
+      synchronized (cloneObj.attribOrder) {
+        cloneObj.attribOrder = Collections.synchronizedList(new ArrayList());
+        int stop = this.attribOrder.size();
+        for (int i = 0; i < stop; i++) {
+          cloneObj.attribOrder.add(new String((String) this.attribOrder.get(i)));
+        }
       }
-     // XMLAttributes Clone
-     cloneObj.attribHash = new Hashtable();
-     Enumeration keys = this.attribHash.keys();
+    }
+     // XMLAttributes Clone, deep copy
      synchronized (this.attribHash) {
-
-      for (int i = 0; i < stop; i++)
-      {
-        String key = (String) cloneObj.attribOrder.get(i);
-        XMLAttribute XMLAttributeValue = (XMLAttribute) this.attribHash.get(key);
-        cloneObj.attribHash.put(key, XMLAttributeValue.clone());
+      synchronized (cloneObj.attribHash) {
+        cloneObj.attribHash = new Hashtable();
+        Enumeration keys = this.attribHash.keys();
+        while (keys.hasMoreElements()) {
+          String key = (String) keys.nextElement();
+          XMLAttribute XMLAttributeValue = (XMLAttribute) this.attribHash.get(key);
+          cloneObj.attribHash.put(key, XMLAttributeValue.clone());
+        }
       }
     }
 
-
-//       cloneObj.classXDFNodeName = this.classXDFNodeName;
-//       cloneObj.attribOrder = this.attribOrder;
-//       cloneObj.groupMemberHash = Collections.synchronizedSet(new HashSet());
-//       cloneObj.openGroupNodeHash = Collections.synchronizedSet(new HashSet());
-
-  /** This field stores object references to those group objects to which a given
-      object belongs.
-  */
-     return (Object) cloneObj;
+    return cloneObj;
   }
 
   //
@@ -782,10 +777,6 @@ public abstract class BaseObject implements Serializable, Cloneable {
   */
   //declare as proteced, sub-classes may use --k.z. 10/17/2000
   protected void writeOut ( OutputStream outputstream, String msg ) {
-    if (msg == null) {
-      return ;
-    }
-
     try {
       outputstream.write(msg.getBytes());
     } catch (IOException e) {
@@ -805,7 +796,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
         for (int i = 0; i < size; i++) {
            String name = attrs.getName(i);
            String value = attrs.getValue(i);
-           if (name != null && value != null) 
+           if (name != null && value != null)
               ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
         }
      }
@@ -912,6 +903,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.24  2000/11/06 21:09:06  kelly
+ * --minor fix.  wirteOut doesnt check if passed in String is null.
+ * --more synchronization on clone.  -k.z.
+ *
  * Revision 1.23  2000/11/03 21:23:33  thomas
  * Small change to setXMLAttributes to intercept null
  * values in the attributelist. -b.t.
