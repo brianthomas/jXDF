@@ -117,7 +117,7 @@ public class DataCube extends BaseObject {
 
   /** set the *href* attribute
    */
-  public void setHref (Href hrefObj)
+  public void setHref (XDFEntity hrefObj)
   {
      ((XMLAttribute) attribHash.get(HREF_XML_ATTRIBUTE_NAME)).setAttribValue(hrefObj);
   }
@@ -125,9 +125,9 @@ public class DataCube extends BaseObject {
   /**
    * @return the current *href* attribute
    */
-  public Href getHref()
+  public XDFEntity getHref()
   {
-     return (Href) ((XMLAttribute) attribHash.get(HREF_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (XDFEntity) ((XMLAttribute) attribHash.get(HREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *checksum* attribute
@@ -584,30 +584,7 @@ public class DataCube extends BaseObject {
 
    }
 
-
-   /**write out the data object to valid XML stream
-    */
-   public void toXMLOutputStream (
-                                     OutputStream outputstream,
-                                     String indent,
-                                     boolean dontCloseNode,
-                                     String newNodeNameString,
-                                     String noChildObjectNodeName
-                                  )
-   throws java.io.IOException
-   {
-  
-      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
-      toXMLWriter (outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
-
-      // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
-      // on SUN and Linux platforms show that it is. Hopefully we can remove
-      // this in the future.
-      outputWriter.flush();
-
-   }
-
-   public void toXMLWriter (
+   protected void basicXMLWriter (
                                 Writer outputWriter,
                                 String strIndent,
                                 boolean dontCloseNode,
@@ -639,12 +616,12 @@ public class DataCube extends BaseObject {
   
       outputWriter.write("<" + nodeName );
   
-      Href hrefObj = getHref();
+      XDFEntity hrefObj = getHref();
   
       XMLDataIOStyle readObj = parentArray.getXMLDataIOStyle();
   
       if (hrefObj != null) {  //write out to another file,
-        String fileName = hrefObj.getSysId();
+        String fileName = hrefObj.getSystemId();
         String hrefName = hrefObj.getName();
   
         if(hrefName == null) 
@@ -656,7 +633,7 @@ public class DataCube extends BaseObject {
            writeHrefAttribute = true;
            try {
 
-              dataOutputStream = new FileOutputStream(hrefObj.getSysId());
+              dataOutputStream = new FileOutputStream(hrefObj.getSystemId());
 
            }
            catch (IOException e) {
@@ -719,7 +696,7 @@ public class DataCube extends BaseObject {
           } else if (compress.equals(Constants.DATA_COMPRESSION_ZIP)) {
              dataOutputStream = new ZipOutputStream(dataOutputStream);
              try {
-                ((ZipOutputStream) dataOutputStream).putNextEntry(new ZipEntry(hrefObj.getSysId())); // write only to the first entry for now 
+                ((ZipOutputStream) dataOutputStream).putNextEntry(new ZipEntry(hrefObj.getSystemId())); // write only to the first entry for now 
              } catch (java.io.IOException e) {
                 Log.errorln("Cant open compressed (ZIP) outputstream to write to an href. Aborting.");
                 return;
@@ -864,8 +841,8 @@ public class DataCube extends BaseObject {
       if (!writeHrefAttribute) 
         outputWriter.write( "</" + nodeName + ">");
   
-      if (niceOutput)
-        outputWriter.write( Constants.NEW_LINE);
+ //     if (niceOutput)
+ //       outputWriter.write( Constants.NEW_LINE);
 
    }
 
@@ -1714,6 +1691,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.42  2001/09/05 22:01:36  thomas
+  * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter. Made Href->XDFEntity change
+  *
   * Revision 1.41  2001/09/04 21:17:52  thomas
   * added 8, 16 bit Integers
   *
