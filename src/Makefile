@@ -37,8 +37,6 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/Constants.java \
 	$(XDF_SOURCE_PATH)/DataFormat.java \
 	$(XDF_SOURCE_PATH)/DataCube.java \
-	$(XDF_SOURCE_PATH)/DOM/Document.java \
-	$(XDF_SOURCE_PATH)/DOM/XDFElementNode.java \
 	$(XDF_SOURCE_PATH)/DelimitedXMLDataIOStyle.java \
 	$(XDF_SOURCE_PATH)/Field.java \
 	$(XDF_SOURCE_PATH)/FieldAxis.java \
@@ -67,6 +65,8 @@ XDF_SOURCES = \
 	$(XDF_SOURCE_PATH)/XDF.java \
 	$(XDF_SOURCE_PATH)/XMLDataIOStyle.java
 
+#	$(XDF_SOURCE_PATH)/DOM/Document.java \
+#	$(XDF_SOURCE_PATH)/DOM/XDFElementNode.java \
 #	$(XDF_SOURCE_PATH)/ExponentialDataFormat.java \
 #	$(XDF_SOURCE_PATH)/ErroredValue.java \
 #	$(XDF_SOURCE_PATH)/FieldGroup.java \
@@ -103,8 +103,8 @@ archive:
 compile: $(ALL_CLASSES)
 	@echo mv $(XDF_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_SOURCE_PATH)
 	@mv $(XDF_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_SOURCE_PATH)
-	@echo mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
-	@mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
+#	@echo mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
+#	@mv $(XDF_DOM_SOURCE_PATH)/*.class $(XDF_BIN_PATH)/$(XDF_DOM_SOURCE_PATH)
 
 # checkin changes 
 checkin:
