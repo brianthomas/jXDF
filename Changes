@@ -52,6 +52,9 @@
 
 0.17-beta1   5/??/01  - Added BaseObjectWithXMLElements class. Array, Field, Structure, Axis
                         classes may now hold new XMLElements.
+                      - Added ability to add an arbitary attribute (e.g. previously undeclared 
+                        attribute that isnt a part of the class in the DTD) to any class that 
+                        inherits from BaseObject.
                       - Re-added writeAxisOrder stuff to XMLDataIOStyle classes. Fixed write
                         bug. 
                       - Added many Interface classes for those classes which seem most likely to
@@ -69,3 +72,5 @@
                       - added convience methods for populating axis, fieldAxis at construction time.
                       - further cleanup of deprecated classes from old xml-tr2 package. It should NOT
                         be needed at all now. Note that we are not making full use of namespaces (yet).
+                      - tightening of toXMLOutputstream method. Only XDF object may print notation hash,
+                        DOCTYPE and xml decl statement.
