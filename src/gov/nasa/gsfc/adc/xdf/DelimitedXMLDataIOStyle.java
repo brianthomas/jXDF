@@ -32,7 +32,7 @@ import java.io.*;
  */
 
 
-public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
+public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 
  //
   //Fields
@@ -40,15 +40,18 @@ public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 
 
   public final static String DefaultDelimiter =" ";
-  public final static boolean DefaultRepeatable = true;
+  public final static String DefaultRepeatable = "yes";
+  //double check
   public final static String DefaultRecordTerminator = Constants.NEW_LINE;
 
-  //double check
-  protected XMLDataIOStyle parentReadObj;
+  protected String delimiter =  DefaultDelimiter;
+  protected String repeatable = DefaultRepeatable;
+  protected String recordTerminator = DefaultRecordTerminator;
 
-  //no-arg constructor
-  public DelimitedXMLDataIOStyle ()
+  //constructor
+  public DelimitedXMLDataIOStyle (Array parentArray)
   {
+    this.parentArray = parentArray;
     init();
   }
 
@@ -58,21 +61,8 @@ public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   private void init()
   {
-
-    classXDFNodeName = "textDelimiter";
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"recordTerminator");
-    attribOrder.add(0,"repeatable");
-    attribOrder.add(0,"delimiter");
-
-    //set up the attribute hashtable key with the default initial value
-    attribHash.put("delimiter", new XMLAttribute(DefaultDelimiter, Constants.STRING_TYPE));
-    attribHash.put("repeatable", new XMLAttribute("yes", Constants.STRING_TYPE));
-    attribHash.put("recordTerminator", new XMLAttribute(DefaultRecordTerminator, Constants.STRING_TYPE));
-
-  };
+      classXDFNodeName = "textDelimiter";
+  }
 
 
   //
@@ -84,8 +74,8 @@ public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String setDelimiter (String strDelimiter)
   {
-    return (String) ((XMLAttribute) attribHash.get("delimiter")).setAttribValue(strDelimiter);
-
+     delimiter=strDelimiter;
+     return delimiter;
   }
 
   /**getDelimiter
@@ -93,7 +83,7 @@ public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String getDelimiter()
   {
-    return (String) ((XMLAttribute) attribHash.get("delimiter")).getAttribValue();
+    return delimiter;
   }
 
 
@@ -103,14 +93,14 @@ public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String setRepeatable (String strIsRepeatable)
   {
-    if (!strIsRepeatable.equals("yes")  && !strIsRepeatable.equals("yes") ) {
+    if (!strIsRepeatable.equals("yes")  && !strIsRepeatable.equals("no") ) {
       Log.error("*repeatable* attribute can only be set to yes or no");
       Log.error("tend to set as" + strIsRepeatable);
       Log.error("invalid. ignoring request");
       return null;
     }
-    return (String) ((XMLAttribute) attribHash.get("repeatable")).setAttribValue(strIsRepeatable);
-
+    repeatable=strIsRepeatable;
+    return repeatable;
   }
 
   /**getRepeatable
@@ -118,7 +108,7 @@ public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String getRepeatable()
   {
-    return (String) ((XMLAttribute) attribHash.get("repeatable")).getAttribValue();
+    return repeatable;
   }
 
 
@@ -127,7 +117,8 @@ public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String setRecordTerminator (String strRecordTerminator)
   {
-    return (String) ((XMLAttribute) attribHash.get("recordTerminator")).setAttribValue(strRecordTerminator);
+    recordTerminator = strRecordTerminator;
+    return recordTerminator;
 
   }
 
@@ -136,32 +127,54 @@ public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String getRecordTerminator()
   {
-    return (String) ((XMLAttribute) attribHash.get("recordTerminator")).getAttribValue();
+    return recordTerminator;
   }
 
+  //
+  //PROTECTED methods
+  //
 
-  public XMLDataIOStyle setParentReadObj(XMLDataIOStyle parentReadObj) {
-    Log.debug("in XMLDataIOStyle, setParentReadObj()");
-    this.parentReadObj = parentReadObj;
-    return parentReadObj;
-  }
+   protected void specificIOStyleToXDF( OutputStream outputstream,String indent) {
+    int stop = parentArray.getAxisList().size()-1;
+    nestedToXDF(outputstream, indent, 0, stop);
 
+   }
 
-  public XMLDataIOStyle getParentReadObj() {
-    return parentReadObj;
-  }
+   //
+   //PRIVATE methods
+   //
 
-  //double check
-  public String regexNotation() {
-    Log.error("in DelimitedXMLDataIOStyle, regexNotation, method empty, returning null");
-    return null;
-  }
+   private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) {
+    if (which > stop) {
+      if (sPrettyXDFOutput) {
+        writeOut(outputstream, Constants.NEW_LINE);
+        writeOut(outputstream, indent);
+      }
+      writeOut(outputstream, "<" + classXDFNodeName);
+      if (delimiter !=null)
+        writeOut(outputstream, " delimiter =\"" + delimiter + "\"");
+      writeOut(outputstream, " repeatable=\"" + repeatable +  "\"");
+      if (recordTerminator !=null)
+        writeOut(outputstream, " recordTerminator=\"" + recordTerminator + "\"/>");
+    }
+    else {
+      if (sPrettyXDFOutput) {
+        writeOut(outputstream, Constants.NEW_LINE);
+        writeOut(outputstream, indent);
+      }
+      writeOut(outputstream, "<" + UntaggedInstructionNodeName + " axisIdRef=\"");
+      writeOut(outputstream, ((AxisInterface) parentArray.getAxisList().get(which)).getAxisId() + "\">");
+      which++;
+      nestedToXDF(outputstream, indent + sPrettyXDFOutputIndentation, which, stop);
 
-  //double check
-   public String sprintfNotation() {
-    Log.error("in DelimitedXMLDataIOStyle, sprintfNotation, method empty, returning null");
-    return null;
-  }
+      if (sPrettyXDFOutput) {
+        writeOut(outputstream, Constants.NEW_LINE);
+        writeOut(outputstream, indent);
+      }
+       writeOut(outputstream, "</" + UntaggedInstructionNodeName + ">");
+    }
+   }
+
 
 
 
@@ -169,6 +182,10 @@ public abstract class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/10/31 21:43:11  kelly
+ * --completed the *toXDF*.
+ * --got rid of the Perl specific stuff  -k.z.
+ *
  * Revision 1.1  2000/10/17 21:57:29  kelly
  * created and pretty much completed the class.  -k.z.
  *
