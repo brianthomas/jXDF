@@ -50,7 +50,6 @@ import java.util.List;
 
   //constructor
   public Locator(Array array) {
-    Log.debug("in Locator(Array)");
     parentArray = array;
     List axisList = parentArray.getAxisList();
 
@@ -295,6 +294,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2000/11/20 20:34:29  thomas
+ * Removed debugging message. -b.t.
+ *
  * Revision 1.14  2000/11/16 20:01:18  kelly
  * fixed documentation.  -k.z.
  *
