@@ -16,7 +16,8 @@
 # JCFLAGS == javac flags
 JCFLAGS = -g 
 # CLASSPATH
-CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip:/usr/local/jaxp-1.1ea2/jaxp.jar
+#CPATH = 	${CLASSPATH}
+#.:/usr/local/jaxp-1.1ea2/jaxp.jar
 #CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip
 
 # archive w/jar flags
@@ -53,7 +54,8 @@ ALL_CLASSES = $(ALL_SOURCES:%.java=%.class)
 
 # Pattern rules:
 %.class : %.java
-	javac $(JCFLAGS) -classpath $(CPATH) $<
+	javac $(JCFLAGS) $<
+	#javac $(JCFLAGS) -classpath $(CLASSPATH) $<
 
 #
 # RULES. 

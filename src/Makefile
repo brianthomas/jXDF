@@ -13,9 +13,6 @@
 
 # JCFLAGS == javac flags
 JCFLAGS = -g # -deprecation
-# CLASSPATH
-CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip:/usr/local/jaxp-1.1ea2/jaxp.jar:/usr/local/jaxp-1.1ea2/xalan.jar:/usr/local/jaxp-1.1ea2/crimson.jar 
-#CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip
 
 # archive w/jar flags
 ARCHIVE_BUILD_ARGS=cvf
@@ -85,7 +82,7 @@ ALL_CLASSES = $(ALL_SOURCES:%.java=%.class)
 
 # Pattern rules:
 %.class : %.java
-	javac $(JCFLAGS) -classpath $(CPATH) $<
+	javac $(JCFLAGS) $<
 #	@echo Compiled:$< : $@ : $* : $+ : $^ 
 #	@echo moving $(basename $@) to $(patsubst %,$(XDF_BIN_PATH)/%,$(dir $@)) 
 #	@mv $@ $(patsubst %,$(XDF_BIN_PATH)/%,$(dir $@))
