@@ -1146,24 +1146,11 @@ Log.errorln("");
 
             if(((BinaryIntegerDataFormat) binaryFormatObj).numOfBytes() == 2) 
             {
-               // 16 bit 
+               // 16 bit (int) 
                if(endianStyle.equals(Constants.BIG_ENDIAN)) 
                   i = (bb[0]&0xFF) << 8  | (bb[1]&0xFF);
                else 
                   i = (bb[1]&0xFF) << 8  | (bb[0]&0xFF);
-
-/*
-Log.error("integer bits are: ");
-int sbyte = 0;
-for (int j=sbyte; j<sbyte+2; j++) {
-   for(int k=7; k >=0; k--) {
-      int newvalue = (bb[j] >> k)&0x01;
-      Log.error(""+newvalue);
-   }
-   Log.error(" ");
-}
-Log.errorln("");
-*/
 
                strDataRep = new Integer(i).toString();
 
@@ -1178,9 +1165,29 @@ Log.errorln("");
 
                strDataRep = new Integer(i).toString();
             } 
+            else if(((BinaryIntegerDataFormat) binaryFormatObj).numOfBytes() == 1) 
+            {
+
+               // 8 bit (short) 
+               i = (bb[0]&0xFF);
+               strDataRep = new Integer(i).toString();
+
+            }
+            else if(((BinaryIntegerDataFormat) binaryFormatObj).numOfBytes() == 3)
+            {  
+
+               // 24 bit (long) 
+               if(endianStyle.equals(Constants.BIG_ENDIAN)) 
+                  i = (bb[0]&0xFF) << 16  | (bb[1]&0xFF) << 8 | (bb[2]&0xFF);
+               else 
+                  i = (bb[2]&0xFF) << 16  | (bb[1]&0xFF) << 8 | (bb[0]&0xFF);
+               
+               strDataRep = new Integer(i).toString();
+
+            } 
             else 
             {
-               Log.errorln("Cant treat binaryIntegers that arent either 16 or 32 bit. Ignoring value.");
+               Log.errorln("Cant treat binaryIntegers that arent either 8, 16, 24 or 32 bit. Ignoring value.");
             } 
 
         } else if (binaryFormatObj instanceof BinaryFloatDataFormat) {
@@ -4335,6 +4342,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.48  2001/09/04 21:50:53  thomas
+ * added 8, 24 bit integer handling
+ *
  * Revision 1.47  2001/09/04 21:19:19  thomas
  * added in 8,24,32 bit BInary integers
  *
