@@ -59,6 +59,10 @@ import java.util.List;
 
   public void setIterationOrder (List axisIterationList) {
 
+    if (axisIterationList == null ||
+	axisIterationList.size() == 0)
+	return;
+    axisOrderList.clear();
     int stop = axisIterationList.size();
     for (int i = 0; i < stop; i++) {
       Object axisObj =  axisIterationList.get(i);
@@ -200,7 +204,8 @@ import java.util.List;
 
     // we cycled back to the origin. Set the global
     // to let us know
-    if (outOfDataCells) HasNext = false;
+    if (outOfDataCells) 
+	HasNext = false;
 
     return !outOfDataCells;
 
@@ -369,6 +374,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2001/04/23 18:52:17  huang
+ * clear the axisOrderList before re-ordering
+ *
  * Revision 1.19  2001/02/07 18:32:33  thomas
  * Fixed "hasNext" to correct meaning. Was dropping
  * last value within the array from consideration. -b.t
