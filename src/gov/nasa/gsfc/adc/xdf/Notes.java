@@ -38,7 +38,7 @@ import java.io.IOException;
  * @version $Revision$
  */
 
-public class Notes extends BaseObject implements NotesInterface {
+public class Notes extends BaseObject {
 
    //
    // Fields
@@ -124,7 +124,7 @@ public class Notes extends BaseObject implements NotesInterface {
        @param note - Note to be added
        @return a Note object if successfull, null if not.
     */
-   public boolean addNote (NoteInterface note )
+   public boolean addNote (Note note )
    {
       getNoteList().add(note);
       return true;
@@ -135,7 +135,7 @@ public class Notes extends BaseObject implements NotesInterface {
        @param Note to be removed
        @return true if successful, false if not
     */
-   public boolean removeNote(NoteInterface what) {
+   public boolean removeNote(Note what) {
       return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
    }
 
@@ -196,6 +196,9 @@ public class Notes extends BaseObject implements NotesInterface {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.11  2001/07/11 22:38:50  thomas
+  * Changes related to Interface removeal
+  *
   * Revision 1.10  2001/07/06 19:04:23  thomas
   * toXMLOutputStream and related methods now pass on IOExceptions
   * to the application writer (e.g. they throw the error).

@@ -56,7 +56,7 @@ import java.util.List;
    @version $Revision$
  */
 
-public class Field extends BaseObjectWithXMLElements implements FieldInterface {
+public class Field extends BaseObjectWithXMLElements {
 
    //
    // Fields
@@ -403,7 +403,7 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
    * @param Note
    * @return an Note object
    */
-  public boolean addNote(NoteInterface n) {
+  public boolean addNote(Note n) {
     return getNoteList().add(n);
   }
 
@@ -411,7 +411,7 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
    * @param Note to be removed
    * @return true on success, false on failure
    */
-   public boolean removeNote(NoteInterface what) {
+   public boolean removeNote(Note what) {
      return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -556,6 +556,9 @@ public class Field extends BaseObjectWithXMLElements implements FieldInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/07/11 22:38:14  thomas
+ * Changes related to Interface removeal
+ *
  * Revision 1.17  2001/07/02 21:19:29  thomas
  * changed attribs to match XDF DTD: now has notAnumber,
  * disabledValue, overflow/underflowValue.
