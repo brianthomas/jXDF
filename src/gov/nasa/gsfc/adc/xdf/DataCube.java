@@ -102,32 +102,32 @@ private void init()
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
-    attribOrder.add(0,"compression");
+    attribOrder.add(0, "compression");
     attribOrder.add(0, "encoding");
-    attribOrder.add(0,"checksum");
-    attribOrder.add(0,"href");
+    attribOrder.add(0, "checksum");
+    attribOrder.add(0, "href");
 
     //set up the attribute hashtable key with the default initial value
     attribHash.put("compression", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("encoding", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("checksum", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("href", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("href", new XMLAttribute(null, Constants.OBJECT_TYPE));
 
   };
 
   /** set the *href* attribute
    */
-  public void setHref (String strHref)
+  public void setHref (Href hrefObj)
   {
-     ((XMLAttribute) attribHash.get("href")).setAttribValue(strHref);
+     ((XMLAttribute) attribHash.get("href")).setAttribValue(hrefObj);
   }
 
   /**
    * @return the current *href* attribute
    */
-  public String getHref()
+  public Href getHref()
   {
-     return (String) ((XMLAttribute) attribHash.get("href")).getAttribValue();
+     return (Href) ((XMLAttribute) attribHash.get("href")).getAttribValue();
   }
 
   /** set the *checksum* attribute
@@ -1009,49 +1009,78 @@ protected boolean  removeData (Locator locator) {
                                    String noChildObjectNodeName
                                 )
   {
+
+    boolean writeHrefAttribute = false;
     boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
     String indent = "";
-    indent = indent + strIndent;
-
     String nodeName = getClassXDFNodeName();
+
+    // indent up one 
+    indent = indent + strIndent;
 
     //open node
     if (niceOutput)
       writeOut(outputstream, indent);
 
     writeOut(outputstream, "<" + nodeName );
-    String href = getHref();
-    if (href !=null) { 
-      writeOut(outputstream, " href = \"");
-      writeOutAttribute(outputstream, href);
-      writeOut(outputstream, "\"");
-    }
 
-    String checksum = getChecksum();
-    if (checksum != null) { 
-      writeOut(outputstream, " checksum = \"");
-      writeOutAttribute(outputstream, checksum.toString());
-      writeOut(outputstream, "\"");
-    }
-
-    writeOut(outputstream, ">");  //end of opening code
+    Href hrefObj = getHref();
 
     //write out just the data
     XMLDataIOStyle readObj = parentArray.getXMLDataIOStyle();
-    OutputStream dataOutputStream;
-    if (href !=null) {  //write out to another file,
-      try {
-        dataOutputStream = new FileOutputStream(getHref());
-      }
-      catch (IOException e) {
-        //oops, sth. is wrong, writ out to the passed in OutputStream
-        dataOutputStream = outputstream;
+    OutputStream dataOutputStream = outputstream;
+
+
+    if (hrefObj !=null) {  //write out to another file,
+      String fileName = hrefObj.getSysId();
+      String hrefName = hrefObj.getName();
+
+      if(hrefName == null) 
+      {
+        Log.errorln("Error: href object in dataCube lacks name. Data being written into metadata instead.\n");
+      } 
+      else if (fileName != null)
+      {
+         writeHrefAttribute = true;
+         try {
+            dataOutputStream = new FileOutputStream(hrefObj.getSysId());
+         }
+         catch (IOException e) {
+            //oops, something. is wrong, writ out to the passed in OutputStream
+            Log.warnln("Error: cannot open file:"+fileName+" for writing. Data being written into metadata.\n");
+            writeHrefAttribute = false;
+         }
+      } 
+      else 
+      {
+            Log.warnln("Error: href:"+hrefName+" lacks systemId, cannot write data to a separate file.");
+            Log.warnln("Data are being written into metadata instead.\n");
+            writeHrefAttribute = false;
       }
     }
     else {
       // no *href* attribute specified, write out to the passed in OutputStream
-      dataOutputStream = outputstream;
+      // dataOutputStream = outputstream; // not needed now 
     }
+
+    // write data node attributes
+    if (writeHrefAttribute) {
+      writeOut(outputstream, " href=\"");
+      writeOutAttribute(outputstream, hrefObj.getName());
+      writeOut(outputstream, "\"");
+    }
+
+    String checksum = getChecksum();
+    if (checksum != null) {  
+      writeOut(outputstream, " checksum=\"");
+      writeOutAttribute(outputstream, checksum.toString());
+      writeOut(outputstream, "\"");
+    }
+
+    if (writeHrefAttribute) 
+       writeOut(outputstream, "/>");  //we just close the data node now
+    else 
+       writeOut(outputstream, ">");  //end of opening code
 
     Locator currentLocator = parentArray.createLocator();
 
@@ -1106,25 +1135,34 @@ protected boolean  removeData (Locator locator) {
        if (readObj instanceof DelimitedXMLDataIOStyle) {
            writeDelimitedData( dataOutputStream, currentLocator,
                                (DelimitedXMLDataIOStyle) readObj,
-                               fastestAxis, NoDataValues );
+                               fastestAxis, NoDataValues,
+                               writeHrefAttribute ? false : true
+                              );
 
        }
        else {
-        writeFormattedData(dataOutputStream,
-                           currentLocator,
-                           (FormattedXMLDataIOStyle) readObj,
-                           fastestAxis,
-                           NoDataValues );
+        writeFormattedData(  dataOutputStream,
+                             currentLocator,
+                             (FormattedXMLDataIOStyle) readObj,
+                             fastestAxis,
+                             NoDataValues,
+                             writeHrefAttribute ? false : true
+                           );
        }
     }
 
     //close the data section appropriately
-    if (niceOutput) {
+    if (!writeHrefAttribute && niceOutput) {
       writeOut(outputstream, Constants.NEW_LINE);
       writeOut(outputstream, indent);
     }
 
-    writeOut(outputstream, "</" + nodeName + ">");
+    // If we didnt write Href attribute, then means that data
+    // were put into document. We need to close the open data
+    // node appropriately.
+    if (!writeHrefAttribute) 
+      writeOut(outputstream, "</" + nodeName + ">");
+
     if (niceOutput)
       writeOut(outputstream, Constants.NEW_LINE);
 
@@ -1134,7 +1172,7 @@ protected boolean  removeData (Locator locator) {
   /**writeTaggedData: write out tagged data
    *
    */
-protected void writeTaggedData(OutputStream outputstream,
+  protected void writeTaggedData(OutputStream outputstream,
 			       Locator locator,
 			       String indent,
 			       int[] axisLength,
@@ -1217,16 +1255,22 @@ protected void writeTaggedData(OutputStream outputstream,
   /** write delimited data
    *
    */
-  private void writeDelimitedData(OutputStream outputstream,
+  private void writeDelimitedData(  OutputStream outputstream,
                                     Locator locator,
                                     DelimitedXMLDataIOStyle readObj,
-                                    AxisInterface fastestAxis, String[] noDataValues) {
+                                    AxisInterface fastestAxis, 
+                                    String[] noDataValues,
+                                    boolean writeCDATAStatement
+                                  ) 
+  {
     String delimiter = readObj.getDelimiter();
     String recordTerminator = readObj.getRecordTerminator();
     int fastestAxisLength = fastestAxis.getLength();
     int dataNum = 0;
 
-    writeOut(outputstream, "<![CDATA[");
+    if(writeCDATAStatement) 
+       writeOut(outputstream, "<![CDATA[");
+
     do {
       dataNum ++;
       try {
@@ -1251,7 +1295,9 @@ protected void writeTaggedData(OutputStream outputstream,
       }
     }
     while (locator.next());
-    writeOut(outputstream, "]]>");
+
+    if (writeCDATAStatement) 
+       writeOut(outputstream, "]]>");
   }
 
   /** Write formatted data
@@ -1260,11 +1306,14 @@ protected void writeTaggedData(OutputStream outputstream,
                                    Locator locator,
                                    FormattedXMLDataIOStyle readObj,
                                    AxisInterface fastestAxis,
-                                   String[] noDataValues )
+                                   String[] noDataValues,
+                                   boolean writeCDATAStatement
+                                  )
    {
 
       // print opening CDATA statement
-      writeOut(outputstream, "<![CDATA[");
+      if (writeCDATAStatement) 
+         writeOut(outputstream, "<![CDATA[");
 
       // print out the data as appropriate for the format
       // QUESTION: don't we need to syncronize on readObj too?
@@ -1352,7 +1401,8 @@ protected void writeTaggedData(OutputStream outputstream,
       } // end of sync loop
 
       // print closing CDATA statement
-      writeOut(outputstream, "]]>");
+      if (writeCDATAStatement) 
+         writeOut(outputstream, "]]>");
 
    }
 
@@ -1498,6 +1548,11 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.19  2001/01/19 17:23:20  thomas
+  * Fixed Href stuff to DTD standard. Now using
+  * notation and entities at the beginning of the
+  * file. -b.t.
+  *
   * Revision 1.18  2000/11/27 22:39:25  thomas
   * Fix to allow attribute text to have newline, carriage
   * returns in them (print out as entities: &#010; and

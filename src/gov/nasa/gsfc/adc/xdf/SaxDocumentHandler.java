@@ -32,6 +32,7 @@ package gov.nasa.gsfc.adc.xdf;
 // Import Java stuff
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Enumeration;
@@ -40,12 +41,18 @@ import java.lang.Character;
 
 // Import needed SAX stuff
 import org.xml.sax.AttributeList;
-import org.xml.sax.DocumentHandler;
+import org.xml.sax.HandlerBase;
 import org.xml.sax.SAXException;
+
+import org.xml.sax.InputSource;
+
+import java.io.Reader;
+import java.io.FileReader;
+import java.io.File;
 
 /** 
  */
-public class SaxDocumentHandler implements DocumentHandler {
+public class SaxDocumentHandler extends HandlerBase {
 
     // 
     // Fields
@@ -84,6 +91,11 @@ public class SaxDocumentHandler implements DocumentHandler {
     private Object CurrentObject; 
     private ArrayList CurrentObjectList = new ArrayList(); 
     private boolean UpdateCurrentObject = false; 
+
+    // needed to capture internal entities.
+    private HashSet Notation = new HashSet();
+//    private Hashtable Entity = new Hashtable();
+    private Hashtable UnParsedEntity = new Hashtable();
 
     // GLOBALs for saving these between dataFormat/read node and later when we 
     // know what kind of DataFormat/DataIOStyle object we really have
@@ -290,6 +302,18 @@ public class SaxDocumentHandler implements DocumentHandler {
 
     }
 
+    public String getAttributeListValueByName (AttributeList attrs, String name) {
+       if (attrs != null) {
+          // whip thru the list, checking each value
+          int size = attrs.getLength();
+          for (int i = 0; i < size; i++) {
+             String attribName = attrs.getName(i);
+             if (attribName.equals(name)) return attrs.getValue(i);
+          }
+       }
+       return (String) null;
+    }
+
     public void setCurrentDatatypeObject(Object object) {
         CurrentDatatypeObject = object;
     }
@@ -427,6 +451,7 @@ public class SaxDocumentHandler implements DocumentHandler {
     // Public SAX methods we dont use
     //
 
+/*
     public void setDocumentLocator (org.xml.sax.Locator l)
     {
 
@@ -435,17 +460,20 @@ public class SaxDocumentHandler implements DocumentHandler {
         // Right now, do nothing here.
 
     }
+*/
 
     public void startDocument()
     throws SAXException
     {
-        // do nothing, method required by interface 
+        // do nothing
     }
 
     public void endDocument()
     throws SAXException
     {
-        // do nothing, method required by interface 
+        // do nothing
+        //set the notation hash for the XDF structure
+        XDF.setXMLNotationHash(Notation);
     }
 
     public void ignorableWhitespace(char buf [], int offset, int len)
@@ -462,11 +490,47 @@ public class SaxDocumentHandler implements DocumentHandler {
         // do nothing, method required by interface 
     }
 
+    /* Hurm, why doesnt this method treat 'base'?? */
+    public void unparsedEntityDecl ( String name,  
+                                     String publicId, 
+                                     String systemId,
+                                     String notationName ) 
+    {
+        Log.debugln("H_UNPARSED_ENTITY: "+name+" "+publicId+" "+systemId+" "+notationName);
+
+        // create hashtable to hold information about Unparsed entity
+        Hashtable information = new Hashtable ();
+        information.put("name", name);
+        // if (base != null) information.put("base", base);
+        if (publicId != null) information.put("pubId", publicId);
+        if (systemId != null) information.put("sysId", systemId);
+        if (notationName != null) information.put("ndata", notationName);
+
+        // add this to the UnparsedEntity hash
+        UnParsedEntity.put(name, information);
+    }
+
+    /* Hurm, why doesnt this method treat 'base'?? */
+    public void notationDecl (String name, String publicId, String systemId )
+    {
+        Log.debugln("H_NOTATION: "+name+" "+publicId+" "+systemId);
+
+        // create hash to hold information about notation.
+        Hashtable information = new Hashtable ();
+        information.put("name", name);
+        if (publicId != null) information.put("publicId", publicId);
+        if (systemId != null) information.put("systemId", systemId);
+       
+        // add this to the Notation hash
+        Notation.add(information);
+
+    }
+
     public void processingInstruction(String target, String data)
     throws SAXException
     {
         Log.debugln("H_PROCESSING_INSTRUCTION:"+"<?"+target+" "+data+"?>");
-        // do nothing, method required by interface 
+        // do nothing
     }
 
     //
@@ -494,15 +558,71 @@ public class SaxDocumentHandler implements DocumentHandler {
 
     }
 
+    // This is NOT the best implimentation. In fact, I freely 
+    // admit that I dont understand what the entityResolver is 
+    // trying to do here.. At this time, it will read a file, 
+    // I dunno if this will really work for other URI's 
+    private String getHrefData (Href hrefObj) {
+
+       String buffer = null;
+
+       // well, we should be doing something with base here, 
+       // but arent because it isnt captured by this API. feh.
+       // $file = $href->getBase() if $href->getBase();
+
+       if (hrefObj.getSysId() != null) {
+
+          // we assume here that this is a file. hurm.
+          String fileName = hrefObj.getSysId();
+          int size = 0;
+
+          try {
+
+             java.io.Reader in = null;
+
+             try {
+               InputSource input = resolveEntity(hrefObj.getPubId(), hrefObj.getSysId()); 
+               in = (java.io.Reader) input.getCharacterStream();
+             } catch (SAXException e) {
+                Log.printStackTrace(e);
+             } catch (NullPointerException e) {
+                // in this case the InputSource object is null to request that 
+                // the parser open a regular URI connection to the system identifier.
+                // In our case, the sysId IS the filename.
+                File f = new File(hrefObj.getSysId());
+                size = (int) f.length();
+                in = (java.io.Reader) new FileReader(new File(hrefObj.getSysId()));
+             }
+
+             // ok, got a reader, read the info
+             // Need to use a buffered reader here!!!
+             if (in != null) {
+                char[] data = new char[size]; 
+                int chars_read = 0;
+
+                while (chars_read < size) 
+                  chars_read += in.read(data, chars_read, size-chars_read);
+          
+                buffer = new String(data);
+             }
+  
+          } catch (java.io.IOException e) {
+             Log.printStackTrace(e);
+          }
+
+       } else {
+          Log.warnln("Can't read Href data, undefined sysId!");
+       }
+
+       return buffer;
+    } 
+
     // Placeholder to remind me to do some version checking w/ base class
     private boolean checkXDFDocVersion (String version)
     {
       // if(version != xdfVersion) { return false; } else { return true; }
       return false;
     }
-
-    // required by the DocumentHandler Interface
-    private void setDocumentHandler (DocumentHandler myHandler) { }
 
     //
     private void initStartHandlerHashtable () {
@@ -1426,8 +1546,37 @@ Log.errorln(" TValue:"+valueString);
           // a data node
           if (DataNodeLevel == 0) {
 
+             // A little 'pre-handling' as href is a specialattribute
+             // that will hold an (Href) object rather than string value 
+             Href hrefObj = null;
+             String hrefValue = getAttributeListValueByName(attrs,"href");
+             if (hrefValue != null ) 
+             {
+
+                // now we look up the href from the entity list gathered by
+                // the parser and transfer relevant info to our Href object 
+                hrefObj = new Href();
+
+                Hashtable hrefInfo = (Hashtable) UnParsedEntity.get(hrefValue);
+                hrefObj.setName((String) hrefInfo.get("name"));
+                if (hrefInfo.containsKey("base")) 
+                   hrefObj.setBase((String) hrefInfo.get("base"));
+                if (hrefInfo.containsKey("sysId")) 
+                   hrefObj.setSysId((String) hrefInfo.get("sysId"));
+                if (hrefInfo.containsKey("pubId")) 
+                   hrefObj.setPubId((String) hrefInfo.get("pubId"));
+                if (hrefInfo.containsKey("ndata")) 
+                   hrefObj.setNdata((String) hrefInfo.get("ndata"));
+
+             }
+
              // update the array dataCube with passed attributes
              CurrentArray.getDataCube().setXMLAttributes(attrs);
+
+             // Clean up. We override the string value of Href and set it as
+             // the Href object , if we created it (yeh, sloppy). 
+             if (hrefObj != null)
+                 CurrentArray.getDataCube().setHref(hrefObj);
 
              // determine the size of the dataFormat (s) in our dataCube
              if (CurrentArray.hasFieldAxis()) {
@@ -1458,6 +1607,10 @@ Log.errorln(" TValue:"+valueString);
              // have entered DATABLOCK is used in cases where we read in untagged data
              if (DataNodeLevel == 0) DATABLOCK = new StringBuffer ();
           }
+
+          // tack in href data 
+          if (CurrentArray.getDataCube().getHref() != null) 
+              DATABLOCK.append(getHrefData(CurrentArray.getDataCube().getHref()));
 
           // entered a datanode, raise the count 
           // this (partially helps) declare we are now reading data, 
@@ -2785,6 +2938,11 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.24  2001/01/19 17:23:03  thomas
+ * Fixed Href stuff to DTD standard. Now using
+ * notation and entities at the beginning of the
+ * file. -b.t.
+ *
  * Revision 1.23  2001/01/17 18:28:46  thomas
  * removed unneeded debug comments. -b.t.
  *
