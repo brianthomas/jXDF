@@ -2,6 +2,9 @@
 // XDF Locator class
 // CVS $Id$
 
+// Locator.java Copyright (C) 2000 Brian Thomas,
+// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+
 /*
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,7 +23,11 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
 
 /**
    Identifies a specific datum location within the n-dimensional data space.
@@ -30,7 +37,8 @@ import java.util.*;
  */
 
 
- public class Locator implements Cloneable{
+ public class Locator implements Cloneable {
+
   //
   //Fields
   //
@@ -270,6 +278,9 @@ import java.util.*;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/08 19:57:45  thomas
+ * Trimmed down import path to just needed classes. -b.t.
+ *
  * Revision 1.9  2000/11/06 21:25:19  kelly
  * --added clone()
  * --added addAxis() methods.  it is called when its parentArray adds an axis
