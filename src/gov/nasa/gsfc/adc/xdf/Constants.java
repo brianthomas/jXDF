@@ -25,6 +25,8 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
+import org.apache.xerces.dom.CoreDocumentImpl;
+
 // Hmm. this file amounts to a header file in C. Might be better to put
 // these various things in the objects where they are used. 
 
@@ -35,9 +37,19 @@ package gov.nasa.gsfc.adc.xdf;
 
 public abstract class Constants {
 
+  private static CoreDocumentImpl InternalDOMDocument;
+
   //
   // XML attributes
   //
+
+  public static CoreDocumentImpl getInternalDOMDocument () { 
+
+     if (InternalDOMDocument == null) {
+        InternalDOMDocument = new CoreDocumentImpl();
+     }
+     return InternalDOMDocument;
+  }
 
   public static final String STRING_TYPE = "String";
   public static final String LIST_TYPE   = "List";
@@ -145,6 +157,9 @@ public abstract class Constants {
 /* Modification History
  * 
  * $Log$
+ * Revision 1.14  2001/08/31 19:59:35  thomas
+ * added getInternalDOMDocument method. Its public (ugh)
+ *
  * Revision 1.13  2001/07/11 22:35:20  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *
