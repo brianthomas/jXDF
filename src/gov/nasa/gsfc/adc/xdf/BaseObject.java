@@ -183,6 +183,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
       @deprecated Use the getAttributeStringValue method instead.
    */
   public String getXMLAttributeStringValue(String attribName) 
+  {
      return this.getAttributeStringValue(attribName);
   }
 
@@ -945,6 +946,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.61  2001/09/18 21:38:50  thomas
+ * fixed typo
+ *
  * Revision 1.60  2001/09/18 20:52:20  thomas
  * re-added deprecated method getXMLAttributeStringValue
  *
