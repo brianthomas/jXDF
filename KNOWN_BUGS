@@ -1,0 +1,41 @@
+	
+   Here is a short list (with some description) of the known bugs 
+   within this package:
+
+        - binary data not implemented (!!).
+
+        - Makefile is NOT nmake (the W32 make utility) ready. Must currently compile
+          each class "by hand" ugh. 
+
+        - Dropping relationship node/object after output fed thru parser a second time.
+          (relationship node not implemented yet??).
+
+        - Log configuration doesnt appear to allow writing to System.err.
+
+        - The Java DecimalFormat code for exponential fields has unfortunate behavior.
+          There can be no maximum exponent size specified, this means that the width of
+          the exponential after being formated may exceed the specified dataFormat width.
+          Our present 'solution' is to trim fields that are too big. An example of how this
+          may happen: negative exponents in the exponential format. We need to implement
+          by hand our own exponential formatter code to fix this. 
+
+        - show we not allow repeatable attribute to apply to the recordterminator
+          on string parsing (it only applies to delimiting characters right now;
+          Question: how does the Perl package handle this?) 
+   
+        - Exponential formatting is *less than optimal* in Java. Using DecimalFormat
+          results in rounding errors, for example, the following numbers:
+          double data[] = { 1.01E-1, 3.001E5, -13.E-8, 1.021E3 };
+	  using the following decimalFormat pattern: "#0.0E0;-0.0E0" 
+	  print out as: .101E0, 30.0E4, -13E-8, 10.2E2
+
+        - Treatment of XML comments (the stuff in an XML file that occurs between the "<--" "-->").
+          This information is currently dropped during the parsing of the XDF file.
+          This would seem to be the correct thing to do; machine readable comments ought
+          to be placed in an appropriate node, e.g. parameter, note or attribute
+          (such as "description").
+
+        - Clean up debugging messages. Improve and make consistent error messaging 
+          within the package. Missing any Exception classes? 
+
+

@@ -15,9 +15,6 @@
 
 	- Impliment binary data read/write in SaxDocHandler/Binary*DataFormats.
 
-        - Dropping relationship after output fed thru parser a second time.
-          (relationship node not implemented yet??).
-
 	- always use constants (sPCDATAAttribute = "value") 
           check that all Constants in CONSTANTS class are used. Make attribute names
           wired in constants class (?).
@@ -49,9 +46,6 @@
 
         - Remove Perl junk in documentation. Improve the content of the doc text.
 
-        - FormatPattern of exponential fields has bug, size of field exceeded when
-          exponent in the datum is negative. Seems like bug in java formatter code.
-
         - Need to implement a shadow array for precision on numbers within the dataCube.
           setData may adjust precision to be *lower* than declared in the relevant
           dataFormat object but may *never* insert a number with *higher* precision than
@@ -61,10 +55,6 @@
         - Lots of inefficiencies in the code, synchronized blocks, SPecification calls
           for PrettyOutput. Check dataCube access.
 
-        - show we not allow repeatable attribute to apply to the recordterminator
-          on string parsing (it only applies to delimiting characters right now;
-          Question: how does the Perl package handle this?) 
-   
 	- Improve efficiency of data reading. Direct char->number converstion
 	  (faster) rather than convert to String, then to a number object,
           then to a primative (in SaxDocumentHandler:addData.. private method).
@@ -84,12 +74,6 @@
           This is a slow solution, but it works. Isnt there something better?
 
 	- Make methods/classes as consistent as possible with Perl package.
-
-        - Exponential formatting is *less than optimal* in Java. Using DecimalFormat
-          results in rounding errors, for example, the following numbers:
-          double data[] = { 1.01E-1, 3.001E5, -13.E-8, 1.021E3 };
-	  using the following decimalFormat pattern: "#0.0E0;-0.0E0" 
-	  print out as: .101E0, 30.0E4, -13E-8, 10.2E2
 
         - the XML declaration hash doesnt allow user to declare the XML version;
           (partly because XMLDecl Hashtable is not an orderd object, and we cant
@@ -122,7 +106,7 @@
 
 	- XDF functions.
 
-	- Face up to the setData/dataFormat problem. What happens when a user
+	- Face up to the setData/dataFormat issue. What happens when a user
           sets the first data? Check that it conforms to the declared dataFormat
 	  before allocating the primitive array that will hold the datum.
 
