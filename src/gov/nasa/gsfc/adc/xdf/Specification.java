@@ -68,6 +68,11 @@ public class Specification {
       dataset) it may be desirable to DECREASE the value.
   */
 
+  /* this is the XML parser to use by the reader. The default is to use the
+     non-validating parser that ships in xml.jar (the Sun parser).
+  */
+  private String XMLParserClass = "com.sun.xml.parser.Parser";
+
   //brian, do we need this? double check
   private int defaultDataArraySize = 1000;
 
@@ -122,6 +127,21 @@ public class Specification {
   //
   //Get/Set methods
   //
+
+  /** Set the name of the XML parser we want to use. The supplied string must
+      be the classname of the desired parser (ex. "com.sun.xml.parser.Parser")
+  */
+  public void setXMLParser (String parserName) {
+    synchronized (mutex) {
+      XMLParserClass = parserName;
+    }
+  }
+
+  /** Get the class name of the XML parser that will be used by the XDF reader.
+   */
+  public String getXMLParser () {
+    return XMLParserClass;
+  }
 
   /** Get the output XDF format style.
       @return the value of sPrettyXDFOutput field  (which is true if nicely formatted
@@ -216,6 +236,9 @@ public class Specification {
 /* Modification history
  *
  * $Log$
+ * Revision 1.3  2001/01/19 17:20:19  thomas
+ * Added XMLParserClass attribute. -b.t.
+ *
  * Revision 1.2  2000/11/27 17:14:30  thomas
  * added bounds check on set dataArraySize -b.t.
  *
