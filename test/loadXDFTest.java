@@ -26,6 +26,7 @@ package test;
 import gov.nasa.gsfc.adc.xdf.*;
 
 import java.util.List;
+import java.util.Iterator;
 import java.util.Hashtable;
 import java.io.IOException;
 import java.io.BufferedWriter;
@@ -75,6 +76,17 @@ public class loadXDFTest extends org.apache.tools.ant.Task {
      // set the output specification
      Specification.getInstance().setPrettyXDFOutput(true);
      Specification.getInstance().setPrettyXDFOutputIndentation("  ");
+
+     List entityObjList = s.getDocumentType().getEntities();
+     // whip thru the list of entity objects
+     Iterator iter = entityObjList.iterator(); 
+     int counter = 0;
+     while (iter.hasNext()) {
+        Entity entityObj = (Entity) iter.next();
+        String sysId = "test" + counter + ".dat";
+        entityObj.setSystemId(sysId);
+        counter++;
+     }
 
      try {
 
