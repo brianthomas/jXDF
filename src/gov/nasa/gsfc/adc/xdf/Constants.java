@@ -99,6 +99,30 @@ public abstract class Constants {
     DATA_COMPRESSION_LIST[4]=DATA_COMPRESSION_COMPRESS;
    }
 
+   public static final String VALUE_INEQUALITY_LESS_THAN = "lessThan";
+   public static final String VALUE_INEQUALITY_LESS_THAN_OR_EQUAL = "lessThanOrEqual";
+   public static final String VALUE_INEQUALITY_GREATER_THAN = "greaterThan";
+   public static final String VALUE_INEQUALITY_GREATER_THAN_OR_EQUAL = "greaterThanOrEqual";
+
+   public static final String[] VALUE_INEQUALITY_LIST = new String[4];
+   static {
+    VALUE_INEQUALITY_LIST[0]= VALUE_INEQUALITY_LESS_THAN;
+    VALUE_INEQUALITY_LIST[1]= VALUE_INEQUALITY_LESS_THAN_OR_EQUAL ;
+    VALUE_INEQUALITY_LIST[2]= VALUE_INEQUALITY_GREATER_THAN;
+    VALUE_INEQUALITY_LIST[3]= VALUE_INEQUALITY_GREATER_THAN_OR_EQUAL;
+   }
+
+   public static final String VALUE_SPECIAL_INFINITE = "infinite";
+   public static final String VALUE_SPECIAL_INFINITE_NEGATIVE = "infiniteNegative";
+   public static final String VALUE_SPECIAL_NODATA= "noData";
+
+   public static final String[] VALUE_SPECIAL_LIST = new String[3];
+   static {
+    VALUE_SPECIAL_LIST[0] = VALUE_SPECIAL_INFINITE;
+    VALUE_SPECIAL_LIST[1] = VALUE_SPECIAL_INFINITE_NEGATIVE;
+    VALUE_SPECIAL_LIST[2] = VALUE_SPECIAL_NODATA;
+   }
+
 }
 
 
