@@ -42,6 +42,9 @@ public class DataCube extends BaseObject {
   //
   //Fields
   //
+
+  protected int dimension = 0;;
+
 protected Array parentArray;
 
   //to store the n-dimensional data, it is an ArrayList of ArrayList, whose
@@ -97,17 +100,15 @@ private void init()
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
-    attribOrder.add(0,"maxDimensionIndex");
-    attribOrder.add(0,"dimension");
     attribOrder.add(0,"compression");
+    attribOrder.add(0, "encoding");
     attribOrder.add(0,"checksum");
     attribOrder.add(0,"href");
 
     //set up the attribute hashtable key with the default initial value
-    attribHash.put("maxDimensionIndex", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("dimension", new XMLAttribute(new Integer(0), Constants.NUMBER_TYPE));
     attribHash.put("compression", new XMLAttribute(null, Constants.STRING_TYPE));  //double check init value
-    attribHash.put("checksum", new XMLAttribute(new Double(0), Constants.NUMBER_TYPE));  //double check
+    attribHash.put("encoding", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("checksum", new XMLAttribute(null, Constants.NUMBER_TYPE));  //double check
     attribHash.put("href", new XMLAttribute(null, Constants.STRING_TYPE));
 
   };
@@ -115,7 +116,7 @@ private void init()
   /**setHref: set the *href* attribute
    * @return: the current *href* attribute
    */
-public String setHref (String strHref)
+  public String setHref (String strHref)
   {
     return (String) ((XMLAttribute) attribHash.get("href")).setAttribValue(strHref);
 
@@ -124,7 +125,7 @@ public String setHref (String strHref)
   /**getHref
    * @return: the current *href* attribute
    */
-public String getHref()
+  public String getHref()
   {
     return (String) ((XMLAttribute) attribHash.get("href")).getAttribValue();
   }
@@ -132,10 +133,10 @@ public String getHref()
   /**setChecksum: set the *checksum* attribute
    * @return: the current *checksum* attribute
    */
-public Number setChecksum (Number checksum) {
-  Log.info("in DataCube.setChecksum()");
-  return (Number) ((XMLAttribute) attribHash.get("checksum")).setAttribValue(checksum);
-}
+  public Number setChecksum (Number checksum) {
+    Log.info("in DataCube.setChecksum()");
+   return (Number) ((XMLAttribute) attribHash.get("checksum")).setAttribValue(checksum);
+  }
 
   /**getChecksum
    * @return: the current *checksum* attribute
@@ -144,11 +145,33 @@ public Number getChecksum () {
   return (Number) ((XMLAttribute) attribHash.get("checksum")).getAttribValue();
 }
 
+/**setEncoding: set the *encoding* attribute
+   * @return: the current *encoding* attribute
+   */
+  public String setEncoding (String strEncoding)
+  {
+    if (!Utility.isValidDataEncoding(strEncoding))
+      return null;
+    return (String) ((XMLAttribute) attribHash.get("encoding")).setAttribValue(strEncoding);
+
+  }
+
+  /**getEncoding
+   * @return: the current *encoding* attribute
+   */
+  public String getEncoding()
+  {
+    return (String) ((XMLAttribute) attribHash.get("encoding")).getAttribValue();
+  }
+
+
   /**setCompression: set the *compression* attribute
    * @return: the current *compression* attribute
    */
 public String setCompression (String strCompression)
   {
+    if (!Utility.isValidDataCompression(strCompression))
+      return null;
     return (String) ((XMLAttribute) attribHash.get("compression")).setAttribValue(strCompression);
 
   }
@@ -161,20 +184,11 @@ public String getCompression()
     return (String) ((XMLAttribute) attribHash.get("compression")).getAttribValue();
   }
 
-
-
-  /**setDimension: called by incrementDimension to bump the dimension by 1
-   * should not allow the outsiders to set the dimension.
-   */
-private Number setDimension(Number dimension) {
-  return (Number) ((XMLAttribute)attribHash.get("dimension")).setAttribValue(dimension);
-}
-
   /**getDimension
-   * @return: the current *dimension* attribute
+   * @return: the current dimension
    */
-public Number getDimension() {
-  return (Number) ((XMLAttribute) attribHash.get("dimension")).getAttribValue();
+public int getDimension() {
+  return dimension;
 }
 
   /**getMaxDataIndex: get the max index along with dimension
@@ -184,11 +198,11 @@ public int[] getMaxDataIndex() {
   List axes = parentArray.getAxisList();
   int[] maxDataIndices = new int[axes.size()];
 
-  for(int i = 0; i < axes.size(); i++) {
+  int stop = axes.size();
+  for(int i = 0; i < stop; i++) {
     maxDataIndices[i]=((Axis) axes.get(i)).getLength();
   }
-  //update the *maxDimensionIndex* attribute
-  attribHash.put("maxDimensionIndex", maxDataIndices);
+
   return maxDataIndices;
 }
 
@@ -209,17 +223,16 @@ public Array getParentArray() {
 
   /**incrementDimension: increase the dimension by 1
    * @return: the current dimension ( which is incremented)
-   * this is call after the Array the DataCube belongs to added an Axis
+   * this is called after the Array the DataCube belongs to adds an Axis
    */
-public Number incrementDimension(Axis axis) {
-  Number dim = getDimension();
-  if (dim.intValue()==0) {  //add first dimension
+public int incrementDimension(Axis axis) {
+  if (dimension==0) {  //add first dimension
     data.add(null);
     data.add(null);
-    return  setDimension(new Integer(1));
+    return dimension++;
   }
 
-  if (dim.intValue() == 1) {  //add second dimension
+  if (dimension == 1) {  //add second dimension
     int length = axis.getLength();
     for (int i = 2; i < 2*length; i++)
       data.add(i,null);
@@ -232,7 +245,7 @@ public Number incrementDimension(Axis axis) {
     for (int i = 1; i < length; i++)
       data.add(i,null);
   }
-  return setDimension(new Integer(dim.intValue()+1));
+  return dimension++;
 }
 
   /**decrementDimension: decrease the dimension by 1
@@ -240,14 +253,13 @@ public Number incrementDimension(Axis axis) {
    */
 
   //not right, have to write again, double check implications of dataCube
-public Number decrementDimension() {
-  Number dim = getDimension();
-  if (dim == null) {
-    Log.error(" in DataCube, incrementDimentsion, the dimension is undef");
-    return null;
+public int decrementDimension() {
+  if (dimension == 0) {
+    Log.error(" in DataCube, incrementDimentsion, the dimension is 0");
+    return 0;
   }
   else
-    return setDimension(new Integer(dim.intValue()-1));
+   return dimension--;
 }
 
 public String getStringData(Locator locator) throws NoDataException{
@@ -813,9 +825,9 @@ public void toXDFOutputStream (
     if (href !=null)
       writeOut(outputstream, " href = \"" + href + "\"");
 
-    String checksum = getChecksum().toString();
+    Number checksum = getChecksum();
     if (checksum !=null)
-      writeOut(outputstream, " checksum = \"" + checksum + "\"");
+      writeOut(outputstream, " checksum = \"" + checksum.toString() + "\"");
 
     writeOut(outputstream, ">");  //end of opening code
 
@@ -829,23 +841,23 @@ public void toXDFOutputStream (
       String[] tagOrder = ((TaggedXMLDataIOStyle)readObj).getAxisTags();
       int stop = tagOrder.length;
       String[] tags = new String[stop];
-      
+
       for (int i = stop-1; i >= 0 ; i--) {
         tags[stop-i-1]  = tagOrder[i];
 	// System.out.println(tagOrder.get(i));
       }
-      
+
       if (!parentArray.hasFieldAxis()) {  //even with FieldAxis, it is ok, double check
         int[] axes = getMaxDataIndex();
 	stop =axes.length;
 	int[] axisLength = new int[stop];
 	for (int i = 0; i < stop; i++) {
 	  axisLength[i] =axes[stop - 1 - i];
-	 
+
 	}
 	writeTaggedData(outputstream, currentLocator, indent, axisLength, tags, 0);
       }
-      
+
 
     }  //done dealwith with TaggedXMLDataIOSytle
 
@@ -865,13 +877,13 @@ public void toXDFOutputStream (
     */
 
 protected void writeTaggedData(OutputStream outputstream,
-			       Locator locator, 
+			       Locator locator,
 			       String indent,
 			       int[] axisLength,
 			       String[] tags,
 			       int which)
   {
-	  
+
     String tag = (String) tags[which];
     if (sPrettyXDFOutput) {
       indent += sPrettyXDFOutputIndentation;
@@ -932,9 +944,6 @@ protected void writeTaggedData(OutputStream outputstream,
     }
   }
 }
-
-
-
 
 
 
