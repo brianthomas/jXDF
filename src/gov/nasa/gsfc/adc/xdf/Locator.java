@@ -29,19 +29,25 @@ import java.util.*;
    the range of valid datum indexes.
  */
 
-  //double check, should not inherit from BaseObject as is implemented
- public class Locator {
+
+ public class Locator implements Cloneable{
+  //
+  //Fields
+  //
   protected Array parentArray;
   protected List axisOrderList = Collections.synchronizedList(new ArrayList());
+
   //hashtable to store the (axis, index) pair
   protected Hashtable locations;
+
+  //constructor
   public Locator(Array array) {
     Log.debug("in Locator(Array)");
     parentArray = array;
     List axisList = parentArray.getAxisList();
 
     /**now, since we KNOW _parentArray is defined
-     * (has to be intanciated via XDF::Array ONLY)
+     * (has to be instanciated via XDF::Array ONLY)
      * we can proceed to initialize the axis, index positions
      * to the origin (ie index 0 for each axis).
      * We choose the parent Array axisList ordering for our
@@ -59,39 +65,22 @@ import java.util.*;
   }
 
   /**setAxisLocation: set the index of an axis
-   * @param: Axis, index
+   * @param: AxisInterface, int
    * @return: index if successful
    */
-  public int setAxisLocation (Axis axisObj, int index) throws AxisLocationOutOfBoundsException {
+  public int setAxisLocation (AxisInterface axisObj, int index) throws AxisLocationOutOfBoundsException {
     if ((!parentArray.getAxisList().contains(axisObj)) ||
         (index < 0) ||
         (index > axisObj.getLength()-1) ) {
         throw new AxisLocationOutOfBoundsException();
     }
     //now update the axis and index pair in the hashtable
-    //locations.remove(axisObj);
-    locations.put(axisObj, new Integer(index));
-    return index;
-  }
-
-  /**setAxisLocation: set the index of an axis
-   * @param: FieldAxis, index
-   * @return: index if successful
-   */
-  public int setAxisLocation (FieldAxis axisObj, int index) throws AxisLocationOutOfBoundsException {
-    if ((!parentArray.getAxisList().contains(axisObj)) ||
-        (index < 0) ||
-        (index > axisObj.getLength()-1) ) {
-        throw new AxisLocationOutOfBoundsException();
-    }
-    //now update the axis and index pair in the hashtable
-    //locations.remove(axisObj);
     locations.put(axisObj, new Integer(index));
     return index;
   }
 
   /**getAxisLocation: get the index of an Axis in the Locator object
-   * @param: Axis
+   * @param: AxisInterface
    * @return: index if successful, -1 if not
    */
   public int getAxisLocation (AxisInterface axisObj) {
@@ -108,26 +97,6 @@ import java.util.*;
       return -1;
     }
   }
-
-  /**getAxisLocation: get the index of an Axis in the Locator object
-   * @param: FieldAxis
-   * @return: index if successful, -1 if not
-   */
-  public int getAxisLocation (FieldAxis axisObj) {
-     if ((!parentArray.getAxisList().contains(axisObj)) ) {
-        Log.error("axisObj is not an Axis ref contained in Locator's parentArray");
-        Log.error("regnore request");
-        return -1;
-     }
-     Integer loc = (Integer) locations.get(axisObj);
-     if (loc !=null)
-      return loc.intValue();
-     else {
-      Log.error("error, parentArray constains the axisObj, but Location doens't");
-      return -1;
-    }
-  }
-
 
 
   /**setAxisLocationByAxisValue: set the index of an axis to the index of a value
@@ -244,6 +213,56 @@ import java.util.*;
       }
     }
 
+    public Object clone() throws CloneNotSupportedException{
+      Locator cloneObj = (Locator) super.clone();
+      //clone the axisOrderList
+      synchronized (this.axisOrderList) {
+        synchronized (cloneObj.axisOrderList) {
+          int stop = this.axisOrderList.size();
+          cloneObj.axisOrderList = Collections.synchronizedList(new ArrayList(stop));
+          for (int i = 0; i < stop; i ++) {
+            cloneObj.axisOrderList.add(this.axisOrderList.get(i));
+          }
+        }
+      }
+
+      //clone the locations, ie. the (axis, index) pair
+      synchronized (this.locations) {
+        synchronized (cloneObj.locations) {
+          int stop = this.locations.size();
+          cloneObj.locations = new Hashtable(stop);
+           Enumeration keys = this.locations.keys();
+           {
+              Object key = keys.nextElement();
+              cloneObj.locations.put(key, this.locations.get(key));
+           }while (keys.hasMoreElements());
+
+        }
+       }
+       return cloneObj;
+    }
+
+    //
+    //PROTECTED methods
+    //
+    /**adjust: adjust its axisOrderList and hashtable locations according
+     * to parentArray's axes change
+     */
+    public void addAxis(AxisInterface AxisObj) {
+      if (AxisObj instanceof Axis) {  //it is an Axis
+        axisOrderList.add(AxisObj);
+      }
+      else {                           //it is a FieldAxis
+        axisOrderList.add(0, AxisObj);
+      }
+
+      locations.put(AxisObj, new Integer(0));
+
+
+    }
+
+
+
 
 }  //end of Locator class
 
@@ -251,6 +270,10 @@ import java.util.*;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/06 21:25:19  kelly
+ * --added clone()
+ * --added addAxis() methods.  it is called when its parentArray adds an axis
+ *
  * Revision 1.8  2000/10/31 21:40:15  kelly
  * minor fix
  *
