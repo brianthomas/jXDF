@@ -59,7 +59,7 @@ implements AxisInterface
    private static final String ID_XML_ATTRIBUTE_NAME = new String("axisId");
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("axisIdRef");
    private static final String ALIGN_XML_ATTRIBUTE_NAME = new String("align");
-   private static final String DATATYPE_XML_ATTRIBUTE_NAME = new String("axisDatatype");
+   private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = new String("dataFormat");
    private static final String UNITS_XML_ATTRIBUTE_NAME = new String("axisUnits");
    private static final String VALUELIST_XML_ATTRIBUTE_NAME = new String("valueList");
 
@@ -163,23 +163,23 @@ implements AxisInterface
     return (String) ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /** set the *datatype* attribute
-   */
-  public void setDatatype(String strDatatype)
-  {
-    if (strDatatype == null || Utility.isValidDatatype(strDatatype))
-      ((Attribute) attribHash.get(DATATYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strDatatype);
-    else
-      Log.warnln("Datatype:["+strDatatype+"] is not valid, ignoring set request.");
-  }
+     /** Sets the data format for the label of this axis 
+     */
+     public void setLabelDataFormat(DataFormat dataFormat)
+     {
+        ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).setAttribValue(dataFormat);
+     }
+   
 
-  /**
-   * @return the current *datatype* attribute
-   */
-  public String getDatatype()
-  {
-    return (String) ((Attribute) attribHash.get(DATATYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
-  }
+     /**
+      * Gets the data format for the label of this axis.
+      * @return the current *dataFormat* object
+      */
+     public DataFormat getLabelDataFormat()
+     {
+        return (DataFormat) ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).getAttribValue();
+     }
+
 
   /** set the *axisUnits* attribute
    */
@@ -672,7 +672,7 @@ implements AxisInterface
      // occurence in the XDF DTD
      attribOrder.add(0, VALUELIST_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
-     attribOrder.add(0, DATATYPE_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, ALIGN_XML_ATTRIBUTE_NAME);  //not sure what it is???
      attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
@@ -694,7 +694,10 @@ implements AxisInterface
      attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new Attribute(unitsObj, Constants.OBJECT_TYPE));
      unitsObj.setXDFNodeName(UNITS_XML_ATTRIBUTE_NAME);
 
-     attribHash.put(DATATYPE_XML_ATTRIBUTE_NAME,new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME,new Attribute(null, Constants.OBJECT_TYPE));
+// NO. leave this null so that it wont print out, we assume implicitly its string in the Sax parser 
+//     this.setLabelDataFormat(new StringDataFormat()); // default is string with default length
+
      attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
      attribHash.put(NAME_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
