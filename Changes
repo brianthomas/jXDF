@@ -84,3 +84,6 @@
                         to treat <valueList> nodes.
                       - added XDF::DOM functionality. Any XML document may be read into this DOM which 
                         contains convience methods for accessing/manipulation of the XDF element nodes.
+                      - support for correct output formatting under delimited and tagged data added.
+                      - better support for reading file href Entities that reside in different locations
+                        from the metadata.

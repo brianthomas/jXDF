@@ -22,6 +22,8 @@
           work). We need to snarf and hold onto the XMLDecl for encoding an use
           appropriately in toXMLWriter methods.
 
+        - data encoding (base64/uuencoded) not supported yet either.
+
         - unique axisId's are not enforced, but should be. Overall we should hide
 	  id/idref sillyness from the programmer.
 

@@ -1,5 +1,5 @@
 
-<project name="XDF" default="all" basedir=".">
+<project name="XDF" default="help" basedir=".">
 
   <!-- set global properties for this build -->
   <property name="path" value="gov/nasa/gsfc/adc/xdf"/>
@@ -15,6 +15,18 @@
     <!-- Create the build directory structure used by compile -->
     <mkdir dir="${build}"/>
     <mkdir dir="${docApi}"/>
+  </target>
+
+  <target name="dump-info" >
+    <echo message="java.vm.info=${java.vm.info}" />
+    <echo message="java.vm.name=${java.vm.name}" />
+    <echo message="java.vm.vendor=${java.vm.vendor}" />
+    <echo message="java.vm.version=${java.vm.version}" />
+    <echo message="os.arch=${os.arch}" />
+    <echo message="os.name=${os.name}" />
+    <echo message="os.version=${os.version}" />
+    <echo message="file.encoding=${file.encoding}" />
+    <echo message="user.language=${user.language}" />
   </target>
 
   <target name="compile" depends="init">
@@ -52,6 +64,23 @@
   </target>
 
   <target name="all" depends="compile,doc"/>
+
+  <target name="help">
+    <echo message="Invoke 'ant' with one of the following options:" />
+    <echo message=" "/>
+    <echo message="   all       - do both 'jar' and 'doc' commands" />
+    <echo message="   compile   - compile XDF classes only (no jar file)" />
+    <echo message="   clean     - clean up temporary directories" />
+    <echo message="   doc       - compile XDF API documentation" />
+    <echo message="   dump-info - dump information about your machine" />
+    <echo message="   help      - print this help message and exit" />
+    <echo message="   jar       - compile XDF jar file" />
+    <echo message=" "/>
+    <echo message=" "/>
+    <echo message="Example usage: "/>
+    <echo message=" "/>
+    <echo message="> ant compile "/>
+  </target>
 
   <target name="clean">
     <delete dir="gov"/>
