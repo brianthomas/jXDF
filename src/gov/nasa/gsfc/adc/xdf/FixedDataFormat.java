@@ -3,7 +3,7 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.*;
+import java.util.Hashtable;
 
 // FixedDataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -52,7 +52,7 @@ public class FixedDataFormat extends DataFormat {
    *  conviently build the XML attribute list for a given class.
    */
   private void init() {
-    classXDFNodeName = super.getClassXDFNodeName()+ "||" + "fixed";
+     specificDataFormatName = "fixed";
     //add attributes
     /**precision:The precision of this fixed field which is the number of digits
      * to the right of the '.'.
@@ -204,8 +204,9 @@ public class FixedDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
- * Revision 1.2  2000/10/26 20:19:23  kelly
- * get methods are now in superclass DataFormat, implement set methods itself -k.z.
+ * Revision 1.3  2000/10/27 21:19:30  kelly
+ * get rid of classXDFNodeName, added specificDataFormatName to suit its
+ * supper class DataFormat *toXDF*.  -k.z.
  *
  * Revision 1.1  2000/10/16 14:55:11  kelly
  * created and pretty much completed the class. --k.z.

@@ -3,7 +3,7 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.*;
+import java.util.Hashtable;
 
 // ExponentialDataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -57,7 +57,7 @@ public class ExponentialDataFormat extends DataFormat {
    *  conviently build the XML attribute list for a given class.
    */
   private void init() {
-    classXDFNodeName = super.getClassXDFNodeName()+ "||" + "exponent";
+     specificDataFormatName = "exponent";
     //add attributes
     /**precision:
      * The precision of this exponential field from the portion to the
@@ -213,6 +213,10 @@ public class ExponentialDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/27 21:15:47  kelly
+ * get rid of classXDFNodeName, added specificDataFormatName to suit its
+ * supper class DataFormat *toXDF*.  -k.z.
+ *
  * Revision 1.2  2000/10/26 20:34:13  kelly
  * fixed the class name, etc. -k.z.
  *

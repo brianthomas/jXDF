@@ -64,7 +64,7 @@ public class IntegerDataFormat extends DataFormat {
    *  conviently build the XML attribute list for a given class.
    */
   private void init() {
-    classXDFNodeName = super.getClassXDFNodeName()+ "||" + "integer";
+     specificDataFormatName = "integer";
     //add attributes
     attribOrder.add(0,"width");
     attribOrder.add(0, "type");
@@ -249,6 +249,10 @@ public class IntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/27 21:20:06  kelly
+ * get rid of classXDFNodeName, added specificDataFormatName to suit its
+ * supper class DataFormat *toXDF*.  -k.z.
+ *
  * Revision 1.2  2000/10/26 20:18:52  kelly
  * get methods are now in superclass DataFormat, implement set methods itself -k.z.
  *

@@ -53,7 +53,7 @@ public class StringDataFormat extends DataFormat {
    *  conviently build the XML attribute list for a given class.
    */
   private void init() {
-    classXDFNodeName = super.getClassXDFNodeName()+ "||" + "string";
+    specificDataFormatName = "string";
     attribOrder.add(0, "length");  //add length as the first attribute;
     attribHash.put("length", new XMLAttribute(new Integer(0), Constants.NUMBER_TYPE));
   }
@@ -167,44 +167,14 @@ public class StringDataFormat extends DataFormat {
 
   /** override the base object method to add a little tailoring
    */
-  public void toXDFOutputStream (  OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
-                                   String indent,
-                                   boolean dontCloseNode,
-                                   String newNodeNameString,
-                                   String noChildObjectNodeName
-  ) {
-
-     boolean wasPretty = false;
-     //String dataFormatNodeName = super.getClassXDFNodeName();
-     String dataFormatNodeName = parentClassXDFNodeName;
-
-     if (sPrettyXDFOutput) writeOut(outputstream, indent); // indent node if desired
-
-     // open a "dataformat" tag
-     writeOut(outputstream, "<" + dataFormatNodeName + ">");
-     // now use normal method, but no pretty output
-     if (sPrettyXDFOutput)
-        wasPretty = true;
-     // turn off pretty output so no newline, or indenting
-     this.setPrettyXDFOutput(false);
-     super.toXDFOutputStream( outputstream, XMLDeclAttribs,
-                              indent, dontCloseNode,
-                              newNodeNameString, noChildObjectNodeName );
-     // return to pretty output if that was what we had before
-     if (wasPretty)
-        this.setPrettyXDFOutput(true);
-     // close the "dataformat" tag
-     writeOut(outputstream, "</" + dataFormatNodeName + ">");
-
-     if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
-
-  }
-
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/10/27 21:20:53  kelly
+ * get rid of classXDFNodeName, added specificDataFormatName to suit its
+ * supper class DataFormat *toXDF*.  -k.z.
+ *
  * Revision 1.5  2000/10/26 20:18:33  kelly
  * get methods are now in superclass DataFormat, implement set methods itself -k.z.
  *

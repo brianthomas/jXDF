@@ -3,7 +3,7 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.*;
+import java.util.Hashtable;
 
 // BinaryIntegerDataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -54,7 +54,7 @@ public class BinaryIntegerDataFormat extends DataFormat {
    *  conviently build the XML attribute list for a given class.
    */
   private void init() {
-    classXDFNodeName = super.getClassXDFNodeName()+ "||" + "binaryInteger";
+     specificDataFormatName = "binaryInteger";
     //add attributes
     attribOrder.add(0,"bits");
     attribOrder.add(0, "signed");
@@ -214,6 +214,10 @@ public class BinaryIntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/10/27 21:11:00  kelly
+ * get rid of classXDFNodeName, added specificDataFormatName to suit its
+ * supper class DataFormat *toXDF*.  -k.z.
+ *
  * Revision 1.3  2000/10/26 20:16:34  kelly
  * get methods are now in superclass DataFormat, implement set methods itself -k.z.
  *

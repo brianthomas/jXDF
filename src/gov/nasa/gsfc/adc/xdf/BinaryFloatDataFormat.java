@@ -3,7 +3,7 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.*;
+import java.util.Hashtable;
 
 // BinaryFloatDataFormat.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -53,7 +53,7 @@ public class BinaryFloatDataFormat extends DataFormat {
    *  conviently build the XML attribute list for a given class.
    */
   private void init() {
-    classXDFNodeName = super.getClassXDFNodeName()+ "||" + "binaryFloat";
+    specificDataFormatName = "binaryFloat";
     attribOrder.add(0, "bits");  //add bits as the first attribute;
 
     attribHash.put("bits", new XMLAttribute(new Integer(DefaultBinaryFloatBits), Constants.NUMBER_TYPE));
@@ -185,6 +185,10 @@ public class BinaryFloatDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/27 21:10:29  kelly
+ * get rid of classXDFNodeName, added specificDataFormatName to suit its
+ * supper class DataFormat *toXDF*.  -k.z.
+ *
  * Revision 1.2  2000/10/26 20:15:53  kelly
  * get methods are now in superclass DataFormat, implement set methods itself -k.z.
  *
