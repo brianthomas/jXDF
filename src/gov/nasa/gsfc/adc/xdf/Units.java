@@ -42,6 +42,7 @@ import java.io.OutputStream;
   //Fields
   //
 
+  private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
   protected String XDFNodeName;
 
   //double check
@@ -183,6 +184,20 @@ import java.io.OutputStream;
      return removeFromList(index, getUnitList(), "unitList");
   }
 
+  /** 
+   * set the description* attribute
+   */
+  public void setDescription (String strDesc) {
+      ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+  }
+
+  /**
+   * @return the current *description* attribute
+   */
+  public String getDescription() {
+      return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
   /**
    * assemble all the units in the list of units held in this object and return
    * it as a string
@@ -263,6 +278,9 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/05/22 21:27:43  huang
+ * added description set/get methods
+ *
  * Revision 1.13  2001/05/10 21:43:06  thomas
  * added resetXMLAttributes to init().
  *
