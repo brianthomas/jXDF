@@ -121,7 +121,7 @@ import java.util.*;
   public boolean next() {
     boolean outofDataCells = true;
 
-    for (int i = axisOrderList.size()-1; i >=0 ; i--) {
+    for (int i = 0; i <axisOrderList.size() ; i++) {
       Axis axis = (Axis) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
       if (index < axis.getLength()-1) {
@@ -142,7 +142,7 @@ import java.util.*;
   public boolean prev() {
     boolean outofDataCell = true;
 
-    for (int i = axisOrderList.size()-1; i >=0; i--) {
+    for (int i = 0; i <axisOrderList.size() ; i++) {
       Axis axis = (Axis) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
       index--;
@@ -215,6 +215,9 @@ import java.util.*;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/10/26 14:26:08  kelly
+ * retrieval order is in sync with the axisOrder now (first axis is the fastest).  -k.z.
+ *
  * Revision 1.5  2000/10/22 21:11:10  kelly
  * major rework of the class.
  *
