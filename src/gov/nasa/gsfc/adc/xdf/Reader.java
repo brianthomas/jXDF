@@ -222,17 +222,20 @@ public class Reader
             parser.parse(inputsource);
 
         } catch (SAXParseException err) {
-            Log.errorln("** Parsing error"+", line "+err.getLineNumber()
-                +", uri "+err.getSystemId()+"   " + err.getMessage());
+            String message = "** Parsing error"+", line "+err.getLineNumber()
+                +", uri "+err.getSystemId()+"   " + err.getMessage();
+            throw new java.io.IOException(message);
 
         } catch (SAXException e) {
             Exception   x = e;
             if (e.getException () != null)
                 x = e.getException ();
             Log.printStackTrace(x);
+            throw new java.io.IOException(x.getMessage());
 
         } catch (Throwable e) {
             Log.printStackTrace(e);
+            throw new java.io.IOException(e.getMessage());
         }
 
         // return the parsed structure object
@@ -358,6 +361,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2001/09/20 21:00:02  thomas
+ *  now converts SAXExceptions,etc into java.io.exceptions
+ *
  * Revision 1.20  2001/09/19 16:39:45  thomas
  * changed level of warning message to 'info'
  *
