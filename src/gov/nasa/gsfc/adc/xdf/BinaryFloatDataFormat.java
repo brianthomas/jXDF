@@ -126,6 +126,8 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
 
    protected void init() {
 
+      super.init();
+
       specificDataFormatName = "binaryFloat";
 
       attribOrder.add(0, BITS_XML_ATTRIBUTE_NAME);  //add bits as the first attribute;
@@ -138,6 +140,10 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/05/04 20:20:09  thomas
+ * added super.init() in init() method. This may have to be undone
+ * in the future.  Consider this to be a 'side-ways' change.
+ *
  * Revision 1.8  2001/02/07 18:42:25  thomas
  * Changes to enable binary read/writing. Converted XML attribute decl
  * to use constants (final static fields within the object). These

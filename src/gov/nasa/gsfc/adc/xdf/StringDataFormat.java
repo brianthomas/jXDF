@@ -164,6 +164,8 @@ public class StringDataFormat extends DataFormat {
     */
   protected void init() {
 
+     super.init();
+
      specificDataFormatName = "string";
 
      attribOrder.add(0, LENGTH_XML_ATTRIBUTE_NAME);  //add length as the first attribute;
@@ -179,6 +181,10 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/05/04 20:20:09  thomas
+ * added super.init() in init() method. This may have to be undone
+ * in the future.  Consider this to be a 'side-ways' change.
+ *
  * Revision 1.12  2001/04/27 21:30:59  thomas
  * Removed get/set methods for lessThan, greaterthan attribs.
  * These are now in Field and Array classes.

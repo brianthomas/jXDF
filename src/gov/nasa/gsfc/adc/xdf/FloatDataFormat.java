@@ -227,6 +227,8 @@ public class FloatDataFormat extends NumberDataFormat {
    */
   protected void init() {
 
+    super.init();
+
      specificDataFormatName = "float";
 
     //add attributes, order matters 
@@ -259,6 +261,10 @@ public class FloatDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/05/04 20:20:09  thomas
+ * added super.init() in init() method. This may have to be undone
+ * in the future.  Consider this to be a 'side-ways' change.
+ *
  * Revision 1.2  2001/02/07 18:44:04  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These

@@ -151,6 +151,9 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
       build the XML attribute list for a given class.
    */
    protected void init() {
+
+      super.init();
+
       specificDataFormatName = "binaryInteger";
      //add attributes
      attribOrder.add(0, BITS_XML_ATTRIBUTE_NAME);
@@ -169,6 +172,10 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/05/04 20:20:09  thomas
+ * added super.init() in init() method. This may have to be undone
+ * in the future.  Consider this to be a 'side-ways' change.
+ *
  * Revision 1.9  2001/02/07 18:42:25  thomas
  * Changes to enable binary read/writing. Converted XML attribute decl
  * to use constants (final static fields within the object). These
