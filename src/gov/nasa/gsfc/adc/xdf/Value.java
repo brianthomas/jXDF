@@ -11,15 +11,9 @@ package gov.nasa.gsfc.adc.xdf;
 
 public class Value {
 
-   private static MsgHandler msg = new MsgHandler();
-
    public Value () {
 
-      msg.setDebugMode(true);
-      msg.debug("**XDF Value created.\n");
-
    }
-
 
 }
 

@@ -11,15 +11,9 @@ package gov.nasa.gsfc.adc.xdf;
 
 public class Axis {
 
-    private static MsgHandler msg = new MsgHandler();
-
     public Axis() {
 
-       msg.setDebugMode(true);
-       msg.debug("**XDF Axis created.\n");
-
     }
-
 
 }
 

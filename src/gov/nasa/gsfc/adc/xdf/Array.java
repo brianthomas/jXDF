@@ -1,32 +1,13 @@
-
-// XDF Array Class 
-// CVS $Id$
-
 package gov.nasa.gsfc.adc.xdf;
+
 import java.util.*;
 
-/** The XDF Array class.
-    @author b.t. (thomas@adc.gsfc.nasa.gov)
-    @version $Revision$
-*/
+/**
+ * Array.java
+ * @author: Kelly Zeng (kelly.zeng@commerceone.com)
+ */
 
-public class Array {
+ public class Array {
 
-    MsgHandler msg;
-    private java.util.ArrayList axisList;
-
-    // Constructor methods
-    public Array () {
-
-       msg = new MsgHandler();
-       msg.setDebugMode(true);
-       msg.debug("**XDF Array created.\n");
-
-    }
-
-    // ****
-    // Public Methods
-    // ****
-
-}
+ }
 

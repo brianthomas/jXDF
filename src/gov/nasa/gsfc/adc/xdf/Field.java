@@ -16,16 +16,13 @@ package gov.nasa.gsfc.adc.xdf;
 /**
  * Field 
  */
-public class Field extends Tickmark {
-// Attributes of tickmark:
-//  private String name_;
-//  private Axis   axis_;
-    private String units_;
+public class Field {
 
     /**
      * Default no-argument constructor.
      */
     public Field() {
+
     }
 
     /**
@@ -40,6 +37,9 @@ public class Field extends Tickmark {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/09/29 22:03:37  cvs
+ * More files
+ *
  * Revision 1.1.1.1  2000/09/21 17:53:28  thomas
  * Imported Java Source
  *
