@@ -143,6 +143,7 @@ public class SaxDocumentHandler extends HandlerBase {
 
     // lookup tables holding objects that have id/idref stuff
     private Hashtable FieldObj = new Hashtable();
+    private Hashtable ValueListObj = new Hashtable();
     private Hashtable ValueObj = new Hashtable();
     private Hashtable ParamObj = new Hashtable();
     private Hashtable AxisObj = new Hashtable();
@@ -2094,15 +2095,6 @@ Log.errorln(" TValue:"+valueString);
     class notesEndElementHandlerFunc implements EndElementHandlerAction {
        public void action (SaxDocumentHandler handler) {
 
-       // set the locatorOrder in the Notes object
-/*
-   my $notesObj = $LAST_NOTES_OBJECT;
-
-#   if (ref($notesObj) eq 'XDF::Array') {
-#     for (@NOTE_LOCATOR_ORDER) { $notesObj->addAxisIdToLocatorOrder($_); }
-#   }
-*/
-
           // reset the location order
           NoteLocatorOrder = new ArrayList ();
 
@@ -2981,44 +2973,121 @@ Log.errorln(" TValue:"+valueString);
           // IF we get here, we have the delmited case for populating
           // a value list.
 
+          // 1. set up information we need
           // our string that we will parse
           String valueListString = new String (buf, offset, len);
-
           String delimiter = (String) CurrentValueListParameter.get("delimiter");
           String repeatable = (String) CurrentValueListParameter.get("repeatable");
 
-          // reconsitute information stored in CurrentValueListParameter table 
+          // 2. reconsitute information stored in CurrentValueListParameter table 
           String parentNodeName = (String) CurrentValueListParameter.get("parentNodeName");
 
-// NOT currently complete. Adds values ONLY to axes. Need one for parameter too. 
-
-          // get the last axis
-          List axisList = (List) CurrentArray.getAxisList();
-          Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
-
-          // split up string into values based on declared delimiter
+          // 3. split up string into values based on declared delimiter
           // and snag the string representation of the values
           ArrayList strValueList = 
               splitStringIntoStringObjects(valueListString, delimiter, repeatable, null );
 
-          // now create value objects, add them to groups 
-          Iterator iter = strValueList.iterator();
-          while (iter.hasNext()) 
-          {
-             String valueString = (String) iter.next();
+          // 4. add these values to the lookup table, if the original valueList had an ID
+          String valueListId = (String) CurrentValueListParameter.get("valueListId");
+          if (valueListId != null) {
 
-             // add the value to the axis
-             Value newvalue = new Value(valueString);
-             lastAxisObject.addAxisValue(newvalue);
+              // a warning check, just in case 
+              if (ValueListObj.containsKey(valueListId))
+                 Log.warnln("More than one valueList node with valueListId=\""+valueListId+"\", using latest node." );
 
-             // add this object to all open value groups
-             Iterator groupIter = CurrentValueGroupList.iterator();
-             while (groupIter.hasNext()) 
-             {
-                ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
-                newvalue.addToGroup(nextValueGroupObj);
-             }
+              // add the valueList array into the list of valueList objects
+              ValueListObj.put(valueListId, strValueList);
+
           }
+
+          //  5. If there is a reference object, clone it to get
+          //     the new valueList
+          String valueListIdRef = (String) CurrentValueListParameter.get("valueListIdRef");
+          if (valueListIdRef != null) {
+
+             if (ValueListObj.containsKey(valueListIdRef)) {
+
+                 // Just a simple clone since we have stored the ArrayList rather than the
+                 // ValueList object (which actually doesnt exist. :P
+                 ArrayList refValueListObj = (ArrayList) ValueListObj.get(valueListIdRef);
+                 strValueList = (ArrayList) refValueListObj.clone();
+
+// This is missing. Should allow override.
+/*
+                 // override attrs with those in passed list
+              //   strValueList.setXMLAttributes(attrs);
+                 // give the clone a unique Id and remove IdRef 
+              //   strValueList.setValueListId(findUniqueIdName(ValueListObj,strValueList.getValueListId()));
+              //   strValueList.setValueListIdRef(null);
+
+                 // add this into the list of valueList objects
+              //   ValueListObj.put(strValueList.getValueListId(), strValueList);
+*/
+
+              } else {
+                 Log.warnln("Error: Reader got an valueList with ValueListIdRef=\""+valueListIdRef+"\" but no previous valueList has that id! Ignoring add valueList request.");
+                 return;
+              }
+          }
+
+
+          // 6. determine where these values go and then insert them
+          //   (hurm. could have reused code here. lazy. feh.
+          if( parentNodeName.equals(XDFNodeName.AXIS) )
+          {
+
+             // get the last axis
+             List axisList = (List) CurrentArray.getAxisList();
+             Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+
+             // now create value objects, add them to groups 
+             Iterator iter = strValueList.iterator();
+             while (iter.hasNext())
+             {
+                String valueString = (String) iter.next();
+
+                // add the value to the axis
+                Value newvalue = new Value(valueString);
+                lastAxisObject.addAxisValue(newvalue);
+
+                // add this object to all open value groups
+                Iterator groupIter = CurrentValueGroupList.iterator();
+                while (groupIter.hasNext())
+                {
+                   ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
+                   newvalue.addToGroup(nextValueGroupObj);
+                }
+             }
+
+          } 
+           else if( parentNodeName.equals(XDFNodeName.PARAMETER) )
+          {
+
+             // now create value objects, add them to groups 
+             Iterator iter = strValueList.iterator();
+             while (iter.hasNext())
+             {
+                String valueString = (String) iter.next();
+
+                // add the value to the axis
+                Value newvalue = new Value(valueString);
+                LastParameterObject.addValue(newvalue);
+
+                // add this object to all open value groups
+                Iterator groupIter = CurrentValueGroupList.iterator();
+                while (groupIter.hasNext())
+                {
+                   ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
+                   newvalue.addToGroup(nextValueGroupObj);
+                }
+             }
+
+          } 
+          else 
+          {
+             Log.errorln("Error: weird parent node "+parentNodeName+" for "+XDFNodeName.VALUELIST+", aborting read.");
+             System.exit(-1);
+          } 
 
           CurrentValueListParameter.put("isDelimitedCase", "true"); // notify that we did the list 
 
@@ -3038,7 +3107,7 @@ Log.errorln(" TValue:"+valueString);
            CurrentValueListParameter = attribListToHashtable(attrs);
 
            // 3. populate ValueListparameters w/ parent name 
-           String parentNodeName = getParentNodeName();
+           String parentNodeName = getParentNodeName(XDFNodeName.VALUEGROUP);
            CurrentValueListParameter.put("parentNodeName", parentNodeName);
 
            // 4. set this parameter to false to indicate the future is not
@@ -3063,10 +3132,42 @@ Log.errorln(" TValue:"+valueString);
           // 1. grab parent node name
           String parentNodeName = (String) CurrentValueListParameter.get("parentNodeName");
 
-          // 2. try to determine values from attributes (e.g. algorithm method)
-          ArrayList values = getValueListNodeValues();
+          // 2. Find the list of values. If there is a reference object, clone it to get
+          //    the new values list, otherwise, determine values from attributes 
+          //    (e.g. algorithm method)
+          ArrayList values = null;
+          String valueListIdRef = (String) CurrentValueListParameter.get("valueListIdRef");
+          if (valueListIdRef != null) {
+             if (ValueListObj.containsKey(valueListIdRef)) {
 
-          // 3. Populate correct parent node w/ values 
+                 // Just a simple clone since we have stored the ArrayList rather than the
+                 // ValueList object (which actually doesnt exist. :P
+                 ArrayList refValueListObj = (ArrayList) ValueListObj.get(valueListIdRef);
+                 values  = (ArrayList) refValueListObj.clone();
+
+             } else {
+                 Log.warnln("Error: Reader got an valueList with ValueListIdRef=\""+valueListIdRef+"\" but no previous valueList has that id! Ignoring add valueList request.");
+                 return;
+              }
+
+          } else { 
+             values = getValueListNodeValues();
+          } 
+
+          // 4. add these values to the lookup table, if the original valueList had an ID
+          String valueListId = (String) CurrentValueListParameter.get("valueListId");
+          if (valueListId != null) {
+
+              // a warning check, just in case 
+              if (ValueListObj.containsKey(valueListId))
+                 Log.warnln("More than one valueList node with valueListId=\""+valueListId+"\", using latest node." );
+
+              // add the valueList array into the list of valueList objects
+              ValueListObj.put(valueListId, values);
+
+          }
+
+          // 5. Populate correct parent node w/ values 
           if(values.size() > 0 ) { // needed safety?
 
              ArrayList valueObjList = new ArrayList();
@@ -3085,14 +3186,9 @@ Log.errorln(" TValue:"+valueString);
                         valueObjList.add(lastAxisObject.addAxisValue(value));
                     }
 
-             } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
+             } 
+             else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
              {
-
-/*
-   ValueGroup lastValueGroup = (ValueGroup)
-   CurrentValueGroupList.get(CurrentValueGroupList.size()-1);
-   newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
-*/
 
                 if ( LastValueGroupParentObject instanceof Parameter )
                 {
@@ -3165,6 +3261,11 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.26  2001/01/22 22:11:58  thomas
+ * Added id/idref struff to valueList, value and parameter. Read
+ * id/idref stuff fixed. valueList values may now be added to
+ * parameter objects. -b.t.
+ *
  * Revision 1.25  2001/01/19 22:34:28  thomas
  * Fixed handling of readId/IdRef stuff. Added Id/IdRef stuff
  * for value, parameter. valuelist is not done yet. -b.t.
