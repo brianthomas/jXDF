@@ -506,8 +506,8 @@ public class DataCube extends BaseObject {
          java.lang.reflect.Array.setDouble(longDataArray.get(longIndex+1), shortIndex, numValue);
          return;
       }
-      catch (Exception e) {
-         throw new SetDataException();
+      catch (ArrayIndexOutOfBoundsException e) {
+         throw new SetDataException("Cant set double data:["+numValue+"] ("+longIndex+","+shortIndex+") Array out of bounds, using the wrong Locator?");
       }
 
    }
@@ -538,8 +538,8 @@ public class DataCube extends BaseObject {
          java.lang.reflect.Array.setFloat(longDataArray.get(longIndex+1), shortIndex, numValue);
          return;
       }
-      catch (Exception e) {
-         throw new SetDataException();
+      catch (ArrayIndexOutOfBoundsException e) {
+         throw new SetDataException("Cant set float data:["+numValue+"] Array out of bounds, using the wrong Locator?");
       }
 
    }
@@ -570,8 +570,8 @@ public class DataCube extends BaseObject {
          java.lang.reflect.Array.setInt(longDataArray.get(longIndex+1), shortIndex, numValue);
          return;
       }
-      catch (Exception e) {
-         throw new SetDataException();
+      catch (ArrayIndexOutOfBoundsException e) {
+         throw new SetDataException("Cant set int data:["+numValue+"] Array out of bounds, using the wrong Locator?");
       }
 
    }
@@ -602,8 +602,8 @@ public class DataCube extends BaseObject {
          java.lang.reflect.Array.setLong(longDataArray.get(longIndex+1), shortIndex, numValue);
          return;
       }
-      catch (Exception e) {
-         throw new SetDataException();
+      catch (ArrayIndexOutOfBoundsException e) {
+         throw new SetDataException("Cant set long data:["+numValue+"] Array out of bounds, using the wrong Locator?");
       }
 
    }
@@ -634,8 +634,8 @@ public class DataCube extends BaseObject {
          java.lang.reflect.Array.setShort(longDataArray.get(longIndex+1), shortIndex, numValue);
          return;
       }
-      catch (Exception e) {
-         throw new SetDataException();
+      catch (ArrayIndexOutOfBoundsException e) {
+         throw new SetDataException("Cant set short data:["+numValue+"] Array out of bounds, using the wrong Locator?");   
       }
 
    }
@@ -666,8 +666,8 @@ public class DataCube extends BaseObject {
          java.lang.reflect.Array.setByte(longDataArray.get(longIndex+1), shortIndex, numValue);
          return;
       }
-      catch (Exception e) {
-         throw new SetDataException();
+      catch (ArrayIndexOutOfBoundsException e) {
+         throw new SetDataException("Cant set byte data:["+numValue+"] Array out of bounds, using the wrong Locator?");   
       }
 
    }
@@ -699,8 +699,8 @@ public class DataCube extends BaseObject {
          java.lang.reflect.Array.set(longDataArray.get(longIndex+1), shortIndex, stringValue);
          return;
       }
-      catch (Exception e) {
-         throw new SetDataException();
+      catch (ArrayIndexOutOfBoundsException e) {
+         throw new SetDataException("Cant set String data:["+stringValue+"] Array out of bounds, using the wrong Locator?");   
       }
 
    }
@@ -1188,16 +1188,16 @@ public class DataCube extends BaseObject {
         int currentShortAxisSize = getLongDataArraySize(longIndex, type);
 
          // requested short axis location not exist?
-         if (currentShortAxisSize < shortIndex) {
+         if (currentShortAxisSize <= shortIndex) {
 
             // should flag the user that need to add AxisValue first
             if (shortIndex > shortAxisSize) {
-               Log.errorln ("Error: axis lacks an AxisValue at location requested in setData().");
-               throw new SetDataException();
+               throw new SetDataException("Error: axis lacks an AxisValue at location requested in setData().");
             } else {
                // add in short axis location to local short array(s) 
                int newsize = shortIndex+1; // need to add one for case of 1-D 
                newsize *= expandFactor; // expand short axis by expandFactor 
+// Log.debugln("Expanding short array at longIndex:"+longIndex+" to "+newsize);
                longDataArray.set(longIndex, expandArray((byte []) longDataArray.get(longIndex), newsize));
 
                if (type == DOUBLE_DATA_TYPE) {
@@ -2005,6 +2005,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.51  2001/09/21 16:50:17  thomas
+  * setData now throw SetDataException w/ messages now
+  *
   * Revision 1.50  2001/09/20 20:59:36  thomas
   * checkBounds now checks for neg. short/long internal axes values
   *
