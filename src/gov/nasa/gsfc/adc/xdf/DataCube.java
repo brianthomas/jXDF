@@ -972,7 +972,18 @@ public class DataCube extends BaseObject {
          // now, based on outputstyle, write out the data
          if (readObj instanceof TaggedXMLDataIOStyle) 
          {
+ 
 
+            // first order of business: we need to enclose
+            // external, tagged data with single <data> root nodes to make it 
+            // legit XML. We print the first root node here, now if this is the case
+            // ALSO, if writing to an external file, no need to have gratuitously large
+            // indent , save it aside, and set current indent to '0'
+            String taggedIndent = indent;
+            if (writeHrefAttribute) { 
+               dataOutputWriter.write("<"+nodeName+">");
+               taggedIndent = "";
+            }
 
             String[] tags = ((TaggedXMLDataIOStyle)readObj).getAxisTags();
 
@@ -1000,7 +1011,7 @@ public class DataCube extends BaseObject {
 
             writeTaggedData( dataOutputWriter,
                              taggedLocator,
-                             indent,
+                             taggedIndent,
                              axisLength,
                              tags,
                              0,
@@ -1016,7 +1027,15 @@ public class DataCube extends BaseObject {
                              intFlag, 
                              whichTagIsFieldAxis
                            );
-   
+
+            // Now we need to close the data root node, if we print to an external resource
+            if (writeHrefAttribute) { 
+               if (niceOutput) //close the data section appropriately
+                  dataOutputWriter.write(Constants.NEW_LINE);
+
+               dataOutputWriter.write("</"+nodeName+">");
+            }
+
             // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
             // on SUN and Linux platforms show that it is. Hopefully we can remove
             // this in the future.
@@ -1081,8 +1100,6 @@ public class DataCube extends BaseObject {
       if (!writeHrefAttribute) 
         outputWriter.write( "</" + nodeName + ">");
   
- //     if (niceOutput)
- //       outputWriter.write( Constants.NEW_LINE);
       return nodeName;
 
    }
@@ -2005,6 +2022,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.52  2001/09/27 17:19:54  thomas
+  * fixes to allow writing out of TaggedXMLDataIOStyle
+  *
   * Revision 1.51  2001/09/21 16:50:17  thomas
   * setData now throw SetDataException w/ messages now
   *
