@@ -417,17 +417,20 @@ import java.util.Vector;
 
      /* set the *axisList* attribute
       */
-     public void setAxisList(List axisList) {
+     public void setAxisList (List axisList) {
 	 // remove the existing axes
 	 List oldAxisList = getAxes();
-	 for (int i=0;i<oldAxisList.size();i++)
-	     removeAxis(i++);
+         int lastindex = oldAxisList.size()-1;
+	 for (int i = lastindex; i >= 0; i--)
+         {
+	     removeAxis(i);
+         }
 
 	 //add new axes
 	 if (axisList != null && axisList.size() > 0) {
 	     Iterator iter = axisList.iterator();
 	     while (iter.hasNext())
-		 addAxis((Axis) iter.next());
+		 addAxis((AxisInterface) iter.next());
 	 }
      }
    
@@ -498,7 +501,8 @@ import java.util.Vector;
       /** get the dimension of the DataCube held within this Array.
       */
       public int getDimension() {
-        return getDataCube().getDimension();
+        // return getDataCube().getDimension();
+        return getAxes().size();
       }
    
       //
@@ -544,7 +548,7 @@ import java.util.Vector;
         {
            setFieldAxis((FieldAxis) axis);
         } else if (canAddAxisObjToArray((Axis) axis)) { //check if the axis can be added
-           getDataCube().incrementDimension((Axis) axis);  //increment the DataCube dimension by 1
+//           getDataCube().incrementDimension((Axis) axis);  //increment the DataCube dimension by 1
            getAxes().add((Axis) axis);
            updateChildLocators((Axis) axis, "add");
            updateNotesLocationOrder(); // reset to the current order of the axes
@@ -563,8 +567,8 @@ import java.util.Vector;
       */
      public boolean removeAxis (AxisInterface axisObj) {
        boolean isRemoveSuccess = removeFromList(axisObj, getAxes(), AXISLIST_XML_ATTRIBUTE_NAME);
-       if (isRemoveSuccess) {   //remove successful
-          getDataCube().decrementDimension(axisObj);   //decrease the dimension by 1
+       if (isRemoveSuccess) {    //remove successful
+          getDataCube().reset(); // reset data within the datacube
           updateChildLocators(axisObj, "remove");
        }
        return isRemoveSuccess;
@@ -579,7 +583,7 @@ import java.util.Vector;
        AxisInterface removeAxis = (AxisInterface) getAxes().get(index);
        boolean isRemoveSuccess = removeFromList(index, getAxes(), AXISLIST_XML_ATTRIBUTE_NAME);
        if (isRemoveSuccess) {  //remove successful
-          getDataCube().decrementDimension(removeAxis);   //decrease the dimension by 1
+          getDataCube().reset(); // reset data within the datacube
           updateChildLocators(index, "remove");
        }
        return isRemoveSuccess;
@@ -931,12 +935,15 @@ System.out.println ("DEBUG: String []: " + numValue.length);
          if (fieldAxis != null) { 
             axisList.add(0, fieldAxis);  //replace the old fieldAxis with the new one
             hasFieldAxis = true;
-         }
+         } 
        } else {  //add a fieldAxis where none prev existed.
          if (fieldAxis != null) { // only if we have something to add 
             getAxes().add(0, fieldAxis);
-            getDataCube().incrementDimension(fieldAxis); // increment dimension
+//            getDataCube().incrementDimension(fieldAxis); // increment dimension
             hasFieldAxis = true;
+            getDataCube().reset(); // reset data within the datacube
+                                   // since we no longer can guarente internal ordering
+                                   // as the field axis goes in slot "0".
          }
        }
 
@@ -960,7 +967,7 @@ System.out.println ("DEBUG: String []: " + numValue.length);
    
    public FieldAxis getFieldAxis() {
        List axisList = getAxes();
-       if (axisList.size() == 0){  //empty axisList
+       if (axisList.size() == 0 || !this.hasFieldAxis() ){  //empty axisList or lacks field Axis 
          return null;
        }
    
@@ -1144,6 +1151,11 @@ System.out.println ("DEBUG: String []: " + numValue.length);
 /**
   * Modification History:
   * $Log$
+  * Revision 1.28  2001/06/18 17:08:40  thomas
+  * fixed setAxisList bug. Removed extraneous methods
+  * of incrementDimension, decrementDimension. Small
+  * (other) changes to reflect new DataCube storage scheme.
+  *
   * Revision 1.27  2001/05/24 17:23:54  huang
   * revived setAxisList() and other minor changes
   *
