@@ -45,15 +45,15 @@
 
         Use the later URL if you can login already as Java Sun developer. JAXP 
         includes the crimson parser which is the default XML parser for XDF.
-      	You will also need to acquire the Xerces-J (version 1.4.3, not the upcoming 2) 
+      	You will also need to acquire the Xerces-J (version 1.4.4, not the upcoming 2) 
         package from 
 
             http://xml.apache.org/dist/xerces-j/
 
         in order to use the classes in the sub-package: gov.nasa.gsfc.adc.xdf.DOM package.
 
-        Furthermore, we *only* support Xerces-1.4.3, so please download that version,
-	and YOU WILL NEED TO APPLY A PATCH: ElementState.java.patch (included in this
+        Furthermore, we *only* support Xerces-1.4.3/1.4.4, so please download one of those
+        versions, and YOU WILL NEED TO APPLY A PATCH: ElementState.java.patch (included in this
         distribution) to the relevant Xerces class ElementState AND REBUILD the Xerces 
         distribution (not difficult). Having to patch the Xerces distribution is unfortunate, 
         however, the patch has been submitted to the Xerces-J mailing list, and hopefully it will
