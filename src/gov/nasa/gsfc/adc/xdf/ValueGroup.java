@@ -24,9 +24,6 @@
  
 package gov.nasa.gsfc.adc.xdf;
 import java.util.Hashtable;
-import java.util.Collections;
-import java.util.Set;
-import java.util.HashSet;
 
 /** ValueGroup:
     @version $Revision$
@@ -41,7 +38,6 @@ public class ValueGroup extends Group {
     /** This field stores object references to those parameter group objects
        to which this array object belongs
     */  
-    protected Set valueGroupOwnedHash = Collections.synchronizedSet(new HashSet()); 
 
     /** No-argument constructor
      */
@@ -68,16 +64,15 @@ public class ValueGroup extends Group {
     */
     public ValueGroup addValueGroup (ValueGroup group) {
        //add the group to the groupOwnedHash
-       addMemberObject((Object) group); // paramGroupOwnedHash.add(group);
+       addMemberObject((Object) group); 
        return group;
     }
 
-    /** Remove a ValueGroup object from the hashset--valueGroupOwnedHash
+    /** Remove a ValueGroup object from this object.
         @return: true on success, false on failure
      */
     public boolean removeValueGroup(ValueGroup group) {
 
-       // return paramGroupOwnedHash.remove(group);
        if( removeMemberObject((Object) group) != null)
           return true;
        return false;
@@ -98,6 +93,10 @@ public class ValueGroup extends Group {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/11/01 21:57:25  thomas
+ * removed extraneous valueGroupOwnedHash field
+ * from class. Put in explicit import paths. -b.t.
+ *
  * Revision 1.2  2000/10/26 20:41:54  thomas
  * Inserted needed code to bring to initial version -b.t.
  *
