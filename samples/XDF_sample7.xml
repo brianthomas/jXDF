@@ -68,7 +68,7 @@
         <units>
           <unitless/>
         </units>
-        <dataFormat><exponential width="8" precision="3" exponent="2"/></dataFormat>
+        <dataFormat><float width="8" precision="3" exponent="2"/></dataFormat>
 <!--
         <dataFormat><string length="8"/></dataFormat>
         <dataFormat><binaryFloat bits="64"/></dataFormat>
