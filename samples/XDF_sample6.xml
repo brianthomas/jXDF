@@ -44,7 +44,7 @@
          <field name="V-band Error" >
             <units><unit>magnitude</unit></units>
             <dataFormat><float width="4" precision="1" /></dataFormat>
-            <relation fieldIdRefs="vmag" role="errors" />
+            <relation fieldIdRefs="vmag" role="error" />
          </field>
          <field fieldId="ccdNumber" name="CCD ID Number">
             <units><unitless/></units>
@@ -57,14 +57,14 @@
          <field name="Reference" >
             <units><unitless/></units>
             <dataFormat><string length="10" /></dataFormat>
-            <relation fieldIdRefs="gname" role="references" />
+            <relation fieldIdRefs="gname" role="reference" />
          </field>
       </fieldAxis>
 
       <axis axisId="rows" axisDatatype="integer">
          <axisUnits><unitless/></axisUnits>
          <valueGroup name="rows"> 
-           <valueList delimiter=" " size="3">0 1 2</valueList> 
+           <valueList delimiter=" ">0 1 2</valueList> 
          </valueGroup> 
       </axis>
 

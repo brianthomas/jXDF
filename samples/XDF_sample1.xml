@@ -21,7 +21,7 @@
           </axis>
           <axis name="y" axisId="y-axis" axisDatatype="integer" >
              <axisUnits><unit>pixel</unit></axisUnits>
-             <valueList size="10" delimiter=" " repeatable="yes">10  9 8 7 6 5 4 3 2 1</valueList>
+             <valueList delimiter=" " repeatable="yes">10  9 8 7 6 5 4 3 2 1</valueList>
           </axis>
 
              <read>

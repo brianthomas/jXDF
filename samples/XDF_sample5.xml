@@ -21,10 +21,10 @@
           </axis>
           <axis name="y" axisId="y-axis">
              <axisUnits><unit>pixel</unit></axisUnits>
-             <valueList size="10" delimiter=" " repeatable="yes">10  9 8 7 6 5 4 3 2 1</valueList>
+             <valueList delimiter=" " repeatable="yes">10  9 8 7 6 5 4 3 2 1</valueList>
           </axis>
 
-             <read encoding="iso8859-1">
+             <read encoding="ISO-8859-1">
                 <for axisIdRef="y-axis">
                    <for axisIdRef="x-axis">
                      <textDelimiter repeatable="yes" recordTerminator="&#10;" />
