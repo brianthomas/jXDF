@@ -55,8 +55,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    //
    public DelimitedXMLDataIOStyle (ArrayInterface parentArray)
    {
-      this.parentArray = parentArray;
-      init();
+      super(parentArray);
    }
 
    /**  This constructor takes a Java Hashtable as an initializer of
@@ -66,16 +65,8 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
     */
    public DelimitedXMLDataIOStyle ( ArrayInterface parentArray, Hashtable InitXDFAttributeTable )
    {
-
-      this.parentArray = parentArray;
-
-      // init the XML attributes (to defaults)
-      init();
-
-      // init the value of selected XML attributes to HashTable values
-      hashtableInitXDFAttributes(InitXDFAttributeTable);
+      super(parentArray, InitXDFAttributeTable);
    }
-
 
   //
   //Get/Set Methods
@@ -209,7 +200,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    protected void init()
    {
 
-      // super.init(); // DONT do this. 
+      super.init(); 
 
       classXDFNodeName = "textDelimiter";
 
@@ -232,6 +223,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/05/10 21:15:12  thomas
+ * changes related to inheritance. call super in constructor.
+ *
  * Revision 1.11  2001/05/04 20:22:52  thomas
  * Added Interface stuff.
  *
