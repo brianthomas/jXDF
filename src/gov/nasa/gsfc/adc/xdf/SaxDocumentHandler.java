@@ -1906,7 +1906,7 @@ public class SaxDocumentHandler implements DocumentHandler {
           // if this global option is set in the reader, we use it
           if(Options.contains("DefaultDataDimensionSize")) { 
              int value = ((Integer) Options.get("DefaultDataDimensionSize")).intValue();
-             XDF.setDefaultDataArraySize(value);
+             Specification.getInstance().setDefaultDataArraySize(value);
           }
 
           return CurrentStructure;
@@ -2366,6 +2366,10 @@ public class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2000/11/17 16:01:43  thomas
+ * Minor bug fix, needed to switch to using Specification
+ * class. -b.t.
+ *
  * Revision 1.14  2000/11/10 06:14:43  thomas
  * Added set/get for Current/Array/Structure/DatatypeObject
  * methods . -b.t.
