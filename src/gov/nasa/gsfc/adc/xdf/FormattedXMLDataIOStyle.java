@@ -142,29 +142,24 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   /**specific tailoring when writing out
    */
 
-  protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
+  protected void specificIOStyleToXDF( OutputStream outputstream, String indent)
   {
 
-     ArrayList axisIds = new ArrayList ();
-     int numberOfAxes = 0;
-
-     synchronized (parentArray) {
-
-        List axisList = parentArray.getAxes();
-        Iterator iter = axisList.iterator(); 
-        while(iter.hasNext()) {
-           AxisInterface axis = (AxisInterface) iter.next();
-           if (Specification.getInstance().isPrettyXDFOutput()) {
-              writeOut(outputstream, Constants.NEW_LINE);
-              writeOut(outputstream, indent);
-              indent = indent + Specification.getInstance().getPrettyXDFOutputIndentation(); 
-           }
-           writeOut(outputstream, "<"+UntaggedInstructionNodeName+" "+UntaggedInstructionAxisIdRefName+"=\"");
-           writeOutAttribute(outputstream, axis.getAxisId());
-           writeOut(outputstream, "\">");
-
-           numberOfAxes++;
+     //List axisList = parentArray.getAxes();
+     List axisList = getIOAxesOrder();
+     int numberOfAxes = axisList.size(); 
+     for (int i = (numberOfAxes-1); i >= 0; i--) {
+        AxisInterface axis = (AxisInterface) axisList.get(i);
+        if (Specification.getInstance().isPrettyXDFOutput()) {
+           writeOut(outputstream, Constants.NEW_LINE);
+           writeOut(outputstream, indent);
+           indent = indent + Specification.getInstance().getPrettyXDFOutputIndentation(); 
         }
+        writeOut(outputstream, "<"+UntaggedInstructionNodeName+" "+UntaggedInstructionAxisIdRefName+"=\"");
+        writeOutAttribute(outputstream, axis.getAxisId());
+        writeOut(outputstream, "\">");
+
+        numberOfAxes++;
      }
 
      if (Specification.getInstance().isPrettyXDFOutput()) 
@@ -252,6 +247,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/06/18 21:32:35  thomas
+ * changes to reflect new getIOAxisOrder method of parent.
+ *
  * Revision 1.14  2001/05/10 21:16:10  thomas
  * changes related to inheritance. call super in constructor.
  * FormattedIO objects arent type XMLDataIOSTYLE!!
