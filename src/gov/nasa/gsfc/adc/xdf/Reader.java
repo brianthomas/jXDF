@@ -34,6 +34,7 @@ package gov.nasa.gsfc.adc.xdf;
 import java.io.File;
 // import java.util.Hashtable;
 import java.util.Map;
+import java.io.StringReader;
 
 // Import needed SAX stuff
 // import org.xml.sax.helpers.DefaultHandler;
@@ -223,8 +224,18 @@ public class Reader
 
     /** Parse a file into an XDF Structure object.
         @return XDF (structure) object
-    */
+        @deprecated use parseFile method instead.
+     */
     public XDF parsefile (String file)
+    throws java.io.IOException
+    {
+       return parseFile(file);
+    }
+
+    /** Parse a file into an XDF Structure object.
+        @return XDF (structure) object
+    */
+    public XDF parseFile (String file)
     throws java.io.IOException
     {
 
@@ -246,6 +257,33 @@ public class Reader
         return parse(input);
 
     }
+
+    public XDF parseString (String XMLContent)
+    throws java.io.IOException
+    {
+
+        InputSource input;
+        StringReader reader = new StringReader(XMLContent);
+
+        //
+        // Turn the filename into an input source
+        //
+        // NOTE:  The input source must have a "system ID" if
+        // there are relative URLs in the input document.  The
+        // static resolver methods handle that automatically
+        // in most cases.
+        //
+//        input = Resolver.createInputSource (new File(file));
+        input = new InputSource (reader);
+
+
+        // now parse it, return whatever structure is derived 
+        XDF myXDFObject = parse(input);
+System.err.println("parseString returns object:"+myXDFObject);
+        return myXDFObject;
+
+    }
+
 
 } // end Reader class
 
@@ -302,6 +340,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/08/31 20:00:00  thomas
+ * added parseFile, parseString methods
+ *
  * Revision 1.17  2001/07/26 15:57:47  thomas
  * Small improvement to error reporting handler message output.
  *
