@@ -121,21 +121,3 @@ import java.util.ArrayList;
 
 } // end of internal Class Attribute
 
-/* Modification History
- * 
- * $Log$
- * Revision 1.1  2001/09/13 21:36:59  thomas
- * *** empty log message ***
- *
- * Revision 1.9  2000/11/09 23:26:48  kelly
- * fixed a little documentation.
- *
- * Revision 1.8  2000/11/08 22:30:11  thomas
- * Changed set methods to return void. -b.t.
- *
- * Revision 1.7  2000/11/08 20:25:34  thomas
- * Added header information/log mod history -b.t.
- *
- * 
- */
-

@@ -147,59 +147,5 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
       numOfBytes = getBits().intValue()/8;
    }
 
-
 }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.12  2001/09/18 17:41:52  thomas
- * caches numOfBytes now
- *
- * Revision 1.11  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.10  2001/07/17 19:06:23  thomas
- * upgrade to use JAXP (SAX2) only. Namespaces NOT
- * implemented (yet).
- *
- * Revision 1.9  2001/05/04 20:20:09  thomas
- * added super.init() in init() method. This may have to be undone
- * in the future.  Consider this to be a 'side-ways' change.
- *
- * Revision 1.8  2001/02/07 18:42:25  thomas
- * Changes to enable binary read/writing. Converted XML attribute decl
- * to use constants (final static fields within the object). These
- * are private decl for now. -b.t.
- *
- * Revision 1.7  2000/11/22 20:42:00  thomas
- * beaucoup changes to make formatted reads work.
- * DataFormat methods now store the "template" or
- * formatPattern that will be needed to print them
- * back out. Removed sprintfNotation, Perl regex and
- * Perl attributes from DataFormat classes. -b.t.
- *
- * Revision 1.6  2000/11/20 22:05:50  thomas
- * plit up Attribute type NUMBER_TYPE into
- * INTEGER_TYPE and DOUBLE_TYPE. This allows for
- * some needed handling in the SaxDocHandler when
- * parsing data for the formatted read. Put prior NUMBER_TYPE
- * attributes into appropriate new category. -b.t.
- *
- * Revision 1.5  2000/11/16 19:51:46  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.4  2000/11/08 22:30:12  thomas
- * Changed set methods to return void. -b.t.
- *
- * Revision 1.3  2000/10/27 21:10:29  kelly
- * get rid of classXDFNodeName, added specificDataFormatName to suit its
- * supper class DataFormat *toXDF*.  -k.z.
- *
- * Revision 1.2  2000/10/26 20:15:53  kelly
- * get methods are now in superclass DataFormat, implement set methods itself -k.z.
- *
- * Revision 1.1  2000/10/16 14:50:48  kelly
- * created and pretty much completed the class. --k.z.
- *
- */

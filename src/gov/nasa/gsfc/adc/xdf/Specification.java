@@ -184,28 +184,3 @@ public class Specification {
 
 }
 
-/* Modification history
- *
- * $Log$
- * Revision 1.7  2001/09/05 21:59:38  thomas
- * moved PCDATA_ATTR, XDF_ROOT_NODE_NAME, XML_SPEC_VERSION, and XDF_DTD_NAME out to Constants
- *
- * Revision 1.6  2001/07/17 19:06:23  thomas
- * upgrade to use JAXP (SAX2) only. Namespaces NOT
- * implemented (yet).
- *
- * Revision 1.5  2001/06/19 15:07:14  thomas
- * updated DTD name to remove the extraneous '.'
- *
- * Revision 1.4  2001/06/12 17:15:55  huang
- * added a static method
- *
- * Revision 1.3  2001/01/19 17:20:19  thomas
- * Added XMLParserClass attribute. -b.t.
- *
- * Revision 1.2  2000/11/27 17:14:30  thomas
- * added bounds check on set dataArraySize -b.t.
- *
- *
- */
-

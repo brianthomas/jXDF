@@ -148,13 +148,3 @@ import java.io.OutputStreamWriter;
 
  }
 
- /* Modification History:
- *
- * $Log$
- * Revision 1.1  2001/09/14 18:23:42  thomas
- * Initial Version, obj used by XDF object when it is printed out
- *
- *
- */
-
-

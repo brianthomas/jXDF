@@ -43,21 +43,3 @@ public interface ValueListInterface
    public Object clone() throws CloneNotSupportedException;
 }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.4  2001/09/05 22:03:15  thomas
- * added toXMLString method
- *
- * Revision 1.3  2001/09/04 21:18:44  thomas
- * added to XMLOutputStream method
- *
- * Revision 1.2  2001/07/26 15:56:12  thomas
- * toXMLOutputStream => toXMLWriter method.
- *
- * Revision 1.1  2001/07/11 22:40:29  thomas
- * Initial Version
- *
- *
- */
-

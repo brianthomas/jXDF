@@ -131,42 +131,4 @@ public class  ErroredValue extends Value {
 
    }
 }
-/* Modification History:
- *
- * $Log$
- * Revision 1.9  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.8  2001/06/12 16:03:58  huang
- * initialize a variable
- *
- * Revision 1.7  2001/05/04 20:24:13  thomas
- * added super.init() to init() method.
- *
- * Revision 1.6  2001/02/07 18:08:55  thomas
- * removed duplicitous setErrorValue method.
- *
- * Revision 1.5  2001/02/07 18:44:03  thomas
- * Converted XML attribute decl
- * to use constants (final static fields within the object). These
- * are private decl for now. -b.t.
- *
- * Revision 1.4  2001/01/19 17:23:59  thomas
- * Fixed class to match DTD standard. Now there
- * is no attribute called "errorValue". -b.t.
- *
- * Revision 1.3  2000/11/20 22:03:48  thomas
- * Split up Attribute type NUMBER_TYPE into
- * INTEGER_TYPE and DOUBLE_TYPE. This allows for
- * some needed handling in the SaxDocHandler when
- * parsing data for the formatted read. Put prior NUMBER_TYPE
- * attributes into appropriate new category. -b.t.
- *
- * Revision 1.2  2000/11/16 19:57:29  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.1  2000/11/02 20:34:17  kelly
- * created the class
- *
- *
- */
+

@@ -27,18 +27,11 @@ package gov.nasa.gsfc.adc.xdf;
 
 import java.io.OutputStream;
 
+// Note: is there any point to this class?? Probably should be removed.
+
 /** common interface for formatted IO command
  */
 public interface FormattedIOCmd {
 
 }
-
-/* Modification History
- *
- * $Log$
- * Revision 1.4  2000/11/17 22:29:55  thomas
- * Some minor changes to code layout. -b.t.
- *
- *
- */
 

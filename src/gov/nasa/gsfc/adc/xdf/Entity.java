@@ -227,19 +227,3 @@ import java.io.OutputStreamWriter;
 
  }
 
- /* Modification History:
- *
- * $Log$
- * Revision 1.1  2001/09/13 21:36:43  thomas
- * *** empty log message ***
- *
- * Revision 1.2  2001/09/06 15:57:42  thomas
- * changed basicXMLWriter to return String (nodeName); made nodeName private,static field in class
- *
- * Revision 1.1  2001/09/05 21:57:26  thomas
- * Initial Version
- *
- *
- */
-
-

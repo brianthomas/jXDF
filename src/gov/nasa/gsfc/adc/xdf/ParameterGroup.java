@@ -90,25 +90,3 @@ import java.util.Hashtable;
 
  }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.10  2001/06/28 16:50:54  thomas
- * changed add method(s) to return boolean.
- *
- * Revision 1.9  2001/05/04 20:26:07  thomas
- * added super.init() to init().
- *
- * Revision 1.8  2000/11/27 16:57:45  thomas
- * Made init method protected so that extending
- * Dataformats may make use of them. -b.t.
- *
- * Revision 1.7  2000/11/16 20:04:39  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.6  2000/11/01 21:08:47  thomas
- * Un-did prior (stupid) change. Also removed extraneous
- * reference to paramGroupOwnedHash. -b.t.
- *
- * 
- */

@@ -149,38 +149,3 @@ public class Unit extends BaseObject {
 
  }
 
- /* Modification History:
- *
- * $Log$
- * Revision 1.13  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.12  2001/05/22 19:35:59  huang
- * added several constructor methods
- *
- * Revision 1.11  2001/05/10 21:42:26  thomas
- * added resetAttributes to init().
- *
- * Revision 1.10  2001/02/07 18:44:03  thomas
- * Converted XML attribute decl
- * to use constants (final static fields within the object). These
- * are private decl for now. -b.t.
- *
- * Revision 1.9  2000/11/27 16:57:45  thomas
- * Made init method protected so that extending
- * Dataformats may make use of them. -b.t.
- *
- * Revision 1.8  2000/11/20 22:03:48  thomas
- * Split up Attribute type NUMBER_TYPE into
- * INTEGER_TYPE and DOUBLE_TYPE. This allows for
- * some needed handling in the SaxDocHandler when
- * parsing data for the formatted read. Put prior NUMBER_TYPE
- * attributes into appropriate new category. -b.t.
- *
- * Revision 1.7  2000/11/16 20:09:50  kelly
- * fixed documentation.  -k.z.
- *
- */
-
-
-

@@ -174,14 +174,3 @@ public class Group extends BaseObject {
 
 }
 
-/* Modification History:
- *
- * $Log: Group.java,v
- * Revision 1.2  2000/10/10 19:14:59  cvs
- * Added log history section, commenting on methods
- * and fixed the constructor section (added init method)
- * -b.t
- *
- *
- */
-

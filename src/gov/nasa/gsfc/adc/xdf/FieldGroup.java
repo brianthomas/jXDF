@@ -115,34 +115,3 @@ import java.util.Hashtable;
 
  }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.8  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.7  2001/08/01 19:13:23  thomas
- * forgot to put in accessor methodscvs update fixed
- *
- * Revision 1.6  2001/08/01 18:13:53  thomas
- * added Class attribute
- *
- * Revision 1.5  2001/06/28 16:50:54  thomas
- * changed add method(s) to return boolean.
- *
- * Revision 1.4  2001/05/04 20:25:37  thomas
- * added super.init() to init().
- *
- * Revision 1.3  2000/11/27 16:57:45  thomas
- * Made init method protected so that extending
- * Dataformats may make use of them. -b.t.
- *
- * Revision 1.2  2000/11/16 19:58:59  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.1  2000/11/01 21:09:40  thomas
- * Initial Version. -b.t.
- *
- * 
- */
-

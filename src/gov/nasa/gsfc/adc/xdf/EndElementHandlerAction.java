@@ -36,19 +36,3 @@ public interface EndElementHandlerAction {
   public void action (SaxDocumentHandler handler) throws SAXException; 
 }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.3  2001/09/20 20:58:37  thomas
- * action handler now throws SAXException
- *
- * Revision 1.2  2000/11/09 23:04:56  thomas
- * Updated version, made changes to allow extension
- * to other dataformats (e.g. FITSML). -b.t.
- *
- * Revision 1.1  2000/10/25 17:57:00  thomas
- * Initial Version. -b.t.
- *
- * 
- */
-

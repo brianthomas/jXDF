@@ -76,30 +76,3 @@ public class ReadCellFormattedIOCmd extends BaseObject implements FormattedIOCmd
 }
 
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.6  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.5  2001/07/19 21:58:09  thomas
- * removed commented out toXMLOutputStream stuff.
- *
- * Revision 1.4  2001/05/10 21:24:44  thomas
- * added resetAttributes to init().
- * replaced specificIOStyleToXDF w/ appropriate
- * toXMLOutputStream method.
- *
- * Revision 1.3  2001/02/07 18:44:04  thomas
- * Converted XML attribute decl
- * to use constants (final static fields within the object). These
- * are private decl for now. -b.t.
- *
- * Revision 1.2  2000/11/16 20:04:55  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.1  2000/11/09 23:42:16  kelly
- * created the class
- *
- *
- */

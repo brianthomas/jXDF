@@ -199,46 +199,4 @@ public class Value extends BaseObject {
 
 
 }
-/* Modification History:
- *
- * $Log$
- * Revision 1.14  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.13  2001/07/02 18:02:08  thomas
- * added warning message if setSpecial wont allow value to be set.
- *
- * Revision 1.12  2001/06/19 15:38:01  thomas
- * added convience constructor methods
- *
- * Revision 1.11  2001/05/10 21:43:06  thomas
- * added resetAttributes to init().
- *
- * Revision 1.10  2001/02/07 18:44:04  thomas
- * Converted XML attribute decl
- * to use constants (final static fields within the object). These
- * are private decl for now. -b.t.
- *
- * Revision 1.9  2001/01/19 22:33:52  thomas
- * ValueIdRef was misspelled!!! Now methods, attributes are
- * correct. -b.t.
- *
- * Revision 1.8  2000/11/16 20:11:01  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.7  2000/11/08 20:24:00  thomas
- * Inserted copywrite, fixed some documentation. -b.t.
- *
- * Revision 1.6  2000/11/02 20:33:49  kelly
- * finished the class
- *
- * Revision 1.5  2000/11/02 18:39:24  thomas
- * Made changes. forget what.. -b.t.
- *
- * Revision 1.4  2000/10/26 20:41:30  thomas
- * Inserted needed code to bring this to initial version. -b.t.
- *
- * Revision 1.3  2000/10/11 18:41:41  kelly
- * added modification history.  -k.z.
- *
- */
+

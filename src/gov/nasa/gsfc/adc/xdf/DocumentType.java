@@ -239,22 +239,3 @@ import java.io.StringWriter;
 
  }
 
- /* Modification History:
- *
- * $Log$
- * Revision 1.2  2001/09/27 17:20:29  thomas
- * fix for writing out DocumentType where entities exist, but notationNode has been forgotten to be set
- *
- * Revision 1.1  2001/09/13 21:37:58  thomas
- * *** empty log message ***
- *
- * Revision 1.2  2001/09/06 15:57:42  thomas
- * changed basicXMLWriter to return String (nodeName); made nodeName private,static field in class
- *
- * Revision 1.1  2001/09/05 21:57:41  thomas
- * Initial Version
- *
- *
- */
-
-

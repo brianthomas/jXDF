@@ -41,22 +41,3 @@ public class UnitDirection extends BaseObject {
 
 }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.5  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.4  2001/07/19 21:59:09  thomas
- * trivial change to class decl. line.
- *
- * Revision 1.3  2001/05/10 21:43:06  thomas
- * added resetAttributes to init().
- *
- * Revision 1.2  2000/11/08 20:14:45  thomas
- * Added GPL blurb to header. -b.t.
- *
- * Revision 1.1  2000/10/11 18:40:14  kelly
- * first layout of the class
- *
- */

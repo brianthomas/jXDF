@@ -261,25 +261,3 @@ public class ValueListDelimitedList implements ValueListInterface,Cloneable {
 
 }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.5  2001/09/06 15:56:41  thomas
- * changed basicXMLWriter to return String (nodeName)
- *
- * Revision 1.4  2001/09/05 22:04:08  thomas
- * added toXMLOutputString, basicXMLWriter, methods and assoc. changes
- *
- * Revision 1.3  2001/07/26 15:55:42  thomas
- * added flush()/close() statement to outputWriter object as
- * needed to get toXMLOutputStream to work properly.
- *
- * Revision 1.2  2001/07/12 17:53:15  thomas
- * minor bug fix, error handling incorrect in toXMLOutputStream
- *
- * Revision 1.1  2001/07/11 22:40:36  thomas
- * Initial Version
- *
- *
- */
-

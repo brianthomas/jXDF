@@ -131,21 +131,3 @@ public abstract class NumberDataFormat extends DataFormat {
 
 }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.3  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.2  2001/04/27 21:30:22  thomas
- * accomodating DTD, no longer have set/get methods for
- * lessthan, greaterThan, etc in dataformat classes.
- *
- * Revision 1.1  2001/02/07 18:52:52  thomas
- * Inital Version. Concat's set methods that
- * the number-based (ascii) dataformats need into
- * one class. -b.t.
- *
- *
- */
-

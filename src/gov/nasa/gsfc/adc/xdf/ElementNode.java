@@ -458,26 +458,3 @@ public class ElementNode extends ElementNSImpl implements Cloneable {
 
 }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.3  2001/09/18 20:52:45  thomas
- * re-added deprecated method setXMLAttributes
- *
- * Revision 1.2  2001/09/18 20:32:20  thomas
- * added back in setXMLAttribute(s) convience method, w/ deprecated statement
- *
- * Revision 1.1  2001/09/13 21:36:59  thomas
- * *** empty log message ***
- *
- * Revision 1.3  2001/08/23 18:01:52  thomas
- * Switched to Xerces implementation
- *
- * Revision 1.2  2001/08/01 18:08:12  thomas
- * new version using dom4j
- *
- * Revision 1.1  2001/07/26 15:58:36  thomas
- * From the old 'XMLElement' class, just changed name.
- *
- *
- */

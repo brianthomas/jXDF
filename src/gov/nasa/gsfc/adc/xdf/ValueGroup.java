@@ -91,33 +91,3 @@ public class ValueGroup extends Group {
 
 }
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.8  2001/06/28 16:50:54  thomas
- * changed add method(s) to return boolean.
- *
- * Revision 1.7  2001/06/26 21:22:26  huang
- * changed return type to boolean for all addObject()
- *
- * Revision 1.6  2001/05/04 20:26:41  thomas
- * added super.init() to init().
- *
- * Revision 1.5  2000/11/27 16:57:45  thomas
- * Made init method protected so that extending
- * Dataformats may make use of them. -b.t.
- *
- * Revision 1.4  2000/11/16 20:11:15  kelly
- * fixed documentation.  -k.z.
- *
- * Revision 1.3  2000/11/01 21:57:25  thomas
- * removed extraneous valueGroupOwnedHash field
- * from class. Put in explicit import paths. -b.t.
- *
- * Revision 1.2  2000/10/26 20:41:54  thomas
- * Inserted needed code to bring to initial version -b.t.
- *
- * Revision 1.1  2000/10/11 18:41:08  kelly
- * created the class
- *
- */
