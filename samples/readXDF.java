@@ -53,8 +53,8 @@ public class readXDF {
 
     Locator locator = arrayObj.createLocator();
     try {
-      locator.setAxisLocation((AxisInterface) arrayObj.getAxisList().get(0), 1);
-      locator.setAxisLocation((AxisInterface) arrayObj.getAxisList().get(1), 2);
+      locator.setAxisIndex((AxisInterface) arrayObj.getAxisList().get(0), 1);
+      locator.setAxisIndex((AxisInterface) arrayObj.getAxisList().get(1), 2);
     } catch (AxisLocationOutOfBoundsException e) {
     }
  
@@ -65,8 +65,8 @@ public class readXDF {
       value = new String("");
     }
 
+    s.toXMLOutputStream(System.out);
     System.out.println("Array 0 data cell (1,2):"+value);
-    // s.toXMLOutputStream(System.out);
 
   }
 }

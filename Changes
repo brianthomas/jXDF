@@ -1,33 +1,48 @@
-
-Package Version History
-
-0.01   9/15/00  Initial code/directory structure laid down and
-                Java project started. 
-
-0.17a 11/11/00  First alpha version. Delimited and Tagged ASCII
-                IO implemented. Formatted and Binary data IO 
-		missing. Deep cloning *is* implemented. 
-
-0.17b 11/??/00  2nd alpha version.
-
-0.17c 12/??/00  3rd alpha version.
-
-0.17d  1/23/01  4th alpha version.
-               - Fixed Errored Value to DTD standard.
-               - Fixed some of ExponentialDataFormat. Exponents max
-                 size cant be specified in Java, so some problems remain.
-               - Added ability to set the XML parser.
-               - Href attribute implemented properly in DataCube.
-               - Read id/idref fixed. Added id/idref stuff for value,
-                 parameter and valueList as per DTD.
-               - fixed value valueIdRef attribute misspelling.
-               - valueList now may be used under parameter node.
-               - Array now directs child Locators to properly remove an axis 
-                 when it itself removes an axis.
-
-0.17e  1/29/01  revision to 4th alpha version. 
-               - Binary reading enabled
-               - Finally fess'd up to the fact that nobody uses Java-X package.
-                 Code is now compliant with org.xml.sax.* classes. Download
-                 jaxp (or other package) to get this functionality. 
-
+      
+      Package Version History
+      
+ 0.01       9/15/00  Initial code/directory structure laid down and
+                     Java project started. 
+      
+0.17a      11/11/00  First alpha version. Delimited and Tagged ASCII
+                     IO implemented. Formatted and Binary data IO 
+      		     missing. Deep cloning *is* implemented. 
+      
+0.17b      11/??/00  2nd alpha version.
+      
+0.17c      12/??/00  3rd alpha version.
+      
+0.17d       1/23/01  4th alpha version.
+                     - Fixed Errored Value to DTD standard.
+                     - Fixed some of ExponentialDataFormat. Exponents max
+                       size cant be specified in Java, so some problems remain.
+                     - Added ability to set the XML parser.
+                     - Href attribute implemented properly in DataCube.
+                     - Read id/idref fixed. Added id/idref stuff for value,
+                       parameter and valueList as per DTD.
+                     - fixed value valueIdRef attribute misspelling.
+                     - valueList now may be used under parameter node.
+                     - Array now directs child Locators to properly remove an axis 
+                       when it itself removes an axis.
+      
+0.17e       1/29/01  revision to 4th alpha version. 
+                     - Binary reading enabled
+                     - Finally fess'd up to the fact that nobody uses Java-X package.
+                       Code is now compliant with org.xml.sax.* classes. Download
+                       jaxp (or other package) to get this functionality. 
+      
+0.17-beta0  2/06/01  1st Beta. 
+                     - Changed name of FixedDataFormat to FloatDataFormat.
+                     - Removed ExponentialDataFormat, functionality now in FloatDataFormat.
+                     - Binary write data enabled.
+                     - Octal/hex data read/write enabled.
+                     - Changed internal code to more consistent use of constants. This 
+                       should make us more able to meet changed in the DTD in the future and
+                       lower errors.
+                     - Jaxp compatiblity. SAX1 remains in use however.
+                     - added setData methods for Double, Integer objects to DataCube and Array. 
+                       Fixed some of the internal logic (but still needs more work).
+                     - Fixed bug in locator.hasNext method. Was droping last value in dataCube
+                       from consideration.
+                     - Added append array functionality.
+      
