@@ -737,105 +737,121 @@ public class DataCube extends BaseObject {
   
       Locator currentLocator = parentArray.createLocator();
   
-      AxisInterface fastestAxis = (AxisInterface) parentArray.getAxes().get(0);
-      //stores the NoDataValues for the parentArray,
-      //used in writing out when NoDataException is caught
-      String[] NoDataValues;
-  
-      if (parentArray.hasFieldAxis()) {
-        NoDataValues = new String[parentArray.getFieldAxis().getLength()];
-        List fields = parentArray.getFieldAxis().getFields();
-        Iterator iter = fields.iterator();
-        int i = 0;
-        while (iter.hasNext()) {
-            Field field = (Field) iter.next();
-            if (field != null && field.getNoDataValue() != null) 
-                NoDataValues[i]=field.getNoDataValue().toString();
-            i++;
-        } 
-      }
-      else {
-            NoDataValues = new String[1];
-            String value = (String) null;
-            if (parentArray.getNoDataValue() != null) {
-                value = parentArray.getNoDataValue().toString(); // this is a HACK 
-            }
-            NoDataValues[0] = value;
-      }
-  
-      // init the dataOutputWriter properly. To a file or to the same writer as the
-      // rest of the XML metadata?
-      if (dataOutputStream != null) { 
-         // if this exists, then we are re-directing to an outside file.
-         // wrap the outputstream (compressed or otherwise) with bufferedWriter
-         dataOutputWriter = new BufferedWriter(new OutputStreamWriter(dataOutputStream));
+      List axisList = parentArray.getAxes();
+      if (axisList == null || axisList.size() == 0) {
+
+          // we dont have axes to direct the write?!?. Well, then, we 
+          // wont be writing Data to either the XML file or an Href
+
+         Log.infoln("No axes defined in DataCube, cannot write data. Ignoring request.");
+
       } else {
-         // goes to same spot as meta-data, e.g. just use the XML output writer  
-         dataOutputWriter = outputWriter;
-      }
+ 
+         // writing Data to either the XML file or an Href
+         //
 
-      if (readObj instanceof TaggedXMLDataIOStyle) {
-         String[] tagOrder = ((TaggedXMLDataIOStyle)readObj).getAxisTags();
-         int stop = tagOrder.length;
-         String[] tags = new String[stop];
-  
-         for (int i = stop-1; i >= 0 ; i--) {
-            tags[stop-i-1]  = tagOrder[i];
-         }
-  
-         int[] axes = getMaxDataIndex();
-         stop =axes.length;
-         int[] axisLength = new int[stop];
-         for (int i = 0; i < stop; i++) {
-            axisLength[i] =axes[stop - 1 - i];
-         }
-         writeTaggedData(dataOutputWriter,
-                        currentLocator,
-                        indent,
-                        axisLength,
-                        tags,
-                        0,
-                        fastestAxis,
-                        NoDataValues);
+         AxisInterface fastestAxis = (AxisInterface) axisList.get(0);
 
-         // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
-         // on SUN and Linux platforms show that it is. Hopefully we can remove
-         // this in the future.
-         dataOutputWriter.flush();
-
+         //stores the NoDataValues for the parentArray,
+         //used in writing out when NoDataException is caught
+         String[] NoDataValues;
   
-      }  //done dealing with with TaggedXMLDataIOSytle
-      else {
-
-         if (readObj instanceof DelimitedXMLDataIOStyle) {
-             writeDelimitedData( dataOutputWriter, currentLocator,
-                                 (DelimitedXMLDataIOStyle) readObj,
-                                 fastestAxis, NoDataValues,
-                                 writeHrefAttribute ? false : true
-                                );
-  
+         if (parentArray.hasFieldAxis()) {
+            NoDataValues = new String[parentArray.getFieldAxis().getLength()];
+            List fields = parentArray.getFieldAxis().getFields();
+            Iterator iter = fields.iterator();
+           int i = 0;
+           while (iter.hasNext()) {
+               Field field = (Field) iter.next();
+               if (field != null && field.getNoDataValue() != null) 
+                   NoDataValues[i]=field.getNoDataValue().toString();
+               i++;
+           } 
          }
          else {
-          writeFormattedData(  dataOutputWriter,
-                               currentLocator,
-                               (FormattedXMLDataIOStyle) readObj,
-                               fastestAxis,
-                               NoDataValues,
-                               writeHrefAttribute ? false : true
-                             );
+               NoDataValues = new String[1];
+               String value = (String) null;
+               if (parentArray.getNoDataValue() != null) {
+                   value = parentArray.getNoDataValue().toString(); // this is a HACK 
+               }
+               NoDataValues[0] = value;
          }
-
-         if (writeHrefAttribute) {
-            try {
-               // should work as flush() too, so no call needed here. 
-               dataOutputWriter.close();
-            } catch (java.io.IOException e) {
-               Log.errorln("Cant close dataOuputStream! Aborting.");
-               return;
+     
+         // init the dataOutputWriter properly. To a file or to the same writer as the
+         // rest of the XML metadata?
+         if (dataOutputStream != null) { 
+            // if this exists, then we are re-directing to an outside file.
+            // wrap the outputstream (compressed or otherwise) with bufferedWriter
+            dataOutputWriter = new BufferedWriter(new OutputStreamWriter(dataOutputStream));
+         } else {
+            // goes to same spot as meta-data, e.g. just use the XML output writer  
+            dataOutputWriter = outputWriter;
+         }
+   
+         if (readObj instanceof TaggedXMLDataIOStyle) {
+            String[] tagOrder = ((TaggedXMLDataIOStyle)readObj).getAxisTags();
+            int stop = tagOrder.length;
+            String[] tags = new String[stop];
+     
+            for (int i = stop-1; i >= 0 ; i--) {
+               tags[stop-i-1]  = tagOrder[i];
             }
+     
+            int[] axes = getMaxDataIndex();
+            stop =axes.length;
+            int[] axisLength = new int[stop];
+            for (int i = 0; i < stop; i++) {
+               axisLength[i] =axes[stop - 1 - i];
+            }
+            writeTaggedData(dataOutputWriter,
+                           currentLocator,
+                           indent,
+                           axisLength,
+                           tags,
+                           0,
+                           fastestAxis,
+                           NoDataValues);
+   
+            // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
+            // on SUN and Linux platforms show that it is. Hopefully we can remove
+            // this in the future.
+            dataOutputWriter.flush();
+   
+     
+         }  //done dealing with with TaggedXMLDataIOSytle
+         else {
+   
+            if (readObj instanceof DelimitedXMLDataIOStyle) {
+                writeDelimitedData( dataOutputWriter, currentLocator,
+                                    (DelimitedXMLDataIOStyle) readObj,
+                                    fastestAxis, NoDataValues,
+                                    writeHrefAttribute ? false : true
+                                   );
+     
+            }
+            else {
+             writeFormattedData(  dataOutputWriter,
+                                  currentLocator,
+                                  (FormattedXMLDataIOStyle) readObj,
+                                  fastestAxis,
+                                  NoDataValues,
+                                  writeHrefAttribute ? false : true
+                                );
+            }
+   
+            if (writeHrefAttribute) {
+               try {
+                  // should work as flush() too, so no call needed here. 
+                  dataOutputWriter.close();
+               } catch (java.io.IOException e) {
+                  Log.errorln("Cant close dataOuputStream! Aborting.");
+                  return;
+               }
+            }
+   
          }
 
-      }
+      } // finish writing data to XML/Href 
   
       //close the data section appropriately
       if (!writeHrefAttribute && niceOutput) {
@@ -1529,11 +1545,20 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
             byte[] byteBuf = new byte[numOfBytes];
             int i = getIntData(locator);
 
-            // short
-            if (numOfBytes == 2) {
+            if (numOfBytes == 1) {
+
+               byteBuf[0] = (byte) i;
+
+            } else if (numOfBytes == 2) {
 
                byteBuf[0] = (byte) (i >>>  8);
                byteBuf[1] = (byte)  i;
+
+            } else if (numOfBytes == 3) {
+
+               byteBuf[0] = (byte) (i >>> 16);
+               byteBuf[1] = (byte) (i >>>  8);
+               byteBuf[2] = (byte)  i;
 
             } else if (numOfBytes == 4) {
 
@@ -1554,7 +1579,8 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                byteBuf[7] = (byte)  i;
 
             } else {
-               Log.errorln("Got weird number of bytes for BinaryIntegerDataFormat:"+numOfBytes+" exiting.");
+               // we could be a lot nicer than this..
+               Log.errorln("XDF BinaryIntegerDataFormat cant handle integers with:"+numOfBytes+"bytes. Exiting.");
                System.exit(-1);
             }
 
@@ -1688,6 +1714,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.41  2001/09/04 21:17:52  thomas
+  * added 8, 16 bit Integers
+  *
   * Revision 1.40  2001/07/26 15:55:42  thomas
   * added flush()/close() statement to outputWriter object as
   * needed to get toXMLOutputStream to work properly.
