@@ -223,7 +223,6 @@ import java.util.List;
    */
   public List getIterationOrder() {
     return axisOrderList;
-
   }
 
   //
@@ -244,6 +243,23 @@ import java.util.List;
       }
     }
 
+    /** How many locations his locator may 'visit' in the
+        present array. This value is the same as the number of dataCells within 
+        the parent Array object of the locator.
+     */
+    public int numOfLocations () {
+
+       int numOfLocations = 0;
+       for (int i = 0, numOfAxes = axisOrderList.size(); i < numOfAxes; i++) { 
+           numOfLocations += ((AxisInterface) axisOrderList.get(i)).getLength();
+       }
+
+       return numOfLocations;
+    }
+
+    /** Create a clone of this locator. The current location  
+        of the clone is the same as the parent object.
+     */
     public Object clone() throws CloneNotSupportedException{
       Locator cloneObj = (Locator) super.clone();
       //clone the axisOrderList
@@ -357,6 +373,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.26  2001/09/05 14:59:15  thomas
+ * added numOfLocations convenience method
+ *
  * Revision 1.25  2001/07/19 21:53:20  thomas
  * argh, that writeAxisIOORder stuff still getting bugs.
  * Wasnt being set in locator init.
