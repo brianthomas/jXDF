@@ -125,15 +125,19 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
      return (String) ((XMLAttribute) attribHash.get(END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  //
-  //PROTECTED methods
-  //
+   //
+   //PROTECTED methods
+   //
 
    protected void specificIOStyleToXDF( OutputStream outputstream,String indent) {
-    int stop = parentArray.getAxes().size()-1;
-    synchronized (attribHash) {
-      nestedToXDF(outputstream, indent, 0, stop);
-    }
+
+      int stop = getIOAxesOrder().size()-1;
+      synchronized (attribHash) {
+         nestedToXDF(outputstream, indent, stop, 0);
+      }
+      if (Specification.getInstance().isPrettyXDFOutput()) {
+        writeOut(outputstream, Constants.NEW_LINE);
+      }
 
    }
 
@@ -147,7 +151,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
      String repeatable = getRepeatable();
      String recordTerminator = getRecordTerminator();
 
-    if (which > stop) {
+    if (which < stop) {
       if (Specification.getInstance().isPrettyXDFOutput()) {
         writeOut(outputstream, Constants.NEW_LINE);
         writeOut(outputstream, indent);
@@ -177,8 +181,10 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, indent);
       }
       writeOut(outputstream, "<" + UntaggedInstructionNodeName + " "+UntaggedInstructionAxisIdRefName+"=\"");
-      writeOut(outputstream, ((AxisInterface) parentArray.getAxes().get(which)).getAxisId() + "\">");
-      which++;
+
+//      writeOut(outputstream, ((AxisInterface) parentArray.getAxes().get(which)).getAxisId() + "\">");
+      writeOut(outputstream, ((AxisInterface) getIOAxesOrder().get(which)).getAxisId() + "\">");
+      which--;
       nestedToXDF(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation(), which, stop);
 
       if (Specification.getInstance().isPrettyXDFOutput()) {
@@ -187,6 +193,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
       }
        writeOut(outputstream, "</" + UntaggedInstructionNodeName + ">");
     }
+
    }
 
 
@@ -223,6 +230,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/06/18 21:33:18  thomas
+ * changes reflecting new getIOAxesOrder in parent.
+ *
  * Revision 1.12  2001/05/10 21:15:12  thomas
  * changes related to inheritance. call super in constructor.
  *
