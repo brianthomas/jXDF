@@ -65,6 +65,8 @@ import java.util.List;
       locations.put(axisObj, new Integer(0));
     }
 
+    Log.infoln("Locator.setIterationOrder() has reset the current location to the dataCube origin.");
+
   }
 
   /** set the index of an axis
@@ -267,19 +269,39 @@ import java.util.List;
     //PROTECTED methods
     //
 
-    /** adjust its axisOrderList and hashtable locations according
-     * to parentArray's axes change
+    /** Add an axis object to the list of axes within this Locator.
+        This is used to adjust its axisOrderList and hashtable locations according
+     * to parentArray's axes change. 
      */
-    protected void addAxis(AxisInterface AxisObj) {
-      if (AxisObj instanceof Axis) {  //it is an Axis
-        axisOrderList.add(AxisObj);
-      }
-      else {                           //it is a FieldAxis
-        axisOrderList.add(0, AxisObj);
-      }
+    protected void addAxis(AxisInterface addAxisObj) {
 
-      locations.put(AxisObj, new Integer(0));
+      axisOrderList.add(addAxisObj);
+      locations.put(addAxisObj, new Integer(0));
 
+    }
+
+    /** Remove an Axis from the list of axes within this Locator.
+        This is used to adjust its axisOrderList and hashtable locations according
+     *  to parentArray's axis geometry.
+     */
+    protected void removeAxis (AxisInterface removeAxisObj) {
+
+       int index = axisOrderList.indexOf(removeAxisObj);
+       if (index > -1) { 
+          removeAxis(index);
+       } else  
+          Log.warnln("Locator.removeAxis() could not remove Axis from locator.");
+
+    }
+
+    /** Remove an Axis from the list of axes within this Locator.
+        This is an alternative implementation.
+    */
+    protected void removeAxis(int index) {
+
+       Object removedAxisObj = axisOrderList.remove(index);
+       if (removedAxisObj != null) 
+          locations.remove(removedAxisObj);
 
     }
 
@@ -319,6 +341,10 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/01/22 22:10:28  thomas
+ * Added removeAxis method. Fixed bug in addAxis, making
+ *  bad assumption about readAxisordering. -b.t.
+ *
  * Revision 1.17  2000/12/13 18:31:26  thomas
  * Minor spelling change. -b.t.
  *
