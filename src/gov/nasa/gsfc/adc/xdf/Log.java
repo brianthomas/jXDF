@@ -151,6 +151,8 @@ public class Log {
     }
   }
 
+  /** Log a information level message. 
+  */
   public static void info(String msg) {
     if (priority > Priority.INFO)
       return;
@@ -164,6 +166,8 @@ public class Log {
     }
   }
 
+  /** Log a debugging level message. 
+   */
   public static void debug(String msg) {
     if (priority > Priority.DEBUG)
       return;
@@ -176,6 +180,9 @@ public class Log {
       e.printStackTrace();
     }
   }
+ 
+  /** Log a warning level message. 
+   */
   public static void warn(String msg) {
     if (priority > Priority.WARN)
       return;
@@ -189,6 +196,8 @@ public class Log {
     }
   }
 
+  /** Log an error level message. 
+   */
   public static void error(String msg) {
     if (priority > Priority.ERROR)
       return;
@@ -216,6 +225,12 @@ public class Log {
         return;
       }
     }
+  }
+
+  /** Print a stacktrace to the current error outputstream.
+   */
+  public static void printStackTrace (Exception e) {
+      e.printStackTrace((PrintStream) output); 
   }
 
 }
