@@ -154,8 +154,11 @@ public abstract class XMLDataIOStyle extends BaseObject {
     return (String) ((XMLAttribute) attribHash.get("endian")).getAttribValue();
   }
 
-
-  public Array setParentArray(Array parentArray) {
+  /**setParentArray:  set the parentArray.
+   * used when Array clones.
+   * should be protected, ie only classes in the same package see see this method
+   */
+  protected  Array setParentArray(Array parentArray) {
     Log.debug("in XMLDataIOStyle, setParentArray()");
     this.parentArray = parentArray;
     return parentArray;
@@ -166,9 +169,14 @@ public abstract class XMLDataIOStyle extends BaseObject {
     return parentArray;
   }
 
-  public void toXDFOutputStream ( OutputStream outputstream,
-                                  Hashtable XMLDeclAttribs,
-                                  String indent
+
+  public void toXDFOutputStream (
+                                   OutputStream outputstream,
+                                   Hashtable XMLDeclAttribs,
+                                   String indent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
                                 )
   {
     boolean niceOutput = sPrettyXDFOutput;
@@ -186,18 +194,19 @@ public abstract class XMLDataIOStyle extends BaseObject {
     //open the read block
     writeOut(outputstream, "<read");
 
-    //get attribute info
-     Hashtable xmlInfo = getXMLInfo();
+    //write out attributes of read, ie.
 
-    //write out attributes
+    synchronized(attribHash) {  //sync, prevent the attribHash' structure be changed
+      String attrib;
+      if ( (attrib=getEncoding()) !=null)
+        writeOut(outputstream, " encoding=" + attrib);
+      if ( (attrib=getEndian()) !=null)
+        writeOut(outputstream, " endian=" + attrib);
+      if ( (attrib=getReadId()) !=null)
+        writeOut(outputstream, " readId=" + attrib);
+      if ( (attrib=getReadIdRef()) !=null)
+        writeOut(outputstream, " readIdRef=" + attrib);
 
-    ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
-    synchronized(attribs) {  //sync, prevent the attribs' structure be changed
-      int stop = attribs.size();
-      for (int i = 0; i < stop; i++) {
-        Hashtable item = (Hashtable) attribs.get(i);
-        writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
-      }
     }
     writeOut(outputstream, ">");
 
@@ -236,10 +245,17 @@ public abstract class XMLDataIOStyle extends BaseObject {
     return readList;
   }
 
+  public Object clone() throws CloneNotSupportedException {
+    return super.clone();
+  }
+
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/06 21:15:20  kelly
+ * minor fix in *toXDF*
+ *
  * Revision 1.5  2000/10/31 21:45:13  kelly
  * minor fix to *toXDF*, the read opening/closing node is handled by
  * XMLDataIOSytle now.  -k.z.

@@ -44,7 +44,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
   public final static String DefaultRecordTerminator = Constants.NEW_LINE;
 
    //
-   // Constructors 
+   // Constructors
    //
    public DelimitedXMLDataIOStyle (Array parentArray)
    {
@@ -135,7 +135,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 
    protected void specificIOStyleToXDF( OutputStream outputstream,String indent) {
     int stop = parentArray.getAxisList().size()-1;
-    nestedToXDF(outputstream, indent, 0, stop);
+    synchronized (attribHash) {
+      nestedToXDF(outputstream, indent, 0, stop);
+    }
 
    }
 
@@ -183,7 +185,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
        convienently build the XML attribute list for a given class.
     */
    private void init()
-   {   
+   {
       classXDFNodeName = "textDelimiter";
 
       attribOrder.add(0,"delimiter");
@@ -204,6 +206,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/06 21:14:59  kelly
+ * minor fix in *toXDF*
+ *
  * Revision 1.4  2000/11/03 21:37:58  thomas
  * Opps, another fix needed. delimiter, repeatable and
  * recordTerminator werent being stored as XMLattributes.
