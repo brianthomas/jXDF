@@ -1191,7 +1191,7 @@ protected void writeTaggedData(OutputStream outputstream,
     int fastestAxisLength = fastestAxis.getLength();
     int dataNum = 0;
 
-    writeOut(outputstream, "<![CDDATA[");
+    writeOut(outputstream, "<![CDATA[");
     do {
       dataNum ++;
       try {
@@ -1281,6 +1281,10 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.11  2000/11/09 04:52:00  thomas
+  * In toXML* method, CDATA miss-spelled CDDATA (!)
+  * Fixed. -b.t.
+  *
   * Revision 1.10  2000/11/08 22:30:12  thomas
   * Changed set methods to return void. -b.t.
   *
