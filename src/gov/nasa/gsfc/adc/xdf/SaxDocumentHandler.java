@@ -36,6 +36,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.lang.Character;
 
 // Import needed SAX stuff
 import org.xml.sax.AttributeList;
@@ -574,10 +575,13 @@ public class SaxDocumentHandler implements DocumentHandler {
                                        ) 
     {
 
+AxisInterface FastAxis = (AxisInterface) CurrentArray.getAxisList().get(0);
+AxisInterface SlowAxis = (AxisInterface) CurrentArray.getAxisList().get(1);
+
        // Note that we dont treat binary data at all 
        try {
           
-// Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastestAxis)+"]");
+Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastAxis)+","+dataLocator.getAxisLocation(SlowAxis)+"]");
 
            if ( CurrentDataFormat instanceof StringDataFormat) {
               CurrentArray.setData(dataLocator, thisString);
@@ -712,6 +716,84 @@ public class SaxDocumentHandler implements DocumentHandler {
        }
 
        return values;
+    }
+
+    // Not the best implementation. Should probably be done 
+    // with character arrays. -b.t. 
+    private ArrayList formattedSplitStringIntoStringObjects ( String data , 
+                                                              FormattedXMLDataIOStyle readObj
+                                                            ) 
+    {
+
+
+        ArrayList stringObjList = new ArrayList();
+        List commandList = readObj.getCommands();
+        DataFormat dataFormat[] = CurrentArray.getDataFormatList();
+
+        int dataPosition = 0;
+        int dataLength = data.length();
+        int currentDataFormat = 0;
+        int nrofDataFormat = dataFormat.length;
+
+        Log.debugln("in formattedSplitString, data :["+data+"]");
+
+        // the extraction loop
+        // whip thru the data string, either ignoring or accepting
+        // characters in the string as directed by the formatCmdList
+        while (dataPosition < dataLength) {
+
+          Iterator formatIter = commandList.iterator();
+          while (formatIter.hasNext()) {
+             FormattedIOCmd thisCommand = (FormattedIOCmd) formatIter.next();
+             if (thisCommand instanceof ReadCellFormattedIOCmd) // ReadCell ==> read some data
+             {
+
+                 DataFormat formatObj = dataFormat[currentDataFormat];
+                 int endDataPosition = dataPosition + formatObj.numOfBytes();
+
+                 // add in our object
+                 String thisData = data.substring(dataPosition,endDataPosition);
+
+                 // remove leading whitespace from what will be non-string data.
+                 if (Character.isWhitespace(thisData.charAt(0)) && !(formatObj instanceof StringDataFormat)) 
+                    thisData = trimLeadingWhitespace(thisData);
+
+                 Log.debugln("Got Data:["+thisData+"] ("+dataPosition+","+endDataPosition+")");
+
+                 stringObjList.add(thisData);
+
+                 dataPosition = endDataPosition;
+         
+                 // advance our pointer to the current DataFormat
+                 if (nrofDataFormat > 1) 
+                    if (currentDataFormat == (nrofDataFormat - 1)) 
+                       currentDataFormat = 0;
+                    else 
+                       currentDataFormat++;
+
+             } else if (thisCommand instanceof SkipCharFormattedIOCmd) // SkipChar ==> just adv. dataPointer 
+             {
+                dataPosition += ((SkipCharFormattedIOCmd) thisCommand).getCount().intValue();
+             } else {
+                Log.errorln("Unknown FormattedIOCmd, aborting formatted read."); // needed check ? 
+                break;
+             }
+          }
+
+        }
+
+        return stringObjList;
+    }
+
+    // take off only the leading whitespace from a string.
+    // we assume here that we never get all-whitespace data ever,
+    // which might lead to problems. -b.t.
+    private String trimLeadingWhitespace (String string) {
+        int lastWhiteSpacePos = 0;
+        while (Character.isWhitespace(string.charAt(lastWhiteSpacePos)))
+           lastWhiteSpacePos++;
+        return string.substring(lastWhiteSpacePos,string.length());
+
     }
 
     // This will get used heavily during data adding. Implimentation
@@ -1029,10 +1111,10 @@ public class SaxDocumentHandler implements DocumentHandler {
        public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
 
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
+          String thisString = new String(buf,offset,len);
 
           if ( readObj instanceof TaggedXMLDataIOStyle ) {
 
-             String thisString = new String(buf,offset,len);
              // dont add this data unless it has more than just whitespace
              if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(thisString) ) {
 
@@ -1051,11 +1133,9 @@ public class SaxDocumentHandler implements DocumentHandler {
                     readObj instanceof FormattedXMLDataIOStyle )
           {
 
-              String newString = new String(buf,offset,len);
               // add it to the datablock if it isnt all whitespace ?? 
-           //   if ( newString.trim().length() > 0 ) {
-                  DATABLOCK.append(newString);
-           //   }
+              if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(thisString) ) 
+                  DATABLOCK.append(thisString);
 
            } else {
                Log.errorln("UNSUPPORTED Data Node CharData style:"+readObj.toString()+", Aborting!\n");
@@ -1101,10 +1181,18 @@ public class SaxDocumentHandler implements DocumentHandler {
               }
 
               Locator myLocator = CurrentArray.createLocator();
+List iterationList = myLocator.getIterationOrder();
+Iterator liter = iterationList.iterator();
+while (liter.hasNext()) {
+   Axis axis = (Axis) liter.next();
+   Log.errorln("ITERATION AXIS NAME:"+axis.getName());
+}
+
               myLocator.setIterationOrder(AxisReadOrder);
 
 
               CurrentDataFormatIndex = 0; 
+              ArrayList strValueList;
 
 //              boolean dataHasSpecialIntegers = false;
 
@@ -1117,47 +1205,53 @@ public class SaxDocumentHandler implements DocumentHandler {
 
 */
 
-                 Log.errorln("FORMATTED DATA READ Template:"+formatObj.getTemplateNotation());
 
-                 Log.errorln("FORMATTED DATA READ NOT SUPPORTED");
+                 // snag the string representation of the values
+                 strValueList = formattedSplitStringIntoStringObjects( DATABLOCK.toString(), 
+                                                                        ((FormattedXMLDataIOStyle) formatObj)
+                                                                                );
+                 if (strValueList.size() == 0) {
+                    Log.errorln("Error: XDF Reader is unable to acquire formatted data, bad format?");
+                    System.exit(-1);
+                 }
 
               } else {
 
                  // snag the string representation of the values
-                 ArrayList strValueList = splitStringIntoStringObjects( DATABLOCK.toString(), 
+                 strValueList = splitStringIntoStringObjects( DATABLOCK.toString(), 
                                                 ((DelimitedXMLDataIOStyle) formatObj).getDelimiter(), 
                                                 ((DelimitedXMLDataIOStyle) formatObj).getRepeatable(), 
                                                 ((DelimitedXMLDataIOStyle) formatObj).getRecordTerminator()
                                               );
+              }
 
-                 // fire data into dataCube
-                 Iterator iter = strValueList.iterator();
-                 while (iter.hasNext()) 
-                 {
+              // fire data into dataCube
+              Iterator iter = strValueList.iterator();
+              while (iter.hasNext()) 
+              {
 
-                    DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
+                 DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
 
-                    // adding data based on what type..
-                    addDataToCurrentArray(myLocator, (String) iter.next(), CurrentDataFormat);
+                 // adding data based on what type..
+                 addDataToCurrentArray(myLocator, (String) iter.next(), CurrentDataFormat);
 
-                    // bump up DataFormat appropriately
-                    if (MaxDataFormatIndex > 0) {
-                       int currentFastAxisCoordinate = myLocator.getAxisLocation(FastestAxis);
-                       if ( currentFastAxisCoordinate != LastFastAxisCoordinate )
-                       {
-                          LastFastAxisCoordinate = currentFastAxisCoordinate;
-                          if (CurrentDataFormatIndex == MaxDataFormatIndex)
-                             CurrentDataFormatIndex = 0;
-                          else
-                             CurrentDataFormatIndex++;
-                       }
+                 // bump up DataFormat appropriately
+                 if (MaxDataFormatIndex > 0) {
+                    int currentFastAxisCoordinate = myLocator.getAxisLocation(FastestAxis);
+                    if ( currentFastAxisCoordinate != LastFastAxisCoordinate )
+                    {
+                       LastFastAxisCoordinate = currentFastAxisCoordinate;
+                       if (CurrentDataFormatIndex == MaxDataFormatIndex)
+                          CurrentDataFormatIndex = 0;
+                       else
+                          CurrentDataFormatIndex++;
                     }
-
-                    myLocator.next();
-
                  }
 
+                 myLocator.next();
+
               }
+
 
           } else if ( formatObj instanceof TaggedXMLDataIOStyle )
           {
@@ -2473,6 +2567,9 @@ public class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2000/11/20 22:09:05  thomas
+ * *** empty log message ***
+ *
  * Revision 1.16  2000/11/17 22:29:23  thomas
  * Some changes to allow formattedIO, not finished with
  * the data handler yet tho. -b.t.

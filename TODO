@@ -4,6 +4,8 @@
 	this package "BETA"
         ------------------------------------------------------------
 
+        - Kelly has Datablock output is inverted!!
+
 	- Implement Formatted reads.
           Dataformat classes have regex, templateNotation, sprintFNotation methods.
           Are these needed? Closely evaluate these classes (after formatted read
@@ -47,6 +49,9 @@
 	- Number of significant digits being written out in XML is not
           controlled by dataFormat at this time. Also, Exponential format
 	  may print out wi/o the 'E'.  
+
+        - set/get DataFormat methods on Array are confusing. Clear up meanings between these
+          methods and getDataFormatList().
 
 
 	A list of things that have to be done before we can consider
