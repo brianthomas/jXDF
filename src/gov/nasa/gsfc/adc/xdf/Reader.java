@@ -267,8 +267,9 @@ class myErrorHandler implements ErrorHandler
   public void warning (SAXParseException e)
   throws SAXParseException
   {
-    Log.error("** Warning"+", line "+e.getLineNumber()
-               + ", uri " + e.getSystemId()+"   " + e.getMessage());
+    Log.errorln("** Warning"+", line "+e.getLineNumber()
+               + ", uri " + e.getSystemId());
+    Log.errorln("   " + e.getMessage()+" **");
   }
 
   public void fatalError (SAXParseException e)
@@ -301,6 +302,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/07/26 15:57:47  thomas
+ * Small improvement to error reporting handler message output.
+ *
  * Revision 1.16  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
