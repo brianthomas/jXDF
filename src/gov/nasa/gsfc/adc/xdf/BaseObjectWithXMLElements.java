@@ -285,15 +285,17 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
            }
    
          } else {
-   
-           if (dontCloseNode) {
-              // it may not have sub-objects, but we dont want to close it
-             // (happens for group objects)
-             writeOut(outputstream, ">");
-           } else {
-             // no sub-objects, just close this node
-             writeOut(outputstream, "/>");
-           }
+
+           if (nodeNameString != null) {
+	       if (dontCloseNode) {
+		   // it may not have sub-objects, but we dont want to close it
+		   // (happens for group objects)
+		   writeOut(outputstream, ">");
+	       } else {
+		   // no sub-objects, just close this node
+		   writeOut(outputstream, "/>");
+	       }
+	   }
    
          }
    

@@ -431,14 +431,16 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
       } else {
 
-        if (dontCloseNode) {
-           // it may not have sub-objects, but we dont want to close it
-          // (happens for group objects)
-          writeOut(outputstream, ">");
-        } else {
-          // no sub-objects, just close this node
-          writeOut(outputstream, "/>");
-        }
+        if (nodeNameString != null) {
+	    if (dontCloseNode) {
+		// it may not have sub-objects, but we dont want to close it
+		// (happens for group objects)
+		writeOut(outputstream, ">");
+	    } else {
+		// no sub-objects, just close this node
+		writeOut(outputstream, "/>");
+	    }
+	}
 
       }
 
@@ -850,6 +852,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.45  2001/06/12 20:17:55  huang
+ * do not write out brackets if nodeName is null
+ *
  * Revision 1.44  2001/06/12 17:17:09  huang
  * donot writeout a newline if the nodeName is null
  *
