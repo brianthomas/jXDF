@@ -1040,9 +1040,11 @@ protected boolean  removeData (Locator locator) {
     boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
     String indent = "";
     String nodeName = getClassXDFNodeName();
+    if (defined newNodeNameString) nodeName = newNodeNameString;
 
     // indent up one 
     indent = indent + strIndent;
+
 
     //open node
     if (niceOutput)
@@ -1831,6 +1833,9 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.24  2001/03/07 23:15:29  thomas
+  * was missing newNodeNameString rename in toXMLfilehandle (or subroutine).
+  *
   * Revision 1.23  2001/02/07 18:40:15  thomas
   * Added new setData methods. Converted XML attribute decl
   * to use constants (final static fields within the object). These
