@@ -36,7 +36,7 @@ import java.io.OutputStream;
 import java.io.IOException; 
 
 /** A simple object for storing the order in which axis are arranged
-    for note objects. 
+    for note objects. This should probably be a private internal class of Notes. 
     @version $Revision$
  */
 public class NotesLocationOrder extends BaseObject {
@@ -89,6 +89,11 @@ public class NotesLocationOrder extends BaseObject {
 
    throws java.io.IOException
    {
+
+      // if the axis list is empty, no need to print this
+      if (axisIdRefOrder.size() == 0) {
+         return (String) null; 
+      }
 
       String nodeNameString = this.classXDFNodeName;
 
@@ -146,6 +151,9 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/09/14 21:18:55  thomas
+ * fix to prevent printout when no axes are defined
+ *
  * Revision 1.13  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
