@@ -57,7 +57,7 @@ import java.util.Set;
   * list reference to the Array objects held by this Structure.
  */
 
-public class Structure extends BaseObject {
+public class Structure extends BaseObjectWithXMLElements implements StructureInterface {
 
    //
    //Fields
@@ -66,7 +66,6 @@ public class Structure extends BaseObject {
    /* XML attribute names */
    private static final String NAME_XML_ATTRIBUTE_NAME = new String("name");
    private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
-   private static final String TYPE_XML_ATTRIBUTE_NAME = new String("type");
    private static final String PARAMETERLIST_XML_ATTRIBUTE_NAME = new String("paramList");
    private static final String STRUCTURELIST_XML_ATTRIBUTE_NAME = new String("structList");
    private static final String ARRAYLIST_XML_ATTRIBUTE_NAME = new String("arrayList");
@@ -86,8 +85,10 @@ public class Structure extends BaseObject {
    */
   public Structure ()
   {
-    // init the XML attributes (to defaults)
-    init();
+
+      // init the XML attributes (to defaults)
+      init();
+
   }
 
   /**  This constructor takes a Java Hashtable as an initializer of
@@ -97,11 +98,12 @@ public class Structure extends BaseObject {
     */
   public Structure ( Hashtable InitXDFAttributeTable )
   {
-    // init the XML attributes (to defaults)
-    init();
 
-    // init the value of selected XML attributes to HashTable values
-    hashtableInitXDFAttributes(InitXDFAttributeTable);
+     // init the XML attributes (to defaults)
+     init();
+
+     // init the value of selected XML attributes to HashTable values
+     hashtableInitXDFAttributes(InitXDFAttributeTable);
 
   }
 
@@ -113,7 +115,7 @@ public class Structure extends BaseObject {
    */
   public void setName (String strName)
   {
-    ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
+      ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
   }
 
   /**
@@ -121,7 +123,7 @@ public class Structure extends BaseObject {
    */
   public String getName()
   {
-    return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /**set the *description* attribute
@@ -146,8 +148,16 @@ public class Structure extends BaseObject {
 
   /**
    * @return the current *paramList* attribute
+   * @deprecated use getParameters method instead
    */
   public List getParamList() {
+    return (List) ((XMLAttribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
+  /**
+  * @return the current *paramList* attribute
+  */
+  public List getParameters() {
     return (List) ((XMLAttribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
@@ -217,22 +227,6 @@ public class Structure extends BaseObject {
   // Protected Get/set
   //
 
-  /**set the type attribute
-   */
-  // This should only be set by inheriting Structures (ala FITSML and
-  // so on (hmm. reader may also need to set it.., more thought on this..)
-  protected void setType(String strType ) {
-    ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strType);
-  }
-
-  /**
-   * @return the current *type* attribute
-   */
-  public List getType() {
-    return (List) ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
-  }
-
-
   //
   //Other PUBLIC Methods
   //
@@ -241,7 +235,7 @@ public class Structure extends BaseObject {
    * @param n - Note to be added
    * @return an Note object
    */
-  public Note addNote(Note n) {
+  public NoteInterface addNote(NoteInterface n) {
     getNoteList().add(n);
     return n;
   }
@@ -250,7 +244,7 @@ public class Structure extends BaseObject {
    * @param what - Note to be removed
    * @return true on success, false on failure
    */
-   public boolean removeNote(Note what) {
+   public boolean removeNote(NoteInterface what) {
      return removeFromList(what, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -268,7 +262,7 @@ public class Structure extends BaseObject {
    * @param p - Parameter
    * @return an Parameter object
    */
-  public Parameter addParameter(Parameter p) {
+  public ParameterInterface addParameter(ParameterInterface p) {
     getParamList().add(p);
     return p;
   }
@@ -276,7 +270,7 @@ public class Structure extends BaseObject {
    * @param what - Parameter to be removed
    * @return true on success, false on failure
    */
-  public boolean removeParameter(Parameter what) {
+  public boolean removeParameter(ParameterInterface what) {
     return  removeFromList(what, getParamList(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -292,7 +286,7 @@ public class Structure extends BaseObject {
    * @param s - Structure to be added
    * @return an Structure object
    */
-  public Structure addStructure(Structure s) {
+  public StructureInterface addStructure(StructureInterface s) {
     getStructList().add(s);
     return s;
   }
@@ -301,7 +295,7 @@ public class Structure extends BaseObject {
    * @param what - Structure to be removed
    * @return true on success, false on failure
    */
-  public boolean removeStructure(Structure what) {
+  public boolean removeStructure(StructureInterface what) {
     return  removeFromList(what, getStructList(), STRUCTURELIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -317,7 +311,7 @@ public class Structure extends BaseObject {
    * @param array - Array to be added
    * @return an Array object
    */
-  public Array addArray(Array array) {
+  public ArrayInterface addArray(ArrayInterface array) {
     getArrayList().add(array);
     return array;
   }
@@ -326,7 +320,7 @@ public class Structure extends BaseObject {
    * @param what - Array to be removed
    * @return true on success, false on failure
    */
-  public boolean removeArray(Array what) {
+  public boolean removeArray(ArrayInterface what) {
     return removeFromList(what, getArrayList(), ARRAYLIST_XML_ATTRIBUTE_NAME);
   }
 
@@ -358,43 +352,24 @@ public class Structure extends BaseObject {
     return paramGroupOwnedHash.remove(group);
   }
 
-  /** Read in an XML file using Reader.
-   * @return the structure read in on success, null on failure.
-   */
+  public Object clone() throws CloneNotSupportedException
+  {
 
-   public void loadFromXDFFile (String filename)
-   {
+     Structure cloneObj = (Structure) super.clone();
 
-      // clear out existing settings in our structure
-      // with a quick init. Trust java to garbage collect
-      // freed objects(!!)
-      this.init();
-
-      // create an XDFreader, declare this structure object
-      // to be the one it should read into.
-      gov.nasa.gsfc.adc.xdf.Reader reader = new gov.nasa.gsfc.adc.xdf.Reader(this);
-      try {
-        reader.parsefile(filename);
-      } catch (java.io.IOException e) {
-        Log.printStackTrace(e);
-      }
-
-   }
-
-   public Object clone() throws CloneNotSupportedException{
-    Structure cloneObj = (Structure) super.clone();
-
-    //deep copy of the paramGroupOwnedHash
+     //deep copy of the paramGroupOwnedHash
      synchronized (this.paramGroupOwnedHash) {
-      synchronized(cloneObj.paramGroupOwnedHash) {
-        cloneObj.paramGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.paramGroupOwnedHash.size()));
-        Iterator iter = this.paramGroupOwnedHash.iterator();
-        while (iter.hasNext()) {
-          cloneObj.paramGroupOwnedHash.add(((Group)iter.next()).clone());
+        synchronized(cloneObj.paramGroupOwnedHash) {
+          cloneObj.paramGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.paramGroupOwnedHash.size()));
+          Iterator iter = this.paramGroupOwnedHash.iterator();
+          while (iter.hasNext()) {
+            cloneObj.paramGroupOwnedHash.add(((Group)iter.next()).clone());
+          }
         }
       }
-    }
-    return cloneObj;
+
+      return cloneObj;
+
    }
 
    // 
@@ -404,8 +379,11 @@ public class Structure extends BaseObject {
    /** Special method used by constructor methods to
      *  convienently build the XML attribute list for a given class.
      */
+   // overrides BaseObjectw/XMLElements.init() method
    protected void init()
    {
+
+    super.init();
 
     classXDFNodeName = "structure";
 
@@ -415,7 +393,6 @@ public class Structure extends BaseObject {
     attribOrder.add(0, ARRAYLIST_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, STRUCTURELIST_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, PARAMETERLIST_XML_ATTRIBUTE_NAME);
-    attribOrder.add(0, TYPE_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
@@ -424,7 +401,6 @@ public class Structure extends BaseObject {
     attribHash.put(ARRAYLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put(STRUCTURELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put(TYPE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
 
@@ -436,6 +412,10 @@ public class Structure extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/05/04 20:36:51  thomas
+ * moved out type attrib and some methods to XDF class.
+ * some small changes to accomodate inheriting XDF from Structure.
+ *
  * Revision 1.17  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
  *
