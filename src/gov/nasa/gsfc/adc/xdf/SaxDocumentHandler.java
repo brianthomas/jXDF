@@ -272,6 +272,24 @@ public class SaxDocumentHandler implements DocumentHandler {
 
     }
 
+    public String getParentNodeName (String ignoreThisParentName) {
+
+       int pathSize = CurrentNodePath.size();
+       int currentNode = 2;
+       if (pathSize > 1) 
+          while (currentNode <= pathSize) { 
+             String testNodeName = (String) CurrentNodePath.get((pathSize-currentNode));
+             if(testNodeName.equals(ignoreThisParentName)) {
+                // do nothing
+             } else 
+                return testNodeName; // this is the one. 
+             currentNode++;
+       }
+
+       return (String) null;
+
+    }
+
     public void setCurrentDatatypeObject(Object object) {
         CurrentDatatypeObject = object;
     }
@@ -409,14 +427,13 @@ public class SaxDocumentHandler implements DocumentHandler {
     // Public SAX methods we dont use
     //
 
-    // what is this for?? hurm.. 
     public void setDocumentLocator (org.xml.sax.Locator l)
     {
+
         // we'd record this if we needed to resolve relative URIs
         // in content or attributes, or wanted to give diagnostics.
         // Right now, do nothing here.
 
-        // do nothing, method required by interface 
     }
 
     public void startDocument()
@@ -448,7 +465,7 @@ public class SaxDocumentHandler implements DocumentHandler {
     public void processingInstruction(String target, String data)
     throws SAXException
     {
-        // Log.debugln("<?"+target+" "+data+"?>");
+        Log.debugln("H_PROCESSING_INSTRUCTION:"+"<?"+target+" "+data+"?>");
         // do nothing, method required by interface 
     }
 
@@ -589,18 +606,24 @@ public class SaxDocumentHandler implements DocumentHandler {
                                        ) 
     {
 
+// Log.error("addDatatoArray:["+thisString+"]");
+
        // Note that we dont treat binary data at all here 
        try {
 
            if ( CurrentDataFormat instanceof StringDataFormat) {
+// Log.errorln(" StringDataFormat");
               CurrentArray.setData(dataLocator, thisString);
            } else if ( CurrentDataFormat instanceof FixedDataFormat) {
+// Log.errorln(" FixedDataFormat");
               Double number = new Double (thisString);
               CurrentArray.setData(dataLocator, number.doubleValue());
            } else if ( CurrentDataFormat instanceof IntegerDataFormat) {
+// Log.errorln(" IntegerDataFormat");
               Integer number = new Integer (thisString);
               CurrentArray.setData(dataLocator, number.intValue());
            } else if ( CurrentDataFormat instanceof ExponentialDataFormat) {
+// Log.errorln(" ExponentDataFormat");
               // hurm.. this is a stop-gap. Exponential format needs to be
               // preserved better than this. -b.t. 
               Double number = new Double (thisString);
@@ -620,7 +643,11 @@ public class SaxDocumentHandler implements DocumentHandler {
     // *sigh* lack of regular expression support makes this 
     // more difficult to do. I expect that it will be possible to 
     // break this in various ways if the PCDATA in the XML 
-    // document is off. -b.t. 
+    // document is off. 
+    //
+    // We should investigate alternative implimentations here, perhaps
+    // with StringBuffer, StringReader or StringTkenizer may help
+    // performance. -b.t. 
     //
     // Note: right now repeatable is limited to just preventing repeating
     // on delimiting strings, NOT on recordTerminators. Not sure if this
@@ -2451,7 +2478,10 @@ Log.errorln(" TValue:"+valueString);
        public void action (SaxDocumentHandler handler, char buf [], int offset, int len) {
 
           //  grab parent node name
-          String parentNodeName = getParentNodeName();
+          // this special call will find the first parent node name 
+          // that doesnt match XDFNodeName.VALUEGROUP
+          String parentNodeName = getParentNodeName(XDFNodeName.VALUEGROUP);
+          // String parentNodeName = getParentNodeName();
           
           // create new object appropriately 
           Value newvalue = new Value();
@@ -2472,11 +2502,10 @@ Log.errorln(" TValue:"+valueString);
               Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
               newvalue = lastAxisObject.addAxisValue(newvalue);
 
-          } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
-
-          {
-
-             // nothing here yet
+//          } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
+//          {
+//
+//
 
           } else {
              Log.errorln("Error: weird parent node "+parentNodeName+" for value.");
@@ -2756,6 +2785,16 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2000/11/27 22:40:44  thomas
+ * Fix to allow attribute text to have newline, carriage
+ * returns in them (print out as entities: &#010; and
+ * &#013;) This allows files printed out to be read back
+ * in again(yeah!). Also, a fix to ValueGroup, added
+ * method of getParentNode(ignoreThisNode) to allow
+ * us to find the correct parent. Now, axis node is getting
+ * its child values correctly. Need to check that this is
+ * in place for ParameterGroup and FieldGroup. -b.t.
+ *
  * Revision 1.20  2000/11/27 19:58:52  thomas
  * Added repeatable functionality to splitstringInotObj
  * method. -b.t.
