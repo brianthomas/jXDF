@@ -1040,7 +1040,7 @@ protected boolean  removeData (Locator locator) {
     boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
     String indent = "";
     String nodeName = getClassXDFNodeName();
-    if (defined newNodeNameString) nodeName = newNodeNameString;
+    if (newNodeNameString != null) nodeName = newNodeNameString;
 
     // indent up one 
     indent = indent + strIndent;
@@ -1833,6 +1833,9 @@ protected boolean  removeData (Locator locator) {
  /**
   * Modification History:
   * $Log$
+  * Revision 1.25  2001/03/28 21:55:43  thomas
+  * Doh! Perl code doesnt run in Java file. Fixed.
+  *
   * Revision 1.24  2001/03/07 23:15:29  thomas
   * was missing newNodeNameString rename in toXMLfilehandle (or subroutine).
   *
