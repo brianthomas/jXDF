@@ -114,7 +114,7 @@ class SaxDocumentHandler implements DocumentHandler {
     private int DataTagLevel = 0; // the level where the actual char data is
 //my $CDATA_IS_ARRAY_DATA; # Tells us when we are accepting char_data as data 
     private Locator TaggedLocatorObj;
-    private String DATABLOCK = new String();
+    private StringBuffer DATABLOCK;
     private boolean CDATAIsArrayData = false;
     private int MaxDataFormatIndex = 0;     // max allowed index in the DataFormatList[]
     private int CurrentDataFormatIndex = 0; // which dataformat index (in DatFormatList[]) we currently are reading
@@ -279,7 +279,7 @@ class SaxDocumentHandler implements DocumentHandler {
         // do so else the output isn't well formed XML.  To do this
         // right, scan the buffer and write '&amp;' and '&lt' as
         // appropriate.
-        // Log.debugln("H_CharData:["+new String(buf,offset,len)+"]");
+        Log.debugln("H_CharData:["+new String(buf,offset,len)+"]");
 
         /* we need to know what the current node is in order to 
            know what to do with this data, however, 
@@ -510,6 +510,164 @@ class SaxDocumentHandler implements DocumentHandler {
 
     }
  
+
+   // To read in data appropriately to dataCube
+   // we have to type it appropriately as determined from
+   // the CurrentDataFormat object 
+
+   // I just want to say upfront here that YES, we are doing a 
+   // crappy job here. Probably desirable to not convert character data
+   // into a String object ("thisString") then decode it again back into
+   // a double, int, etc. LOADS of overhead, as you can imagine. 
+   // We need better routine to directly convert from chars to numbers
+   // and so forth..
+
+    private void addDataToCurrentArray ( Locator dataLocator, 
+                                         String thisString, 
+                                         DataFormat CurrentDataFormat
+                                       ) 
+    {
+
+       // Note that we dont treat binary data at all 
+       try {
+          
+Log.errorln("setData:["+thisString+"]["+dataLocator.getAxisLocation(FastestAxis)+"]");
+
+           if ( CurrentDataFormat instanceof StringDataFormat) {
+              CurrentArray.setData(dataLocator, thisString);
+           } else if ( CurrentDataFormat instanceof FixedDataFormat) {
+              Double number = new Double (thisString);
+              CurrentArray.setData(dataLocator, number.doubleValue());
+           } else if ( CurrentDataFormat instanceof IntegerDataFormat) {
+              Integer number = new Integer (thisString);
+              CurrentArray.setData(dataLocator, number.intValue());
+           } else if ( CurrentDataFormat instanceof ExponentialDataFormat) {
+              // hurm.. this is a stop-gap. Exponential format needs to be
+              // preserved better than this. -b.t. 
+              Double number = new Double (thisString);
+              CurrentArray.setData(dataLocator, number.doubleValue());
+           } else {
+              Log.warnln("The dataFormat:"+CurrentDataFormat.toString()+" is not allowed in tagged data.");
+              Log.warnln("Unable to setData:["+thisString+"], ignoring request");
+           }
+
+       } catch (SetDataException e) {
+           // bizarre error. Cant add data (out of memory??) :P
+           Log.errorln("Unable to setData:["+thisString+"], ignoring request");
+           Log.printStackTrace(e);
+       }
+    }
+
+    // *sigh* lack of regular expression support makes this 
+    // difficult to do. I expect that it will be possible to 
+    // break this in various ways if the PCDATA in the XML 
+    // document is off. -b.t. 
+    //
+    // ALSO: the repeatable function is properly implemented for this yet. -b.t.
+    //
+    private ArrayList splitStringIntoStringObjects ( String valueListString, 
+                                                     String delimiter,
+                                                     String repeatable, 
+                                                     String terminatingDelimiter
+                                                   )
+    {
+
+       // the list we will return
+       ArrayList values = new ArrayList();
+
+       // parameters 
+       int delimiterSize = delimiter.length();
+       char delimitChar0 = delimiter.charAt(0);
+       int termDelimiterSize = 0;
+       char termDelimitChar0;
+       int valueListSize = valueListString.length(); 
+
+       if(terminatingDelimiter != null) {
+          termDelimiterSize = terminatingDelimiter.length();
+          termDelimitChar0 = terminatingDelimiter.charAt(0);
+       }
+
+       // loop over the valueListString and derive values 
+       int start = 0;
+       while ( start < valueListSize )
+       {
+
+          int stop = start + delimiterSize;
+
+          // safety, can happen
+          if(stop > valueListSize) stop = valueListSize;
+
+          if ( valueListString.substring(start, stop).compareTo(delimiter) == 0 ) 
+          {
+
+             // we hit a delimiter
+             start += delimiterSize;
+
+          } else if (termDelimiterSize > 0 
+                       && valueListString.substring(start, start + termDelimiterSize).compareTo(terminatingDelimiter) == 0
+                    ) 
+          { 
+
+             // we hit record terminator(delimiter) 
+             start += termDelimiterSize;
+ 
+          } else {
+
+             // we didnt hit a delimiter, gather values
+
+             // find the end of this substring
+             int end = valueListString.indexOf(delimitChar0, start);
+
+             int termend = 0;
+
+             if(terminatingDelimiter != null) 
+                 termend = valueListString.indexOf(terminatingDelimiter.charAt(0), start);
+
+// Log.error("end:"+end+" termend:"+termend);
+
+             String valueString;
+             if(termend == 0 || end < termend) {
+
+                // can happen if no terminating delimiter
+                if (end < 0) end = valueListSize;
+
+                // derive our value from string
+                valueString = valueListString.substring(start, end);
+
+                // add the value to arrayList 
+                values.add(valueString);
+
+// Log.errorln(" DValue:"+valueString);
+
+                // this is the last value so terminate the while loop 
+                if ((end+delimiterSize) >= valueListSize ) break;
+
+                start = end;
+
+             } else {
+
+                // if (termend < 0) termend = valueListSize;
+
+                valueString = valueListString.substring(start, termend);
+
+                // add the value to arrayList 
+                values.add(valueString);
+
+// Log.errorln(" TValue:"+valueString);
+
+                // this is the last value so terminate the while loop 
+                if ((termend+termDelimiterSize) >= valueListSize ) break;
+
+                start = termend;
+             }
+
+          }
+
+       }
+
+       return values;
+    }
+
     // This will get used heavily during data adding. Implimentation
     // is kinda slow too. bleh.
     // isnt there some free code around to do this?
@@ -638,13 +796,22 @@ class SaxDocumentHandler implements DocumentHandler {
     // asciiDelimiter node start
     class asciiDelimiterStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("Ascii Delimiter Start handler not implemented yet.");
+
+           DelimitedXMLDataIOStyle readObj = new DelimitedXMLDataIOStyle(CurrentArray);
+           readObj.setXMLAttributes(attrs);
+           CurrentArray.setXMLDataIOStyle(readObj);
+
+           CurrentFormatObjectList.add(readObj);
+
        }
     }
 
     // asciiDelimiter node end
     class asciiDelimiterEndElementHandlerFunc implements EndElementHandlerAction {
-       public void action () { System.out.println("Ascii Delimiter end node handler not implemented yet."); }
+       public void action () { 
+           // pop off last value
+           CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
+       }
     }
 
 
@@ -837,59 +1004,23 @@ class SaxDocumentHandler implements DocumentHandler {
 
                 DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
 
-                // To read in data appropriately to dataCube
-                // we have to type it appropriately as determined from
-                // the CurrentDataFormat object 
-
-                // I just want to say upfront here that YES, we are doing a 
-                // crappy job here. Probably desirable to not convert character data
-                // into a String object ("thisString") then decode it again back into
-                // a double, int, etc. LOADS of overhead, as you can imagine. 
-                // We need better routine to directly convert from chars to numbers
-                // and so forth..
-
                 // adding data based on what type..
-                // Note that we dont treat binary data at all (since you would have
-                // to break the XML spec to store it in tags :P)
-                try {
+                addDataToCurrentArray(TaggedLocatorObj, thisString, CurrentDataFormat); 
 
-                   if ( CurrentDataFormat instanceof StringDataFormat) {
-                       CurrentArray.setData(TaggedLocatorObj, thisString);
-                   } else if ( CurrentDataFormat instanceof FixedDataFormat) {
-                       Double number = new Double (thisString);
-                       CurrentArray.setData(TaggedLocatorObj, number.doubleValue());
-                   } else if ( CurrentDataFormat instanceof IntegerDataFormat) {
-                       Integer number = new Integer (thisString);
-                       CurrentArray.setData(TaggedLocatorObj, number.intValue());
-                   } else if ( CurrentDataFormat instanceof ExponentialDataFormat) {
-                       // hurm.. this is a stop-gap. Exponential format needs to be
-                       // preserved better than this. -b.t. 
-                       Double number = new Double (thisString);
-                       CurrentArray.setData(TaggedLocatorObj, number.doubleValue());
-                   } else {
-                       Log.warnln("The dataFormat:"+CurrentDataFormat.toString()+" is not allowed in tagged data.");
-                       Log.warnln("Unable to setData:["+thisString+"], ignoring request");
-                   } 
-
-                } catch (SetDataException e) {
-                   // bizarre error. Cant add data (out of memory??) :P
-                   Log.errorln("Unable to setData:["+thisString+"], ignoring request");
-                   Log.printStackTrace(e);
-                }
-               
              }
 
           } else if ( readObj instanceof DelimitedXMLDataIOStyle ||
                     readObj instanceof FormattedXMLDataIOStyle )
           {
 
-              if ( CDATAIsArrayData ) {
-                  // accumulate CDATA in the GLOBAL $DATABLOCK for later reading
-                  DATABLOCK.concat(new String(buf,offset,len));
-              }
+              String newString = new String(buf,offset,len);
+              // add it to the datablock if it isnt all whitespace ?? 
+           //   if ( newString.trim().length() > 0 ) {
+                  DATABLOCK.append(newString);
+           //   }
 
            } else {
-               Log.errorln("UNSUPPORTED Data Node CharData style, aborting.\n");
+               Log.errorln("UNSUPPORTED Data Node CharData style:"+readObj.toString()+", Aborting!\n");
                System.exit(-1);
            }
 
@@ -920,8 +1051,75 @@ class SaxDocumentHandler implements DocumentHandler {
                formatObj instanceof FormattedXMLDataIOStyle ) 
           {
 
-              Log.errorln("ERROR: Delimited/Formated DATA reading is not implemented yet. Aborting read.");
-              System.exit(-1);
+
+              // determine the size of the dataFormat (s) in our dataCube
+              if (CurrentArray.hasFieldAxis()) {
+                 // if there is a field axis, then its set to the number of fields
+                 FieldAxis fieldAxis = CurrentArray.getFieldAxis();
+                 MaxDataFormatIndex = (fieldAxis.getLength()-1);
+              } else {
+                 // its homogeneous 
+                 MaxDataFormatIndex = 0;
+              }
+
+              Locator myLocator = CurrentArray.createLocator();
+
+AxisInterface axis0 = (AxisInterface) CurrentArray.getAxisList().get(0); 
+AxisInterface axis1 = (AxisInterface) CurrentArray.getAxisList().get(1); 
+
+              CurrentDataFormatIndex = 0; 
+
+//              boolean dataHasSpecialIntegers = false;
+
+              // set up appropriate instructions for reading
+              if ( formatObj instanceof FormattedXMLDataIOStyle ) {
+/*
+      $template  = $formatObj->_templateNotation(1);
+      $recordSize = $formatObj->bytes();
+      $data_has_special_integers = $formatObj->hasSpecialIntegers;
+
+*/
+                 Log.errorln("FORMATTED DATA READ NOT SUPPORTED");
+
+              } else {
+
+                 // snag the string representation of the values
+                 ArrayList strValueList = splitStringIntoStringObjects( DATABLOCK.toString(), 
+                                                ((DelimitedXMLDataIOStyle) formatObj).getDelimiter(), 
+                                                ((DelimitedXMLDataIOStyle) formatObj).getRepeatable(), 
+                                                ((DelimitedXMLDataIOStyle) formatObj).getRecordTerminator()
+                                              );
+
+                 // fire data into dataCube
+                 Iterator iter = strValueList.iterator();
+                 while (iter.hasNext()) 
+                 {
+
+                    DataFormat CurrentDataFormat = DataFormatList[CurrentDataFormatIndex];
+
+                    // adding data based on what type..
+                    addDataToCurrentArray(myLocator, (String) iter.next(), CurrentDataFormat);
+
+                    // bump up DataFormat appropriately
+                    if (MaxDataFormatIndex > 0) {
+                       int currentFastAxisCoordinate = myLocator.getAxisLocation(FastestAxis);
+                       if ( currentFastAxisCoordinate != LastFastAxisCoordinate )
+                       {
+                          LastFastAxisCoordinate = currentFastAxisCoordinate;
+                          if (CurrentDataFormatIndex == MaxDataFormatIndex)
+                             CurrentDataFormatIndex = 0;
+                          else
+                             CurrentDataFormatIndex++;
+                       }
+                    }
+
+Log.errorln("Location:["+myLocator.getAxisLocation(axis0)+","+myLocator.getAxisLocation(axis1)+"]");
+
+                    myLocator.next();
+
+                 }
+
+              }
 
           } else if ( formatObj instanceof TaggedXMLDataIOStyle )
           {
@@ -930,7 +1128,8 @@ class SaxDocumentHandler implements DocumentHandler {
 
           } else {
 
-              Log.errorln("ERROR: Completely unknown DATA IO style! aborting read.");
+              Log.errorln("ERROR: Completely unknown DATA IO style:"+formatObj.toString()
+                           +" aborting read!");
               System.exit(-1);
 
           }
@@ -967,15 +1166,15 @@ class SaxDocumentHandler implements DocumentHandler {
           }
 
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
+          FastestAxis = (AxisInterface) CurrentArray.getAxisList().get(0);
+          LastFastAxisCoordinate = 0;
 
           if ( readObj instanceof TaggedXMLDataIOStyle) {
              TaggedLocatorObj = CurrentArray.createLocator();
-             LastFastAxisCoordinate = 0;
-             FastestAxis = (AxisInterface) CurrentArray.getAxisList().get(0);
           } else {
              // A safety. We clear datablock when this is the first datanode we 
              // have entered DATABLOCK is used in cases where we read in untagged data
-             if (DataNodeLevel == 0) DATABLOCK = new String();
+             if (DataNodeLevel == 0) DATABLOCK = new StringBuffer ();
           }
 
           // entered a datanode, raise the count 
@@ -1572,7 +1771,8 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class repeatEndElementHandlerFunc implements EndElementHandlerAction {
        public void action () {
-          Log.errorln("REPEAT End handler not implemented yet.");
+          // pop off last value
+          CurrentFormatObjectList.remove(CurrentFormatObjectList.size()-1);
        }
     }
 
@@ -1855,62 +2055,35 @@ class SaxDocumentHandler implements DocumentHandler {
           Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
 
           // split up string into values based on declared delimiter
-          String delimitString = (String) CurrentValueListParameter.get("delimiter");
-          int delimiterSize = delimitString.length();
-          char delimitChar0 = delimitString.charAt(0);
-          int start = 0;
+          String delimiter = (String) CurrentValueListParameter.get("delimiter");
+          String repeatable = (String) CurrentValueListParameter.get("repeatable");
 
-          // *sigh* lack of regular expression support makes this 
-          // difficult to do. I expect that it will be possible to 
-          // break this in various ways if the PCDATA in the XML 
-          // document is off. -b.t. 
-          //
-          // ALSO: the repeatable function is properly implemented for this yet. -b.t.
-          //
-          while ( start < valueListString.length() ) 
+          // snag the string representation of the values
+          ArrayList strValueList = 
+              splitStringIntoStringObjects(valueListString, delimiter, repeatable, null );
+
+          // now create value objects, add them to groups 
+          Iterator iter = strValueList.iterator();
+          while (iter.hasNext()) 
           {
+             String valueString = (String) iter.next();
 
-            int stop = start + delimiterSize;
-            // safety, can happen
-            if(stop > valueListString.length())
-                    stop = valueListString.length();
-            String valueListSubString = valueListString.substring(start, stop);
-            if (valueListSubString.compareTo(delimitString) == 0) {
-               // we hit a delimiter
-               start += delimiterSize;
-            } else {
-               // we didnt hit a delimiter, gather values
+             // add the value to the axis
+             Value newvalue = new Value(valueString);
+             lastAxisObject.addAxisValue(newvalue);
 
-               // find the end of this substring
-               int end = valueListString.indexOf(delimitChar0, start);
-
-               // can happen if no terminating delimiter
-               if (end < 0) 
-                    end = valueListString.length();
-
-               // add the value to the axis
-               String valueString = valueListString.substring(start, end);
-               Value newvalue = new Value(valueString);
-               lastAxisObject.addAxisValue(newvalue);
-
-               // add this object to all open value groups
-               Iterator iter = CurrentValueGroupList.iterator();
-               while (iter.hasNext()) {
-                  ValueGroup nextValueGroupObj = (ValueGroup) iter.next();
-                  newvalue.addToGroup(nextValueGroupObj);
-               }
-
-               // this is the last value so terminate the while loop 
-               if ((end+delimiterSize) >= valueListString.length()) 
-                   break;
-
-               start = end;
-            }
-
+             // add this object to all open value groups
+             Iterator groupIter = CurrentValueGroupList.iterator();
+             while (groupIter.hasNext()) 
+             {
+                ValueGroup nextValueGroupObj = (ValueGroup) groupIter.next();
+                newvalue.addToGroup(nextValueGroupObj);
+             }
           }
 
        }
     }
+
 
     // there is undoubtably some code-reuse spots missed in this function.
     // get it later when Im not being lazy. -b.t.
@@ -2060,6 +2233,11 @@ class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/06 14:47:32  thomas
+ * First Cut at delimited implimented. Problem in
+ * Locator (?) prevents it from being fully functional.
+ * -b.t.
+ *
  * Revision 1.7  2000/11/03 20:10:07  thomas
  * Now tagged data is read into the dataCube with the
  * correct formatting. -b.t.
