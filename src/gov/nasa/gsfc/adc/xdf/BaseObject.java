@@ -400,9 +400,7 @@ public abstract class BaseObject implements Serializable {
     if (!XMLDeclAttribs.isEmpty()) {
         indent = "";
         writeXMLDeclToOutputStream(outputstream, XMLDeclAttribs);
-    } else {
-       Log.warn("Warning: XMLDeclAttribs NOT currently supported.");
-    }
+    } 
 
     // 1. open this node, print its simple XML attributes
     if (nodeNameString != null) {
@@ -853,7 +851,7 @@ public abstract class BaseObject implements Serializable {
 
     // print the DOCTYPE DECL IF its a structure node
     if(classXDFNodeName != null && classXDFNodeName.equals(sXDFStructureNodeName) ) {
-      writeOut(outputstream, "<!DOCTYPE " + sXDFRootNodeName + " " + sXDFDTDName + ">");
+      writeOut(outputstream, "<!DOCTYPE " + sXDFRootNodeName + " SYSTEM " + sXDFDTDName + ">");
       if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
     }
 
@@ -938,6 +936,12 @@ public abstract class BaseObject implements Serializable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2000/10/24 15:02:51  thomas
+ * Hmm. minor problem with XMLDeclAttribs portion
+ * of toXDFOutputStream ("SYSTEM" decl missing, and
+ * it threw a warning when the hashtable for XMLDeclAttribs
+ * was missing .. whichis silly as most nodes lack it). -b.t.
+ *
  * Revision 1.13  2000/10/23 21:32:16  thomas
  * added setXMLAttributes method to BaseObject. This
  * method is functionally similar to Perl BaseObject
