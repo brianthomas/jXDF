@@ -57,9 +57,27 @@ import java.util.Hashtable;
 
     }
 
+    //
+    // Get/Set Methods
+    //
+
+    /** set the fieldgroupclass XML attribute
+     */
+    public void setFieldGroupClass (String strName)
+    {
+       ((XMLAttribute) attribHash.get(CLASS_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
+    } 
+    
+    /**
+     * @return the current *fieldgroupclass* attribute
+     */
+    public String getFieldGroupClass()
+    { 
+       return (String) ((XMLAttribute) attribHash.get(CLASS_XML_ATTRIBUTE_NAME)).getAttribValue();
+    }
 
     //
-    // Public Methods
+    // Other Public Methods
     //
 
     /**Insert a FieldGroup object into this object.
@@ -100,6 +118,9 @@ import java.util.Hashtable;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2001/08/01 19:13:23  thomas
+ * forgot to put in accessor methodscvs update fixed
+ *
  * Revision 1.6  2001/08/01 18:13:53  thomas
  * added Class attribute
  *
