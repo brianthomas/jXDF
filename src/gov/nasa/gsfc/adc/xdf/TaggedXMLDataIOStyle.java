@@ -24,8 +24,12 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+
 import java.io.Writer;
 // import java.io.OutputStream;
 import java.io.IOException; 
@@ -43,8 +47,10 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 
   public static final String TagToAxisNodeName = "tagToAxis";
 
-  //init hash size to 10, prevent rehashing, which is expansive
-  protected Hashtable tagHash = new Hashtable(10);
+  //init hash size to MaxTagDimensions, prevent rehashing, which is expansive
+  private Hashtable tagHash = new Hashtable(Constants.MAX_TAGGED_DIMENSIONS);
+  private Hashtable axisIdHash = new Hashtable(Constants.MAX_TAGGED_DIMENSIONS);
+  private boolean needToCheckAxisOrder = true;
 
   //
   //constructors and related methods
@@ -53,74 +59,139 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //no-arg contructor
   public TaggedXMLDataIOStyle(Array parentArray) 
   {
-    super(parentArray);
+     super(parentArray);
   }
 
   public TaggedXMLDataIOStyle(Array parentArray, Hashtable InitXDFAttributeTable) 
   {
-    super(parentArray,InitXDFAttributeTable);
+     super(parentArray,InitXDFAttributeTable);
   }
   
   //
   //Get/Set Methods
   //
-  public void setTagHash(Hashtable tagHash) {
-    this.tagHash = tagHash;
-  }
 
-  public Hashtable getTagHash() {
-    return tagHash;
-  }
-
-  //
-  //Other PUBLIC Methods
-  //
-/**Set an association between an XDF data tag and axis reference.
- * One day we will hopefully be able to support user defined tags, but for the
- * time being you will have to stick to those specified by the XDF DTD
- * (e.g. "d0","d1", ... "d8"). Note that choosing the wrong tag name will break
- * the current XDF DTD, so go with the defaults (e.g. DONT use this method)
- * if you dont know what you are doing here.
- * @parma: tag - tag , axisId - axisId
- * @return tag value
- */
-  public void setAxisTag(String tag, String axisId) {
-    //insert in hash table, return tag value
-    tagHash.put(axisId, tag);
-  }
-
-  /**getXMLDataIOStyleTags: Return an String array of tags to
-   *  be used to write tagged data, return the tags in the order of
-   * d0, d1, ..., d8
-   */
-
-   public String[] getAxisTags() {
-   List axisList = getParentArray().getAxes();
-    int stop = axisList.size();
-    String[] tags = new String[stop];
-    String tag;
-    String axisId;
-    String tempTag;
-
-
-    int counter = stop;
-    for (int i = 0; i < stop; i++) {
-      axisId = ((AxisInterface)axisList.get(i)).getAxisId();
-      counter--;
-      tag = "d" + counter;  //the default tag
-      //should it exist, we use whats in the tag hash
-      //otherwise we go with the default as singed above
-      tempTag = (String) tagHash.get(axisId);
-      if (tempTag!=null)
-        tag = tempTag;
-      tags[i] = tag;
-    }
-    return tags;
+   /** Overrides the parent class method. We want to insure that this isnt set 
+       as it doesnt make any sense to do so for tagged data which may not carry
+       binary information. 
+    */
+   public void setEndian (String strEndian)
+   {
+       Log.warnln("setEndian() got invalid value. Tagged Data May not wrap binary values. Request ignored.");
    }
 
-  //
-  //PROTECTED Methods
-  //
+   /**Set an association between an XDF data tag and axis reference.
+      One day we will hopefully be able to support user defined tags, but for the
+      time being you will have to stick to those specified by the XDF DTD
+      (e.g. "d0","d1", ... "d8"). Note that choosing the wrong tag name will break
+      the current XDF DTD, so go with the defaults (e.g. DONT use this method)
+      if you dont know what you are doing here.
+      @params: tag - tag , axisId - axisId
+      @return tag value
+    */
+   public void setAxisTag(String tag, String axisId) {
+
+      // it would be nicer to be able to apply a regex here instead :P
+      if (tag != null && tag.length() > 1 && tag.startsWith("d") ) {
+
+         //insert in hash table, return tag value
+         tagHash.put(axisId, tag);
+         axisIdHash.put(tag, axisId);
+         needToCheckAxisOrder = true;
+
+      } else {
+         Log.errorln("setAxisTag() got mal-formed tag string:"+tag+", cannot set.");
+      }
+   }
+
+   /** Return the cooresponding axis object for the given XML tag 
+    */
+   public AxisInterface getAxisByTag (String tag) 
+   {
+      String axisId = (String) axisIdHash.get(tag);
+
+      Iterator iter = getIOAxesOrder().iterator();
+      while (iter.hasNext()) { 
+         AxisInterface thisAxis = (AxisInterface) iter.next();
+         if (thisAxis.getAxisId().equals(axisId)) {
+            return thisAxis;
+         }
+      }
+      return (AxisInterface) null;
+   }
+
+   /** Return the cooresponding XML tag for the passed axisId
+    */
+   public String getTagByAxisId (String axisId)
+   {
+      return (String) tagHash.get(axisId);
+   }
+
+   public void setIOAxesOrder(List axisOrderList) {
+      Log.errorln("Cant setIOAxesOrder for TaggedXMLDataIOStyle");
+   }
+
+   public List getIOAxesOrder () {
+
+         if (needToCheckAxisOrder)
+         {
+             resetIOAxesOrder();
+             needToCheckAxisOrder = false;
+         }
+
+         return super.getIOAxesOrder();
+   }
+
+   /**getXMLDataIOStyleTags: Return an String array of tags to
+    *  be used to write tagged data, return the tags in the order of
+    * d0, d1, .., ., d8
+    */
+
+   public String[] getAxisTags () 
+   {
+
+     // List axisList = getIOAxesOrder(); 
+     List axisList = getParentArray().getAxes();
+     int stop = axisList.size();
+     String[] tags = new String[stop];
+     String tag;
+
+     for (int i = 0; i < stop; i++) {
+       // String axisId = ((AxisInterface) axisList.get(i)).getAxisId();
+       // tags[i] = (String) tagHash.get(axisId);
+       tags[i] = "d" + i;
+     }
+
+/*
+     String axisId;
+     String tempTag;
+
+     int counter = stop;
+     for (int i = 0; i < stop; i++) {
+        counter--;
+        tag = "d" + counter;  //the default tag
+        //should it exist, we use whats in the tag hash
+        //otherwise we go with the default above
+        axisId = ((AxisInterface) axisList.get(i)).getAxisId();
+        tempTag = (String) tagHash.get(axisId);
+        if (tempTag!=null)
+           tag = tempTag;
+        tags[i] = tag;
+     }
+*/
+
+     return tags;
+   }
+
+   //
+   //Other PUBLIC Methods
+   //
+
+
+   //
+   //PROTECTED Methods
+   //
+
    protected void specificIOStyleToXDF( Writer outputWriter, String indent)
    throws java.io.IOException
    {
@@ -166,14 +237,68 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
     * @param axisId - axisId to be removed
     * @return tag if successful, null if not
     */
-   protected String removeAxisTag(String axisId) {
-    return (String) getTagHash().remove(axisId);
+   protected String removeAxisTag (String axisId) {
+      String tagName = (String) tagHash.remove(axisId);
+      if (tagName != null) 
+         axisIdHash.remove(tagName);
+
+      needToCheckAxisOrder = true;
+
+      return tagName;
+   }
+
+   //
+   // Private Methods
+   //
+
+   private void resetIOAxesOrder () {
+
+      List parentAxes = parentArray.getAxes();
+
+      if (tagHash.size() != parentAxes.size()) {
+          // not enough in tagHash to do this yet
+          return;
+      } else {
+      
+         Hashtable parentAxis = mapAxesToIds(parentAxes);
+
+         synchronized (axesIOList) {
+            axesIOList = Collections.synchronizedList(new ArrayList());
+            for (int i = 0, size = parentAxes.size(); i < size; i++) {
+               String tagName = "d" + i;
+               if (axisIdHash.containsKey(tagName)) {
+                  String axisId = (String) axisIdHash.get(tagName);
+                  AxisInterface axisObj = (AxisInterface) parentAxis.get(axisId);
+                  axesIOList.add(0,axisObj);
+               } else {
+                  Log.errorln("Internal Error: Cant find tag:"+tagName+", in internal hash as expected. Bad choice of AxisTag earlier?");
+                  return; 
+               }
+            }
+         }
+      }
+   }
+
+   private Hashtable mapAxesToIds (List axes) 
+   {
+
+       Hashtable table = new Hashtable();
+       Iterator iter = axes.iterator();
+       while (iter.hasNext()) 
+       {
+          AxisInterface axisObj = (AxisInterface) iter.next(); 
+          table.put(axisObj.getAxisId(), axisObj);
+       }
+       return table;
    }
 
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.18  2001/09/18 17:47:27  thomas
+ * bug fixes for tagged data which has non-'d0' field axis (e.g. transposed data)
+ *
  * Revision 1.17  2001/07/26 15:55:42  thomas
  * added flush()/close() statement to outputWriter object as
  * needed to get toXMLOutputStream to work properly.
