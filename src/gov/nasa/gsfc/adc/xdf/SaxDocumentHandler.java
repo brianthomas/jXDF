@@ -302,6 +302,14 @@ public class SaxDocumentHandler extends DefaultHandler {
        return lastObject;
     }
 
+    // get the last object we worked on
+    public Object getParentOfLastObject() {
+       Object lastObject = (Object) null;
+       if (CurrentObjectList.size() > 1)
+          lastObject = CurrentObjectList.get(CurrentObjectList.size()-2);
+       return lastObject;
+    }
+
     public String getCurrentNodeName () {
        int pathSize = CurrentNodePath.size();
        return (String) CurrentNodePath.get((pathSize-1));
@@ -1252,6 +1260,7 @@ Log.errorln("");
        endElementHandlerHashtable.put(XDFNodeName.PARAMETERGROUP, new parameterGroupEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.READ, new readEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.REPEAT, new repeatEndElementHandlerFunc());
+       endElementHandlerHashtable.put(XDFNodeName.STRUCTURE, new structureEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.TD0, new dataTagEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.TD1, new dataTagEndElementHandlerFunc());
        endElementHandlerHashtable.put(XDFNodeName.TD2, new dataTagEndElementHandlerFunc());
@@ -1320,7 +1329,19 @@ Log.debugln(") ");
               if (intRadix == 16) // peal off leading "0x"
                   thisString = thisString.substring(2);
 
-              int thisInt = Integer.parseInt(thisString, intRadix); 
+              int thisInt = 0;
+              // *sigh* parseInt doesnt understand leading "+" signs. We need 
+              // to trap those errors an deal with them appropriately
+              try {
+                 thisInt = Integer.parseInt(thisString, intRadix);
+              } catch (NumberFormatException e) {
+                 if (thisString.startsWith("+")) {
+                    thisInt = Integer.parseInt(thisString.substring(1), intRadix);
+                 } else {
+                    throw e;
+                 }
+              }
+
               CurrentArray.setData(dataLocator, thisInt);
 
            } else {
@@ -2130,6 +2151,8 @@ Log.errorln(" TValue:"+valueString);
              // add the current array and add this array to current structure 
              CurrentStructure.addArray(CurrentArray);
           }
+
+          CurrentArray = null;
 
        }
     }
@@ -3617,6 +3640,19 @@ while(thisIter.hasNext()) {
        }
     }
 
+    class structureEndElementHandlerFunc implements EndElementHandlerAction {
+       public void action (SaxDocumentHandler handler) {
+          Object lastObject = getParentOfLastObject();
+          if (lastObject != null && lastObject instanceof Structure) {
+            setCurrentStructure((Structure) lastObject);
+          } else {
+             // we should throw an error here I think.
+             System.err.println("Internal error cannot parse structure, last object wasn't structure");
+             System.exit(-1);
+          }
+       }
+    }
+
     // TAGTOAXIS
     //
 
@@ -4249,6 +4285,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.46  2001/08/31 20:01:25  thomas
+ * bug fix to integer parsing, couldnt understand values that began w/ + signcvs diff SaxDocumentHandler.java and added estructureEndElementHandler funct
+ *
  * Revision 1.45  2001/07/30 19:24:39  thomas
  * bug fix: read obj not init'ing if didnt have readId!
  *
