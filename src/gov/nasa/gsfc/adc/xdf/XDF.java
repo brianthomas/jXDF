@@ -46,7 +46,12 @@ public class XDF extends Structure {
    /* XML attribute names */
    protected static final String TYPE_XML_ATTRIBUTE_NAME = new String("type");
 
-   // constructors
+   // stores notation entries for the XMLDeclaration
+   protected HashSet XMLNotationHash = new HashSet();
+
+   //
+   // Constructors
+   //
 
    /** The no argument constructor.
     */
@@ -85,6 +90,15 @@ public class XDF extends Structure {
     */
   public String getType() {
      return (String) ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
+  /** Set the NotationHash for this XDF object. Each entry in the passed HashSet
+      will be a Hashtable containing the keys 'name' 'publicId' and 'systemId'.
+      This information will be printed out with other XMLDeclarations in a 
+      toXMLFileHandle call that prints the XML declaration (e.g. DOCTYPE header). 
+  */
+  public void setXMLNotationHash (HashSet hash) {
+     XMLNotationHash = hash;
   }
 
   //
@@ -140,9 +154,30 @@ public class XDF extends Structure {
           writeXMLDeclToOutputStream(outputstream, XMLDeclAttribs);
        }
  
-       super.toXMLOutputStream ( outputstream, XMLDeclAttribs, indent,
+       super.toXMLOutputStream ( outputstream, indent,
                                  dontCloseNode, newNodeNameString, 
                                  noChildObjectNodeName);
+   }
+
+   public void toXMLOutputStream (
+                                   OutputStream outputstream,
+                                   String indent,
+                                   boolean dontCloseNode,
+                                   String newNodeNameString,
+                                   String noChildObjectNodeName
+                                 )
+   throws java.io.IOException
+   {
+
+/*
+     // prepare XMLDeclaration
+      Hashtable XMLDeclAttribs = new Hashtable();
+      XMLDeclAttribs.put("standalone", new String("no"));
+      XMLDeclAttribs.put("dtdName", Specification.getInstance().getXDFDTDName());
+      XMLDeclAttribs.put("rootName", Specification.getInstance().getXDFRootNodeName());
+*/
+
+      this.toXMLOutputStream(outputstream, null, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
    }
 
    public Object clone() throws CloneNotSupportedException{
@@ -333,6 +368,11 @@ public class XDF extends Structure {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/07/19 22:01:30  thomas
+ * put XMLDeclAttribs into toXMLOutputStream (only needed
+ * in the XDF class)
+ * added  XMLNotationHash stuff (again, only needed in XDF class)
+ *
  * Revision 1.4  2001/07/11 22:35:21  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.
  *
