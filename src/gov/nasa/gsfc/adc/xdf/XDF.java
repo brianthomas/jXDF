@@ -45,13 +45,11 @@ public class XDF extends Structure {
    //
    //Fields
    //
+   private XMLDeclaration xmlDeclaration;
    private DocumentType documentType;
 
    /* XML attribute names */
    protected static final String TYPE_XML_ATTRIBUTE_NAME = new String("type");
-
-   // stores notation entries for the XMLDeclaration
-//   protected HashSet NotationNodeHash = new HashSet();
 
    //
    // Constructors
@@ -96,21 +94,30 @@ public class XDF extends Structure {
      return (String) ((Attribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-  /* Set the NotationHash for this XDF object. Each entry in the passed HashSet
-      will be a Hashtable containing the keys 'name' 'publicId' and 'systemId'.
-      This information will be printed out with other XMLDeclarations in a 
-      toXMLFileHandle call that prints the XML declaration (e.g. DOCTYPE header). 
-  */
-/*
-  public void setNotationNodeHash (HashSet hash) {
-     NotationNodeHash = hash;
+  /** Get the XMLDeclaration object which describes the XML declaration to 
+      be printed when toXMLWriter/toXMLOutputStream methods are called for this object.
+   */
+  public XMLDeclaration getXMLDeclaration() {
+     return xmlDeclaration;
   }
-*/
 
+  /** Set the XMLDeclaration object which describes the XML declaration to 
+      be printed when toXMLWriter/toXMLOutputStream methods are called for this object.
+   */
+  public void setXMLDeclaration (XMLDeclaration obj) {
+     xmlDeclaration = obj;
+  }
+
+  /** Get the DocumentType object which describes the XML DOCTYPE declaration to 
+      be printed when toXMLWriter/toXMLOutputStream methods are called for this object.
+   */ 
   public DocumentType getDocumentType() {
      return documentType;
   }
 
+  /** Set the DocumentType object which describes the XML DOCTYPE declaration to 
+      be printed when toXMLWriter/toXMLOutputStream methods are called for this object.
+   */
   public void setDocumentType (DocumentType docType) {
      documentType = docType;
   }
@@ -142,58 +149,6 @@ public class XDF extends Structure {
 
    }
 
-   /** Write this object and all the objects it owns to the supplied
-       OutputStream object as XDF. Supplying a populated XMLDeclAttributes
-       Hashtable will result in the xml declaration being written at the
-       begining of the outputstream (so when you do this, you will
-       get well-formmed XML output for ANY object). For obvious reasons, only
-       XDF objects will create *valid XDF* output.
-   */
-   public void toXMLOutputStream (
-                                   OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
-                                   String indent,
-                                   boolean dontCloseNode,
-                                   String newNodeNameString,
-                                   String noChildObjectNodeName
-                                )
-   throws java.io.IOException
-   {
-
-       Writer outputWriter = new BufferedWriter(new OutputStreamWriter(outputstream));
-       toXMLWriter (outputWriter, XMLDeclAttribs, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
-
-       // this *shouldnt* be needed, but tests with both Java 1.2.2 and 1.3.0
-       // on SUN and Linux platforms show that it is. Hopefully we can remove
-       // this in the future.
-       outputWriter.flush();
-
-   }
-
-   public void toXMLWriter (
-                                Writer outputWriter,
-                                Hashtable XMLDeclAttribs,
-                                String indent,
-                                boolean dontCloseNode,
-                                String newNodeNameString,
-                                String noChildObjectNodeName
-                             )
-   throws java.io.IOException
-   {
-
-
-       //  To be valid XML, we always start an XML block with an
-       //  XML declaration (e.g. somehting like "<?xml standalone="no"?>").
-       //  Here we deal with  printing out XML Declaration && its attributes
-       if (XMLDeclAttribs != null) { //  &&(!XMLDeclAttribs.isEmpty())) {
-          indent = "";
-          writeXMLHeader(outputWriter, XMLDeclAttribs, true);
-       }
- 
-       toXMLWriter ( outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
-
-   }
-
    public Object clone() throws CloneNotSupportedException{
      XDF cloneObj = (XDF) super.clone();
 
@@ -214,6 +169,27 @@ public class XDF extends Structure {
    // Protected Methods
    //
 
+   protected String basicXMLWriter (
+                                Writer outputWriter,
+                                String indent,
+                                boolean dontCloseNode,
+                                String newNodeNameString,
+                                String noChildObjectNodeName
+                             )
+   throws java.io.IOException
+   {
+
+
+       //  To be valid XML, we always start an XML block with an
+       //  XML declaration (e.g. somehting like "<?xml standalone="no"?>").
+       //  Here we deal with  printing out XML Declaration && its attributes
+       writeXMLHeader(outputWriter, indent);
+
+       return super.basicXMLWriter ( outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+
+   }
+
+
    /** Special method used by constructor methods to
      *  convienently build the XML attribute list for a given class.
      */
@@ -222,7 +198,8 @@ public class XDF extends Structure {
    {
        super.init();
 
-       documentType = new DocumentType(this);
+       // xmlDeclaration = new XMLDeclaration ();
+       // documentType = new DocumentType(this);
 
        classXDFNodeName = "XDF";
 
@@ -235,42 +212,23 @@ public class XDF extends Structure {
      *  @return the current *type* attribute. This specifies what the name of the 
      *  dataformat actually is. If undefined, then the structure is *vanilla* XDF.
      */
-   protected void setType(String type) {
-     ((Attribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(type);
-   }
+  protected void setType(String type) {
+    ((Attribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(type);
+  }
 
 
   /** Write the XML Declaration/Doctype to the indicated OutputStream.
    */
-  protected void writeXMLHeader( Writer outputWriter,
-                                 Hashtable XMLDeclAttribs,
-                                 boolean writeDoctype
-                               )
+  protected void writeXMLHeader( Writer outputWriter, String indent)
   throws java.io.IOException
   {
 
     // initial statement
-    outputWriter.write("<?xml");
-    outputWriter.write(" version=\"" + Constants.XML_SPEC_VERSION + "\"");
+    if (xmlDeclaration != null) 
+       xmlDeclaration.toXMLWriter(outputWriter, indent);
 
-    // print attributes
-    Enumeration keys = XMLDeclAttribs.keys();
-    while ( keys.hasMoreElements() )
-    {
-      String attribName = (String) keys.nextElement();
-      if (attribName.equals("version") ) {
-         Log.errorln("XMLDeclAttrib hash has version attribute, not allowed and ignoring.");
-      } else
-         outputWriter.write(" " + attribName + "=\"" + XMLDeclAttribs.get(attribName) + "\"");
-    }
-    outputWriter.write("?>");
-
-    if (Specification.getInstance().isPrettyXDFOutput())
-        outputWriter.write(Constants.NEW_LINE); 
-
-    if ( writeDoctype ) {
-       this.getDocumentType().toXMLWriter(outputWriter, "");
-    }
+    if ( documentType != null) 
+       documentType.toXMLWriter(outputWriter, indent);
 
   }
 
@@ -279,6 +237,9 @@ public class XDF extends Structure {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/09/14 18:23:09  thomas
+ * Changed handling of XML header stuff. Put in hooks for XMLDeclaration obj, etc
+ *
  * Revision 1.8  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
