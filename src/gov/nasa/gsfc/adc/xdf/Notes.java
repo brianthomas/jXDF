@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Collections;
 import java.io.OutputStream;
 import java.io.IOException; 
+import java.io.Writer;
 
 /**
  *  
@@ -148,28 +149,29 @@ public class Notes extends BaseObject {
       return removeFromList(index, getNoteList(), NOTELIST_XML_ATTRIBUTE_NAME);
    }
 
+   // 
+   // Protected Methods
+   // 
+
    // quick little change to prevent this node from printing out
    // IF there are no note objects in its notelist
-   public void toXMLOutputStream ( OutputStream outputstream,
-                                   String indent,
-                                   boolean dontCloseNode,
-                                   String newNodeNameString,
-                                   String noChildObjectNodeName
-                                 )
+   protected String basicXMLWriter ( Writer outputWriter,
+                                     String indent,
+                                     boolean dontCloseNode,
+                                     String newNodeNameString,
+                                     String noChildObjectNodeName
+                                   )
    throws java.io.IOException
    {
 
+      String retString = null;
       if( getNoteList().size() > 0 ) {
-          super.toXMLOutputStream ( outputstream, indent, dontCloseNode,
-                                    newNodeNameString, noChildObjectNodeName
-                                   );
+          retString = super.basicXMLWriter ( outputWriter, indent, dontCloseNode,
+                                             newNodeNameString, noChildObjectNodeName
+                                           );
       }
-
+      return retString;
    }
-
-   //
-   // Protected Methods
-   //
 
    /** A special protected method used by constructor methods to
        convienently build the XML attribute list for a given class.
@@ -196,6 +198,9 @@ public class Notes extends BaseObject {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.14  2001/09/14 21:09:50  thomas
+  * Fixed printing out empty noteList for array when no notes exist
+  *
   * Revision 1.13  2001/09/13 21:39:25  thomas
   * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
   *
