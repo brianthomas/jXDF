@@ -1,4 +1,3 @@
-
 // XDF Unit Class
 // CVS $Id$
 
@@ -27,7 +26,7 @@ package gov.nasa.gsfc.adc.xdf;
 import java.util.Hashtable;
 
 /**
- * Unit.java: describes a unit within a given units object
+ *  describes a unit within a given units object
  * @version $Revision$
  */
 
@@ -95,36 +94,35 @@ import java.util.Hashtable;
   //
 
   /**set the *power* attribute
-   * @param: Number
-   * @return: the current *power* attribute
+   *
+   * @return the current *power* attribute
    */
   public void setPower(Number power) {
      ((XMLAttribute) attribHash.get("power")).setAttribValue(power);
   }
 
-  /**getPower
-   * @return: the current *power* attribute
+  /**
+   * @return the current *power* attribute
    */
   public Number getPower() {
     return (Number) ((XMLAttribute) attribHash.get("power")).getAttribValue();
   }
 
   /**set the *value* attribute
-   * @param: String
-   * @return: the current *value* attribute
+   * @return the current *value* attribute
    */
   public void setValue(String value) {
      ((XMLAttribute) attribHash.get("value")).setAttribValue(value);
   }
 
-  /**getValue
-   * @return: the current *value* attribute
+  /**
+   * @return the current *value* attribute
    */
   public String getValue() {
     return (String) ((XMLAttribute) attribHash.get("value")).getAttribValue();
   }
 
-// I dont think this is even used. commented out for now. -b.t. 
+// I dont think this is even used. commented out for now. -b.t.
   /*update: special for Value Objects
    * set its value attribute to the contents of passed string
    * overload the update in BaseObject which takes the Hashtable as param
@@ -135,3 +133,14 @@ import java.util.Hashtable;
   }
 */
  }
+
+ /* Modification History:
+ *
+ * $Log$
+ * Revision 1.7  2000/11/16 20:09:50  kelly
+ * fixed documentation.  -k.z.
+ *
+ */
+
+
+

@@ -1,4 +1,5 @@
 
+
 // XDF DataFormat Class
 // CVS $Id$
 
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 /**
- * DataFormat.java:
+ *  
  * @version $Revision$
  */
 
@@ -93,48 +94,48 @@ import java.util.Hashtable;
   public  abstract void setNoDataValue(Object Obj) ;
 
 
-  /**getLessThanValue
-   * @return: the current *lessThanValue* attribute
+  /**
+   * @return the current *lessThanValue* attribute
    */
   public Object getLessThanValue()
   {
     return ((XMLAttribute) attribHash.get("lessThanValue")).getAttribValue();
   }
 
-  /**getlessThanOrEqualValue
-   * @return: the current *lessThanOrEqualValue* attribute
+  /**
+   * @return the current *lessThanOrEqualValue* attribute
    */
   public Object getlessThanOrEqualValue()
   {
     return ((XMLAttribute) attribHash.get("lessThanOrEqualValue")).getAttribValue();
   }
 
-  /**getGreaterThanValue
-   * @return: the current *greaterThanValue* attribute
+  /**
+   * @return the current *greaterThanValue* attribute
    */
   public Object getGreaterThanValue()
   {
     return ((XMLAttribute) attribHash.get("greaterThanValue")).getAttribValue();
   }
 
-   /**getGreaterThanOrEqualValue
-   * @return: the current *greaterThanOrEqualValue* attribute
+   /**
+   * @return the current *greaterThanOrEqualValue* attribute
    */
   public Number getGreaterThanOrEqualValue()
   {
     return (Number) ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).getAttribValue();
   }
 
-   /**getInfiniteValue
-   * @return: the current *infiniteValue* attribute
+   /**
+   * @return the current *infiniteValue* attribute
    */
   public Number getInfiniteValue()
   {
     return (Number) ((XMLAttribute) attribHash.get("infiniteValue")).getAttribValue();
   }
 
-   /**getInfiniteNegativeValue
-   * @return: the current *infiniteNegativeValue* attribute
+   /**
+   * @return the current *infiniteNegativeValue* attribute
    */
   public Number getInfiniteNegativeValue()
   {
@@ -142,8 +143,8 @@ import java.util.Hashtable;
   }
 
 
-  /**getNoDataValue
-   * @return: the current *noDataValue* attribute
+  /**
+   * @return the current *noDataValue* attribute
    */
   public Object getNoDataValue()
   {
@@ -162,7 +163,7 @@ import java.util.Hashtable;
 
     String nodeNameString = classXDFNodeName;
     // 1. open this node, print its simple XML attributes
-      if (sPrettyXDFOutput)
+      if (Specification.getInstance().isPrettyXDFOutput())
         writeOut(outputstream, indent); // indent node if desired
 
       writeOut(outputstream,"<" + nodeNameString + ">");   // print opening statement
@@ -190,7 +191,7 @@ import java.util.Hashtable;
 
     //writeout closing node
     writeOut(outputstream, "</" + nodeNameString+ ">");
-    if (sPrettyXDFOutput)
+    if (Specification.getInstance().isPrettyXDFOutput())
       writeOut(outputstream, Constants.NEW_LINE);
 
   }
@@ -200,6 +201,9 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/16 19:56:48  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.7  2000/11/08 22:30:12  thomas
  * Changed set methods to return void. -b.t.
  *

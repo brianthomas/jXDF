@@ -23,7 +23,8 @@
 */
 
 package gov.nasa.gsfc.adc.xdf;
-/** AxisInterface.java: AxisInterface aggregates the common signature of Axis
+
+/**  AxisInterface aggregates the common signature of Axis
  *   and FieldAxis
  */
 
@@ -35,6 +36,9 @@ public interface AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/16 19:50:07  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.3  2000/11/09 23:21:53  kelly
  * added more documentation  -k.z.
  *

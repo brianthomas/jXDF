@@ -1,4 +1,5 @@
 
+
 // XDF FieldAxis Class
 // CVS $Id$
 
@@ -33,6 +34,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**describe an Axis that consists of Fields
+ */
 
 public class FieldAxis extends BaseObject implements AxisInterface{
 
@@ -40,7 +43,8 @@ public class FieldAxis extends BaseObject implements AxisInterface{
   //Fields
   //
 
-  //length of the FieldAxis
+  /**length of the FieldAxis
+  */
   protected int length;
 
   /** This field stores object references to those field group objects
@@ -83,8 +87,8 @@ public class FieldAxis extends BaseObject implements AxisInterface{
      ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
-   /**getName
-   * @return: the current *name* attribute
+   /**
+   * @return the current *name* attribute
    */
   public String getName()
   {
@@ -98,8 +102,8 @@ public class FieldAxis extends BaseObject implements AxisInterface{
      ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
   }
 
-  /**getDescription
-   * @return: the current *description* attribute
+  /**
+   * @return the current *description* attribute
    */
   public String getDescription() {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
@@ -113,8 +117,8 @@ public class FieldAxis extends BaseObject implements AxisInterface{
 
   }
 
-   /**getAxisId
-   * @return: the current *axisId* attribute
+   /**
+   * @return the current *axisId* attribute
    */
   public String getAxisId()
   {
@@ -129,8 +133,8 @@ public class FieldAxis extends BaseObject implements AxisInterface{
 
   }
 
-   /**getAxisIdRef
-   * @return: the current *axisId* attribute
+   /**
+   * @return the current *axisId* attribute
    */
   public String getAxisIdRef()
   {
@@ -143,28 +147,28 @@ public class FieldAxis extends BaseObject implements AxisInterface{
      ((XMLAttribute) attribHash.get("fieldList")).setAttribValue(field);
   }
 
-  /**getFieldList
-   * @return: the current *fieldList* attribute
+  /**
+   * @return the current *fieldList* attribute
    */
   public List getFieldList() {
     return (List) ((XMLAttribute) attribHash.get("fieldList")).getAttribValue();
   }
 
-  /** 
+  /**set the fieldGroupOwnedHash
   */
   public void setFieldGroupOwnedHash(Set fieldGroup)
   {
     fieldGroupOwnedHash = fieldGroup;
   }
 
-  /** getFieldGroupOwnedHash
+  /** return the fieldGroupOwnedHash
   */
   public Set getFieldGroupOwnedHash()
   {
     return fieldGroupOwnedHash;
   }
 
-  /**getLength: Get the length of this axis (eg number of axis value objects)
+  /** return the length of this axis (eg number of axis value objects)
    *
    */
   public int getLength() {
@@ -175,22 +179,18 @@ public class FieldAxis extends BaseObject implements AxisInterface{
   //Other PUBLIC Methods
   //
 
-  /**addField: adds a field to this fieldAxis.
-   * @param: field to be added
-   * @return: field object ref on success, null on failure
+  /** adds a field to this fieldAxis.
+   * @param field to be added
+   * @return a field object that is added
    *
    */
   public Field addField (Field field) {
-     if (field == null) {
-      Log.warn("in FieldAxis.addField(),Field passed in is null");
-      return null;
-    }
     getFieldList().add(field);
     length++;
     return field;
   }
 
-  /**getField: returns the field object at specified index on success, null on failure
+  /** returns the field object at specified index on success, null on failure
    *
    */
   public Field getField (int index) {
@@ -201,15 +201,15 @@ public class FieldAxis extends BaseObject implements AxisInterface{
     return (Field) getFieldList().get(index);
   }
 
-  /**getFields: convience method that returns all field object held in this FieldAxis
+  /** convience method that returns all field object held in this FieldAxis
    * object.
-   * @return: a list of field object reference(ordered by field axis index)
+   * @return a list of field object reference(ordered by field axis index)
    */
   public List getFields() {
     return getFieldList();
   }
 
-  /**setField: Set the field object at indicated index.
+  /** Set the field object at indicated index.
    */
 
   public void setField(int index, Field field) {
@@ -223,17 +223,20 @@ public class FieldAxis extends BaseObject implements AxisInterface{
        getFieldList().set(index, field);  //replace the old field with the new one
 
   }
-
+  /**<b> NOT CURRENTLY IMPLEMENTED</b> needs to define the impact on dataCube
+   */
   public Field removeField(int index) {
     Log.error("in FieldAxis, removeField, method empty");
     return null;
   }
-
+ /**<b> NOT CURRENTLY IMPLEMENTED</b> needs to define the impact on dataCube
+   */
   public Field removeField(Field field) {
     Log.error("in FieldAxis, removeField, method empty");
     return null;
   }
-
+  /**returns the list of dataFormat
+   */
   public DataFormat[] getDataFormatList() {
     DataFormat[] dataFormatList = new DataFormat[length];
     List fieldList = getFieldList();
@@ -244,8 +247,8 @@ public class FieldAxis extends BaseObject implements AxisInterface{
 
 
   /**Insert a FieldGroup object into this object.
-   * @param: FieldGroup to be added
-   * @return:an FieldGroup object reference on success, null on failure.
+   * @param group - FieldGroup to be added
+   * @return an FieldGroup object reference on success, null on failure.
    */
   public FieldGroup addFieldGroup (FieldGroup group) {
     //add the group to the groupOwnedHash
@@ -255,13 +258,14 @@ public class FieldAxis extends BaseObject implements AxisInterface{
   }
 
   /** Remove a FieldGroup object from this object.
-   * @param: FieldGroup to be removed
-   * @return: true on success, false on failure
+   * @param FieldGroup to be removed
+   * @return true on success, false on failure
    */
   public boolean removeFieldGroup(FieldGroup group) {
     return fieldGroupOwnedHash.remove(group);
   }
-
+  /**deep copy of the FieldAxis
+   */
   public Object clone() throws CloneNotSupportedException {
     FieldAxis cloneObj = (FieldAxis) super.clone();
 
@@ -270,7 +274,7 @@ public class FieldAxis extends BaseObject implements AxisInterface{
         cloneObj.fieldGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.fieldGroupOwnedHash.size()));
         Iterator iter = this.fieldGroupOwnedHash.iterator();
         while (iter.hasNext()) {
-          cloneObj.fieldGroupOwnedHash.add(iter.next());
+          cloneObj.fieldGroupOwnedHash.add(((Group)iter.next()).clone());
         }
       }
     }
@@ -302,7 +306,7 @@ public class FieldAxis extends BaseObject implements AxisInterface{
      //set up the attribute hashtable key with the default initial value
 
      //set the minimum array size(essentially the size of the axis)
-    attribHash.put("fieldList", new XMLAttribute(Collections.synchronizedList(new ArrayList(super.sDefaultDataArraySize)), Constants.LIST_TYPE));
+    attribHash.put("fieldList", new XMLAttribute(Collections.synchronizedList(new ArrayList(Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE));
     attribHash.put("axisIdRef", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("axisId", new XMLAttribute(null, Constants.STRING_TYPE));
     attribHash.put("align", new XMLAttribute(null, Constants.STRING_TYPE));  //double check??
@@ -318,6 +322,9 @@ public class FieldAxis extends BaseObject implements AxisInterface{
  /**
   * Modification History:
   * $Log$
+  * Revision 1.11  2000/11/16 19:58:41  kelly
+  * fixed documentation.  -k.z.
+  *
   * Revision 1.10  2000/11/08 22:30:12  thomas
   * Changed set methods to return void. -b.t.
   *

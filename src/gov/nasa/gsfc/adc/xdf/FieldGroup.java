@@ -1,4 +1,5 @@
 
+
 // CVS $Id$
 
 // FieldGroup.java Copyright (C) 2000 Brian Thomas,
@@ -34,43 +35,44 @@ import java.util.Hashtable;
 
     /** This field stores object references to those field group objects
        to which this array object belongs
-    */  
+    */
 
     /** No-argument constructor
      */
     public FieldGroup () {
-       super(); // use superclass constructor 
+       super(); // use superclass constructor
        init(); // my init
     }
 
     /** Constructor taking a hashtable with key/value pairs for
-        the object attributes. 
+        the object attributes.
     */
     public FieldGroup (Hashtable InitXDFAttributeTable) {
-       super(InitXDFAttributeTable); // use superclass constructor 
-       init(); // my init
+       super(InitXDFAttributeTable); // use superclass constructor
+       init(); //my init
+
     }
 
 
-    // 
+    //
     // Public Methods
     //
 
     /**Insert a FieldGroup object into this object.
-       @return:a FieldGroup object reference on success, null on failure.
+       @returna FieldGroup object reference on success, null on failure.
     */
     public FieldGroup addFieldGroup (FieldGroup group) {
        //add the group to the groupOwnedHash
-       addMemberObject((Object) group); 
+       addMemberObject((Object) group);
        return group;
     }
 
     /** Remove a FieldGroup object from this object.
-        @return: true on success, false on failure
+        @return true on success, false on failure
      */
     public boolean removeFieldGroup(FieldGroup group) {
 
-       if( removeMemberObject((Object) group) != null) 
+       if( removeMemberObject((Object) group) != null)
           return true;
        return false; 
 
@@ -91,6 +93,9 @@ import java.util.Hashtable;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/11/16 19:58:59  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.1  2000/11/01 21:09:40  thomas
  * Initial Version. -b.t.
  *

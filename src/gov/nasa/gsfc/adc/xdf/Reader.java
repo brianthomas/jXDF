@@ -1,4 +1,5 @@
 
+
 /** The XDF Reader class.
     Pieced together from a SAX example file (which one??). 
     @version $Revision$
@@ -127,7 +128,7 @@ public class Reader
     }
 
     /** Parse an InputSource into an XDF Structure object.
-        @return: XDF Structure object
+        @return XDF Structure object
      */
     public Structure parse (InputSource inputsource) 
     throws java.io.IOException
@@ -169,7 +170,7 @@ public class Reader
     }
 
     /** Parse a file into an XDF Structure object.
-        @return: XDF Structure object
+        @return XDF Structure object
     */
     public gov.nasa.gsfc.adc.xdf.Structure parsefile (String file)
     throws java.io.IOException
@@ -220,6 +221,9 @@ class SaxErrorHandler extends HandlerBase
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/16 20:05:26  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.8  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *

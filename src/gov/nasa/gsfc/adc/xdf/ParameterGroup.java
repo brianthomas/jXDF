@@ -1,4 +1,5 @@
 
+
 // CVS $Id$
 
 // ParameterGroup.java Copyright (C) 2000 Brian Thomas,
@@ -57,7 +58,7 @@ import java.util.Hashtable;
     //
 
     /**Insert an ParameterGroup object into this object.
-       @return:a ParameterGroup object reference on success, null on failure.
+       @returna ParameterGroup object reference on success, null on failure.
     */
     public ParameterGroup addParamGroup (ParameterGroup group) {
        //add the group to the groupOwnedHash
@@ -66,7 +67,7 @@ import java.util.Hashtable;
     }
 
     /** Remove a ParameterGroup object from this object.
-        @return: true on success, false on failure
+        @return true on success, false on failure
      */
     public boolean removeParamGroup(ParameterGroup group) {
 
@@ -91,6 +92,9 @@ import java.util.Hashtable;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/16 20:04:39  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.6  2000/11/01 21:08:47  thomas
  * Un-did prior (stupid) change. Also removed extraneous
  * reference to paramGroupOwnedHash. -b.t.

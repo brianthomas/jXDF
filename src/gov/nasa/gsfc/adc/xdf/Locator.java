@@ -55,7 +55,7 @@ import java.util.List;
     List axisList = parentArray.getAxisList();
 
     /**now, since we KNOW _parentArray is defined
-     * (has to be instanciated via XDF::Array ONLY)
+     * (has to be instanciated via Array ONLY)
      * we can proceed to initialize the axis, index positions
      * to the origin (ie index 0 for each axis).
      * We choose the parent Array axisList ordering for our
@@ -72,8 +72,9 @@ import java.util.List;
     }
   }
 
-  /**setAxisLocation: set the index of an axis
-   * @param: AxisInterface, int
+  /** set the index of an axis
+   * @param axisObj - the axis Object
+            index - the index of the axis
    */
   public void setAxisLocation (AxisInterface axisObj, int index) throws AxisLocationOutOfBoundsException {
     if ((!parentArray.getAxisList().contains(axisObj)) ||
@@ -85,9 +86,9 @@ import java.util.List;
     locations.put(axisObj, new Integer(index));
   }
 
-  /**getAxisLocation: get the index of an Axis in the Locator object
-   * @param: AxisInterface
-   * @return: index if successful, -1 if not
+  /** get the index of an Axis in the Locator object
+   *
+   * @return index if successful, -1 if not
    */
   public int getAxisLocation (AxisInterface axisObj) {
      if ((!parentArray.getAxisList().contains(axisObj)) ) {
@@ -107,7 +108,7 @@ import java.util.List;
 
   /** set the index of an axis to the index of a value
    * along that axis
-   * @return: index if successful, -1 if not
+   * @return index if successful, -1 if not
    */
   public void setAxisLocationByAxisValue(Axis axisObj, Value valueObj) throws AxisLocationOutOfBoundsException{
     if ((!parentArray.getAxisList().contains(axisObj)) ||
@@ -122,7 +123,8 @@ import java.util.List;
        throw e;
     }
   }
-
+  /**@return true if there are more element, false if no more elements
+   */
   public boolean hasNext() {
     int size = axisOrderList.size();
     for (int i = 0; i < size ; i++) {
@@ -135,7 +137,7 @@ import java.util.List;
     return false;
   }
 
-  /**next: Change the locator coordinates to the next datacell as
+  /** Change the locator coordinates to the next datacell as
    * determined from the locator iteration order.
    *  Returns '0' if it must cycle back to the first datacell
    *  to set a new 'next' location.
@@ -160,7 +162,7 @@ import java.util.List;
 
 
 
-  /**prev: Change the locator coordinates to the previous datacell as
+  /** Change the locator coordinates to the previous datacell as
    * determined from the locator iteration order.
    * Returns '0' if it must cycle to the last datacell.
    */
@@ -212,8 +214,8 @@ import java.util.List;
 
   }
 
-  /**getIteration:
-   * @return: an array of Axises, whose order in the array correspondes to
+  /**
+   * @return an array of Axises, whose order in the array correspondes to
    * the iteration order
    */
   public List getIterationOrder() {
@@ -222,7 +224,7 @@ import java.util.List;
   }
 
 
-  /**reset: reset the locator to the origin
+  /** reset the locator to the origin
    *
    */
     public void reset() {
@@ -255,10 +257,10 @@ import java.util.List;
           int stop = this.locations.size();
           cloneObj.locations = new Hashtable(stop);
            Enumeration keys = this.locations.keys();
-           {
+           while (keys.hasMoreElements()){
               Object key = keys.nextElement();
               cloneObj.locations.put(key, this.locations.get(key));
-           }while (keys.hasMoreElements());
+           }
 
         }
        }
@@ -268,10 +270,10 @@ import java.util.List;
     //
     //PROTECTED methods
     //
-    /**adjust: adjust its axisOrderList and hashtable locations according
+    /** adjust its axisOrderList and hashtable locations according
      * to parentArray's axes change
      */
-    public void addAxis(AxisInterface AxisObj) {
+    protected void addAxis(AxisInterface AxisObj) {
       if (AxisObj instanceof Axis) {  //it is an Axis
         axisOrderList.add(AxisObj);
       }
@@ -293,6 +295,9 @@ import java.util.List;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2000/11/16 20:01:18  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.13  2000/11/09 23:25:18  kelly
  * added hasNext() method
  *

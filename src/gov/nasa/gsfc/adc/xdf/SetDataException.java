@@ -25,7 +25,8 @@
 package gov.nasa.gsfc.adc.xdf;
 
 
-/**SetDataException.java:
+/** this exception is constructed and thrown when there
+   are exceptions in setting data in a DataCube
  * @version $Revision$
  *
  */

@@ -1,4 +1,5 @@
 
+
 // XDF Constants Class
 // CVS $Id$
 
@@ -25,7 +26,7 @@
 package gov.nasa.gsfc.adc.xdf;
 
 /**
- * Constants.java:
+ * stores constants
  * @version $Revision$
  */
 
@@ -149,6 +150,9 @@ public abstract class Constants {
 /* Modification History
  * 
  * $Log$
+ * Revision 1.9  2000/11/16 19:53:03  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.8  2000/11/08 19:36:32  thomas
  * Trimmed import path; added GPL statement and Mod History. -b.t.
  *

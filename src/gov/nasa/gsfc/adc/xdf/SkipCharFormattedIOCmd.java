@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/** this class handles the skipChar ELEMENT
    @version $Revision$
  */
 public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedIOCmd {
@@ -140,6 +140,9 @@ public class SkipCharFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/16 20:08:27  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.3  2000/11/10 15:36:44  kelly
  * minor fix related to cvs checkin
  *

@@ -33,37 +33,16 @@
  * fieldIdRef--
  * A string holding the field id reference to another field.
  * class--
- * "class" of this field. B<NOT CURRENTLY IMPLEMENTED>
- * lessThanValue--
- * The value which indicates the less than symbol ("<") within the data cube
- * for data within the slice corresponding to this field.
- * lessThanOrEqualValue--
- * The value value which indicates the less than equal symbol ("=<") within the data cube
- * for data within the slice corresponding to this field.
- * greaterThanValue--
- * The value which indicates the greater than symbol (">") within the data cube
- * for data within the slice corresponding to this field.
- * greaterThanOrEqualValue--
- * The value which indicates the greater than equal symbol (">=") within the data cube
- *  for data within the slice corresponding to this field.
- * infiniteValue--
- * The value which indicates the infinite value within the data cube
- * for data within the slice corresponding to this field.
- * infiniteNegativeValue--
- * The value which indicates the negative infinite value within the data cube
- * for data within the slice corresponding to this field.
- * noDataValue--
- * The value which indicates the no data value within the data cube
- * for data within the slice corresponding to this field.
+ * "class" of this field. <b>NOT CURRENTLY IMPLEMENTED</b>
  * noteList--
- * a list of the L<XDF::Note> objects held by this field.
+ * a list of the Note objects held by this field.
  * dataFormat--
- * a OBJECT REF of the L<XDF::DataFormat> object for data within this field.
+ * a OBJECT REF of the DataFormat object for data within this field.
  * relation--
- * a  OBJECT REF  of the L<XDF::Relationship> object for this field.
+ * a  OBJECT REF  of the Relationship object for this field.
  * units--
- * a OBJECT REF of the L<XDF::Units> object of this field. The XDF::Units object
- * is used to hold the L<XDF::Unit> objects.
+ * a OBJECT REF of the Units object of this field. The Units object
+ * is used to hold the  Unit objects.
  */
 
 package gov.nasa.gsfc.adc.xdf;
@@ -73,7 +52,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-/**an XDF::Field describes a field at a given index along a fieldAxis
+/**an Field describes a field at a given index along a fieldAxis
    @version $Revision$
  */
 
@@ -114,15 +93,15 @@ public class Field extends BaseObject {
    //
 
    /** Set the *name* attribute
-       @return: the current *name* attribute
+       @return the current *name* attribute
     */
    public void setName (String strName)
    {
       ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
    }
 
-   /** getName
-       @return: the current *name* attribute
+   /**
+       @return the current *name* attribute
     */
    public String getName()
    {
@@ -130,30 +109,30 @@ public class Field extends BaseObject {
    }
 
    /** set the *description* attribute
-       @return: the current *description* attribute
+       @return the current *description* attribute
     */
    public void setDescription (String strDesc)
    {
       ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
    }
 
-   /** getDescription
-       @return: the current *description* attribute
+   /**
+       @return the current *description* attribute
    */
    public String getDescription() {
       return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
    }
 
    /** set the *fieldId* attribute
-       @return: the current *fieldId* attribute
+       @return the current *fieldId* attribute
     */
    public void setFieldId (String strField)
    {
       ((XMLAttribute) attribHash.get("fieldId")).setAttribValue(strField);
    }
 
-   /** getFieldId
-       @return: the current *fieldId* attribute
+   /**
+       @return the current *fieldId* attribute
     */
    public String getFieldId()
    {
@@ -161,15 +140,15 @@ public class Field extends BaseObject {
    }
 
    /** set the *fieldIdRef* attribute
-       @return: the current *fieldIdRef* attribute
+       @return the current *fieldIdRef* attribute
     */
    public void setFieldIdRef (String strField)
    {
       ((XMLAttribute) attribHash.get("fieldIdRef")).setAttribValue(strField);
    }
 
-   /** getFieldIdRef
-       @return: the current *fieldIdRef* attribute
+   /**
+       @return the current *fieldIdRef* attribute
     */
    public String getFieldIdRef()
    {
@@ -177,31 +156,31 @@ public class Field extends BaseObject {
    }
 
    /** set the *units* attribute
-       @return: the current *units* attribute
+       @return the current *units* attribute
     */
    public void setUnits (Units units)
    {
       ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
    }
 
-   /** getUnits
-       @return: the current *units* attribute
+   /**
+       @return the current *units* attribute
     */
    public Units getUnits()
    {
       return (Units) ((XMLAttribute) attribHash.get("units")).getAttribValue();
    }
 
-   /** setDataFormat: set the *dataFormat* attribute
-       @return: the current *dataFormat* attribute
+   /**  set the *dataFormat* attribute
+       @return the current *dataFormat* attribute
     */
    public void setDataFormat (DataFormat dataFormat)
    {
        ((XMLAttribute) attribHash.get("dataFormat")).setAttribValue(dataFormat);
    }
 
-   /**getDataFormat
-   * @return: the current *dataFormat* attribute
+   /**
+   * @return the current *dataFormat* attribute
    */
    public DataFormat getDataFormat()
    {
@@ -209,31 +188,31 @@ public class Field extends BaseObject {
    }
 
    /** set the *noteList* attribute
-      @return: the current *noteList* attribute
+      @return the current *noteList* attribute
     */
    public void setNoteList(List note)
    {
       ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
    }
 
-   /** getNoteList
-       @return: the current *noteList* attribute
+   /**
+       @return the current *noteList* attribute
    */
    public List getNoteList()
    {
       return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
    }
 
-   /** setRelationship: set the *relationship* attribute
-       @return: the current *dataFormat* attribute
+   /**  set the *relationship* attribute
+       @return the current *dataFormat* attribute
     */
    public void setRelationship (FieldRelationship fieldRelation)
    {
        ((XMLAttribute) attribHash.get("relation")).setAttribValue(fieldRelation);
    }
 
-   /** getRelationship
-       @return: the current *relationship* attribute
+   /**
+       @return the current *relationship* attribute
    */
    public FieldRelationship getRelationship ()
    {
@@ -244,52 +223,45 @@ public class Field extends BaseObject {
    // Other public methods
    //
 
-  /** addNote: insert an XDF::Note object into the list of notes in this Field object
-   * @param: XDF::Note
-   * @return: an XDF::Note object on success, null on failure
+  /**insert an Note object into the list of notes in this Field object
+   * @param Note
+   * @return an Note object
    */
   public Note addNote(Note n) {
-    if (n == null) {
-      Log.warn("in Field.addNote(), the Note passed in is null");
-      return null;
-    }
     getNoteList().add(n);
     return n;
   }
 
-  /**removeNote: removes an XDF::Note object from the list of notes in this Field object
-   * @param: Note to be removed
-   * @return: true on success, false on failure
+  /** removes an Note object from the list of notes in this Field object
+   * @param Note to be removed
+   * @return true on success, false on failure
    */
    public boolean removeNote(Note what) {
      return removeFromList(what, getNoteList(), "noteList");
   }
 
-   /**removeNote: removes an XDF::Note object from the list of notes in this Field object
-   * @param: list index number
-   * @return: true on success, false on failure
+   /** removes an Note object from the list of notes in this Field object
+   * @param  index - list index number of the Note to be removed
+   * @return true on success, false on failure
    */
   public boolean removeNote(int index) {
      return removeFromList(index, getNoteList(), "noteList");
   }
 
-  /**getNotes: Convenience method which returns a list of the notes held by
+  /**Convenience method which returns a list of the notes held by
    * this object.
    */
   public List getNotes() {
     return getNoteList();
   }
 
-  /**addUnit: Insert a Unit object into the Units object
+  /**Insert a Unit object into the Units object
    * held in this object.
-   * @param: Unit to be added
-   * @return: an XDF::Unit object if successfull, null if not.
+   * @param unit - Unit to be added
+   * @return an Unit object
    */
   public Unit addUnit(Unit unit) {
-    if (unit == null) {
-      Log.warn("in Array.addUnit(), the Unit passed in is null");
-      return null;
-    }
+
     Units u = getUnits();
     if (u == null) {
       u = new Units();
@@ -298,10 +270,10 @@ public class Field extends BaseObject {
     return  u.addUnit(unit);
   }
 
-  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
+  /** Remove an Unit object from the Units object held in
    * this object
-   * @param: Unit to be removed
-   * @return: true if successful, false if not
+   * @param what - Unit to be removed
+   * @return true if successful, false if not
    */
   public boolean removeUnit(Unit what) {
     Units u = getUnits();
@@ -314,10 +286,10 @@ public class Field extends BaseObject {
       return false;
   }
 
-  /**removeUnit: Remove an XDF::Unit object from the XDF::Units object held in
+  /** Remove an Unit object from the Units object held in
    * this object
-   * @param: list index number
-   * @return: true if successful, false if not
+   * @param index - list index number of the Unit to be removed
+   * @return true if successful, false if not
    */
   public boolean removeUnit(int index) {
    Units u = getUnits();
@@ -377,6 +349,9 @@ public class Field extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2000/11/16 19:58:28  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.10  2000/11/08 19:46:29  thomas
  * Trimmed down import path to just needed classes =b.t
  *

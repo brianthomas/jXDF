@@ -1,4 +1,5 @@
 
+
 // XDF Notes Class
 // CVS $Id$
 
@@ -32,7 +33,7 @@ import java.util.Collections;
 import java.io.OutputStream;
 
 /**
- * Notes.java:
+ *  
  * @version $Revision$
  */
 
@@ -74,29 +75,28 @@ public class Notes extends BaseObject {
     //
 
     /** set the *noteList* attribute
-        @param: List
-        @return: the current *noteList* attribute
+        @param notes
+        @return the current *noteList* attribute
      */
     public void setNoteList (List notes) {
        ((XMLAttribute) attribHash.get("noteList")).setAttribValue(notes);
     }
 
     /**
-        @return: the current *noteList* attribute
+        @return the current *noteList* attribute
      */
     public List getNoteList() {
        return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
     }
 
-    /**getNotes: convenience method that returns the list of notes this object holds
-      
+    /**convenience method that returns the list of notes this object holds
      */
     public List getNotes() { return getNoteList(); }
 
-    /**
+    /** set the locatorOrderList
      */
     public void setLocationOrderList (List axisIdList) {
-       NotesLocationOrder orderObj = (NotesLocationOrder) 
+       NotesLocationOrder orderObj = (NotesLocationOrder)
                ((XMLAttribute) attribHash.get("locationOrder")).getAttribValue();
 
        orderObj.setAxisOrderList(axisIdList);
@@ -106,36 +106,29 @@ public class Notes extends BaseObject {
    // Other PUBLIC Methods
    //
 
-   /** addNote: Insert a Note object into the list of note held by this object. 
-       @param: Note to be added
-       @return: a Note object if successfull, null if not.
+   /** Insert a Note object into the list of note held by this object.
+       @param note - Note to be added
+       @return a Note object if successfull, null if not.
     */
-   public Note addNote (Note note ) 
+   public Note addNote (Note note )
    {
-
-      if (note == null) 
-      {
-         Log.warn("in Notes.addNote(), the Note passed in is null");
-         return null;
-      }
-
       getNoteList().add(note);
       return note;
    }
 
    /** Remove a Note object the list of notes held in
        this object
-       @param: Note to be removed
-       @return: true if successful, false if not
+       @param Note to be removed
+       @return true if successful, false if not
     */
    public boolean removeNote(Note what) {
       return removeFromList(what, getNoteList(), "noteList");
    }
 
-   /** Remove an XDF::Note object from the list of notes held in
+   /** Remove an Note object from the list of notes held in
        this object
-       @param: list index number
-       @return: true if successful, false if not
+       @param index -- list index number of the Note object to be removed
+       @return true if successful, false if not
     */
    public boolean removeNote(int index) {
       return removeFromList(index, getNoteList(), "noteList");
@@ -149,10 +142,10 @@ public class Notes extends BaseObject {
                                    boolean dontCloseNode,
                                    String newNodeNameString,
                                    String noChildObjectNodeName
-                                 ) 
+                                 )
    {
-     
-      if( getNoteList().size() > 0 ) { 
+
+      if( getNoteList().size() > 0 ) {
           super.toXMLOutputStream ( outputstream, XMLDeclAttribs,
                                     indent, dontCloseNode,
                                     newNodeNameString, noChildObjectNodeName
@@ -188,6 +181,9 @@ public class Notes extends BaseObject {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.6  2000/11/16 20:02:52  kelly
+  * fixed documentation.  -k.z.
+  *
   * Revision 1.5  2000/11/08 19:18:07  thomas
   * Changed the name of toXDF* methods to toXML* to
   * better reflect the nature of the output (its not XDF

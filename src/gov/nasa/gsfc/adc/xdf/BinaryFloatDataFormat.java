@@ -28,7 +28,7 @@ import java.util.Hashtable;
 
 
 /**
- * BinaryFloatDataFormat.java:describes binary floating point numbers.
+ *  describes binary floating point numbers.
  * @version $Revision$
  */
 
@@ -85,7 +85,7 @@ public class BinaryFloatDataFormat extends DataFormat {
   }
 
   /** set the *greaterThanOrEqualValue* attribute
-   * @return: the current *greaterThanOrEqualValue* attribute
+   *
    */
   public void setGreaterThanOrEqualValue(Object numGreaterThanOrEqualValue) {
      ((XMLAttribute) attribHash.get("greaterThanOrEqualValue")).setAttribValue(numGreaterThanOrEqualValue);
@@ -122,8 +122,8 @@ public class BinaryFloatDataFormat extends DataFormat {
     }
   }
 
-  /**getbits
-   * @return: the current *bits* attribute
+  /**
+   * @return the current *bits* attribute
    */
   public Number getBits()
   {
@@ -134,8 +134,8 @@ public class BinaryFloatDataFormat extends DataFormat {
   //Other PUBLIC Methods
   //
 
-  /**numOfBytes: A convenience method.
-   * @Return: the number of bytes this XDF::BinaryFloatDataFormat holds.
+  /** A convenience method.
+   * @Return: the number of bytes this BinaryFloatDataFormat holds.
    */
   public int numOfBytes() {
     return getBits().intValue()/8;
@@ -178,6 +178,9 @@ public class BinaryFloatDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/11/16 19:51:46  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.4  2000/11/08 22:30:12  thomas
  * Changed set methods to return void. -b.t.
  *

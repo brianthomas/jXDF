@@ -27,7 +27,7 @@ package gov.nasa.gsfc.adc.xdf;
 import java.util.Hashtable;
 
 /**
- * ExponentialDataFormat.java:describes exponential (ASCII) floating point numbers
+ *  describes exponential (ASCII) floating point numbers
  * (e.g. scientific notation, IE10).
  * @version $Revision$
  */
@@ -126,8 +126,8 @@ public class ExponentialDataFormat extends DataFormat {
      ((XMLAttribute) attribHash.get("width")).setAttribValue(numWidth);
 
   }
-  /**getWidth
-   * @return: the current *width* attribute
+  /**
+   * @return the current *width* attribute
    */
   public Number getWidth()
   {
@@ -140,8 +140,8 @@ public class ExponentialDataFormat extends DataFormat {
      ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
 
   }
-  /**getPrecision
-   * @return: the current *precision* attribute
+  /**
+   * @return the current *precision* attribute
    */
   public Number getPrecision()
   {
@@ -152,8 +152,8 @@ public class ExponentialDataFormat extends DataFormat {
   //Other PUBLIC Methods
   //
 
-  /**numOfBytes: A convenience method.
-   * @Return: the number of bytes this XDF::ExponentialDataFormat holds.
+  /**  A convenience method.
+   * @return the number of bytes this ExponentialDataFormat holds.
    */
   public int numOfBytes() {
     return getWidth().intValue();
@@ -203,6 +203,9 @@ public class ExponentialDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/16 19:58:12  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.5  2000/11/08 22:30:12  thomas
  * Changed set methods to return void. -b.t.
  *

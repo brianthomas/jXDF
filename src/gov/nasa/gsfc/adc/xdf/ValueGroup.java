@@ -1,4 +1,5 @@
 
+
 // XDF ValueGroup Class
 // CVS $Id$
 
@@ -25,7 +26,7 @@
 package gov.nasa.gsfc.adc.xdf;
 import java.util.Hashtable;
 
-/** ValueGroup:
+/**  
     @version $Revision$
 */
 public class ValueGroup extends Group {
@@ -60,7 +61,7 @@ public class ValueGroup extends Group {
     //
 
     /**Insert a ValueGroup object into this object.
-       @return:a ValueGroup object reference on success, null on failure.
+       @returna ValueGroup object reference on success, null on failure.
     */
     public ValueGroup addValueGroup (ValueGroup group) {
        //add the group to the groupOwnedHash
@@ -69,7 +70,7 @@ public class ValueGroup extends Group {
     }
 
     /** Remove a ValueGroup object from this object.
-        @return: true on success, false on failure
+        @return true on success, false on failure
      */
     public boolean removeValueGroup(ValueGroup group) {
 
@@ -93,6 +94,9 @@ public class ValueGroup extends Group {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/16 20:11:15  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.3  2000/11/01 21:57:25  thomas
  * removed extraneous valueGroupOwnedHash field
  * from class. Put in explicit import paths. -b.t.

@@ -1,4 +1,5 @@
 
+
 // XDF Log Class
 // CVS $Id$
 
@@ -73,9 +74,11 @@ public class Log {
   public static final int DEFAULT_PRIORITY = Priority.ERROR;
 
 
-  //hold the priority, initial is Priority.ERROR;
+  /**hold the priority, initial is Priority.ERROR;
+  */
   protected static int priority = DEFAULT_PRIORITY;
-  //hold the output stream, initial is System.out
+  /**hold the output stream, initial is System.out
+   */
   protected static OutputStream output = DEFAULT_OUTPUTSTREAM;
 
 
@@ -93,7 +96,7 @@ public class Log {
   //
 
   /**
-   * configure: read in the properties from the configuration file
+   *  read in the properties from the configuration file
    */
    public static void configure(String configFileName) {
     Properties props = new Properties();  //the property hashtable
@@ -114,7 +117,7 @@ public class Log {
   }
 
   /**
-   * defaultConfig: set the default configuration
+   *  set the default configuration
    * Output=System.out
    * Priority=4
    */
@@ -160,7 +163,7 @@ public class Log {
     }
   }
 
-  /** Log a information level message. 
+  /** Log a information level message.
   */
   public static void info (String msg) {
 
@@ -177,7 +180,7 @@ public class Log {
     }
   }
 
-  /** Log a information level message as a single line. 
+  /** Log a information level message as a single line.
   */
   public static void infoln (String msg) {
 
@@ -193,7 +196,7 @@ public class Log {
 
   }
 
-  /** Log a debugging level message. 
+  /** Log a debugging level message.
    */
   public static void debug (String msg) {
 
@@ -210,7 +213,7 @@ public class Log {
     }
 
   }
- 
+
   /** Log a debugging level message as single line.
    */
   public static void debugln (String msg) {
@@ -227,7 +230,7 @@ public class Log {
 
   }
 
-  /** Log a warning level message. 
+  /** Log a warning level message.
    */
   public static void warn (String msg) {
 
@@ -244,7 +247,7 @@ public class Log {
     }
   }
 
-  /** Log a warning level message as a single line. 
+  /** Log a warning level message as a single line.
    */
   public static void warnln (String msg) {
 
@@ -252,7 +255,7 @@ public class Log {
     if (priority > Priority.WARN)
       return;
 
-    // print msg 
+    // print msg
     warn(msg);
 
     // print newline
@@ -279,7 +282,7 @@ public class Log {
     }
   }
 
-  /** Log an error level message as a single line. 
+  /** Log an error level message as a single line.
    */
 
   public static void errorln (String msg) {
@@ -296,7 +299,7 @@ public class Log {
 
   }
 
-  /**close: release the resources held by Log
+  /** release the resources held by Log
    * i.e., close the output if it is FileOutputStream
    */
   public static void close() {
@@ -315,11 +318,11 @@ public class Log {
   /** Print a stacktrace to the current error outputstream.
    */
   public static void printStackTrace (Exception e) {
-      e.printStackTrace((PrintStream) output); 
+      e.printStackTrace((PrintStream) output);
   }
 
   public static void printStackTrace (Throwable t) {
-      t.printStackTrace((PrintStream) output); 
+      t.printStackTrace((PrintStream) output);
   }
 
   //

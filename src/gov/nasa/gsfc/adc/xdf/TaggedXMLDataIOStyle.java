@@ -1,4 +1,3 @@
-
 // XDF TaggedXMLDataIOStyle Class
 // CVS $Id$
 
@@ -28,7 +27,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.io.OutputStream;
 
-/**TaggedXMLDatatIOStytle.java:
+/** handles tagged IO
  *  @version $Revision$
  */
 
@@ -74,14 +73,10 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
  * (e.g. "d0","d1", ... "d8"). Note that choosing the wrong tag name will break
  * the current XDF DTD, so go with the defaults (e.g. DONT use this method)
  * if you dont know what you are doing here.
- * @parma: tag, axisId
- * @return: tag value if successful, null if not
+ * @parma: tag - tag , axisId - axisId
+ * @return tag value
  */
   public void setAxisTag(String tag, String axisId) {
-    if (tag == null || axisId== null) {
-      Log.error("Missing information: need tag AND axisId for addAxisTag. Ignoring request. returning null");
-      return;
-    }
     //insert in hash table, return tag value
     tagHash.put(axisId, tag);
   }
@@ -120,7 +115,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //
   protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
   {
-    boolean niceOutput = sPrettyXDFOutput;
+    boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
 
     //write out the tags info
     String[] tags = getAxisTags();
@@ -144,10 +139,10 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   }
 
 
-   /**removeAxsiTag: Remove an axis tag from the tag hash. This should be PROTECTED
+   /** Remove an axis tag from the tag hash. This should be PROTECTED
     * and occur only when axis is being removed (ie available to array obj only).
-    * @param: axisId to remove
-    * @return: tag if successful, null if not
+    * @param axisId - axisId to be removed
+    * @return tag if successful, null if not
     */
    protected String removeAxisTag(String axisId) {
     return (String) getTagHash().remove(axisId);
@@ -157,6 +152,9 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/16 20:09:35  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.7  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *

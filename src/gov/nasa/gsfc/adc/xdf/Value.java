@@ -1,4 +1,5 @@
 
+
 // XDF Value
 // CVS $Id$
 
@@ -57,53 +58,53 @@ public class Value extends BaseObject {
    // Public Methods
    //
 
-   /**getValue: get the *value* (PCDATA) attribute.
+   /** get the *value* (PCDATA) attribute.
    */
    public String getValue() {
       return (String) ((XMLAttribute) attribHash.get("value")).getAttribValue();
    }
 
-   /**setValue: set the *value* attribute.
+   /** set the *value* attribute.
     */
    public void setValue (String strValue)
    {
       ((XMLAttribute) attribHash.get("value")).setAttribValue(strValue);
    }
 
-  /**getValueId: get the *valueId* attribute.
+  /** get the *valueId* attribute.
    */
    public String getValueId() {
       return (String) ((XMLAttribute) attribHash.get("valueId")).getAttribValue();
    }
 
-   /**setValueId: set the *valueId* attribute.
+   /** set the *valueId* attribute.
     */
    public void setValueId (String strValueId)
    {
       ((XMLAttribute) attribHash.get("valueId")).setAttribValue(strValueId);
    }
 
-   /**getValueRef: get the *valueRef* attribute.
+   /** get the *valueRef* attribute.
    */
    public String getValueRef() {
       return (String) ((XMLAttribute) attribHash.get("valueRef")).getAttribValue();
    }
 
-   /**setValueRef: set the *valueRef* attribute.
+   /** set the *valueRef* attribute.
    */
    public void setValueRef (String strValueRef)
    {
       ((XMLAttribute) attribHash.get("valueRef")).setAttribValue(strValueRef);
    }
 
-    /**getInequality: get the *inequality*   attribute.
+    /** get the *inequality*   attribute.
     */
    public String getInequality() {
       return (String) ((XMLAttribute) attribHash.get("inequality")).getAttribValue();
    }
 
 
-   /**setInequality: set the *inequality* attribute.
+   /** set the *inequality* attribute.
     */
    public void setInequality (String strInequality)
    {
@@ -111,13 +112,13 @@ public class Value extends BaseObject {
         ((XMLAttribute) attribHash.get("inequality")).setAttribValue(strInequality);
    }
 
-  /**getSpecial: get the *special* attribute.
+  /** get the *special* attribute.
    */
    public String getSpecial() {
       return (String) ((XMLAttribute) attribHash.get("special")).getAttribValue();
    }
 
-   /**setSpecial: set the *special* attribute.
+   /** set the *special* attribute.
     */
    public void setSpecial (String strSpecial)
    {
@@ -160,6 +161,9 @@ public class Value extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/16 20:11:01  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.7  2000/11/08 20:24:00  thomas
  * Inserted copywrite, fixed some documentation. -b.t.
  *

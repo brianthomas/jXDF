@@ -1,4 +1,5 @@
 
+
 // XDF FieldRelationship
 // CVS $Id$
 
@@ -70,7 +71,7 @@ public class FieldRelationship extends BaseObject {
    //
 
    /** Get the value of the role attribute. 
-      @return: the current value of the role attribute.
+      @return the current value of the role attribute.
    */
    public String getRole ( )
    {
@@ -86,7 +87,7 @@ public class FieldRelationship extends BaseObject {
    }
 
    /** Get the value of the description attribute. 
-      @return: the current value of the description attribute.
+      @return the current value of the description attribute.
    */
    public String getDescription ( )
    {
@@ -101,7 +102,7 @@ public class FieldRelationship extends BaseObject {
    }
 
    /** Get the value of the fieldIdRefs attribute. 
-      @return: the current value of the fieldIdRefs attribute.
+      @return the current value of the fieldIdRefs attribute.
    */
    public String getFieldIdRefs ( )
    {
@@ -146,6 +147,9 @@ public class FieldRelationship extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/11/16 19:59:14  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.1  2000/11/02 16:46:50  thomas
  * Initial version. Role checking 'enum list' NOT implemented. -b.t.
  *

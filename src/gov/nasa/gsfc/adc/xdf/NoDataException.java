@@ -25,7 +25,8 @@
 package gov.nasa.gsfc.adc.xdf;
 
 
-/**NoDataException.java:
+/** this exception is constructed and thrown by Array class
+ * and DataCube class when no data is found in the requested cell
  * @version $Revision$
  *
  */

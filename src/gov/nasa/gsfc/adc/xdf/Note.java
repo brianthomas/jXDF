@@ -1,4 +1,5 @@
 
+
 // XDF Note Class
 // CVS $Id$
 
@@ -29,7 +30,7 @@ import java.util.Hashtable;
 import java.util.Collections;
 
 /**
-    Note.java
+     holds a note object
  */
 public class Note extends BaseObject implements Cloneable {
 
@@ -78,7 +79,7 @@ public class Note extends BaseObject implements Cloneable {
    //
 
    /** get the *location* attribute.
-      @return: the current *location* attribute.
+      @return the current *location* attribute.
     */
    public String getLocation() {
       return (String) ((XMLAttribute) attribHash.get("location")).getAttribValue();
@@ -92,7 +93,7 @@ public class Note extends BaseObject implements Cloneable {
    }
 
   /** get the *mark* attribute.
-      @return: the current *mark* attribute.
+      @return the current *mark* attribute.
     */
    public String getMark() {
       return (String) ((XMLAttribute) attribHash.get("mark")).getAttribValue();
@@ -106,7 +107,7 @@ public class Note extends BaseObject implements Cloneable {
    }
 
    /** get the *noteId* attribute.
-      @return: the current *noteId* attribute.
+      @return the current *noteId* attribute.
     */
    public String getNoteId() {
       return (String) ((XMLAttribute) attribHash.get("noteId")).getAttribValue();
@@ -120,7 +121,7 @@ public class Note extends BaseObject implements Cloneable {
    }
 
    /** get the *noteIdRef* attribute.
-      @return: the current *noteIdRef* attribute.
+      @return the current *noteIdRef* attribute.
     */
    public String getNoteIdRef() {
       return (String) ((XMLAttribute) attribHash.get("noteIdRef")).getAttribValue();

@@ -33,7 +33,7 @@ import java.util.List;
 import java.io.OutputStream;
 
 /**
- * Units.java:
+ *  handles a list of units
  * @version $Revision$
  */
 
@@ -99,69 +99,69 @@ import java.io.OutputStream;
   //Get/Set Methods
 
   /**Change the XDF node name for this object.
-     @param: String
-     @return: the current XDF node name
+     @param String
+     @return the current XDF node name
    */
   public void setXDFNodeName(String strName) {
     XDFNodeName = strName;
   }
 
   /**set the *factor* attribute
-   * @param: Number
-   * @return: the current *factor* attribute
+   * @param Number
+   * @return the current *factor* attribute
    */
   public void setFactor (Number factor) {
     Log.info("in Units.setFactor()");
     ((XMLAttribute) attribHash.get("factor")).setAttribValue(factor);
   }
 
-  /**getFactor
-   * @return: the current *factor* attribute
+  /**
+   * @return the current *factor* attribute
    */
   public Number getFactor () {
     return (Number) ((XMLAttribute) attribHash.get("factor")).getAttribValue();
   }
 
   /**set the *system* attribute
-     @param: String
-     @return: the current *system* attribute
+     @param String
+     @return the current *system* attribute
    */
   public void setSystem (String system) {
     ((XMLAttribute) attribHash.get("system")).setAttribValue(system);
   }
 
-  /**getSystem
-   * @return: the current *system* attribute
+  /**
+   * @return the current *system* attribute
    */
   public String getSystem () {
     return (String) ((XMLAttribute) attribHash.get("system")).getAttribValue();
   }
 
   /**set the *unitList* attribute
-     @param: List
-     @return: the current *unitList* attribute
+     @param List
+     @return the current *unitList* attribute
    */
   public void setUnitList(List units) {
     ((XMLAttribute) attribHash.get("unitList")).setAttribValue(units);
   }
 
-  /**getUnitList
-   * @return: the current *unitList* attribute
+  /**
+   * @return the current *unitList* attribute
    */
   public List getUnitList() {
     return (List) ((XMLAttribute) attribHash.get("unitList")).getAttribValue();
   }
 
-  /**getUnits: convenience method that returns the list of units this object holds
+  /** convenience method that returns the list of units this object holds
    *
    */
   public List getUnits() {
     return getUnitList();
   }
 
-  /** getClassNoUnitChildNodeName
-   * return: Name of the child node to print in the toXMLOutputStream method when
-   * an  XDF::Units object contains NO XDF::Unit child objects.
+  /**
+   * @return Name of the child node to print in the toXMLOutputStream method when
+   * an  Units object contains NO Unit child objects.
    */
   public String getClassNoUnitChildName() {
     return classNoUnitChildNodeName;
@@ -171,38 +171,34 @@ import java.io.OutputStream;
   //Other PUBLIC Methods
   //
 
-  /**addUnit: Insert an XDF::Unit object into the list of units held in this object
-   * @param: Unit to be added
-   * @return: an XDF::Unit object if successfull, null if not.
+  /** Insert an Unit object into the list of units held in this object
+   * @param Unit to be added
+   * @return an Unit object if successfull, null if not.
    */
   public Unit addUnit(Unit unit) {
-    if (unit == null) {
-      Log.warn("in Units.addUnit(), the Unit passed in is null");
-      return null;
-    }
     getUnitList().add(unit);
     return unit;
   }
 
-   /**removeUnit: Remove an XDF::Unit object the list of units held in
+   /** Remove an Unit object the list of units held in
    * this object
-   * @param: Unit to be removed
-   * @return: true if successful, false if not
+   * @param what - Unit to be removed
+   * @return true if successful, false if not
    */
    public boolean removeUnit(Unit what) {
      return removeFromList(what, getUnitList(), "unitList");
   }
 
-  /**removeUnit: Remove an XDF::Unit object from the list of units held in
+  /**Remove an Unit object from the list of units held in
    * this object
-   * @param: list index number
-   * @return: true if successful, false if not
+   * @param index - list index number of the Unit to be removed
+   * @return true if successful, false if not
    */
   public boolean removeUnit(int index) {
      return removeFromList(index, getUnitList(), "unitList");
   }
 
-  /**value
+  /**
    * assemble all the units in the list of units held in this object and return
    * it as a string
    */
@@ -256,6 +252,9 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/16 20:09:57  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.8  2000/11/09 04:24:12  thomas
  * Implimented small efficiency improvements to traversal
  * loops. -b.t.

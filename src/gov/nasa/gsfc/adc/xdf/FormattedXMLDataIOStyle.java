@@ -1,4 +1,5 @@
 
+
 // XDF FormattedXMLDataIOStyle Class
 // CVS $Id$
 
@@ -40,14 +41,16 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   //Fields
   //
 
-  //list to store the formatted IO commands
-  private List formatCommandList = Collections.synchronizedList(new ArrayList());
+  /**list to store the formatted IO commands
+  */
+  protected List formatCommandList = Collections.synchronizedList(new ArrayList());
 
   //
   //constructor and related methods
   //
 
-  // constructor
+  /** constructor
+   */
   public FormattedXMLDataIOStyle (Array parentArray)
   {
     this.parentArray = parentArray;
@@ -74,19 +77,19 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   //
   //Get/Set methods
   //
-  /**setFormatCommandList: set the formatCommandList
+  /** set the formatCommandList
    */
 
   public void setFormatCommandList(List formatList) {
      formatCommandList = formatList;
   }
 
-  /**getFormatCommandList: get the formatCommandList
+  /** get the formatCommandList
   */
   public List getFormatCommandList() {
    return formatCommandList;
   }
-  /**getCommands: convenience methods that return the command list
+  /** convenience methods that return the command list
    */
   public List getCommands() {
      return formatCommandList;
@@ -96,21 +99,20 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   //Other PUBLIC methods
   //
 
-  /**addFormatCommand: add a command to the formatCommandList
-    * @return: the command that is added
+  /** add a command to the formatCommandList
+    * @return the command that is added
     */
   public FormattedIOCmd addFormatCommand(FormattedIOCmd formatCmd) {
     formatCommandList.add(formatCmd);
     return formatCmd;
   }
 
-/*
-  public void toXMLOutputStream ( OutputStream outputstream, String indent) { } 
-*/
 
   //
   // Protected Methods
   //
+  /**specific tailoring when writing out
+   */
 
   protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
   {
@@ -118,7 +120,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
      synchronized (formatCommandList) {
       int stop = formatCommandList.size();
       for (int i = 0; i <stop; i++) {
-         if (sPrettyXDFOutput) {
+         if (Specification.getInstance().isPrettyXDFOutput()) {
           writeOut(outputstream, Constants.NEW_LINE);
           writeOut(outputstream, indent);
         }
@@ -143,7 +145,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) {
     //base condition
     if (which > stop) {
-      if (sPrettyXDFOutput) {
+      if (Specification.getInstance().isPrettyXDFOutput()) {
         writeOut(outputstream, Constants.NEW_LINE);
         writeOut(outputstream, indent);
       }
@@ -152,7 +154,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         for (int i = 0; i < end; i++) {
           Object command = formatCommandList.get(i);
           ((XMLDataIOStyle) command).specificIOStyleToXDF(outputstream, indent);
-           if (sPrettyXDFOutput) {
+           if (Specification.getInstance().isPrettyXDFOutput()) {
            writeOut(outputstream, Constants.NEW_LINE);
            writeOut(outputstream, indent);
           }
@@ -160,29 +162,46 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
       }
     }
     else {
-      if (sPrettyXDFOutput) {
+      if (Specification.getInstance().isPrettyXDFOutput()) {
         writeOut(outputstream, Constants.NEW_LINE);
         writeOut(outputstream, indent);
       }
       writeOut(outputstream, "<" + UntaggedInstructionNodeName + " axisIdRef=\"");
       writeOut(outputstream, ((AxisInterface) parentArray.getAxisList().get(which)).getAxisId() + "\">");
       which++;
-      nestedToXDF(outputstream, indent + sPrettyXDFOutputIndentation, which, stop);
+      nestedToXDF(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation(), which, stop);
 
-      if (sPrettyXDFOutput) {
+      if (Specification.getInstance().isPrettyXDFOutput()) {
         writeOut(outputstream, Constants.NEW_LINE);
         writeOut(outputstream, indent);
       }
        writeOut(outputstream, "</" + UntaggedInstructionNodeName + ">");
     }
    }
-
-
+   /**deep copy of this FormattedXMLDataIOStyle object
+    */
+   public Object clone () throws CloneNotSupportedException {
+    FormattedXMLDataIOStyle cloneObj = (FormattedXMLDataIOStyle) super.clone();
+    synchronized (formatCommandList) {
+      synchronized (cloneObj.formatCommandList) {
+        int stop = formatCommandList.size();
+        cloneObj.formatCommandList = Collections.synchronizedList(new ArrayList(stop));
+        for (int i = 0; i <stop; i++) {
+          Object obj = formatCommandList.get(i) ;
+            cloneObj.formatCommandList.add(((BaseObject) obj).clone());
+        }
+        return cloneObj;
+      } //synchronize
+    } //synchronize
+   }
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/16 20:00:19  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.5  2000/11/10 15:36:21  kelly
  * minor fix related to cvs checkin
  *

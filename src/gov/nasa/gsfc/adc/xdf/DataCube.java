@@ -33,28 +33,30 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/**DataCube.java:
+/**Holds the data for a given Array object. It is designed
+ *to flexibly expand as data is added/appended onto it.
  * @version $Revision$
  *
  */
-
-
 public class DataCube extends BaseObject {
 
   //
   //Fields
   //
 
-  protected int dimension = 0;;
-  protected Array parentArray;
-  protected boolean hasMoreData;
-  //to store the n-dimensional data, it is an ArrayList of ArrayList, whose
-  //innermost layer contains two kinds of arrays:
-  //--an array of bytes to indicate if its corresponding cell contains valid data
-  //(Java fills all int[] and double[] with 0 once constructed )
-  //--an array of primative types or an array of Strings depending depending on
-  //the actual data
-  protected List data = Collections.synchronizedList(new ArrayList());
+  private int dimension = 0;;
+  private Array parentArray;
+  private boolean hasMoreData;
+
+  /**
+  to store the n-dimensional data, it is an ArrayList of ArrayList, whose
+  innermost layer contains two kinds of arrays:
+  --an array of bytes to indicate if its corresponding cell contains valid data
+  (Java fills all int[] and double[] with 0 once constructed )
+  --an array of primative types or an array of Strings depending depending on
+  the actual data
+  */
+  private List data = Collections.synchronizedList(new ArrayList());
 
   //
   // Constructor and related methods
@@ -115,8 +117,8 @@ private void init()
      ((XMLAttribute) attribHash.get("href")).setAttribValue(strHref);
   }
 
-  /**getHref
-   * @return: the current *href* attribute
+  /**
+   * @return the current *href* attribute
    */
   public String getHref()
   {
@@ -129,8 +131,8 @@ private void init()
      ((XMLAttribute) attribHash.get("checksum")).setAttribValue(checksum);
   }
 
-  /**getChecksum
-   * @return: the current *checksum* attribute
+  /**
+   * @return the current *checksum* attribute
    */
   public Number getChecksum () {
      return (Number) ((XMLAttribute) attribHash.get("checksum")).getAttribValue();
@@ -143,13 +145,13 @@ private void init()
 
       if (!Utility.isValidDataEncoding(strEncoding))
          Log.warnln("Encoding is not valid, ignoring request to setEncoding.");
-      else 
+      else
          ((XMLAttribute) attribHash.get("encoding")).setAttribValue(strEncoding);
 
   }
 
-  /**getEncoding
-   * @return: the current *encoding* attribute
+  /**
+   * @return the current *encoding* attribute
    */
   public String getEncoding()
   {
@@ -164,28 +166,28 @@ private void init()
 
     if (!Utility.isValidDataCompression(strCompression))
        Log.warnln("Data compression value is not valid, ignoring request to set it.");
-    else 
+    else
       ((XMLAttribute) attribHash.get("compression")).setAttribValue(strCompression);
 
   }
 
-  /**getCompression
-   * @return: the current *compression* attribute
+  /**
+   * @return the current *compression* attribute
    */
   public String getCompression()
   {
     return (String) ((XMLAttribute) attribHash.get("compression")).getAttribValue();
   }
 
-  /**getDimension
-   * @return: the current dimension
+  /**
+   * @return the current dimension
    */
   public int getDimension() {
      return dimension;
   }
 
-  /**getMaxDataIndex: get the max index along with dimension
-   * @return: int[]
+  /** get the max index along with dimension
+   * @return int[]
    */
   public int[] getMaxDataIndex() {
      List axes = parentArray.getAxisList();
@@ -214,8 +216,8 @@ private void init()
   //other PUBLIC methods
   //
 
-  /**incrementDimension: increase the dimension by 1
-   * @return: the current dimension ( which is incremented)
+  /** increase the dimension by 1
+   * @return the current dimension ( which is incremented)
    * this is called after the Array the DataCube belongs to adds an Axis
    */
 public int incrementDimension(Axis axis) {
@@ -243,8 +245,8 @@ public int incrementDimension(Axis axis) {
   return dimension++;
 }
 
-/**incrementDimension: increase the dimension by 1
-   * @return: the current dimension ( which is incremented)
+/** increase the dimension by 1
+   * @return the current dimension ( which is incremented)
    * this is called after the Array the DataCube belongs to adds an Axis
    * FieldAxis should always be the first axis to add
    */
@@ -261,20 +263,21 @@ public int incrementDimension(FieldAxis fieldAxis) {
   }
 }
 
-  /**decrementDimension: decrease the dimension by 1
-   * @return: the current dimension ( which is decremented)
+  /** decrease the dimension by 1
+   * @return the current dimension ( which is decremented)
+     <b> NOT CURRENTLY IMPLEMENTED </b>
    */
 
   //not right, have to write again, double check implications of dataCube
 public int decrementDimension() {
-  if (dimension == 0) {
-    Log.error(" in DataCube, incrementDimentsion, the dimension is 0");
-    return 0;
-  }
-  else
-   return dimension--;
+  Log.errorln("in DataCube, decrementDimension(), methods empty, returning -1");
+  return -1;
+
 }
 
+
+/**get String data of a requested datacell
+ */
 public String getStringData(Locator locator) throws NoDataException{
   List axisList = parentArray.getAxisList();
   List current = data;
@@ -327,6 +330,8 @@ public String getStringData(Locator locator) throws NoDataException{
 
 }
 
+/**get integer data of a requested datacell
+ */
 public int getIntData(Locator locator) throws NoDataException{
   List axisList = parentArray.getAxisList();
   List current = data;
@@ -379,6 +384,8 @@ public int getIntData(Locator locator) throws NoDataException{
 
 }
 
+/**get double data of a requested datacell
+ */
 public double getDoubleData(Locator locator) throws NoDataException{
   List axisList = parentArray.getAxisList();
   List current = data;
@@ -434,8 +441,8 @@ public double getDoubleData(Locator locator) throws NoDataException{
 
 
 
-  /**appendData: Append the String value onto the requested datacell
-   * double check: now to prevent the user from appending to an int or double?
+  /**Append the String value onto the requested datacell
+   * double check: how to prevent the user from appending to an int or double?
    */
   public void appendData (Locator locator, String strValue) throws SetDataException{
     String strData;
@@ -451,8 +458,8 @@ public double getDoubleData(Locator locator) throws NoDataException{
 
   }
 
-  /** setData: Set the SCALAR value of the requested datacell
-   * (via L<XDF::DataCube> LOCATOR REF).
+  /** Set the SCALAR value of the requested datacell
+   * (via L<DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
 
@@ -595,7 +602,7 @@ public void setData (Locator locator, double numValue) throws SetDataException{
 }
 
   /** setData: Set the SCALAR value of the requested datacell
-   * (via L<XDF::DataCube> LOCATOR REF).
+   * (via L<DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
 public void setData(Locator locator, int numValue) throws SetDataException{
@@ -735,7 +742,7 @@ public void setData(Locator locator, int numValue) throws SetDataException{
 }
 
   /** setData: Set the SCALAR value of the requested datacell
-   * (via L<XDF::DataCube> LOCATOR REF).
+   * (via L<DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
 public void setData (Locator locator, String strValue) throws SetDataException{
@@ -876,8 +883,8 @@ public void setData (Locator locator, String strValue) throws SetDataException{
 }
 
   /**removeData : Remove data from the indicated datacell
-   * @param: locator that indicates the location of the cell
-   * @return: true if indicated cell constains data,
+   * @param locator that indicates the location of the cell
+   * @return true if indicated cell constains data,
    * false if indicated cell doesn't contain data
    */
 
@@ -977,7 +984,8 @@ protected boolean  removeData (Locator locator) {
 }
 
 
-
+  /**write out the data object to valid XML stream
+   */
 
   public void toXMLOutputStream (
                                    OutputStream outputstream,
@@ -988,7 +996,7 @@ protected boolean  removeData (Locator locator) {
                                    String noChildObjectNodeName
                                 )
   {
-    boolean niceOutput = sPrettyXDFOutput;
+    boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
     String indent = "";
     indent = indent + strIndent;
 
@@ -1117,8 +1125,8 @@ protected void writeTaggedData(OutputStream outputstream,
   {
 
     String tag = (String) tags[which];
-    if (sPrettyXDFOutput) {
-      indent += sPrettyXDFOutputIndentation;
+    if (Specification.getInstance().isPrettyXDFOutput()) {
+      indent += Specification.getInstance().getPrettyXDFOutputIndentation();
     }
 
     //base case (writes the last 2 inner dimensions of the data cube)
@@ -1126,14 +1134,14 @@ protected void writeTaggedData(OutputStream outputstream,
       int stop = axisLength[which];
       String tag1 = (String) tags[which+1];
       for (int count = 0; count < stop; count++) {
-	if (sPrettyXDFOutput) {
+	if (Specification.getInstance().isPrettyXDFOutput()) {
 	  writeOut(outputstream, Constants.NEW_LINE);
 	  writeOut(outputstream, indent);
 	}
 	writeOut(outputstream, "<" + tag + ">");
-	if (sPrettyXDFOutput) {
+	if (Specification.getInstance().isPrettyXDFOutput()) {
 	  writeOut(outputstream, Constants.NEW_LINE);
-	  writeOut(outputstream, indent + sPrettyXDFOutputIndentation);
+	  writeOut(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation());
 	}
 
 	int fastestAxisLength = fastestAxis.getLength();
@@ -1158,7 +1166,7 @@ protected void writeTaggedData(OutputStream outputstream,
 	  dataNum ++;
 	  locator.next();
 	}
-	if (sPrettyXDFOutput) {
+	if (Specification.getInstance().isPrettyXDFOutput()) {
 	  writeOut(outputstream, Constants.NEW_LINE);
 	  writeOut(outputstream, indent);
 	}
@@ -1171,13 +1179,13 @@ protected void writeTaggedData(OutputStream outputstream,
       int stop = axisLength[which];
       which++;
       for (int i = 0; i < stop; i++) {
-	if (sPrettyXDFOutput) {
+	if (Specification.getInstance().isPrettyXDFOutput()) {
 	  writeOut(outputstream, Constants.NEW_LINE);
 	  writeOut(outputstream, indent);
 	}
 	writeOut(outputstream, "<" + tag + ">");
 	writeTaggedData(outputstream, locator, indent, axisLength, tags, which, fastestAxis, noDataValues);
-	if (sPrettyXDFOutput) {
+	if (Specification.getInstance().isPrettyXDFOutput()) {
 	  writeOut(outputstream, Constants.NEW_LINE);
 	  writeOut(outputstream, indent);
 	}
@@ -1186,10 +1194,10 @@ protected void writeTaggedData(OutputStream outputstream,
     }
   }
 
-  /**writeDelimitedData:
+  /** write delimited data
    *
    */
-  protected void writeDelimitedData(OutputStream outputstream,
+  private void writeDelimitedData(OutputStream outputstream,
                                     Locator locator,
                                     DelimitedXMLDataIOStyle readObj,
                                     AxisInterface fastestAxis, String[] noDataValues) {
@@ -1224,7 +1232,9 @@ protected void writeTaggedData(OutputStream outputstream,
     writeOut(outputstream, "]]>");
   }
 
-  protected void writeFormattedData(OutputStream outputstream ,
+  /**write formatted data
+   */
+  private void writeFormattedData(OutputStream outputstream ,
                                  Locator locator,
                                  FormattedXMLDataIOStyle readObj,
                                  AxisInterface fastestAxis,
@@ -1295,8 +1305,7 @@ protected void writeTaggedData(OutputStream outputstream,
   //PROTECTED methods
   //
 
-  /**clone for DataCube should not be invoked externally.  it has to be invoked
-   * by its parentArray.
+  /**deep copy of this Data object
    */
   protected Object clone() throws CloneNotSupportedException {
     DataCube cloneObj = (DataCube) super.clone();
@@ -1312,9 +1321,9 @@ protected void writeTaggedData(OutputStream outputstream,
   //PRIVATE methods
   //
   /**deepCopy: deep copy data
-   * @param: data--the data that needs to be copied
+   * @param data - the data that needs to be copied
    *         currentLayer--which dimension we are copying
-   * @return: an exact copy of passed in data
+   * @return an exact copy of passed in data
    */
   private List deepCopy(List data, int currentLayer) {
     List tempData = new ArrayList();
@@ -1366,6 +1375,9 @@ protected void writeTaggedData(OutputStream outputstream,
  /**
   * Modification History:
   * $Log$
+  * Revision 1.15  2000/11/16 19:51:25  kelly
+  * fixed documentation.  -k.z.
+  *
   * Revision 1.14  2000/11/10 15:35:08  kelly
   * minor fix related to cvs check in.
   *

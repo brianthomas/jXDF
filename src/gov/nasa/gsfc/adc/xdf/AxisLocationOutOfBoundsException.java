@@ -25,7 +25,7 @@
 package gov.nasa.gsfc.adc.xdf;
 
 
-/**AxisLocationOutOfBoundsException.java:
+/** 
  * @version $Revision$
  *
  */

@@ -1,4 +1,5 @@
 
+
 // XDF IntegerDataFormat Class
 // CVS $Id$
 
@@ -27,7 +28,7 @@ package gov.nasa.gsfc.adc.xdf;
 
 /**
  * IntegerDataFormat.java:IntegerDataFormat class describes the data format
- * of objects which require such description (XDF::Field, XDF::Array).
+ * of objects which require such description (Field, Array).
  * @version $Revision$
  */
 
@@ -136,8 +137,8 @@ public class IntegerDataFormat extends DataFormat {
 
   }
 
-  /**getType
-   * @return: the current *type* attribute
+  /**
+   * @return the current *type* attribute
    */
   public String getType()
   {
@@ -150,8 +151,8 @@ public class IntegerDataFormat extends DataFormat {
      ((XMLAttribute) attribHash.get("width")).setAttribValue(width);
   }
 
-  /**getWidth
-   * @return: the current *width* attribute
+  /**
+   * @return the current *width* attribute
    */
   public Number getWidth()
   {
@@ -161,14 +162,14 @@ public class IntegerDataFormat extends DataFormat {
   //Other PUBLIC Methods
   //
 
-  /**numOfBytes: A convenience method.
-   * @Return: the number of bytes this XDF::IntegerDataFormat holds.
+  /** A convenience method.
+   * @return the number of bytes this IntegerDataFormat holds.
    */
   public int numOfBytes() {
     return getWidth().intValue();
   }
 
-  /** typeHexadecimal
+  /**
    *  Returns the class value for the hexadecimal type.
    *
   */
@@ -177,25 +178,28 @@ public class IntegerDataFormat extends DataFormat {
     return Constants.INTEGER_TYPE_HEX;
   }
 
-  /**typeOctal:
+  /**
    * @Returns the class value for the octal type.
     */
   public static String typeOctal() {
     return Constants.INTEGER_TYPE_OCTAL;
   }
 
-  /** typeDecimal
+  /**
    * @Returns the class value for the (default) decimal type.
    */
   public static String typeDecimal() {
    return Constants.INTEGER_TYPE_DECIMAL;
   }
-
+  /**this method will probably go away
+   */
   //pass in param??? double check???
   public String templateNotation(String strEndian, String strEncoding) {
      return "A"+getWidth();
   }
 
+  /**this method will probably go away
+   */
   public String regexNotation() {
     int width = numOfBytes();
     String symbol;
@@ -213,7 +217,7 @@ public class IntegerDataFormat extends DataFormat {
     return notation;
   }
 
-  /** sprintfNotation: returns sprintf field notation
+  /**  returns sprintf field notation
    *
    */
   public String sprintfNotation() {
@@ -228,7 +232,7 @@ public class IntegerDataFormat extends DataFormat {
     return "%" + getWidth()+ fieldSymbol;
 }
 
-  /** fortranNotation: The fortran style notation for this object.
+  /**  The fortran style notation for this object.
    */
   public String fortranNotation() {
     return "I"+ getWidth();
@@ -239,6 +243,9 @@ public class IntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/16 20:01:07  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.5  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *

@@ -30,7 +30,7 @@ import java.util.List;
 
 import java.io.OutputStream;
 
-/**XMLDataIOStyle.java: This abstract class indicates how records are to be read/written
+/** This abstract class indicates how records are to be read/written
  * back out into XDF formatted XML files.
  * @version $Revision$
  */
@@ -81,7 +81,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   //
 
   /**set the *readId* attribute
-     @return: the current *readId* attribute
+     @return the current *readId* attribute
    */
    public void setReadId (String strReadId)
    {
@@ -89,7 +89,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    }
 
   /**getReadId
-   * @return: the current *readId* attribute
+   * @return the current *readId* attribute
    */
   public String getReadId()
   {
@@ -99,7 +99,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
 
 
   /**set the *readIdRef* attribute
-     @return: the current *readIdRef* attribute
+     @return the current *readIdRef* attribute
    */
    public void setReadIdRef (String strReadIdRef)
    {
@@ -107,7 +107,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    }
 
   /**getReadIdRef
-   * @return: the current *readIdRef* attribute
+   * @return the current *readIdRef* attribute
    */
   public String getReadIdRef()
   {
@@ -115,7 +115,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   }
 
   /**set the *encoding* attribute
-   * @return: the current *encoding* attribute
+   * @return the current *encoding* attribute
    */
    public void setEncoding (String strEncoding)
    {
@@ -127,7 +127,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
     }
 
   /**getEncoding
-   * @return: the current *encoding* attribute
+   * @return the current *encoding* attribute
    */
   public String getEncoding()
   {
@@ -135,7 +135,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
   }
 
   /**set the *endian* attribute
-     @return: the current *endian* attribute
+     @return the current *endian* attribute
    */
    public void setEndian (String strEndian)
    {
@@ -147,7 +147,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    }
 
   /**getEndian
-   * @return: the current *endian* attribute
+   * @return the current *endian* attribute
    */
   public String getEndian()
   {
@@ -170,14 +170,14 @@ public abstract class XMLDataIOStyle extends BaseObject {
                                    String noChildObjectNodeName
                                 )
   {
-    boolean niceOutput = sPrettyXDFOutput;
+    boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
     String myIndent;
     if (indent!=null)
       myIndent = indent;
     else
       myIndent = "";
 
-    String moreIndent = myIndent + sPrettyXDFOutputIndentation;
+    String moreIndent = myIndent + Specification.getInstance().getPrettyXDFOutputIndentation();
 
     if (niceOutput)
       writeOut(outputstream, myIndent);
@@ -261,6 +261,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2000/11/16 20:11:46  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.11  2000/11/09 04:50:59  thomas
  * Error in output attribute for node in toXML* method
  * (missing double quotes). Fixed. -b.t.

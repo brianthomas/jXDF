@@ -1,4 +1,5 @@
 
+
 // XDF Structure Class
 // CVS $Id$
 
@@ -134,8 +135,8 @@ public class Structure extends BaseObject {
     ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
-  /**getName
-   * @return: the current *name* attribute
+  /**
+   * @return the current *name* attribute
    */
   public String getName()
   {
@@ -149,8 +150,8 @@ public class Structure extends BaseObject {
      ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
   }
 
-   /**getDescription
-   * @return: the current *description* attribute
+   /**
+   * @return the current *description* attribute
    */
   public String getDescription() {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
@@ -162,8 +163,8 @@ public class Structure extends BaseObject {
      ((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
   }
 
-  /**getParamList
-   * @return: the current *paramList* attribute
+  /**
+   * @return the current *paramList* attribute
    */
   public List getParamList() {
     return (List) ((XMLAttribute) attribHash.get("paramList")).getAttribValue();
@@ -175,8 +176,8 @@ public class Structure extends BaseObject {
     ((XMLAttribute) attribHash.get("structList")).setAttribValue(struct);
   }
 
-  /**getStructList
-   * @return: the current *structList* attribute
+  /**
+   * @return the current *structList* attribute
    */
   public List getStructList() {
     return (List) ((XMLAttribute) attribHash.get("structList")).getAttribValue();
@@ -188,8 +189,8 @@ public class Structure extends BaseObject {
      ((XMLAttribute) attribHash.get("arrayList")).setAttribValue(array);
   }
 
-  /**getArrayList
-   * @return: the current *arrayList* attribute
+  /**
+   * @return the current *arrayList* attribute
    */
   public List getArrayList() {
     return (List) ((XMLAttribute) attribHash.get("arrayList")).getAttribValue();
@@ -202,13 +203,15 @@ public class Structure extends BaseObject {
   }
 
   /**getNoteList
-   * @return: the current *noteList* attribute
+   * @return the current *noteList* attribute
    */
   public List getNoteList() {
     return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
   }
 
-  /** 
+
+
+  /**
   */
   public void setParamGroupOwnedHash(Set paramGroup)
   {
@@ -222,6 +225,7 @@ public class Structure extends BaseObject {
     return paramGroupOwnedHash;
   }
 
+
   //
   // Protected Get/set
   //
@@ -229,13 +233,13 @@ public class Structure extends BaseObject {
   /**set the type attribute
    */
   // This should only be set by inheriting Structures (ala FITSML and
-  // so on (hmm. reader may also need to set it.., more thought on this..) 
+  // so on (hmm. reader may also need to set it.., more thought on this..)
   protected void setType(String strType ) {
     ((XMLAttribute) attribHash.get("type")).setAttribValue(strType);
   }
 
-  /**getNoteList
-   * @return: the current *type* attribute
+  /**
+   * @return the current *type* attribute
    */
   public List getType() {
     return (List) ((XMLAttribute) attribHash.get("type")).getAttribValue();
@@ -246,22 +250,18 @@ public class Structure extends BaseObject {
   //Other PUBLIC Methods
   //
 
-  /** addNote: insert an Note object into the noteList
-   * @param: Note
-   * @return: an Note object on success, null on failure
+  /**  insert an Note object into the noteList
+   * @param n - Note to be added
+   * @return an Note object
    */
   public Note addNote(Note n) {
-    if (n == null) {
-      Log.warn("in Structure.addNote(), the Note passed in is null");
-      return null;
-    }
     getNoteList().add(n);
     return n;
   }
 
-  /**removeNote: removes an Note object from noteList
-   * @param: Note to be removed
-   * @return: true on success, false on failure
+  /**removes an Note object from noteList
+   * @param what - Note to be removed
+   * @return true on success, false on failure
    */
    public boolean removeNote(Note what) {
      return removeFromList(what, getNoteList(), "noteList");
@@ -269,137 +269,117 @@ public class Structure extends BaseObject {
 
 
 
-  /**removeNote: removes an Note object from noteList
-   * @param: list index number
-   * @return: true on success, false on failure
+  /** removes an Note object from noteList
+   * @param index - list index number of the Note to be removed
+   * @return true on success, false on failure
    */
   public boolean removeNote(int index) {
      return removeFromList(index, getNoteList(), "noteList");
   }
 
-   /**getNotes
-   * @return: the current *noteList* held by this object
+   /**
+   * @return the current *noteList* held by this object
    */
   public List getNotes() {
     return getNoteList();
   }
 
- /** addParameter: insert an Parameter object into the paramList
-   * @param: Parameter
-   * @return: an Parameter object on success, null on failure
+ /**  nsert an Parameter object into the paramList
+   * @param p - Parameter
+   * @return an Parameter object
    */
   public Parameter addParameter(Parameter p) {
-    if (p == null) {
-      Log.warn("in Structure.addParameter, Parameter passed in is null");
-      return null;
-    }
     getParamList().add(p);
     return p;
   }
-  /**removeParameter: removes an Parameter object from paramList
-   * @param: Parameter to be removed
-   * @return: true on success, false on failure
+  /** removes an Parameter object from paramList
+   * @param what - Parameter to be removed
+   * @return true on success, false on failure
    */
   public boolean removeParameter(Parameter what) {
     return  removeFromList(what, getParamList(), "paramList");
   }
 
-  /**removeParameter: removes an Parameter object from paramList
-   * @param: list index number
-   * @return: true on success, false on failure
+  /** removes an Parameter object from paramList
+   * @param index - list index number of the Parameter to be removed
+   * @return true on success, false on failure
    */
   public boolean removeParameter(int index) {
     return removeFromList(index, getParamList(), "paramList");
   }
 
-  /** addStructure: insert an Structure object into the structList
-   * @param: Structure
-   * @return: an Structure object on success, null on failure
+  /**  insert an Structure object into the structList
+   * @param s - Structure to be added
+   * @return an Structure object
    */
   public Structure addStructure(Structure s) {
-    if (s == null) {
-      Log.warn("in Structure.addStructure(), Structure passed in is null");
-      return null;
-    }
     getStructList().add(s);
     return s;
   }
 
-  /**removeStructure: removes an Structure object from structList
-   * @param: Structure to be removed
-   * @return: true on success, false on failure
+  /** removes an Structure object from structList
+   * @param what - Structure to be removed
+   * @return true on success, false on failure
    */
   public boolean removeStructure(Structure what) {
     return  removeFromList(what, getStructList(), "structList");
   }
 
-  /**removeStructure: removes an Structure object from structList
-   * @param: list index number
-   * @return: true on success, false on failure
+  /** removes an Structure object from structList
+   * @param index - list index number of the Structure to be removed
+   * @return true on success, false on failure
    */
   public boolean removeStructure(int index) {
     return removeFromList(index, getStructList(), "structList");
   }
 
-  /**addArray: insert an Array object into the arrayList
-   * @param: Array
-   * @return: an Array object on success, null on failure
+  /** insert an Array object into the arrayList
+   * @param array - Array to be added
+   * @return an Array object
    */
   public Array addArray(Array array) {
-    if (array == null) {
-      Log.warn("in Structure.addArray(), Array passed in is null");
-      return null;
-    }
     getArrayList().add(array);
     return array;
   }
 
-  /**removeArray: removes an Array object from arrayList
-   * @param: Array to be removed
-   * @return: true on success, false on failure
+  /** removes an Array object from arrayList
+   * @param what - Array to be removed
+   * @return true on success, false on failure
    */
   public boolean removeArray(Array what) {
     return removeFromList(what, getArrayList(), "arrayList");
   }
 
-  /**removeArray: removes an Array object from arrayList
-   * @param: list index number
-   * @return: true on success, false on failure
+  /** emoves an Array object from arrayList
+   * @param index - list index number of the Array to be removed
+   * @return true on success, false on failure
    */
   public boolean removeArray(int index) {
     return removeFromList(index, getArrayList(), "arrayList");
   }
 
-  /**addParamGroup: Insert an ParameterGroup object into this object.
-   * @param: ParameterGroup to be added
-   * @return:an ParameterGroup object reference on success, null on failure.
+  /** Insert an ParameterGroup object into this object.
+   * @param ParameterGroup to be added
+   * @return an ParameterGroup object reference
    */
   public ParameterGroup addParamGroup (ParameterGroup group) {
-    if (group !=null) {
-      //add the group to the groupOwnedHash
-      paramGroupOwnedHash.add(group);
-      return group;
-    }
-    else {
-      Log.warn("in Structure.addParamGroup(). ParameterGroup passed in is null");
-      return null;
-    }
+    //add the group to the groupOwnedHash
+    paramGroupOwnedHash.add(group);
+    return group;
+
+
   }
 
-  /**removeParamGroup: Remove an ParameterGroup object from the hashset--paramGroupOwnedHash
-   * @param: ParameterGroup to be removed
-   * @return: true on success, false on failure
+  /** Remove an ParameterGroup object from the hashset--paramGroupOwnedHash
+   * @param group - ParameterGroup to be removed
+   * @return true on success, false on failure
    */
   public boolean removeParamGroup(ParameterGroup group) {
-    if (group == null) {
-      Log.warn("in Structure.removeParamGroup().  ParameterGroup passed in is null");
-      return false;
-    }
     return paramGroupOwnedHash.remove(group);
   }
 
   /** Read in an XML file using Reader.
-   * @return: the structure read in on success, null on failure.
+   * @return the structure read in on success, null on failure.
    */
 
    public void loadFromXDFFile (String filename)
@@ -430,7 +410,7 @@ public class Structure extends BaseObject {
         cloneObj.paramGroupOwnedHash = Collections.synchronizedSet(new HashSet(this.paramGroupOwnedHash.size()));
         Iterator iter = this.paramGroupOwnedHash.iterator();
         while (iter.hasNext()) {
-          cloneObj.paramGroupOwnedHash.add(iter.next());
+          cloneObj.paramGroupOwnedHash.add(((Group)iter.next()).clone());
         }
       }
     }
@@ -442,6 +422,9 @@ public class Structure extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2000/11/16 20:09:19  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.14  2000/11/09 23:04:56  thomas
  * Updated version, made changes to allow extension
  * to other dataformats (e.g. FITSML). -b.t.

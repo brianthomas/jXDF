@@ -1,4 +1,5 @@
 
+
 // XDF NotesLocationOrder 
 // CVS $Id$
 
@@ -104,25 +105,25 @@ public class NotesLocationOrder extends BaseObject {
 */
 
       // 1. open this node, print its simple XML attributes
-      if (sPrettyXDFOutput) writeOut(outputstream, indent); // indent node if desired
+      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, indent); // indent node if desired
       writeOut(outputstream,"<" + nodeNameString + ">");   // print opening statement
-      if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
+      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
 
-      String newindent = indent + sPrettyXDFOutputIndentation; // bump up the indentation
+      String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation(); // bump up the indentation
       // 2. Print out the axisIdRefs as child nodes 
       Iterator iter = axisIdRefOrder.iterator();
       while (iter.hasNext()) {
          String axisIdRef = (String) iter.next();
 
-         if (sPrettyXDFOutput) writeOut(outputstream, newindent); // indent node if desired
+         if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, newindent); // indent node if desired
          writeOut(outputstream,"<" + indexNodeName + " axisIdRef=\""+axisIdRef+"\"/>");
-         if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
+         if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
       }
 
       // 3. Close this node
-      if (sPrettyXDFOutput) writeOut(outputstream, indent); // indent node if desired
+      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, indent); // indent node if desired
       writeOut(outputstream,"</" + nodeNameString + ">");   // print opening statement
-      if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
+      if (Specification.getInstance().isPrettyXDFOutput()) writeOut(outputstream, Constants.NEW_LINE);
 
    }
 
@@ -144,6 +145,9 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2000/11/16 20:03:22  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.3  2000/11/09 05:16:07  thomas
  * Index node wasnt being closed properly! Fixed. -b.t.
  *

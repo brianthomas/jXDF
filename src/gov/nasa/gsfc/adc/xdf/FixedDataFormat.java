@@ -1,4 +1,5 @@
 
+
 // XDF FixedDataFormat Class
 // CVS $Id$
 
@@ -28,7 +29,7 @@ import java.util.Hashtable;
 
 
 /**
- * FixedDataFormat.java:describes (ASCII) fixed (floating point) numbers.
+ *  describes (ASCII) fixed (floating point) numbers.
  * @version $Revision$
  */
 
@@ -73,7 +74,7 @@ public class FixedDataFormat extends DataFormat {
   //
 
   /** set the *lessThanValue* attribute
-   * @return: the current *lessThanValue* attribute
+   * @return the current *lessThanValue* attribute
    */
   public void setLessThanValue(Object numLessThanValue) {
      ((XMLAttribute) attribHash.get("lessThanValue")).setAttribValue(numLessThanValue);
@@ -122,8 +123,8 @@ public class FixedDataFormat extends DataFormat {
      ((XMLAttribute) attribHash.get("width")).setAttribValue(numWidth);
 
   }
-  /**getWidth
-   * @return: the current *width* attribute
+  /**
+   * @return the current *width* attribute
    */
   public Number getWidth()
   {
@@ -136,8 +137,8 @@ public class FixedDataFormat extends DataFormat {
      ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
 
   }
-  /**getPrecision
-   * @return: the current *precision* attribute
+  /**
+   * @return the current *precision* attribute
    */
   public Number getPrecision()
   {
@@ -148,17 +149,21 @@ public class FixedDataFormat extends DataFormat {
   //Other PUBLIC Methods
   //
 
-  /**numOfBytes: A convenience method.
-   * @Return: the number of bytes this XDF::FixedDataFormat holds.
+  /** A convenience method that return the number of bytes this FixedDataFormat holds.
    */
   public int numOfBytes() {
     return getWidth().intValue();
   }
 
+  /**probably this method will go away
+   */
 
   public String templateNotation(String strEndian, String strEncoding) {
     return "A"+numOfBytes();
   }
+
+  /**probably this method will go away
+   */
 
   public String regexNotation() {
 
@@ -176,17 +181,18 @@ public class FixedDataFormat extends DataFormat {
     return notation;
   }
 
-  /** sprintfNotation: returns sprintf field notation
-   *
+  /**probably this method will go away
    */
+
   public String sprintfNotation() {
 
   return  "%" + numOfBytes() + "." + getPrecision().intValue() + PerlSprintfFieldFixed  ;
 
 }
 
-  /** fortranNotation: The fortran style notation for this object.
+/**probably this method will go away
    */
+
   public String fortranNotation() {
     return "F"+ numOfBytes() + "." + getPrecision().intValue();
   }
@@ -196,6 +202,9 @@ public class FixedDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/16 19:59:51  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.5  2000/11/08 22:30:12  thomas
  * Changed set methods to return void. -b.t.
  *

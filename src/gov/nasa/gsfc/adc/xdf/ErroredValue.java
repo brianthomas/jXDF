@@ -21,8 +21,8 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-/** ErroredValue.java: ErroredValue describes a single scalar (number or string)
-  * that has an associated error value. XDF::Parameter uses this object
+/**  ErroredValue describes a single scalar (number or string)
+  * that has an associated error value. Parameter uses this object
   * to store its (mathematical) value.
    @version $Revision$
   */
@@ -49,39 +49,39 @@ public class  ErroredValue extends Value {
    // Public Methods
    //
 
-  /**getUpperErrorValue: get the *upperErrorValue* attribute.
+  /** get the *upperErrorValue* attribute.
    */
    public String getUpperErrorValue() {
       return (String) ((XMLAttribute) attribHash.get("upperErrorValue")).getAttribValue();
    }
 
-   /**set upperErrorValue: set the *upperErrorValue* attribute.
+   /** set the *upperErrorValue* attribute.
     */
    public void setUpperErrorValue (Number upperErrorValue)
    {
       ((XMLAttribute) attribHash.get("upperErrorValue")).setAttribValue(upperErrorValue);
    }
 
-   /**getLowerErrorValue: get the *lowerErrorValue* attribute.
+   /** get the *lowerErrorValue* attribute.
    */
    public String getLowerErrorValue() {
       return (String) ((XMLAttribute) attribHash.get("lowerErrorValue")).getAttribValue();
    }
 
-   /**set lowerErrorValue: set the *lowerErrorValue* attribute.
+   /** set the *lowerErrorValue* attribute.
     */
    public void setLowerErrorValue (Number lowerErrorValue)
    {
       ((XMLAttribute) attribHash.get("lowerErrorValue")).setAttribValue(lowerErrorValue);
    }
 
-   /**getErrorValue: get the *lowerErrorValue* attribute.
+   /** get the *lowerErrorValue* attribute.
    */
    public String getErrorValue() {
       return (String) ((XMLAttribute) attribHash.get("errorValue")).getAttribValue();
    }
 
-   /**setErrorValue: set the *errorValue* attribute.
+   /** set the *errorValue* attribute.
     */
    public void setErrorValue (Number ErrorValue)
    {
@@ -116,6 +116,9 @@ public class  ErroredValue extends Value {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/11/16 19:57:29  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.1  2000/11/02 20:34:17  kelly
  * created the class
  *

@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/** this class handles the readCell ELEMENT  
    @version $Revision$
  */
 public class ReadCellFormattedIOCmd extends XMLDataIOStyle implements FormattedIOCmd {
@@ -86,6 +86,9 @@ public class ReadCellFormattedIOCmd extends XMLDataIOStyle implements FormattedI
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/11/16 20:04:55  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.1  2000/11/09 23:42:16  kelly
  * created the class
  *

@@ -1,4 +1,5 @@
 
+
 // XDF StringDataFormat Class
 // CVS $Id$
 
@@ -28,7 +29,7 @@ import java.util.Hashtable;
 import java.io.OutputStream;
 
 /**
-   StringDataFormat.java:describes string data.
+    describes string data.
    @version $Revision$
  */
 
@@ -110,7 +111,7 @@ public class StringDataFormat extends DataFormat {
      ((XMLAttribute) attribHash.get("length")).setAttribValue(numLength);
   }
   /**getLength
-   * @return: the current *length* attribute
+   * @return the current *length* attribute
    */
   public Number getLength()
   {
@@ -120,8 +121,8 @@ public class StringDataFormat extends DataFormat {
   //Other PUBLIC Methods
   //
 
-  /**numOfBytes: A convenience method.
-   * @Return: the number of bytes this XDF::StringDataFormat holds.
+  /** A convenience method.
+   * @return the number of bytes this StringDataFormat holds.
    */
   public int numOfBytes() {
     return getLength().intValue();
@@ -163,6 +164,9 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2000/11/16 20:09:02  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.7  2000/11/08 22:30:11  thomas
  * Changed set methods to return void. -b.t.
  *

@@ -1,4 +1,5 @@
 
+
 // XDF DelimitedXMLDataIOStyle Class
 // CVS $Id$
 
@@ -39,10 +40,10 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
   //Fields
   //
 
-  // these things are defined in the DTD. It would be best if we 
+  // these things are defined in the DTD. It would be best if we
   // didnt have to initialize them from here, and , of course, the
-  // Reader, if used, will set the attributes to the DTD defaults. 
-  // However, a user may not use the reader, and so these are needed. 
+  // Reader, if used, will set the attributes to the DTD defaults.
+  // However, a user may not use the reader, and so these are needed.
   //   Unfortuneately this means we have to keep updating the code whenever
   // the DTD changes. -b.t.
   public final static String DefaultDelimiter =" ";
@@ -80,24 +81,24 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
   //Get/Set Methods
   //
 
-  /**setDelimiter: set the *delimiter* attribute
-   * @return: the current *delimiter* attribute
+  /** set the *delimiter* attribute
+   * @return the current *delimiter* attribute
    */
   public void setDelimiter (String strDelimiter)
   {
       ((XMLAttribute) attribHash.get("delimiter")).setAttribValue(strDelimiter);
   }
 
-  /**getDelimiter
-   * @return: the current *delimiter* attribute
+  /**
+   * @return the current *delimiter* attribute
    */
   public String getDelimiter()
   {
      return (String) ((XMLAttribute) attribHash.get("delimiter")).getAttribValue();
   }
 
-  /**setRepeatable: set the *repeatable* attribute
-   * @return: the current *repeatable* attribute
+  /** set the *repeatable* attribute
+   * @return the current *repeatable* attribute
    */
   public void setRepeatable (String strIsRepeatable)
   {
@@ -110,8 +111,8 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
      ((XMLAttribute) attribHash.get("repeatable")).setAttribValue(strIsRepeatable);
   }
 
-  /**getRepeatable
-   * @return: the current *repeatable* attribute
+  /**
+   * @return the current *repeatable* attribute
    */
   public String getRepeatable()
   {
@@ -119,16 +120,16 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
   }
 
 
-   /**setRecordTerminator: set the *recordTerminator* attribute
-   * @return: the current *recordTerminator* attribute
+   /** set the *recordTerminator* attribute
+   * @return the current *recordTerminator* attribute
    */
   public void setRecordTerminator (String strRecordTerminator)
   {
      ((XMLAttribute) attribHash.get("recordTerminator")).setAttribValue(strRecordTerminator);
   }
 
-  /**getRecordTerminator
-   * @return: the current *recordTerminator* attribute
+  /**
+   * @return the current *recordTerminator* attribute
    */
   public String getRecordTerminator()
   {
@@ -158,7 +159,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
      String recordTerminator = getRecordTerminator();
 
     if (which > stop) {
-      if (sPrettyXDFOutput) {
+      if (Specification.getInstance().isPrettyXDFOutput()) {
         writeOut(outputstream, Constants.NEW_LINE);
         writeOut(outputstream, indent);
       }
@@ -170,16 +171,16 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
         writeOut(outputstream, " recordTerminator=\"" + recordTerminator + "\"/>");
     }
     else {
-      if (sPrettyXDFOutput) {
+      if (Specification.getInstance().isPrettyXDFOutput()) {
         writeOut(outputstream, Constants.NEW_LINE);
         writeOut(outputstream, indent);
       }
       writeOut(outputstream, "<" + UntaggedInstructionNodeName + " axisIdRef=\"");
       writeOut(outputstream, ((AxisInterface) parentArray.getAxisList().get(which)).getAxisId() + "\">");
       which++;
-      nestedToXDF(outputstream, indent + sPrettyXDFOutputIndentation, which, stop);
+      nestedToXDF(outputstream, indent + Specification.getInstance().getPrettyXDFOutputIndentation(), which, stop);
 
-      if (sPrettyXDFOutput) {
+      if (Specification.getInstance().isPrettyXDFOutput()) {
         writeOut(outputstream, Constants.NEW_LINE);
         writeOut(outputstream, indent);
       }
@@ -212,6 +213,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.7  2000/11/16 19:57:09  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.6  2000/11/08 19:42:43  thomas
  * Trimmed import path to just needed classes. -b.t.
  *

@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/** this class handles the repeat ELEMENT
    @version $Revision$
  */
 public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOCmd {
@@ -74,43 +74,59 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
   //Get/Set methods
   //
 
-  /**setCount: set the *count* attribute
+  /** set the *count* attribute
    */
   public void setCount(Integer numCount) {
     ((XMLAttribute) attribHash.get("count")).setAttribValue(numCount);
   }
 
-  /**getCount: get the *count* attribute
+  /** get the *count* attribute
    */
   public Integer getCount() {
     return (Integer)  ((XMLAttribute) attribHash.get("count")).getAttribValue();
   }
 
-  /**setFormatCommandList: set the formatCommandList
+  /** set the formatCommandList
    */
   public void setFormatCommandList(List formatList) {
      formatCommandList = formatList;
   }
 
-  /**getFormatCommandList: get the formatCommandList
+  /** get the formatCommandList
   */
   public List getFormatCommandList() {
    return formatCommandList;
   }
 
-  /**addFormatCommand: add a command to the formatCommandList
-    * @return: the command that is added
+  /** add a command to the formatCommandList
+    * @return the command that is added
     */
   public FormattedIOCmd addFormatCommand(FormattedIOCmd formatCmd) {
     formatCommandList.add(formatCmd);
     return formatCmd;
   }
 
-  /**getCommands: convenience methods that return the command list
+  /** convenience methods that return the command list
    */
   public List getCommands() {
      return formatCommandList;
   }
+
+  /**deep copy of this RepeatFormattedIOCmd object
+    */
+   public Object clone () throws CloneNotSupportedException {
+    RepeatFormattedIOCmd cloneObj = (RepeatFormattedIOCmd) super.clone();
+    synchronized (formatCommandList) {
+      synchronized (cloneObj.formatCommandList) {
+        int stop = formatCommandList.size();
+        cloneObj.formatCommandList = Collections.synchronizedList(new ArrayList(stop));
+        for (int i = 0; i <stop; i++) {
+          cloneObj.formatCommandList.add(((XMLDataIOStyle)formatCommandList.get(i)).clone());
+        }
+        return cloneObj;
+      } //synchronize
+    } //synchronize
+   }
 
   //
   // Protected Methods
@@ -126,9 +142,9 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
      //write out nodes in formatCommandList
      synchronized (formatCommandList) {
       int stop = formatCommandList.size();
-      String moreIndent = indent + sPrettyXDFOutputIndentation;
+      String moreIndent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
       for (int i = 0; i <stop; i++) {
-         if (sPrettyXDFOutput) {
+         if (Specification.getInstance().isPrettyXDFOutput()) {
             writeOut(outputstream, Constants.NEW_LINE);
             writeOut(outputstream, moreIndent);
          }
@@ -137,7 +153,7 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
      }
 
      //close the node
-     if (sPrettyXDFOutput) {
+     if (Specification.getInstance().isPrettyXDFOutput()) {
       writeOut(outputstream, Constants.NEW_LINE);
       writeOut(outputstream, indent);
      }
@@ -165,6 +181,9 @@ public class RepeatFormattedIOCmd extends XMLDataIOStyle implements FormattedIOC
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2000/11/16 20:06:09  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.1  2000/11/09 23:42:38  kelly
  * created the class
  *

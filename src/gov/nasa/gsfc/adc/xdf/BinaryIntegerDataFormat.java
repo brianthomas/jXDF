@@ -28,7 +28,7 @@ import java.util.Hashtable;
 
 
 /**
- * BinaryIntegerDataFormat.java:describes binary integer numbers.
+ *  describes binary integer numbers.
  * @version $Revision$
  */
 
@@ -115,8 +115,8 @@ public class BinaryIntegerDataFormat extends DataFormat {
      ((XMLAttribute) attribHash.get("bits")).setAttribValue(numBits);
 
   }
-  /**getbits
-   * @return: the current *bits* attribute
+  /**
+   * @return the current *bits* attribute
    */
   public Number getBits()
   {
@@ -138,8 +138,8 @@ public class BinaryIntegerDataFormat extends DataFormat {
 
   }
 
-  /**getSigned
-   * @return: the current *signed* attribute
+  /**
+   * @return the current *signed* attribute
    */
   public String getSigned()
   {
@@ -149,8 +149,8 @@ public class BinaryIntegerDataFormat extends DataFormat {
   //Other PUBLIC Methods
   //
 
-  /**numOfBytes: A convenience method.
-   * @Return: the number of bytes this XDF::BinaryIntegerDataFormat holds.
+  /** A convenience method.
+   * @Return: the number of bytes this BinaryIntegerDataFormat holds.
    */
   public int numOfBytes() {
     return getBits().intValue()/8;
@@ -159,7 +159,7 @@ public class BinaryIntegerDataFormat extends DataFormat {
   //pass in param??? double check???
   public String templateNotation(String strEndian, String strEncoding) {
     if (numOfBytes() >4) {
-      Log.error("XDF::BinaryInteger cant handle > 32 bit Integer Numbers");
+      Log.error("BinaryInteger cant handle > 32 bit Integer Numbers");
       Log.error("returning null");
       return null;
     }
@@ -207,6 +207,9 @@ public class BinaryIntegerDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2000/11/16 19:51:59  kelly
+ * fixed documentation.  -k.z.
+ *
  * Revision 1.5  2000/11/08 22:30:12  thomas
  * Changed set methods to return void. -b.t.
  *
