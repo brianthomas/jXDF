@@ -69,11 +69,14 @@ public class DataCube extends BaseObject {
 
    // should be hex for faster comparison?
    private int DOUBLE_DATA_TYPE = 0;
-   private int INT_DATA_TYPE = 1;
-   private int SHORT_DATA_TYPE = 2;
-   private int LONG_DATA_TYPE = 3;
-   private int STRING_DATA_TYPE = 4;
+   private int FLOAT_DATA_TYPE = 1;
+   private int LONG_DATA_TYPE = 2;
+   private int INT_DATA_TYPE = 3;
+   private int SHORT_DATA_TYPE = 4;
    private int BYTE_DATA_TYPE = 5;
+   private int STRING_DATA_TYPE = 6;
+   private int POINTER_DATA_TYPE = 7;
+   private int UNDEFINED_DATA_TYPE = -1;
 
    //  to store the n-dimensional data, it is an ArrayList of ArrayList, whose
    //  innermost layer contains two kinds of arrays:
@@ -274,7 +277,8 @@ public class DataCube extends BaseObject {
    
    /** We return whatever object is stored in the datacell.
     */
-   public Object getData (Locator locator) throws NoDataException
+   public Object getData (Locator locator) 
+       throws NoDataException, IllegalArgumentException
    {
    
       int longIndex = parentArray.getLongArrayIndex(locator);
@@ -285,8 +289,9 @@ public class DataCube extends BaseObject {
             throw new NoDataException();  //the location we try to access contains noDataValue
    
          return java.lang.reflect.Array.get(longDataArray.get(longIndex+1), shortIndex);
-      }
-      catch (Exception e) {  //the location we try to access is not allocated,
+      } catch (IllegalArgumentException iae) {
+	  throw new  IllegalArgumentException();
+      } catch (Exception e) {  //the location we try to access is not allocated,
          //i.e., no data in the cell
          throw new NoDataException();
       }
@@ -294,16 +299,69 @@ public class DataCube extends BaseObject {
    }
    
    
-   /** Regardless of what type of data is stored in the data cell we return the
-       String representation.
+   /**Get the double value of the requested datacell.
     */
-   public String getStringData (Locator locator) 
-   throws NoDataException 
+   public double getDoubleData (Locator locator)
+       throws NoDataException, IllegalArgumentException
+   {
+
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
+
+      try {
+         if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
+            throw new NoDataException();  //the location we try to access contains noDataValue
+    
+         return java.lang.reflect.Array.getDouble(longDataArray.get(longIndex+1), shortIndex);
+
+      } catch (IllegalArgumentException iae) {
+	  throw new  IllegalArgumentException();
+
+      }  catch (Exception e) {  //the location we try to access is not allocated,
+         //i.e., no data in the cell
+         throw new NoDataException();
+      }
+
+   }
+
+
+   /**Get the double value of the requested datacell.
+    */
+   public float getFloatData (Locator locator)
+   throws NoDataException
+   {
+
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
+
+      try { 
+         if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
+            throw new NoDataException();  //the location we try to access contains noDataValue
+
+         return java.lang.reflect.Array.getFloat(longDataArray.get(longIndex+1), shortIndex);
+      }
+      catch (Exception e) {  //the location we try to access is not allocated,
+         //i.e., no data in the cell
+         throw new NoDataException();
+      }
+
+   }
+
+
+   /** Get long (64-bit) integer data from a requested datacell. 
+    */
+   public long getLongData (Locator locator)
+   throws NoDataException
    {
    
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
+   
       try {
-         Object data = getData(locator);
-         return data.toString();
+         if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
+            throw new NoDataException();  //the location we try to access contains noDataValue
+   
+         return java.lang.reflect.Array.getLong(longDataArray.get(longIndex+1), shortIndex);
       }
       catch (Exception e) {  //the location we try to access is not allocated,
          //i.e., no data in the cell
@@ -311,7 +369,8 @@ public class DataCube extends BaseObject {
       }
    
    }
-   
+
+
    /** Get integer data from a requested datacell. 
     */
    public int getIntData (Locator locator) 
@@ -378,21 +437,17 @@ public class DataCube extends BaseObject {
 
    }
 
-   
-   /** Get long (64-bit) integer data from a requested datacell. 
+
+   /** Regardless of what type of data is stored in the data cell we return the
+       String representation.
     */
-   public long getLongData (Locator locator)
-   throws NoDataException
+   public String getStringData (Locator locator) 
+   throws NoDataException 
    {
-   
-      int longIndex = parentArray.getLongArrayIndex(locator);
-      int shortIndex = parentArray.getShortArrayIndex(locator);
    
       try {
-         if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
-            throw new NoDataException();  //the location we try to access contains noDataValue
-   
-         return java.lang.reflect.Array.getLong(longDataArray.get(longIndex+1), shortIndex);
+         Object data = getData(locator);
+         return data.toString();
       }
       catch (Exception e) {  //the location we try to access is not allocated,
          //i.e., no data in the cell
@@ -400,62 +455,19 @@ public class DataCube extends BaseObject {
       }
    
    }
-
-
-   /**Get the double value of the requested datacell.
-    */
-   public double getDoubleData (Locator locator)
-   throws NoDataException
-   {
-
-      int longIndex = parentArray.getLongArrayIndex(locator);
-      int shortIndex = parentArray.getShortArrayIndex(locator);
-
-      try {
-         if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
-            throw new NoDataException();  //the location we try to access contains noDataValue
-    
-         return java.lang.reflect.Array.getDouble(longDataArray.get(longIndex+1), shortIndex);
-      }
-      catch (Exception e) {  //the location we try to access is not allocated,
-         //i.e., no data in the cell
-         throw new NoDataException();
-      }
-
-   }
-
-   /**Get the double value of the requested datacell.
-    */
-   public float getFloatData (Locator locator)
-   throws NoDataException
-   {
-
-      int longIndex = parentArray.getLongArrayIndex(locator);
-      int shortIndex = parentArray.getShortArrayIndex(locator);
-
-      try { 
-         if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
-            throw new NoDataException();  //the location we try to access contains noDataValue
-
-         return java.lang.reflect.Array.getFloat(longDataArray.get(longIndex+1), shortIndex);
-      }
-      catch (Exception e) {  //the location we try to access is not allocated,
-         //i.e., no data in the cell
-         throw new NoDataException();
-      }
-
-   }
+   
+   
 
   /**  Append the String value onto the requested datacell. 
-       Care should be taken when using this method to insure that
-       String data is not appended into a non-String datacell (currently
-       possible, but it will cause problems later on).
    */
-// We need a double check here: how to prevent the user 
-// from appending to an int or double?
    public void appendData (Locator locator, String stringValue) 
    throws SetDataException 
    {
+
+      int type = getDataType( locator );
+      if (type != DOUBLE_DATA_TYPE) {
+	  throw new SetDataException ("The target dataCell is not a String");
+      }
 
       String strData;
       try {
@@ -469,6 +481,7 @@ public class DataCube extends BaseObject {
       setData(locator, strData);
 
    }
+
 
   /** Set the value of the requested datacell. 
    *  Overwrites existing datacell value if already populated with a value.
@@ -491,15 +504,6 @@ public class DataCube extends BaseObject {
 
   /** Set the value of the requested datacell. 
    *  Overwrites existing datacell value if already populated with a value.
-   */
-   public void setData (Locator locator, Integer value)
-   throws SetDataException
-   {  
-      setData(locator, value.intValue());
-   }
-
-  /** Set the value of the requested datacell. 
-   *  Overwrites existing datacell value if already populated with a value.
    */ 
    public void setData (Locator locator, Long value)
    throws SetDataException
@@ -510,10 +514,28 @@ public class DataCube extends BaseObject {
   /** Set the value of the requested datacell. 
    *  Overwrites existing datacell value if already populated with a value.
    */
+   public void setData (Locator locator, Integer value)
+   throws SetDataException
+   {  
+      setData(locator, value.intValue());
+   }
+
+  /** Set the value of the requested datacell. 
+   *  Overwrites existing datacell value if already populated with a value.
+   */
    public void setData (Locator locator, Short value)
    throws SetDataException
    {
       setData(locator, value.shortValue());
+   }
+
+    /** Set the value of the requested datacell. 
+     *  Overwrites existing datacell value if already populated with a value.
+     */
+   public void setData (Locator locator, Byte value)
+   throws SetDataException
+   {
+      setData(locator, value.byteValue());
    }
 
    /** Set the value of the requested datacell. 
@@ -548,6 +570,7 @@ public class DataCube extends BaseObject {
 
    }
 
+
    /** Set the value of the requested datacell. 
     *  Overwrites existing datacell value if already populated with a value.
     */
@@ -562,7 +585,7 @@ public class DataCube extends BaseObject {
       int shortIndex = parentArray.getShortArrayIndex(locator);
 
       // Bounds checking
-      checkDataArrayBounds(longIndex, shortIndex, DOUBLE_DATA_TYPE);
+      checkDataArrayBounds(longIndex, shortIndex, FLOAT_DATA_TYPE);
 
       // Set the Data
       try {
@@ -579,6 +602,40 @@ public class DataCube extends BaseObject {
       }
 
    }
+
+
+   /** Set the value of the requested datacell. 
+    *  Overwrites existing datacell value if already populated with a value.
+    */
+   public void setData(Locator locator, long numValue)
+   throws SetDataException
+   {
+
+      // data are stored in a huge 2D array. The long array axis
+      // mirrors all dimensions but the 2nd axis. The 2nd axis gives
+      // the index on the 'short' internal array.
+      int longIndex = parentArray.getLongArrayIndex(locator);
+      int shortIndex = parentArray.getShortArrayIndex(locator);
+
+      // Bounds checking
+      checkDataArrayBounds(longIndex, shortIndex, LONG_DATA_TYPE);
+
+      // Set the Data
+      try { 
+         byte realValue = 1;
+         //indicate its corresponding datacell holds valid data
+         java.lang.reflect.Array.setByte(longDataArray.get(longIndex), shortIndex, realValue);
+
+         //put data into the requested datacell
+         java.lang.reflect.Array.setLong(longDataArray.get(longIndex+1), shortIndex, numValue);
+         return;
+      }
+      catch (ArrayIndexOutOfBoundsException e) {
+         throw new SetDataException("Cant set long data:["+numValue+"] Array out of bounds, using the wrong Locator?");
+      }
+
+   }
+
 
    /** Set the value of the requested datacell. 
     *  Overwrites existing datacell value if already populated with a value.
@@ -612,37 +669,6 @@ public class DataCube extends BaseObject {
 
    }
 
-   /** Set the value of the requested datacell. 
-    *  Overwrites existing datacell value if already populated with a value.
-    */
-   public void setData(Locator locator, long numValue)
-   throws SetDataException
-   {
-
-      // data are stored in a huge 2D array. The long array axis
-      // mirrors all dimensions but the 2nd axis. The 2nd axis gives
-      // the index on the 'short' internal array.
-      int longIndex = parentArray.getLongArrayIndex(locator);
-      int shortIndex = parentArray.getShortArrayIndex(locator);
-
-      // Bounds checking
-      checkDataArrayBounds(longIndex, shortIndex, LONG_DATA_TYPE);
-
-      // Set the Data
-      try { 
-         byte realValue = 1;
-         //indicate its corresponding datacell holds valid data
-         java.lang.reflect.Array.setByte(longDataArray.get(longIndex), shortIndex, realValue);
-
-         //put data into the requested datacell
-         java.lang.reflect.Array.setLong(longDataArray.get(longIndex+1), shortIndex, numValue);
-         return;
-      }
-      catch (ArrayIndexOutOfBoundsException e) {
-         throw new SetDataException("Cant set long data:["+numValue+"] Array out of bounds, using the wrong Locator?");
-      }
-
-   }
 
    /** Set the value of the requested datacell. 
     *  Overwrites existing datacell value if already populated with a value.
@@ -1183,11 +1209,13 @@ public class DataCube extends BaseObject {
       DataCube cloneObj = (DataCube) super.clone();
       synchronized (this) {
          synchronized (cloneObj) {
+	     // dimension defined --Ping???
             cloneObj.longDataArray = deepCopy(this.longDataArray, dimension);
          }
       }
       return cloneObj;
    }
+
 
    //
    // PRIVATE methods
@@ -1199,20 +1227,77 @@ public class DataCube extends BaseObject {
 
       if (type == DOUBLE_DATA_TYPE) {
          size = ((double[]) longDataArray.get(longIndex+1)).length;
-      } else if (type == INT_DATA_TYPE) {
-         size = ((int []) longDataArray.get(longIndex+1)).length;
-      } else if (type == BYTE_DATA_TYPE) {
-         size = ((byte []) longDataArray.get(longIndex+1)).length;
-      } else if (type == SHORT_DATA_TYPE) {
-         size = ((short []) longDataArray.get(longIndex+1)).length;
+      } else if (type == FLOAT_DATA_TYPE) {
+         size = ((float[]) longDataArray.get(longIndex+1)).length;
       } else if (type == LONG_DATA_TYPE) {
          size = ((long []) longDataArray.get(longIndex+1)).length;
+      } else if (type == INT_DATA_TYPE) {
+         size = ((int []) longDataArray.get(longIndex+1)).length;
+      } else if (type == SHORT_DATA_TYPE) {
+         size = ((short []) longDataArray.get(longIndex+1)).length;
+      } else if (type == BYTE_DATA_TYPE) {
+         size = ((byte []) longDataArray.get(longIndex+1)).length;
       } else if (type == STRING_DATA_TYPE) {
          size = ((String []) longDataArray.get(longIndex+1)).length;
       }
 
      return size;
    }
+
+
+   /**
+    * get the data type at a dataCell
+    *
+    * debug???
+    * should be modified if an array within an array is implemented
+    */
+   private int getDataType (Locator locator)
+   {
+      int type;
+
+      // data are stored in a huge 2D array. The long array axis
+      // mirrors all dimensions but the 2nd axis. The 2nd axis gives
+      // the index on the 'short' internal array.
+      int longIndex = parentArray.getLongArrayIndex(locator);
+
+      // this shortIndex is needed if an array within an array is implemented
+      int shortIndex = parentArray.getShortArrayIndex(locator);
+
+      // this should not be necessay
+      if (shortIndex < 0 || longIndex < 0) 
+      {
+      	  return -1; // throw an exception instead ???
+      }
+
+      Object dataObj=null;
+      try {
+	  // longIndex is shadow byte array
+	  dataObj = longDataArray.get(longIndex+1);
+      } catch (IndexOutOfBoundsException e) {
+	  return -1; // throw an exception instead ???
+      }
+
+      if (dataObj instanceof double[])
+	  type=DOUBLE_DATA_TYPE;
+      else if (dataObj instanceof float[])
+	  type=FLOAT_DATA_TYPE;
+      else if (dataObj instanceof long[])
+	  type=LONG_DATA_TYPE;
+      else if (dataObj instanceof int[] )
+	  type=INT_DATA_TYPE;
+      else if (dataObj instanceof short[] )
+	  type=SHORT_DATA_TYPE;
+      else if (dataObj instanceof byte[] )
+	  type=BYTE_DATA_TYPE;
+      else if (dataObj instanceof String[])
+	  type=STRING_DATA_TYPE;
+      else 
+	  type=UNDEFINED_DATA_TYPE;
+
+      return type;
+      
+   }
+
 
    private void checkDataArrayBounds (int longIndex, int shortIndex, int type)
    throws SetDataException
@@ -1239,20 +1324,25 @@ public class DataCube extends BaseObject {
 
       // is the short array too small? has it been init'd even yet? 
       // we perform checks here..
+      //
+      // should check array out of bound exception -- Ping???
+      //
       if (longDataArray.get(longIndex) == null) {
 
          // init/create the short array 
          longDataArray.set(  longIndex, new byte[shortAxisSize]);
          if (type == DOUBLE_DATA_TYPE) {
             longDataArray.set(longIndex+1, new double [shortAxisSize]);
-         } else if (type == INT_DATA_TYPE) {
-            longDataArray.set(longIndex+1, new int [shortAxisSize]);
-         } else if (type == BYTE_DATA_TYPE) {
-            longDataArray.set(longIndex+1, new byte [shortAxisSize]);
-         } else if (type == SHORT_DATA_TYPE) {
-            longDataArray.set(longIndex+1, new short [shortAxisSize]);
+         } else if (type == FLOAT_DATA_TYPE) {
+            longDataArray.set(longIndex+1, new float [shortAxisSize]);
          } else if (type == LONG_DATA_TYPE) {
             longDataArray.set(longIndex+1, new long [shortAxisSize]);
+         } else if (type == INT_DATA_TYPE) {
+            longDataArray.set(longIndex+1, new int [shortAxisSize]);
+         } else if (type == SHORT_DATA_TYPE) {
+            longDataArray.set(longIndex+1, new short [shortAxisSize]);
+         } else if (type == BYTE_DATA_TYPE) {
+            longDataArray.set(longIndex+1, new byte [shortAxisSize]);
          } else if (type == STRING_DATA_TYPE) {
             longDataArray.set(longIndex+1, new String [shortAxisSize]);
          }
@@ -1276,14 +1366,16 @@ public class DataCube extends BaseObject {
 
                if (type == DOUBLE_DATA_TYPE) {
                    longDataArray.set(longIndex+1, expandArray((double[]) longDataArray.get(longIndex+1), newsize));
-                } else if (type == INT_DATA_TYPE) {
-                   longDataArray.set(longIndex+1, expandArray((int[]) longDataArray.get(longIndex+1), newsize));
-                } else if (type == BYTE_DATA_TYPE) {
-                   longDataArray.set(longIndex+1, expandArray((byte[]) longDataArray.get(longIndex+1), newsize));
-                } else if (type == SHORT_DATA_TYPE) {
-                   longDataArray.set(longIndex+1, expandArray((short[]) longDataArray.get(longIndex+1), newsize));
+                } else if (type == FLOAT_DATA_TYPE) {
+                   longDataArray.set(longIndex+1, expandArray((float[]) longDataArray.get(longIndex+1), newsize));
                 } else if (type == LONG_DATA_TYPE) {
                    longDataArray.set(longIndex+1, expandArray((long []) longDataArray.get(longIndex+1), newsize));
+                } else if (type == INT_DATA_TYPE) {
+                   longDataArray.set(longIndex+1, expandArray((int[]) longDataArray.get(longIndex+1), newsize));
+                } else if (type == SHORT_DATA_TYPE) {
+                   longDataArray.set(longIndex+1, expandArray((short[]) longDataArray.get(longIndex+1), newsize));
+                } else if (type == BYTE_DATA_TYPE) {
+                   longDataArray.set(longIndex+1, expandArray((byte[]) longDataArray.get(longIndex+1), newsize));
                 } else if (type == STRING_DATA_TYPE) {
                    longDataArray.set(longIndex+1, expandArray((String []) longDataArray.get(longIndex+1), newsize));
                 }
@@ -1305,6 +1397,16 @@ public class DataCube extends BaseObject {
    private static double[] expandArray (double[] array, int newsize) {
 
       double[] newarray = new double[newsize];
+
+      int size = array.length;
+      for (int i = 0; i < size ; i++) { newarray[i] = array[i]; }
+      return newarray;
+
+   }
+
+   private static float[] expandArray (float[] array, int newsize) {
+
+      float[] newarray = new float[newsize];
 
       int size = array.length;
       for (int i = 0; i < size ; i++) { newarray[i] = array[i]; }
