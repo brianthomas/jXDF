@@ -99,7 +99,6 @@ public class CreateXdfTest extends org.apache.tools.ant.Task
             DocumentType doctype = new DocumentType(xdf); 
             Array array = new Array();
          
-    //        doctype.setSystemId("http://xml.gsfc.nasa.gov/DTD/XDF_017.dtd");
             xdf.setXMLDeclaration(xmlDecl);
             xdf.setDocumentType(doctype);
             
