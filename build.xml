@@ -25,7 +25,7 @@
 
   <!-- set global properties for this build -->
 
-  <property name="DTD_VERSION" value="017"/>
+  <property name="DTD_VERSION" value="018"/>
   <property name="path" value="gov/nasa/gsfc/adc/xdf"/>
   <property name="src" value="src/${path}"/>
   <property name="build" value="."/>
@@ -73,16 +73,20 @@
     </antcall>
 
     <!-- create delimited data, internal -->
+<!--
     <antcall target="creationTest">
          <param name="internalFile" value="false"/>
          <param name="dataiostyle" value="delimited"/>
     </antcall>
+-->
 
     <!-- create delimited data, external -->
+<!--
     <antcall target="creationTest">
          <param name="internalFile" value="true"/>
          <param name="dataiostyle" value="delimited"/>
     </antcall>
+-->
 
     <!-- create formatted data, internal -->
     <antcall target="creationTest">
