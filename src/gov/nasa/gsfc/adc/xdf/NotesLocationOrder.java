@@ -115,7 +115,7 @@ public class NotesLocationOrder extends BaseObject {
          String axisIdRef = (String) iter.next();
 
          if (sPrettyXDFOutput) writeOut(outputstream, newindent); // indent node if desired
-         writeOut(outputstream,"<" + indexNodeName + " axisIdRef=\""+axisIdRef+"\">");
+         writeOut(outputstream,"<" + indexNodeName + " axisIdRef=\""+axisIdRef+"\"/>");
          if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
       }
 
@@ -144,6 +144,9 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/11/09 05:16:07  thomas
+ * Index node wasnt being closed properly! Fixed. -b.t.
+ *
  * Revision 1.2  2000/11/08 19:18:07  thomas
  * Changed the name of toXDF* methods to toXML* to
  * better reflect the nature of the output (its not XDF
