@@ -65,6 +65,7 @@ public class Field extends BaseObjectWithXMLElements {
    private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
    private static final String ID_XML_ATTRIBUTE_NAME = new String("fieldId");
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("fieldIdRef");
+   private static final String CONVERSION_XML_ATTRIBUTE_NAME = "conversion";
    private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = "dataFormat";
    private static final String UNITS_XML_ATTRIBUTE_NAME = "units";
    private static final String RELATION_XML_ATTRIBUTE_NAME = "relation";
@@ -161,6 +162,23 @@ public class Field extends BaseObjectWithXMLElements {
    public String getFieldIdRef()
    {
       return (String) ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
+   }
+
+   /** 
+    *  Set how to convert values of the data in this field. 
+    */
+   public void setConversion(Conversion value)
+   {
+        ((Attribute) attribHash.get(CONVERSION_XML_ATTRIBUTE_NAME)).setAttribValue(value);
+   }
+
+   /**
+    *  Get how to convert values of the data in this field. 
+    * @return the current *dataFormat* object
+    */
+   public Conversion getConversion()
+   {
+      return (Conversion) ((Attribute) attribHash.get(CONVERSION_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *units* attribute
@@ -337,6 +355,7 @@ public class Field extends BaseObjectWithXMLElements {
      attribOrder.add(0, RELATION_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, CONVERSION_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
@@ -348,6 +367,7 @@ public class Field extends BaseObjectWithXMLElements {
      attribHash.put(RELATION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));  //double check
      attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new Attribute(new Units(), Constants.OBJECT_TYPE));
      attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
+     attribHash.put(CONVERSION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
      attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
      attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
      attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));

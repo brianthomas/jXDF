@@ -73,6 +73,7 @@ public class Parameter extends BaseObjectWithValueList {
    private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
    private static final String ID_XML_ATTRIBUTE_NAME = new String("paramId");
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("paramIdRef");
+   private static final String CONVERSION_XML_ATTRIBUTE_NAME = new String("conversion");
    private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = new String("dataFormat");
    private static final String UNITS_XML_ATTRIBUTE_NAME = new String("units");
    private static final String NOTELIST_XML_ATTRIBUTE_NAME = new String("notes");
@@ -201,6 +202,23 @@ public class Parameter extends BaseObjectWithValueList {
   public Units getUnits()
   {
     return (Units) ((Attribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
+
+   /** 
+    *  Set how to convert values of the data in this parameter. 
+    */
+   public void setConversion(Conversion value)
+   {
+        ((Attribute) attribHash.get(CONVERSION_XML_ATTRIBUTE_NAME)).setAttribValue(value);
+   }
+
+  /**
+   *  Get how to convert values of the data in this parameter. 
+   * @return the current *dataFormat* object
+   */
+  public Conversion getConversion()
+  {
+     return (Conversion) ((Attribute) attribHash.get(CONVERSION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /**  set the *dataFormat* attribute
@@ -487,6 +505,7 @@ public class Parameter extends BaseObjectWithValueList {
     attribOrder.add(0, VALUELIST_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
+    attribOrder.add(0, CONVERSION_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
@@ -496,6 +515,7 @@ public class Parameter extends BaseObjectWithValueList {
     attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put(VALUELIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new Attribute(new Units(), Constants.OBJECT_TYPE));
+    attribHash.put(CONVERSION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
     attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
     attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));  //double check k.z.
     attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));

@@ -59,6 +59,7 @@ implements AxisInterface
    private static final String ID_XML_ATTRIBUTE_NAME = new String("axisId");
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("axisIdRef");
    private static final String ALIGN_XML_ATTRIBUTE_NAME = new String("align");
+   private static final String CONVERSION_XML_ATTRIBUTE_NAME = new String("conversion");
    private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = new String("dataFormat");
    private static final String UNITS_XML_ATTRIBUTE_NAME = new String("axisUnits");
    private static final String VALUELIST_XML_ATTRIBUTE_NAME = new String("valueList");
@@ -163,23 +164,38 @@ implements AxisInterface
     return (String) ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
-     /** Sets the data format for the label of this axis 
-     */
-     public void setLabelDataFormat(DataFormat dataFormat)
-     {
-        ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).setAttribValue(dataFormat);
-     }
-   
+   /** 
+    *  Set how to convert values of the data in this axis. 
+    */
+   public void setConversion(Conversion value)
+   {
+        ((Attribute) attribHash.get(CONVERSION_XML_ATTRIBUTE_NAME)).setAttribValue(value);
+   }
 
-     /**
-      * Gets the data format for the label of this axis.
-      * @return the current *dataFormat* object
-      */
-     public DataFormat getLabelDataFormat()
-     {
-        return (DataFormat) ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).getAttribValue();
-     }
+  /**
+   *  Get how to convert values of the data in this axis. 
+   * @return the current *dataFormat* object
+   */
+  public Conversion getConversion()
+  {
+     return (Conversion) ((Attribute) attribHash.get(CONVERSION_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
 
+  /** Sets the data format for the label of this axis 
+  */
+  public void setLabelDataFormat(DataFormat dataFormat)
+  {
+     ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).setAttribValue(dataFormat);
+  }
+
+  /**
+   * Gets the data format for the label of this axis.
+   * @return the current *dataFormat* object
+   */
+  public DataFormat getLabelDataFormat()
+  {
+     return (DataFormat) ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).getAttribValue();
+  }
 
   /** set the *axisUnits* attribute
    */
@@ -673,6 +689,7 @@ implements AxisInterface
      attribOrder.add(0, VALUELIST_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
+     attribOrder.add(0, CONVERSION_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, ALIGN_XML_ATTRIBUTE_NAME);  //not sure what it is???
      attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
@@ -693,6 +710,8 @@ implements AxisInterface
      Units unitsObj = new Units();
      attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new Attribute(unitsObj, Constants.OBJECT_TYPE));
      unitsObj.setXDFNodeName(UNITS_XML_ATTRIBUTE_NAME);
+
+     attribHash.put(CONVERSION_XML_ATTRIBUTE_NAME,new Attribute(null, Constants.OBJECT_TYPE));
 
      attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME,new Attribute(null, Constants.OBJECT_TYPE));
 // NO. leave this null so that it wont print out, we assume implicitly its string in the Sax parser 

@@ -111,6 +111,7 @@ import java.util.Vector;
      private static final String APPENDTO_XML_ATTRIBUTE_NAME = new String("appendTo");
      private static final String PARAMETERLIST_XML_ATTRIBUTE_NAME = new String("paramList");
      private static final String UNITS_XML_ATTRIBUTE_NAME = new String("units");
+     private static final String CONVERSION_XML_ATTRIBUTE_NAME = new String("conversion");
      private static final String DATAFORMAT_XML_ATTRIBUTE_NAME = new String("dataFormat");
      private static final String AXISLIST_XML_ATTRIBUTE_NAME = new String("axisList");
      private static final String XMLDATAIOSTYLE_XML_ATTRIBUTE_NAME = new String("xmlDataIoStyle");
@@ -258,6 +259,23 @@ import java.util.Vector;
        return (Units) ((Attribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
    
+      /** 
+       *  Set how to convert values of the data in this array. 
+       */
+      public void setConversion(Conversion value)
+      {
+           ((Attribute) attribHash.get(CONVERSION_XML_ATTRIBUTE_NAME)).setAttribValue(value);
+      }
+   
+     /**
+      *  Get how to convert values of the data in this array. 
+      * @return the current *dataFormat* object
+      */
+     public Conversion getConversion()
+     {
+        return (Conversion) ((Attribute) attribHash.get(CONVERSION_XML_ATTRIBUTE_NAME)).getAttribValue();
+     }
+
      /** Sets the data format *type* for this array (an DataFormat object
       * is held in the attribute $obj->dataFormat, its type is accessible
       * Takes a SCALAR object reference as its argument. Allowed objects to pass
@@ -1262,6 +1280,7 @@ import java.util.Vector;
        attribOrder.add(0, AXISLIST_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, DATAFORMAT_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, UNITS_XML_ATTRIBUTE_NAME);
+       attribOrder.add(0, CONVERSION_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, PARAMETERLIST_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, APPENDTO_XML_ATTRIBUTE_NAME);
        attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
@@ -1276,6 +1295,7 @@ import java.util.Vector;
        attribHash.put(XMLDATAIOSTYLE_XML_ATTRIBUTE_NAME, 
                new Attribute(new DelimitedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
        attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
+       attribHash.put(CONVERSION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
        attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
        attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
        attribHash.put(APPENDTO_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
