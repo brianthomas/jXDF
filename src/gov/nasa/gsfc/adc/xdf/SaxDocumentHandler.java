@@ -3172,8 +3172,20 @@ while (iter.hasNext()) {
 
              int startByte = CurrentArray.getDataCube().getStartByte().intValue();
              int endByte = -1; // default: -1 means read it all
+
+             if (startByte > 0) {
+                // Since startByte is basically a one-time deal, we must reset this 
+                // to 0 now to avoid problems in the future, should we get some other
+                // cdata to examine (usually whitespace stuff). 
+                CurrentArray.getDataCube().setStartByte(new Integer(0));
+             }
+
              if (CurrentArray.getDataCube().getEndByte() != null) 
+             {
                 endByte = CurrentArray.getDataCube().getEndByte().intValue();
+                // for the same reasons above for startByte, we set endByte to null
+                CurrentArray.getDataCube().setEndByte(null);
+             }
 
               // The first method is the 'old' way.
               // If you uncomment it  be sure to uncomment line that looks like:
