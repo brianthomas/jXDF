@@ -7,11 +7,16 @@
 	this package "BETA"
         ------------------------------------------------------------
 
+        - implement new exponential fields.
+
+        - fix ErroredValue to new DTD standard (check Perl Code).
+
         - check that notesEndElementHandlerFunc is finished (?)
 
         - readId/readIdRef not quite working, looks like deep clone issue with/DataIOStyle class.
 
         - correct href handling. Use entities to read in the files. 
+          Bring into line with Perl package Href Class.
 
 	- Impliment octal/hex data read/write in SaxDocHandler.
 
