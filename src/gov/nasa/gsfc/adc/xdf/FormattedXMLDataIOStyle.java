@@ -54,9 +54,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public FormattedXMLDataIOStyle (ArrayInterface parentArray)
   {
-    this.parentArray = parentArray;
-    init();
-
+     super(parentArray);
   }
 
   /**  This constructor takes a Java Hashtable as an initializer of
@@ -66,15 +64,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
     */
   public FormattedXMLDataIOStyle ( ArrayInterface parentArray, Hashtable InitXDFAttributeTable )
   {
-
-    this.parentArray = parentArray;
-
-    // init the XML attributes (to defaults)
-    init();
-
-    // init the value of selected XML attributes to HashTable values
-    hashtableInitXDFAttributes(InitXDFAttributeTable);
-
+     super(parentArray,InitXDFAttributeTable);
   }
 
   //
@@ -129,6 +119,23 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   }
 
 
+   /**deep copy of this FormattedXMLDataIOStyle object
+    */
+  public Object clone () throws CloneNotSupportedException {
+    FormattedXMLDataIOStyle cloneObj = (FormattedXMLDataIOStyle) super.clone();
+    synchronized (formatCommandList) {
+      synchronized (cloneObj.formatCommandList) {
+        int stop = formatCommandList.size();
+        cloneObj.formatCommandList = Collections.synchronizedList(new ArrayList(stop));
+        for (int i = 0; i <stop; i++) {
+          Object obj = formatCommandList.get(i) ;
+            cloneObj.formatCommandList.add(((BaseObject) obj).clone());
+        }
+        return cloneObj;
+      } //synchronize
+    } //synchronize
+  }
+
   //
   // Protected Methods
   //
@@ -160,15 +167,21 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
         }
      }
 
+     if (Specification.getInstance().isPrettyXDFOutput()) 
+              writeOut(outputstream, Constants.NEW_LINE);
+
+     String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
+
      //write out nodes in formatCommandList
      synchronized (formatCommandList) {
         int stop = formatCommandList.size();
         for (int i = 0; i <stop; i++) {
-           if (Specification.getInstance().isPrettyXDFOutput()) {
-              writeOut(outputstream, Constants.NEW_LINE);
-              writeOut(outputstream, indent);
-           }
-           ((XMLDataIOStyle) formatCommandList.get(i)).specificIOStyleToXDF(outputstream, indent);
+           // if (Specification.getInstance().isPrettyXDFOutput()) {
+           //   writeOut(outputstream, Constants.NEW_LINE);
+           //   writeOut(outputstream, indent);
+          // }
+           // ((XMLDataIOStyle) formatCommandList.get(i)).specificIOStyleToXDF(outputstream, indent);
+           ((BaseObject) formatCommandList.get(i)).toXMLOutputStream(outputstream, newindent);
         }
      } // end formatCommandList sync 
 
@@ -176,33 +189,25 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
      while(numberOfAxes-- > 0) 
      {
         if (Specification.getInstance().isPrettyXDFOutput()) {
-           writeOut(outputstream, Constants.NEW_LINE);
            // peel off some indent
            indent = indent.substring(0,indent.length() - 
                           Specification.getInstance().getPrettyXDFOutputIndentation().length());
            writeOut(outputstream, indent);
         }
         writeOut(outputstream, "</"+UntaggedInstructionNodeName+">");
+        if (Specification.getInstance().isPrettyXDFOutput()) {
+           writeOut(outputstream, Constants.NEW_LINE);
+        }
      }
 
   }
-
 
 
   //
   // Private Methods
   //
 
-  /** special method used by constructor methods to
-      convienently build the XML attribute list for a given class.
-   */
-  protected void init()
-  {
-
-     // super.init(); // DONT do this 
-
-  }
-
+/*
   private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) {
     //base condition
     if (which > stop) {
@@ -239,27 +244,19 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
        writeOut(outputstream, "</" + UntaggedInstructionNodeName + ">");
     }
    }
-   /**deep copy of this FormattedXMLDataIOStyle object
-    */
-   public Object clone () throws CloneNotSupportedException {
-    FormattedXMLDataIOStyle cloneObj = (FormattedXMLDataIOStyle) super.clone();
-    synchronized (formatCommandList) {
-      synchronized (cloneObj.formatCommandList) {
-        int stop = formatCommandList.size();
-        cloneObj.formatCommandList = Collections.synchronizedList(new ArrayList(stop));
-        for (int i = 0; i <stop; i++) {
-          Object obj = formatCommandList.get(i) ;
-            cloneObj.formatCommandList.add(((BaseObject) obj).clone());
-        }
-        return cloneObj;
-      } //synchronize
-    } //synchronize
-   }
+*/
+
+
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/05/10 21:16:10  thomas
+ * changes related to inheritance. call super in constructor.
+ * FormattedIO objects arent type XMLDataIOSTYLE!!
+ * changed to make them BaseObject.
+ *
  * Revision 1.13  2001/05/04 20:23:16  thomas
  * Added Interface stuff.
  *
