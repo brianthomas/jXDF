@@ -171,58 +171,53 @@ public abstract class XMLDataIOStyle extends BaseObject {
                                   String indent
                                 )
   {
+    boolean niceOutput = sPrettyXDFOutput;
     String myIndent;
-    boolean niceOutput = super.sPrettyXDFOutput;
-    if (indent !=null) {
+    if (indent!=null)
       myIndent = indent;
-    }
     else
       myIndent = "";
-    String moreIndent = super.sPrettyXDFOutputIndentation;
 
+    String moreIndent = myIndent + sPrettyXDFOutputIndentation;
+
+    if (niceOutput)
+      writeOut(outputstream, myIndent);
 
     //open the read block
-    if (niceOutput)
-      writeOut(outputstream, myIndent);
-    writeOut(outputstream, "<"+classXDFNodeName + ">");
-    if (niceOutput)
-      writeOut(outputstream, Constants.NEW_LINE);
+    writeOut(outputstream, "<read");
 
-    String nextIndent = myIndent + moreIndent;
-    List indents = new ArrayList();
-    List axisList = getParentArray().getAxisList();
-    String axisId;
-    for (int i = 0; i< axisList.size(); i++) {
-      axisId = ((AxisInterface)axisList.get(i)).getAxisId();
-      indents.add(nextIndent);
-      if (niceOutput)
-        writeOut(outputstream, nextIndent);
-      writeOut(outputstream,"<"+UntaggedInstructionNodeName + "axisIdRef = \"" + axisId + "\">");
-      if (niceOutput)
-        writeOut(outputstream, Constants.NEW_LINE);
-      nextIndent += moreIndent;
+    //get attribute info
+     Hashtable xmlInfo = getXMLInfo();
+
+    //write out attributes
+
+    ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
+    synchronized(attribs) {  //sync, prevent the attribs' structure be changed
+      int stop = attribs.size();
+      for (int i = 0; i < stop; i++) {
+        Hashtable item = (Hashtable) attribs.get(i);
+        writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
+      }
     }
-    //now dump ourselves here using the trusty generic method
-    super.toXDFOutputStream(outputstream, null, nextIndent);
+    writeOut(outputstream, ">");
 
-    //close the instruction
-    for (int i = indents.size()-1; i>=0; i++) {
-      if (niceOutput)
-        writeOut(outputstream, (String) indents.get(i));
-      writeOut(outputstream, "</" + UntaggedInstructionNodeName + ">");
-      if (niceOutput)
-        writeOut(outputstream, Constants.NEW_LINE);
+    //specific tailoring for childObj: Tagged, Delimited, Formated
+    specificIOStyleToXDF(outputstream, moreIndent);
 
+     //close the read block
+    if (niceOutput) {
+      writeOut(outputstream, Constants.NEW_LINE);
+      writeOut(outputstream, indent);
     }
 
-    //close the read block
-    if (niceOutput)
-      writeOut(outputstream, myIndent);
-    writeOut(outputstream, "<//"+classXDFNodeName + ">");
-    if (niceOutput)
-      writeOut(outputstream, Constants.NEW_LINE);
+     writeOut(outputstream, "</read>");
+    if (niceOutput) {
+      writeOut(outputstream,Constants.NEW_LINE);
+     }
 
   }
+
+  protected abstract void specificIOStyleToXDF(OutputStream out, String indent);
 
   /** getReadAxisOrder:
    * Retrieve the order in which the axis will be read in/written out.
@@ -241,13 +236,14 @@ public abstract class XMLDataIOStyle extends BaseObject {
     return readList;
   }
 
-
-
-
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/10/31 21:45:13  kelly
+ * minor fix to *toXDF*, the read opening/closing node is handled by
+ * XMLDataIOSytle now.  -k.z.
+ *
  * Revision 1.4  2000/10/30 18:17:01  kelly
  * Axis and FieldAxis now share common interface.  -k.z.
  *

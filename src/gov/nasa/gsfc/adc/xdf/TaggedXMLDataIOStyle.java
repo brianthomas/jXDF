@@ -98,42 +98,12 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
     return tags;
    }
 
-   public void toXDFOutputStream ( OutputStream outputstream,
-                                  Hashtable XMLDeclAttribs,
-                                  String indent
-                                )
+  //
+  //PROTECTED Methods
+  //
+  protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
   {
-    boolean niceOutput = super.sPrettyXDFOutput;
-    String myIndent;
-    if (indent!=null)
-      myIndent = indent;
-    else
-      myIndent = "";
-
-    String moreIndent = myIndent + super.sPrettyXDFOutputIndentation;
-
-    if (niceOutput)
-      writeOut(outputstream, myIndent);
-
-    //open the read block
-    writeOut(outputstream, "<"+classXDFNodeName);
-
-    //get attribute info
-     Hashtable xmlInfo = getXMLInfo();
-
-    //write out attributes
-
-    ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
-    synchronized(attribs) {  //sync, prevent the attribs' structure be changed
-      int stop = attribs.size();
-      for (int i = 0; i < stop; i++) {
-        Hashtable item = (Hashtable) attribs.get(i);
-        writeOut(outputstream, " "+ item.get("name") + "=\"" + item.get("value") + "\"");
-      }
-    }
-    writeOut(outputstream, ">");
-    if (niceOutput)
-      writeOut(outputstream, Constants.NEW_LINE);
+    boolean niceOutput = sPrettyXDFOutput;
 
     //write out the tags info
     String[] tags = getAxisTags();
@@ -141,34 +111,21 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
     String axisId;
     String tag;
     int stop = axisList.size();
+
     synchronized (axisList) {
       for (int i = 0; i <stop; i++) {
         axisId = ((AxisInterface) axisList.get(i)).getAxisId();
         tag = tags[i];
         if (niceOutput) {
-          writeOut(outputstream, moreIndent);
+          writeOut(outputstream, Constants.NEW_LINE);
+          writeOut(outputstream, indent);
         }
         writeOut(outputstream, "<" + TagToAxisNodeName + " axisIdRef=\"" + axisId + "\"" + " tag = \"" + tag + "\"/>");
-        if (niceOutput) {
-          writeOut(outputstream,Constants.NEW_LINE);
-        }
+
       }
     }
-
-    //close the read block
-    if (niceOutput) {
-      writeOut(outputstream,indent);
-     }
-     writeOut(outputstream, "</"+classXDFNodeName+">");
-    if (niceOutput) {
-      writeOut(outputstream,Constants.NEW_LINE);
-     }
-
   }
 
-   //
-   //PROTECTED Methods
-   //
 
    /**removeAxsiTag: Remove an axis tag from the tag hash. This should be PROTECTED
     * and occur only when axis is being removed (ie available to array obj only).
@@ -183,6 +140,10 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2000/10/31 21:44:39  kelly
+ * minor fix to *toXDF*, the read opening/closing node is handled by
+ * XMLDataIOSytle now.  -k.z.
+ *
  * Revision 1.4  2000/10/30 18:17:38  kelly
  * Axis and FieldAxis now share common interface -k.z.
  *
