@@ -166,9 +166,14 @@ public class Conversion extends BaseObject {
      return removeFromList(index, getComponentList(), COMPONENTLIST_XML_ATTRIBUTE_NAME);
   }
 
-  public Number evaluate (Number value) {
+  public double evaluate (double value) {
      //NOT IMPLEMENTED YET
-      return (Number) new Integer("0");
+     return value;
+  }
+
+  public Double evaluate (Double value) {
+     //NOT IMPLEMENTED YET
+     return value;
   }
 
   //
@@ -182,7 +187,7 @@ public class Conversion extends BaseObject {
   {
 
 
-     resetAttributes();
+     super.init();
 
      classXDFNodeName = "conversion";
 
