@@ -64,7 +64,6 @@ public class DataCube extends BaseObject {
 
    private int dimension = 0;;
    private Array parentArray;
-   private boolean hasMoreData;
 
    // should be hex for faster comparison?
    private int DOUBLE_DATA_TYPE = 0;
@@ -774,8 +773,7 @@ public class DataCube extends BaseObject {
       else 
           outputWriter.write(">");  //end of opening code
   
-      Locator currentLocator = parentArray.createLocator();
-  
+      // Locator currentLocator = parentArray.createLocator();
       // List axisList = parentArray.getAxes();
       List axisList = readObj.getIOAxesOrder();
 
@@ -878,8 +876,10 @@ public class DataCube extends BaseObject {
                }
             }
 
+            Locator taggedLocator = parentArray.createLocator();
+
             writeTaggedData( dataOutputWriter,
-                             currentLocator,
+                             taggedLocator,
                              indent,
                              axisLength,
                              tags,
@@ -908,20 +908,23 @@ public class DataCube extends BaseObject {
          {
    
             if (readObj instanceof DelimitedXMLDataIOStyle) {
-                writeDelimitedData( dataOutputWriter, currentLocator,
+                writeDelimitedData( dataOutputWriter,
                                     (DelimitedXMLDataIOStyle) readObj,
                                     fastestAxis, NoDataValues,
+                                    dataFormat,
+                                    numOfBytes,
+                                    pattern,
+                                    negExponentialPattern,
+                                    endian,
+                                    intFlag,
                                     writeHrefAttribute ? false : true
                                    );
      
             }
             else {
              writeFormattedData(  dataOutputWriter,
-                                  currentLocator,
                                   (FormattedXMLDataIOStyle) readObj,
-                                  fastestAxis,
                                   NoDataValues,
-                                  nrofDataFormats,
                                   dataFormat,
                                   numOfBytes,
                                   pattern,
@@ -1217,6 +1220,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
     // int nrofNoDataValues = noDataValues.length;
 
     String tag = (String) tags[whichTag];
+    boolean hasFieldAxis = parentArray.hasFieldAxis();
 
     if (Specification.getInstance().isPrettyXDFOutput()) {
       indent += Specification.getInstance().getPrettyXDFOutputIndentation();
@@ -1237,6 +1241,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
 	  outputWriter.write( indent + Specification.getInstance().getPrettyXDFOutputIndentation());
 	}
 
+        // lets write out one row of data w/out newlines
 	int fastestAxisLength = fastestAxis.getLength();
 	int dataNum = 0;
 	while (dataNum < fastestAxisLength) {
@@ -1264,11 +1269,11 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                 outputWriter.write("/>");
 	  }
 
-	  dataNum ++;
+	  dataNum++;
 	  locator.next();
 
           // advance the DataFormat to be used  
-          if(nrofDataFormats > 1 && (whichTag+1) == whichTagIsFieldAxis )
+          if(hasFieldAxis && (whichTag+1) == whichTagIsFieldAxis )
           {
              currentDataFormat++;
              if ( currentDataFormat == nrofDataFormats)
@@ -1283,7 +1288,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
 
 	outputWriter.write("</" + tag+ ">");
 
-        if(nrofDataFormats > 1 && whichTag == whichTagIsFieldAxis )
+        if(hasFieldAxis && whichTag == whichTagIsFieldAxis )
         {
            currentDataFormat++;
            if ( currentDataFormat == nrofDataFormats)
@@ -1307,7 +1312,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                          whichTagIsFieldAxis );
 
         // advance the DataFormat to be used  
-        if(nrofDataFormats > 1 && whichTag == whichTagIsFieldAxis )
+        if(hasFieldAxis && whichTag == whichTagIsFieldAxis )
         {
            currentDataFormat++;
            if ( currentDataFormat == nrofDataFormats)
@@ -1326,39 +1331,61 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
    *
    */
   private void writeDelimitedData(  Writer outputWriter,
-                                    Locator locator,
                                     DelimitedXMLDataIOStyle readObj,
                                     AxisInterface fastestAxis, 
                                     String[] noDataValues,
+                                    DataFormat[] dataFormat,
+                                    int[] numOfBytes,
+                                    String[] pattern,
+                                    String[] negExponentialPattern,
+                                    String endian,
+                                    String[] intFlag,
                                     boolean writeCDATAStatement
                                   ) 
   throws java.io.IOException
   {
 
-    int nrofNoDataValues = noDataValues.length;
+    // int nrofNoDataValues = noDataValues.length;
+    Locator locator = parentArray.createLocator();
+
+    int lastFieldIndex = 0;
+    boolean hasFieldAxis = parentArray.hasFieldAxis();
+    FieldAxis fieldAxis = null;
+    if (hasFieldAxis)
+       fieldAxis = parentArray.getFieldAxis();
 
     String delimiter = readObj.getDelimiter();
     String recordTerminator = readObj.getRecordTerminator();
+
+    // safety
+    if (recordTerminator == null)
+       recordTerminator = delimiter;
+
     int fastestAxisLength = fastestAxis.getLength();
-    int dataNum = 0;
 
     if(writeCDATAStatement) 
        outputWriter.write("<![CDATA[");
 
-    do {
-      dataNum ++;
+    // the data loop
+    int dataNum = 0;
+    while (locator.hasNext())
+    {
+
       try {
         
-         outputWriter.write(getStringData(locator));
+          outputWriter.write ( getFormattedDataCell ( dataFormat[lastFieldIndex],
+                                                      numOfBytes[lastFieldIndex],
+                                                      pattern[lastFieldIndex],
+                                                      negExponentialPattern[lastFieldIndex],
+                                                      endian,
+                                                      intFlag[lastFieldIndex],
+                                                      true,
+                                                      locator )
+                              );
 
       } catch (NoDataException e) {  //double check, a bug here, "yes" is already printed
 
-         // sloppy algorithm as a result of clean up after Kelly 
-         String noData;
-         if (nrofNoDataValues > 1)
-             noData = noDataValues[locator.getAxisIndex(fastestAxis)];
-         else
-             noData = noDataValues[0];
+         String noData = noDataValues[lastFieldIndex];
 
          if (noData == null) {
             if(readObj.getRepeatable().equals("yes"))
@@ -1372,14 +1399,30 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
          }
       }
 
-      //write out delimiter anyway
-      outputWriter.write(delimiter);
-      if (dataNum == fastestAxisLength) {
-        outputWriter.write(recordTerminator);
-        dataNum = 0;
-      }
+       // advance our counters
+       dataNum++;
+       locator.next();
+
+       // write the record terminator when we reach end of the fastest axis
+       if (dataNum == fastestAxisLength) {
+          outputWriter.write(recordTerminator);
+          dataNum = 0;
+       } else { 
+          // write out delimiter anyway
+          outputWriter.write(delimiter);
+       }
+
+       // advance the DataFormat to be used only if we are on a new field
+       if(hasFieldAxis)
+       {
+          int currentFieldIndex = locator.getAxisIndex(fieldAxis);
+          if (currentFieldIndex != lastFieldIndex)
+          {
+             lastFieldIndex = currentFieldIndex;
+          }
+       }
+
     }
-    while (locator.next());
 
     if (writeCDATAStatement) 
        outputWriter.write("]]>");
@@ -1387,24 +1430,28 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
 
   /** Write formatted data
    */
-   private void writeFormattedData(Writer outputWriter,
-                                   Locator locator,
-                                   FormattedXMLDataIOStyle readObj,
-                                   AxisInterface fastestAxis,
-                                   String[] noDataValues,
-                                   int nrofDataFormats,
-                                   DataFormat[] dataFormat,
-                                   int[] numOfBytes,
-                                   String[] pattern,
-                                   String[] negExponentialPattern,
-                                   String endian,
-                                   String[] intFlag, 
-                                   boolean writeCDATAStatement 
+   private void writeFormattedData( Writer outputWriter,
+                                    FormattedXMLDataIOStyle readObj,
+                                    String[] noDataValues,
+                                    DataFormat[] dataFormat,
+                                    int[] numOfBytes,
+                                    String[] pattern,
+                                    String[] negExponentialPattern,
+                                    String endian,
+                                    String[] intFlag, 
+                                    boolean writeCDATAStatement 
                                   )
    throws java.io.IOException
    {
 
-      int nrofNoDataValues = noDataValues.length;
+      // int nrofNoDataValues = noDataValues.length;
+      Locator locator = parentArray.createLocator();
+
+      int lastFieldIndex = 0;
+      boolean hasFieldAxis = parentArray.hasFieldAxis(); 
+      FieldAxis fieldAxis = null;
+      if (hasFieldAxis) 
+          fieldAxis = parentArray.getFieldAxis();
 
       // print opening CDATA statement
       if (writeCDATAStatement) 
@@ -1418,44 +1465,30 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
         List commands = readObj.getFormatCommands(); // returns expanded list (no repeat cmds) 
         int nrofCommands = commands.size();
         int currentCommand = 0;
-        int currentDataFormat = 0;
 
         // loop thru all of the dataCube until finished with all data and commands 
-        boolean atEndOfDataCube = false;
-        boolean backToStartOfDataCube = false;
-        while (!backToStartOfDataCube)
+        while (locator.hasNext())
         { 
 
              FormattedIOCmd command = (FormattedIOCmd) commands.get(currentCommand);
 
-             if(atEndOfDataCube && locator.getAxisIndex(fastestAxis) == 0) 
-                 backToStartOfDataCube = true;
-
              if (command instanceof ReadCellFormattedIOCmd)
              {
 
-                if (backToStartOfDataCube) break; // dont bother, we'd be re-printing data 
-
                 try {
-                   outputWriter.write ( getFormattedDataCell ( dataFormat[currentDataFormat],
-                                                               numOfBytes[currentDataFormat],
-                                                               pattern[currentDataFormat],
-                                                               negExponentialPattern[currentDataFormat],
+                   outputWriter.write ( getFormattedDataCell ( dataFormat[lastFieldIndex],
+                                                               numOfBytes[lastFieldIndex],
+                                                               pattern[lastFieldIndex],
+                                                               negExponentialPattern[lastFieldIndex],
                                                                endian,
-                                                               intFlag[currentDataFormat],
+                                                               intFlag[lastFieldIndex],
                                                                true,
                                                                locator )  
                                       );
                 } catch (NoDataException e) {
 
                     // no data here, hurm. Print the noDataValue. 
-                    // sloppy algorithm as a result of clean up after Kelly 
-                    String noData;
-
-                    if (nrofNoDataValues > 1) 
-                        noData = noDataValues[locator.getAxisIndex(fastestAxis)];
-                    else 
-                        noData = noDataValues[0];
+                    String noData = noDataValues[lastFieldIndex];
 
                     if (noData != null) { 
                         outputWriter.write( noData);
@@ -1468,12 +1501,14 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                 // advance the data location 
                 locator.next();
 
-                // advance the DataFormat to be used  
-                if(nrofDataFormats > 1)
+                // advance the DataFormat to be used only if we are on a new field
+                if(hasFieldAxis)
                 {
-                   currentDataFormat++;
-                   if ( currentDataFormat == nrofDataFormats)
-                      currentDataFormat = 0;
+                   int currentFieldIndex = locator.getAxisIndex(fieldAxis);
+                   if (currentFieldIndex != lastFieldIndex) 
+                   {
+                      lastFieldIndex = currentFieldIndex;
+                   }
                 }
 
              }
@@ -1497,9 +1532,6 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                    currentCommand = 0;
                 }
              }
-
-             if(!atEndOfDataCube && !locator.hasNext()) atEndOfDataCube = true;
-
 
          } // end of while loop 
 
@@ -1848,6 +1880,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.47  2001/09/18 21:40:45  thomas
+  * I saw the light and yanked the 'fastestAxis' code in writeFormatted/Delimited data as per earlier stuff in tagged data writes. We should be thinking only in terms of the field axis when we need to determine if a new dataformat is needed for the next datacell we are writing. These changes should make it much more likely that the higher dimensional data will write out correctly (but it still needs to be tested!)
+  *
   * Revision 1.46  2001/09/18 19:35:54  thomas
   * subtracted unused code
   *
