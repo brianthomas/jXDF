@@ -1,9 +1,16 @@
+
 // XDF Array Class
 // CVS $Id$
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.ArrayList;
 
 // Array.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -71,21 +78,21 @@ import java.util.*;
    * arrayId
    * A scalar string holding the array Id of this Array.
    * axisList--
-   * a SCALAR (ARRAY REF) of the list of L<XDF::Axis> objects held within this array.
+   * a SCALAR (ARRAY REF) of the list of Axis> objects held within this array.
    * paramList--
-   * reference of the list of L<XDF::Parameter> objects held within in this Array.
+   * reference of the list of Parameter> objects held within in this Array.
    * noteList--
-   * reference of the list of L<XDF::Note> objects held within this object.
+   * reference of the list of Note> objects held within this object.
    * dataCube
-   * object ref of the L<XDF::DataCube> object which is a matrix holding the mathematical data
+   * object ref of the DataCube> object which is a matrix holding the mathematical data
    * of this array.
    * dataFormat
-   * object ref of the L<XDF::DataFormat> object.
+   * object ref of the DataFormat> object.
    * units
-   * object ref of the L<XDF::Units> object of this array. The XDF::Units object
+   * object ref of the Units> object of this array. The XDF::Units object
    * is used to hold the XDF::Unit objects.
    * fieldAxis
-   * OBJECT REF of the L<XDF::FieldAxis> object.
+   * OBJECT REF of the FieldAxis> object.
    */
 
   public class Array extends BaseObject{
@@ -103,7 +110,7 @@ import java.util.*;
   protected boolean hasFieldAxis = false;
 
   //
-  // Constructor and related methods
+  // Constructors
   //
 
   /** The no argument constructor.
@@ -129,42 +136,6 @@ import java.util.*;
 
   }
 
-  /** init -- special private method used by constructor methods to
-   *  conviently build the XML attribute list for a given class.
-   */
-  private void init()
-  {
-
-    classXDFNodeName = "array";
-
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"noteList");
-    attribOrder.add(0,"dataCube");
-    attribOrder.add(0,"xmlDataIOStyle");
-    attribOrder.add(0, "axisList");
-    attribOrder.add(0, "dataFormat");
-    attribOrder.add(0, "units");
-    attribOrder.add(0, "paramList");
-    attribOrder.add(0,"description");
-    attribOrder.add(0,"name");
-
-    //set up the attribute hashtable key with the default initial value
-    attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("dataCube", new XMLAttribute(new DataCube(this), Constants.OBJECT_TYPE));
-
-
-    //default is TaggedXMLDataIOStyle, xmlDataOStyle.parentArray = this
-    attribHash.put("xmlDataIOStyle", new XMLAttribute(new TaggedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
-    attribHash.put("dataFormat", new XMLAttribute(null, Constants.OBJECT_TYPE));
-    attribHash.put("units", new XMLAttribute(null, Constants.OBJECT_TYPE));
-    attribHash.put("axisList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("paramList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
-
-  };
-
   //
   //Get/Set Methods
   //
@@ -172,10 +143,9 @@ import java.util.*;
   /**setName: set the *name* attribute
    * @return: the current *name* attribute
    */
-  public String setName (String strName)
+  public void setName (String strName)
   {
-    return (String) ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
-
+     ((XMLAttribute) attribHash.get("name")).setAttribValue(strName);
   }
 
   /**getName
@@ -189,9 +159,9 @@ import java.util.*;
    /**setDescription: set the *description* attribute
    * @return: the current *description* attribute
    */
-  public String setDescription (String strDesc)
+  public void setDescription (String strDesc)
   {
-    return (String) ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
+     ((XMLAttribute) attribHash.get("description")).setAttribValue(strDesc);
   }
 
    /**getDescription
@@ -204,8 +174,8 @@ import java.util.*;
   /**setParamList: set the *paramList* attribute
    * @return: the current *paramList* attribute
    */
-  public List setParamList(List param) {
-    return (List)((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
+  public void setParamList(List param) {
+     ((XMLAttribute) attribHash.get("paramList")).setAttribValue(param);
   }
 
   /**getParamList
@@ -218,9 +188,9 @@ import java.util.*;
    /**setUnits: set the *units* attribute
    * @return: the current *units* attribute
    */
-  public Units setUnits (Units units)
+  public void setUnits (Units units)
   {
-    return (Units) ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
+     ((XMLAttribute) attribHash.get("units")).setAttribValue(units);
   }
 
   /**getUnits
@@ -234,15 +204,14 @@ import java.util.*;
   /**setDataFormat: Sets the data format *type* for this array (an XDF::DataFormat object
    * is held in the attribute $obj->dataFormat, its type is accessible
    * Takes a SCALAR object reference as its argument. Allowed objects to pass
-   * to this method include L<XDF::BinaryIntegerDataFormat>, L<XDF::BinaryFloatDataFormat>,
-   * L<XDF::ExponentDataFormat>, L<XDF::FixedDataFormat>, L<XDF::IntegerDataFormat>,
-   * or L<XDF::StringDataFormat>.
+   * to this method include BinaryIntegerDataFormat>, BinaryFloatDataFormat>,
+   * ExponentDataFormat>, FixedDataFormat>, IntegerDataFormat>,
+   * or StringDataFormat>.
    * RETURNS an object reference
   */
-  public DataFormat setDataFormat(DataFormat dataFormat)
+  public void setDataFormat(DataFormat dataFormat)
   {
-    return (DataFormat) ((XMLAttribute) attribHash.get("dataFormat")).setAttribValue(dataFormat);
-
+     ((XMLAttribute) attribHash.get("dataFormat")).setAttribValue(dataFormat);
   }
 
   /**getDataFormat
@@ -256,8 +225,8 @@ import java.util.*;
    /**setAxisList: set the *axisList* attribute
    * @return: the current *axisList* attribute
    */
-  public List setAxisList(List axis) {
-    return (List)((XMLAttribute) attribHash.get("axisList")).setAttribValue(axis);
+  public void setAxisList(List axis) {
+     ((XMLAttribute) attribHash.get("axisList")).setAttribValue(axis);
   }
 
   /**getAxisList
@@ -271,15 +240,22 @@ import java.util.*;
    * note we have to nsure that _parentArray is properly updated
    * @return: the current *xmlDataIOStyle* attribute
    */
-  public XMLDataIOStyle setXMLDataIOStyle(XMLDataIOStyle xmlDataIOStyle)
+  public void setXMLDataIOStyle(XMLDataIOStyle xmlDataIOStyle)
   {
-    if (xmlDataIOStyle == null) {
-      Log.error("in Array.setXMLDataIOStyle(), param passed in is null");
-      Log.error("xmlDataIOStyle attribute not updated");
-      return getXMLDataIOStyle();
-    }
-    xmlDataIOStyle.setParentArray(this);  //set the parent array to this object
-    return (XMLDataIOStyle) ((XMLAttribute) attribHash.get("xmlDataIOStyle")).setAttribValue(xmlDataIOStyle);
+
+     if (xmlDataIOStyle == null) 
+     {
+        Log.error("in Array.setXMLDataIOStyle(), param passed in is null, ");
+        Log.errorln("xmlDataIOStyle attribute not updated");
+        return; // bail 
+     }
+
+     //set the parent array to this object
+     xmlDataIOStyle.setParentArray(this);  
+
+     // set the xmlattribute
+     ((XMLAttribute) attribHash.get("xmlDataIOStyle")).setAttribValue(xmlDataIOStyle);
+
   }
 
   /**getXMLDataIOStyle
@@ -290,69 +266,62 @@ import java.util.*;
     return (XMLDataIOStyle) ((XMLAttribute) attribHash.get("xmlDataIOStyle")).getAttribValue();
   }
 
-  /**setDataCube: set the *dataCube* attribute
+  /* setDataCube: set the *dataCube* attribute
    * @return: the current *dataCube* attribute
    * double check, we should not allow user to set the datacube
    */
-  public DataCube setDataCube(DataCube dataCube)
+// 
+// Hurm.. This is a dangerous method. All sorts of array meta-data arent updated
+// properly when this is used. Commenting it out for now. -b.t.
+//
+/*
+  public void setDataCube(DataCube dataCube)
   {
-    return (DataCube) ((XMLAttribute) attribHash.get("dataCube")).setAttribValue(dataCube);
+     ((XMLAttribute) attribHash.get("dataCube")).setAttribValue(dataCube);
   }
+*/
 
-  /**getDataCube
-   * @return: the current *DataCube* attribute
+  /** getDataCube
+      @return: the current *DataCube* attribute
    */
   public DataCube getDataCube()
   {
     return (DataCube) ((XMLAttribute) attribHash.get("dataCube")).getAttribValue();
   }
 
-  /**setNoteList: set the *noteList* attribute
-   * @return: the current *noteList* attribute
+  /** Set the *noteList* attribute
+      @return: the current *noteList* attribute
    */
-  public List setNoteList(List note) {
-    return (List)((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
+  public void setNoteList(List note) {
+     ((XMLAttribute) attribHash.get("noteList")).setAttribValue(note);
   }
 
-  /**getNoteList
-   * @return: the current *noteList* attribute
+   /**getNoteList
+      @return: the current *noteList* attribute
    */
-  public List getNoteList() {
-    return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
-  }
+   public List getNoteList() {
+      return (List) ((XMLAttribute) attribHash.get("noteList")).getAttribValue();
+   }
 
-
-  /** setParamGroupOwnedHash
-  */
-  public Set setParamGroupOwnedHash(Set paramGroup)
-  {
-    paramGroupOwnedHash = paramGroup;
-    return paramGroupOwnedHash;
-  }
-
-  /** getParamGroupOwnedHash
-  */
-  public Set getParamGroupOwnedHash()
-  {
-    return paramGroupOwnedHash;
-  }
-
-   /**getDimension: set the dimension of the L<XDF::DataCube> held within this Array.
+   /**getDimension: set the dimension of the DataCube> held within this Array.
    */
    public int getDimension() {
      return getDataCube().getDimension();
    }
 
-   /**creatLocator: Create one instance of an L<XDF::Locator> object for this array.
+   //
+   // Other Public Methods
+   //
+
+   /**creatLocator: Create one instance of an Locator> object for this array.
     *
     */
    public Locator createLocator() {
-    Locator locatorObj = new Locator(this);
-
-    return locatorObj;
+      Locator locatorObj = new Locator(this);
+      return locatorObj;
    }
 
-   /**addParamGroup: Insert an XDF::ParameterGroup object into this object.
+   /** addParamGroup: Insert an XDF::ParameterGroup object into this object.
    * @param: ParameterGroup to be added
    * @return:an XDF::ParameterGroup object reference on success, null on failure.
    */
@@ -379,7 +348,6 @@ import java.util.*;
     }
     return paramGroupOwnedHash.remove(group);
   }
-
 
    /** addAxis: insert an XDF::Axis object into the list of axises held by this Array object
    * @param: XDF::Axis to be added
@@ -425,7 +393,7 @@ import java.util.*;
     return isRemoveSuccess;
   }
 
-  /**addUnit: Insert an XDF::Unit object into the L<XDF::Units> object
+  /**addUnit: Insert an XDF::Unit object into the Units> object
    * held in this object.
    * @param: Unit to be added
    * @return: an XDF::Unit object if successfull, null if not.
@@ -534,7 +502,6 @@ import java.util.*;
   }
 
 
-
    /**removeNote: removes an XDF::Note object from the list of notes in this Array object
    * @param: list index number
    * @return: true on success, false on failure
@@ -551,14 +518,14 @@ import java.util.*;
   }
 
   /**appendData: Append the string value onto the requested datacell
-   * (via L<XDF::DataCube> LOCATOR REF).
+   * (via DataCube> LOCATOR REF).
    */
   public String  appendData (Locator locator, String strValue) throws SetDataException{
     return getDataCube().appendData(locator, strValue);
   }
 
   /** setData: Set the SCALAR value of the requested datacell
-   * (via L<XDF::DataCube> LOCATOR REF).
+   * (via DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
 
@@ -583,10 +550,10 @@ import java.util.*;
 
 
   /** setData: Set the SCALAR value of the requested datacell
-   * (via L<XDF::DataCube> LOCATOR REF).
+   * (via DataCube> LOCATOR REF).
    * Overwrites existing datacell value if any.
    */
-  public String  setData (Locator locator, String strValue) throws SetDataException{
+  public String setData (Locator locator, String strValue) throws SetDataException{
     try {
       return getDataCube().setData(locator, strValue);
     }
@@ -623,7 +590,7 @@ import java.util.*;
   }
 
   /**removeData : Remove the requested data from the indicated datacell
-   * (via L<XDF::DataCube> LOCATOR REF) in the XDF::DataCube held in this Array.
+   * (via DataCube LOCATOR REF) in the XDF::DataCube held in this Array.
    * B<NOT CURRENTLY IMPLEMENTED>.
    */
 
@@ -632,7 +599,7 @@ import java.util.*;
   }
 
  /**removeData : Remove the requested data from the indicated datacell
-   * (via L<XDF::DataCube> LOCATOR REF) in the XDF::DataCube held in this Array.
+   * (via DataCube LOCATOR REF) in the XDF::DataCube held in this Array.
    * B<NOT CURRENTLY IMPLEMENTED>.
    */
   public String  removeData (Locator locator, String strValue) {
@@ -653,7 +620,7 @@ import java.util.*;
     }
   }
   /** addFieldAxis: A convenience method (same as setFieldAxis()).
-   * Changes the L<XDF::FieldAxis> object in this Array to the indicated one.
+   * Changes the FieldAxis object in this Array to the indicated one.
    * @return: reference to fieldAxis if successful, null if not.
    */
   public FieldAxis addFieldAxis(FieldAxis fieldAxis) {
@@ -696,9 +663,45 @@ import java.util.*;
   }
 
   //
-  //PRIVATE Methods
+  // PRIVATE Methods
   //
 
+  /** a special private method used by constructor methods to
+   *  conviently build the XML attribute list for a given class.
+   */
+  private void init()
+  {
+
+    classXDFNodeName = "array";
+
+    // order matters! these are in *reverse* order of their
+    // occurence in the XDF DTD
+    attribOrder.add(0,"noteList");
+    attribOrder.add(0,"dataCube");
+    attribOrder.add(0,"xmlDataIOStyle");
+    attribOrder.add(0, "axisList");
+    attribOrder.add(0, "dataFormat");
+    attribOrder.add(0, "units");
+    attribOrder.add(0, "paramList");
+    attribOrder.add(0,"description");
+    attribOrder.add(0,"name");
+
+    //set up the attribute hashtable key with the default initial value
+    attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put("dataCube", new XMLAttribute(new DataCube(this), Constants.OBJECT_TYPE));
+
+
+    //default is TaggedXMLDataIOStyle, xmlDataOStyle.parentArray = this
+    attribHash.put("xmlDataIOStyle", new XMLAttribute(new TaggedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
+    attribHash.put("dataFormat", new XMLAttribute(null, Constants.OBJECT_TYPE));
+    attribHash.put("units", new XMLAttribute(null, Constants.OBJECT_TYPE));
+    attribHash.put("axisList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put("paramList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
+
+  };
+ 
   /**canAddAxisObjToArray: check if we can add this Axis Object to the array
    * 1- check to see that it has an id
    * 2- we SHOULD also check that the id is unique but DONT currently.
@@ -737,6 +740,11 @@ import java.util.*;
  /**
   * Modification History:
   * $Log$
+  * Revision 1.11  2000/11/02 18:06:33  thomas
+  * Updated file to have void return from set methods.
+  * Removed setParamOwnedHash and setDataCube
+  * methods. -b.t.
+  *
   * Revision 1.10  2000/10/31 21:39:06  kelly
   * --completed appendData for String data
   * --getFormatList() is returning DataFormat[] now instead of List, faster.  -k.z.
