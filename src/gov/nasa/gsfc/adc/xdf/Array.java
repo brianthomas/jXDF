@@ -813,56 +813,67 @@ import java.util.Vector;
    /**
     *  set data for a general object
     *  which can be an array of primitive object; or wrapped data
+    *  Note: we need to implement boolean type
     */
    public void setData (Locator locator, Object dataObj) 
        throws SetDataException 
    {
        String classType = dataObj.getClass().getName().trim();
-       if (classType.startsWith("[[")) {
+       if (dataObj instanceof Vector) {
+	   Vector dataVec = (Vector) dataObj;
+	    for (int i=0; i<dataVec.size(); i++)
+		setData(locator, dataVec.elementAt(i));
+       } else if (classType.startsWith("[[")) {
 	   Object [] dataArray = (Object[])dataObj;
 	   for (int i=0; i<dataArray.length; i++) {
 	       setData(locator, dataArray[i]);
 	   }
        } else if (classType.startsWith("[")) {
 	   if (dataObj instanceof byte[] )
-	       this.setData (locator, (byte[])dataObj);
+	       setData (locator, (byte[])dataObj);
 	   else if (dataObj instanceof short[] )
-	       this.setData (locator, (short[])dataObj);
+	       setData (locator, (short[])dataObj);
 	   else if (dataObj instanceof int[] )
-	       this.setData (locator, (int[])dataObj);
+	       setData (locator, (int[])dataObj);
 	   else if (dataObj instanceof long[])
-	       this.setData (locator, (long[])dataObj);
+	       setData (locator, (long[])dataObj);
 	   else if (dataObj instanceof float[])
-	       this.setData (locator, (float[])dataObj);
+	       setData (locator, (float[])dataObj);
 	   else if (dataObj instanceof double[])
-	       this.setData (locator, (double[])dataObj);
+	       setData (locator, (double[])dataObj);
 	   else if (dataObj instanceof String[])
-	       this.setData (locator, (String[])dataObj);	
+	       setData (locator, (String[])dataObj);	
 	   else {
 	       String msg = "Array: setData(): " + dataObj.getClass().getName() + " is not implemented";
 	       Log.errorln(msg);
 	       throw new SetDataException (msg);
 	   }
        } else {
-	   if (dataObj instanceof Double )
-	       this.setData (locator, (Double) dataObj);
+	   if (dataObj instanceof Short )
+	       setData (locator, (Short) dataObj);
 	   else if (dataObj instanceof Integer )
-	       this.setData (locator, (Integer) dataObj);
-	   else if (dataObj instanceof Short )
-	       this.setData (locator, (Short) dataObj);
+	       setData (locator, (Integer) dataObj);
+	   else if (dataObj instanceof Long)
+	       setData (locator, (Long) dataObj);
+	   else if (dataObj instanceof Float )
+	       setData (locator, (Float) dataObj);
+	   else if (dataObj instanceof Double )
+	       setData (locator, (Double) dataObj);
+	   else if (dataObj instanceof String)
+	       setData (locator, (String) dataObj);
 	   else {
 	       String msg = "Array: setData(): " + dataObj.getClass().getName() + " is not implemented";
 	       Log.errorln(msg);
 	       throw new SetDataException (msg);
 	   }
-       }
+       } 
    }
 
 
    /** 
-    *  set Data from adouble data array
+    *  set Data from an byte data array 
     */
-   public void setData (Locator locator, double [] numValue) 
+   public void setData (Locator locator, byte [] numValue) 
        throws SetDataException {
 
        for (int i = 0; i < numValue.length; i++) {
@@ -870,6 +881,19 @@ import java.util.Vector;
 	   locator.next();
        }
    }
+
+   /** 
+    *  set Data from an short data array 
+    */
+   public void setData (Locator locator, short [] numValue) 
+       throws SetDataException {
+
+       for (int i = 0; i < numValue.length; i++) {
+	   this.setData(locator, numValue[i]);
+	   locator.next();
+       }
+   }
+
 
    /** 
     *  set Data from an integer data array 
@@ -884,10 +908,10 @@ import java.util.Vector;
    }
 
 
-   /** 
-    *  set Data from an integer data array 
+  /** 
+    *  set Data from an long integer data array 
     */
-   public void setData (Locator locator, short [] numValue) 
+   public void setData (Locator locator, long [] numValue) 
        throws SetDataException {
 
        for (int i = 0; i < numValue.length; i++) {
@@ -896,20 +920,6 @@ import java.util.Vector;
        }
    }
 
-
-  /** 
-    *  set Data from an integer data array 
-    */
-   public void setData (Locator locator, long [] numValue) 
-       throws SetDataException {
-
-       for (int i = 0; i < numValue.length; i++) {
-	   this.setData(locator, (int) numValue[i]);
-	   locator.next();
-       }
-   }
-
-
    /** 
     *  set Data from a float data array 
     */
@@ -917,11 +927,22 @@ import java.util.Vector;
        throws SetDataException {
 
        for (int i = 0; i < numValue.length; i++) {
-	   this.setData(locator, (double) numValue[i]);
+	   this.setData(locator, numValue[i]);
 	   locator.next();
        }
    }
 
+   /** 
+    *  set Data from a double data array
+    */
+   public void setData (Locator locator, double [] numValue) 
+       throws SetDataException {
+
+       for (int i = 0; i < numValue.length; i++) {
+	   this.setData(locator, numValue[i]);
+	   locator.next();
+       }
+   }
 
    /** 
     *  set Data from a data array -- String
@@ -938,21 +959,11 @@ import java.util.Vector;
    /** Set the value of the requested datacell. 
     * Overwrites existing datacell value if any.
     */
-   public void setData (Locator locator, double numValue) 
+   public void setData (Locator locator, byte numValue) 
    throws SetDataException 
    {
       getDataCube().setData(locator, numValue);
    }
-   
-   /** Set the value of the requested datacell. 
-    * Overwrites existing datacell value if any.
-    */
-   public void setData (Locator locator, Double numValue) 
-   throws SetDataException 
-   {
-      getDataCube().setData(locator, numValue);
-   }
-
 
    /** Set the value of the requested datacell. 
     * Overwrites existing datacell value if any.
@@ -963,17 +974,6 @@ import java.util.Vector;
       getDataCube().setData(locator, numValue);
    }
 
-
-   /** Set the value of the requested datacell. 
-    * Overwrites existing datacell value if any.
-    */
-   public void setData (Locator locator, Short numValue) 
-   throws SetDataException 
-   {
-      getDataCube().setData(locator, numValue);
-   }
-
-
    /** Set the value of the requested datacell. 
     * Overwrites existing datacell value if any.
     */
@@ -983,11 +983,29 @@ import java.util.Vector;
       getDataCube().setData(locator, numValue);
    }
 
+   /** Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, long numValue) 
+   throws SetDataException 
+   {
+      getDataCube().setData(locator, numValue);
+   }
 
    /** Set the value of the requested datacell. 
     * Overwrites existing datacell value if any.
     */
-   public void setData (Locator locator, Integer numValue) 
+   public void setData (Locator locator, float numValue) 
+   throws SetDataException 
+   {
+      // DEBUG
+      getDataCube().setData(locator, (double) numValue);
+   }
+   
+   /** Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, double numValue) 
    throws SetDataException 
    {
       getDataCube().setData(locator, numValue);
@@ -1002,6 +1020,73 @@ import java.util.Vector;
          getDataCube().setData(locator, strValue);
    }
    
+   /**  Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, Byte numValue ) 
+   throws SetDataException 
+   {
+       getDataCube().setData(locator, numValue.byteValue());
+   }
+
+   /**  Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, Short numValue ) 
+   throws SetDataException 
+   {
+       getDataCube().setData(locator, numValue);
+   }
+
+ 
+   /**  Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, Integer numValue ) 
+   throws SetDataException 
+   {
+       getDataCube().setData(locator, numValue);
+   }
+
+ 
+   /**  Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, Long numValue ) 
+   throws SetDataException 
+   {
+       getDataCube().setData(locator, numValue);
+   }
+
+  
+   /**  Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, Float numValue ) 
+   throws SetDataException 
+   {
+       // Float not implemented in dataCube
+       getDataCube().setData(locator, new Double (numValue.doubleValue()));
+   }
+
+
+   /**  Set the value of the requested datacell. 
+    * Overwrites existing datacell value if any.
+    */
+   public void setData (Locator locator, Double numValue ) 
+   throws SetDataException 
+   {
+       getDataCube().setData(locator, numValue);
+   }
+
+   /**
+    * Set href object to dataCube
+    */
+   public void setHref (Entity hrefObj) 
+   {
+       getDataCube().setHref(hrefObj);
+   }
+
    /**Get the String data in the requested datacell
     */
    public String getStringData(Locator locator) 
@@ -1356,7 +1441,6 @@ import java.util.Vector;
 
    }
 
-
    // Should be hardwired w/ private variable. Only
    // updates when addAxis is called by parentArray.
    public int getShortArrayIndex (Locator locator) {
@@ -1422,6 +1506,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.40  2001/09/19 18:35:27  huang
+  * added/modified setData(); also added setHref()
+  *
   * Revision 1.39  2001/09/19 17:51:32  thomas
   * made some set*List methods deprecated
   *
