@@ -1,4 +1,5 @@
 
+
 // CVS $Id$
 
 // Group.java Copyright (C) 2000 Brian Thomas,
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
+import java.util.Iterator;
 
 /** This is an abstract class for group objects.
  */
@@ -92,7 +94,7 @@ public class Group extends BaseObject {
   }
 
   /**getName
-   * @return: the current *name* attribute
+   * @return the current *name* attribute
    */
   public String getName()
   {
@@ -107,7 +109,7 @@ public class Group extends BaseObject {
   }
 
    /**getDescription
-   * @return: the current *description* attribute
+   * @return the current *description* attribute
    */
   public String getDescription() {
     return (String) ((XMLAttribute) attribHash.get("description")).getAttribValue();
@@ -118,56 +120,62 @@ public class Group extends BaseObject {
   //
 
   /** Add an object as a member of this group.
-      @return: true if successfully adds this object as a member, false otherwise.
+      @return true if successfully adds this object as a member, false otherwise.
   */
   public Object addMemberObject (Object obj) {
-    if (obj!=null) {
-      if (memberObjHash.add(obj))
-        return obj;
-      else
-        return null;
-    }
+    if (memberObjHash.add(obj))
+      return obj;
     else
       return null;
+
   }
 
   /** Remove an object from membership in this group.
-      @return: true if successfully removes the object from membership, false otherwise.
+      @return true if successfully removes the object from membership, false otherwise.
   */
   public Object removeMemberObject (Object obj) {
-     if (obj!=null) {
-      if (memberObjHash.contains(obj))  {
-        memberObjHash.remove(obj);
-        return obj;
-      }
-      else
-        return null;
+    if (memberObjHash.contains(obj))  {
+      memberObjHash.remove(obj);
+      return obj;
     }
     else
       return null;
+
   }
 
   /** Determine if this group has passed object as a member.
-      @return: true if contains this object, false otherwise.
+      @return true if contains this object, false otherwise.
   */
   public boolean hasMemberObj (Object obj) {
-    if (obj!=null) {
-      if (memberObjHash.contains(obj)) {
-        return true;
-      }
-      else
-        return false;
+    if (memberObjHash.contains(obj)) {
+      return true;
     }
-    return false;
+    else
+      return false;
   }
+
+  public Object clone () throws CloneNotSupportedException {
+    Group cloneObj = (Group) super.clone();
+    synchronized (this.memberObjHash) {
+      synchronized (cloneObj.memberObjHash) {
+        Iterator iter = this.memberObjHash.iterator();
+        while (iter.hasNext()){
+          cloneObj.memberObjHash.add(((BaseObject) iter.next()).clone());
+        }
+      return cloneObj;
+      }
+    }
+  }
+
+
 
 }
 
 /* Modification History:
  *
- * $Log: Group.java,v 
- * Revision 1.2  2000/10/10 19:14:59  cvs 
- * Added log history section, commenting on methods 
+ * $Log: Group.java,v
+ * Revision 1.2  2000/10/10 19:14:59  cvs
+ * Added log history section, commenting on methods
  * and fixed the constructor section (added init method)
  * -b.t
  *
