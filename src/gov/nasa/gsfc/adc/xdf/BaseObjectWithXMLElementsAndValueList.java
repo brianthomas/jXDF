@@ -79,7 +79,7 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
    // Get/Set Methods
    //
 
-   protected void setValueListObj (ValueListInterface valueListObj)
+   protected void setValueListObj (ValueList valueListObj)
    {
 
       resetValueListObjects();
@@ -87,7 +87,7 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
 
    }
 
-   protected boolean addValueListObj (ValueListInterface valueListObj)
+   protected boolean addValueListObj (ValueList valueListObj)
    {
 
       if (valueListObj == null) return false;
@@ -100,7 +100,7 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
 
    /** Return the list of objects which describe the compact
      * description(s) of the value list. Each object in this list
-     * conforms to the ValueListInterface format. 
+     * inherits from the ValueList class. 
      */
    public List getValueListObjects () 
    {
@@ -218,7 +218,7 @@ public abstract class BaseObjectWithXMLElementsAndValueList extends BaseObjectWi
 
                   Iterator iter = valueListObjects.iterator();
                   while(iter.hasNext()) {
-                     ValueListInterface valueListObj = (ValueListInterface) iter.next();
+                     ValueList valueListObj = (ValueList) iter.next();
                      // first determine if groups should open or close
                      // using the first value in the values list.
                      List values = valueListObj.getValues();

@@ -282,7 +282,7 @@ implements AxisInterface
        objects).
        @deprecated You should use add/remove methods instead.
     */ 
-   public void setAxisValueList (ValueListInterface valueListObj)
+   public void setAxisValueList (ValueList valueListObj)
    {
       resetAxisValues();
       addAxisValueList(valueListObj);
@@ -343,7 +343,7 @@ implements AxisInterface
       setValueList(new ArrayList());
    }
 
-   public boolean addAxisValueList (ValueListInterface valueListObj)
+   public boolean addAxisValueList (ValueList valueListObj)
    {
 
       List values = valueListObj.getValues();

@@ -78,7 +78,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
    // Get/Set Methods
    //
 
-   protected void setValueListObj (ValueListInterface valueListObj) 
+   protected void setValueListObj (ValueList valueListObj) 
    {
 
       resetBaseValueListObjects();
@@ -86,7 +86,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
    }
 
-   protected boolean addValueListObj (ValueListInterface valueListObj) 
+   protected boolean addValueListObj (ValueList valueListObj) 
    {
 
       if (valueListObj == null) return false;
@@ -109,7 +109,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
    /** Return the list of objects which describe the compact
      * description(s) of the value list. Each object in this list
-     * conforms to the ValueListInterface format. 
+     * conforms to the ValueList format. 
      */
    public List getValueListObjects () {
       return valueListObjects;
@@ -125,7 +125,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
       cloneObj.valueListObjects = Collections.synchronizedList(new ArrayList());
       int stop = this.valueListObjects.size();
       for (int i = 0; i < stop; i++) {
-          cloneObj.valueListObjects.add( ((ValueListInterface) this.valueListObjects.get(i)).clone());
+          cloneObj.valueListObjects.add( ((ValueList) this.valueListObjects.get(i)).clone());
       }
       return cloneObj;
 
@@ -211,7 +211,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
                   Iterator iter = valueListObjects.iterator();
                   while(iter.hasNext()) {
-                     ValueListInterface valueListObj = (ValueListInterface) iter.next();
+                     ValueList valueListObj = (ValueList) iter.next();
                      // Grouping *may* differ between the values held in each ValueLists. To check we
                      // if all valueListObjects are 'kosher' we use the first value in the values 
                      // list of each ValueListObj as a reference object and compare it to all other

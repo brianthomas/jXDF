@@ -253,7 +253,7 @@ public class Parameter extends BaseObjectWithValueList {
        using those held in the passed ValueList object.
     */
        // @deprecated You should use the add/remove methods to manipulate this list.
-   public void setValueList (ValueListInterface valueListObj)
+   public void setValueList (ValueList valueListObj)
    {
       resetValues();
       addValueList(valueListObj);
@@ -294,7 +294,7 @@ public class Parameter extends BaseObjectWithValueList {
   /** Append a list of values held by the passed ValueList into this Parameter 
     * object.
     */
-   public boolean addValueList (ValueListInterface valueListObj) 
+   public boolean addValueList (ValueList valueListObj) 
    {
 
       List values = valueListObj.getValues();
