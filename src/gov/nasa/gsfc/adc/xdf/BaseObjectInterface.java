@@ -30,6 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.io.OutputStream;
 
+import org.xml.sax.AttributeList;
+
+
 /**  BaseObjectInterface aggregates the common signature of XDF derived
  *   data structures.
  */
@@ -42,6 +45,7 @@ public interface BaseObjectInterface {
    public List getAttribOrder();
 
    public void setXMLNotationHash (HashSet hash);
+   public void setXMLAttributes (AttributeList attrs);
 
    // output methods
    public void toXMLFile (String filename, Hashtable XMLDeclAttribs);
@@ -68,6 +72,9 @@ public interface BaseObjectInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/05/04 21:00:35  thomas
+ * added setXMLAttributes method.
+ *
  * Revision 1.1  2001/05/04 20:05:53  thomas
  * Initial version
  *
