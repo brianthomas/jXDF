@@ -98,7 +98,7 @@ import java.util.Vector;
    * object ref of the FieldAxis object.
    */
 
-  public class Array extends BaseObject
+  public class Array extends BaseObjectWithXMLElements implements ArrayInterface
   {
 
      //
@@ -211,7 +211,7 @@ import java.util.Vector;
    
      /** set the *lessThanValue* attribute
       */
-     public void setLessThanValue (String strDesc)
+     public void setLessThanValue (Object strDesc)
      { 
         ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      } 
@@ -219,13 +219,13 @@ import java.util.Vector;
       /*
       * @return the current *lessThanValue* attribute
       */
-     public String getLessThanValue() {
-       return (String) ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getLessThanValue() {
+       return ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      } 
    
      /** set the *lessThanOrEqualValue* attribute
       */
-     public void setLessThanOrEqualValue (String strDesc)
+     public void setLessThanOrEqualValue (Object strDesc)
      { 
         ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      } 
@@ -233,13 +233,13 @@ import java.util.Vector;
       /*
       * @return the current *lessThanOrEqualValue* attribute
       */
-     public String getLessThanOrEqualValue() {
-       return (String) ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getLessThanOrEqualValue() {
+       return ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      } 
    
      /** set the *greaterThanValue* attribute
       */
-     public void setGreaterThanValue (String strDesc)
+     public void setGreaterThanValue (Object strDesc)
      { 
         ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      } 
@@ -247,13 +247,13 @@ import java.util.Vector;
       /*
       * @return the current *greaterThanValue* attribute
       */
-     public String getGreaterThanValue() {
-       return (String) ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getGreaterThanValue() {
+       return ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      } 
    
      /** set the *greaterThanOrEqualValue* attribute
       */
-     public void setGreaterThanOrEqualValue (String strDesc)
+     public void setGreaterThanOrEqualValue (Object strDesc)
      { 
         ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      } 
@@ -261,13 +261,13 @@ import java.util.Vector;
      /*
       * @return the current *greaterThanOrEqualValue* attribute
       */
-     public String getGreaterThanOrEqualValue() {
-       return (String) ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getGreaterThanOrEqualValue() {
+       return ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      } 
    
      /** set the *infiniteValue* attribute
       */
-     public void setInfiniteValue (String strDesc)
+     public void setInfiniteValue (Object strDesc)
      { 
         ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      } 
@@ -275,13 +275,13 @@ import java.util.Vector;
      /*
       * @return the current *infiniteValue* attribute
       */
-     public String getInfiniteValue() {
-       return (String) ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getInfiniteValue() {
+       return ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      } 
    
      /** set the *infiniteNegativeValue* attribute
       */
-     public void setInfiniteNegativeValue (String strDesc)
+     public void setInfiniteNegativeValue (Object strDesc)
      {
         ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      }
@@ -289,13 +289,13 @@ import java.util.Vector;
      /*
       * @return the current *infiniteNegativeValue* attribute
       */
-     public String getInfiniteNegativeValue() {
-       return (String) ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getInfiniteNegativeValue() {
+       return ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
    
      /** set the *noDataValue* attribute
       */
-     public void setNoDataValue (String strDesc)
+     public void setNoDataValue (Object strDesc)
      {
         ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
      }
@@ -303,8 +303,8 @@ import java.util.Vector;
      /*
       * @return the current *noDataValue* attribute
       */
-     public String getNoDataValue() {
-       return (String) ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public Object getNoDataValue() {
+       return ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
    
    
@@ -331,8 +331,16 @@ import java.util.Vector;
    
      /**
       * @return the current *paramList* attribute
+      * @deprecated use getParameters method instead.
       */
      public List getParamList() {
+       return (List) ((XMLAttribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+     }
+
+     /**
+      * @return the current list of parameters held in this object.
+      */
+     public List getParameters() {
        return (List) ((XMLAttribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
    
@@ -378,7 +386,7 @@ import java.util.Vector;
    
      /** set the Notes object held by this Array object
       */
-     public void setArrayNotes (Notes notes)
+     public void setArrayNotes (NotesInterface notes)
      {
         ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
      }
@@ -386,7 +394,7 @@ import java.util.Vector;
      /** set the Notes object held by this Array object
          @deprecated use the setArrayNotes method instead.
       */
-     public void setNotesObject (Notes notes)
+     public void setNotesObject (NotesInterface notes)
      {
         ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
      }
@@ -394,17 +402,18 @@ import java.util.Vector;
      /**
         @return the current (array) Notes object that describes the notes held by this array. 
       */
-     public Notes getArrayNotes()
+     public NotesInterface getArrayNotes()
      {
-        return (Notes) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
+        return (NotesInterface) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
    
      /**
         @return the current (array) Notes object that describes the notes held by this array. 
         @deprecated use the getArrayNotes method instead.
      */
-     public Notes getNotesObject()
-        return (Notes) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
+     public NotesInterface getNotesObject()
+     {
+        return (NotesInterface) ((XMLAttribute) attribHash.get(NOTES_XML_ATTRIBUTE_NAME)).getAttribValue();
      }
 
      /* set the *axisList* attribute
@@ -463,16 +472,23 @@ import java.util.Vector;
      }
    
       /** Set the *noteList* attribute
+       * @deprecated use setNotes instead
        */
-      public void setNoteList(List note) {
-         getArrayNotes().setNoteList(note);
+      public void setNoteList (List note) {
+         getArrayNotes().setNotes(note);
+      }
+
+      /** Set the *noteList* attribute
+       */
+      public void setNotes (List note) {
+         getArrayNotes().setNotes(note);
       }
    
       /**
          @return the current *noteList* attribute
       */
       public List getNoteList() {
-         return getArrayNotes().getNoteList();
+         return getArrayNotes().getNotes();
       }
    
       /** get the dimension of the DataCube held within this Array.
@@ -614,8 +630,8 @@ import java.util.Vector;
       * @param p - the Parameter to be added
       * @return a Parameter object
       */
-     public Parameter addParameter(Parameter p) {
-       getParamList().add(p);
+     public ParameterInterface addParameter(ParameterInterface p) {
+       getParameters().add(p);
        return p;
      }
 
@@ -623,8 +639,8 @@ import java.util.Vector;
     * @param what - Parameter to be removed
     * @return true on success, false on failure
     */
-   public boolean removeParameter(Parameter what) {
-       return removeFromList(what, getParamList(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
+   public boolean removeParameter(ParameterInterface what) {
+       return removeFromList(what, getParameters(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
    }
    
    /** removes an Parameter object from paramList
@@ -632,7 +648,7 @@ import java.util.Vector;
     * @return true on success, false on failure
     */
    public boolean removeParameter(int index) {
-       return removeFromList(index, getParamList(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
+       return removeFromList(index, getParameters(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
    }
    
    /**A convenience method that returns an array ref of non-negative INTEGERS
@@ -646,7 +662,7 @@ import java.util.Vector;
     * @param n - Note to be added
     * @return a Note object
     */
-   public Note addNote(Note n) {
+   public NoteInterface addNote(NoteInterface n) {
        return getArrayNotes().addNote(n);
    }
    
@@ -654,7 +670,7 @@ import java.util.Vector;
     * @param what - Note to be removed
     * @return true on success, false on failure
     */
-   public boolean removeNote(Note what) {
+   public boolean removeNote(NoteInterface what) {
         return (boolean) getArrayNotes().removeNote(what);
    }
    
@@ -671,7 +687,7 @@ import java.util.Vector;
     *  the array notes object of this array.
     */
    public List getNotes() {
-       return (List) getArrayNotes().getNoteList();
+       return (List) getArrayNotes().getNotes();
    }
    
    /** Append the string value onto the requested datacell
@@ -886,6 +902,8 @@ import java.util.Vector;
    protected void init()
    {
    
+       super.init();
+
        classXDFNodeName = "array";
    
        // order matters! these are in *reverse* order of their
@@ -1003,7 +1021,7 @@ import java.util.Vector;
             ((ArrayList) axisIdList).add(axisIdRef);
          }
    
-         Notes notesObj = getArrayNotes();
+         NotesInterface notesObj = getArrayNotes();
          notesObj.setLocationOrderList(axisIdList);
    }
    
@@ -1012,6 +1030,12 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.24  2001/05/04 20:15:59  thomas
+  * setNotesObject method is now setArrayNotes
+  * Implement Interface stuff in Array.
+  * changed baseObject class to baseObjectWIthXMLElements.
+  * lessthan, etc methods now take OBject rather than String.
+  *
   * Revision 1.23  2001/05/02 18:14:54  thomas
   * Minor changes related to API standardization
   * effort.
