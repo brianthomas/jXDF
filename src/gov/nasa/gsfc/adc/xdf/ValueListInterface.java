@@ -25,7 +25,7 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.io.OutputStream;
+import java.io.Writer;
 import java.io.IOException;
 import java.util.List;
 
@@ -35,7 +35,7 @@ import java.util.List;
 
 public interface ValueListInterface 
 {
-   public void toXMLOutputStream (OutputStream outputstream, String indent) throws java.io.IOException;
+   public void toXMLWriter (Writer outputWriter, String indent) throws java.io.IOException;
    public List getValues();
    public Object clone() throws CloneNotSupportedException;
 }
@@ -43,6 +43,9 @@ public interface ValueListInterface
 /* Modification History:
  *
  * $Log$
+ * Revision 1.2  2001/07/26 15:56:12  thomas
+ * toXMLOutputStream => toXMLWriter method.
+ *
  * Revision 1.1  2001/07/11 22:40:29  thomas
  * Initial Version
  *
