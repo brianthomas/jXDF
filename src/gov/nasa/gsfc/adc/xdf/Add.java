@@ -26,8 +26,6 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import org.xml.sax.Attributes;
-
 /**
    An XDF::Add is a class that defines an addition component for an 
    XDF::ConversionComponent object.
