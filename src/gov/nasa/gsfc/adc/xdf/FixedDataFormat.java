@@ -101,9 +101,12 @@ public class FixedDataFormat extends DataFormat {
 
   /** set the *width* attribute
    */
-  public void setWidth(Integer numWidth) {
-     ((XMLAttribute) attribHash.get("width")).setAttribValue(numWidth);
-     generateFormatPattern();
+  public void setWidth (Integer numWidth) {
+     if(numWidth.intValue() >= 0) { 
+       ((XMLAttribute) attribHash.get("width")).setAttribValue(numWidth);
+       generateFormatPattern();
+     } else 
+       Log.warnln("FixedDataFormat.setWidth() cannot take value less than 0. Ignoring request.");
   }
 
   /**
@@ -116,9 +119,14 @@ public class FixedDataFormat extends DataFormat {
 
   /** set the *precision* attribute
    */
-  public void setPrecision(Integer precision) {
-     ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
-     generateFormatPattern();
+  public void setPrecision (Integer precision) {
+
+     if(precision.intValue() >= 0) { 
+       ((XMLAttribute) attribHash.get("precision")).setAttribValue(precision);
+       generateFormatPattern();
+     } else
+       Log.warnln("FixedDataFormat.setPrecision() cannot take value less than 0. Ignoring request.");
+ 
   }
 
   /**
@@ -205,6 +213,9 @@ public class FixedDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/27 17:14:04  thomas
+ * added bounds checking on width and precision. -b.t.
+ *
  * Revision 1.8  2000/11/22 20:42:00  thomas
  * beaucoup changes to make formatted reads work.
  * DataFormat methods now store the "template" or
