@@ -101,6 +101,7 @@ import java.io.OutputStream;
     XDFNodeName = strName;
   }
 
+
   /**set the *factor* attribute
    * @param Number
    * @return the current *factor* attribute
@@ -278,6 +279,9 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/05/24 17:24:24  huang
+ * added/modified constructors and other convenience methods
+ *
  * Revision 1.14  2001/05/22 21:27:43  huang
  * added description set/get methods
  *
