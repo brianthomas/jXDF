@@ -1,12 +1,27 @@
-
+	
 
 	A list of things that have to be done before we can consider
 	this package "ALPHA"
         ------------------------------------------------------------
 
 	- Implement Formatted reads.
+          Dataformat classes have regex, templateNotation, sprintFNotation methods.
+          Are these needed? Closely evaluate these classes (after formatted read
+          is implemented). Remove extraneous methods.
 
-        - make init protected for all main classes.
+        - make init protected for all main classes (to allow inheritance of classes
+          in other dataformats).
+
+	- Efficiency issues. Don't use sth. like attrib.size() in the for loop
+          (now fixed? review code again)
+
+        - Group cloning needs to be finished.
+          XMLDataIOStyle has clone method in it, correct? (I did this, please check kelly)
+
+	- Use singleton for PrettyOutput, etc.
+
+	- In some cases, passing null of not reasonable. We dont have 
+          to check null to save some time. 
 
         - in SaxDocumentHandler, need set/get for AxisObj, FieldObj, private
           globals so we can mimic id/idref stuff. In fact, we should just
@@ -14,14 +29,11 @@
 
         - readId/readIdRef not implimented in SaxDocHandler (?)
 
-        - XMLDataIOStyle has clone method in it, correct? (I did this, not kelly?)
+        - fix the repeatable attribute on string parsing
 
-	- Efficiency issues. Don't use sth. like attrib.size() in the for loop
-          (now fixed? review code again)
+	- Impliment octal/hex data read/write in SaxDocHandler.
 
-        - Dataformat classes have regex, templateNotation, sprintFNotation methods.
-          Are these needed? Closely evaluate these classes (in conjuction w/ Formatted
-          IO code).
+	- Impliment binary data read/write in SaxDocHandler/Binary*DataFormats.
        
         - Are Utility, Constants classes truely independant? Shunt methods to
           places they are used.
@@ -33,11 +45,6 @@
           thru a second time.
 
         - check that notesEndElementHandlerFunc is finished (?)
-
-	- Use singleton for PrettyOutput, etc.
-
-	- In some cases, passing null of not reasonable. We dont have 
-          to check null to save some time. 
 
 	- always use constants (sPCDATAAttribute = "value") 
 
@@ -59,16 +66,11 @@
           controlled by dataFormat at this time. Also, Exponential format
 	  may print out wi/o the 'E'.  
 
-	- Impliment binary data read/write.
-
-	- Impliment octal/hex data read/write.
-
 
 	A list of things that have to be done before we can consider
 	this package "BETA"
         ------------------------------------------------------------
    
-
 	- Improve efficiency of data reading. Direct char->number converstion
 	  (faster) rather than convert to String, then to a number object,
           then to a primative (in SaxDocumentHandler:addData.. private method).
@@ -77,7 +79,8 @@
 	  locator object ref's rather than nasty space delimited strings.
 
 	- Treatment of special characters (like NEWLINE) should be entities 
-          (&newline;) in element attributes of output XML. 
+          (&newline;) in element attributes of output XML (this causes a problem
+          with being able to re-load delimited case data w/ newline recordterminators). 
 
 	- Make methods/classes as consistent as possible with Perl package.
 
@@ -86,6 +89,7 @@
            insure that "version" will be the first attribute (and why this needs
 	   to be is difficult for me to understand, but thats another matter..).
 	   ) so we need to review if current implementation is correct.
+
 
         Things for the next big version upgrade to XDF version 0.19
         ============================================================
@@ -107,5 +111,11 @@
         - Large datasets. When to automatically switch to persistent dataCube 
           How much memory to use, efficiency issues. Native code alternative to
           Java (?).
+
+	- Internal directory of user-defined parameters. Allow applications always
+	  a way of finding the science parameters/keywords even if XDF parameter
+          isnt used to hold the information.
+
+	- Overflow, underflow, NaN issues for data. What does "null" cell really mean?.
 
 
