@@ -43,7 +43,9 @@ import java.util.List;
   //
   protected Array parentArray;
   protected List axisOrderList;
-  private boolean HasNext;
+  private boolean nextCellAvailable;
+  private boolean prevCellAvailable;
+  private int dimension;
 
   //hashtable to store the (axis, index) pair
   protected Hashtable locations;
@@ -59,9 +61,13 @@ import java.util.List;
 
   public void setIterationOrder (List axisIterationList) {
 
+    // Ping???: correct treatment???
+    // if null, set it to null or just ignore and return???
+    // also, the num of axies  of the parent array should be checked before a reset???
     if (axisIterationList == null ||
 	axisIterationList.size() == 0)
 	return;
+
     axisOrderList.clear();
     int stop = axisIterationList.size();
     for (int i = 0; i < stop; i++) {
@@ -69,6 +75,8 @@ import java.util.List;
       axisOrderList.add(axisObj);
       locations.put(axisObj, new Integer(0));
     }
+
+    dimension = axisIterationList.size();
 
     Log.infoln("Locator.setIterationOrder() has reset the current location to the dataCube origin.");
 
@@ -81,6 +89,7 @@ import java.util.List;
   public void setAxisIndex (AxisInterface axisObj, int index) 
   throws AxisLocationOutOfBoundsException 
   {
+    // Ping-??? if not exists, should call addAxis()
     if ((!parentArray.getAxes().contains(axisObj)) ||
         (index < 0) ||
         (index > axisObj.getLength()-1) ) {
@@ -102,10 +111,9 @@ import java.util.List;
           return loc.intValue();
 
        return -1;
-
    }
 
-   /** Get the current index (for a particular Axis) in this Locator object. 
+   /** 
        @return the current value if successful, null if no such Axis exists in this locator.
    */
    public Value getAxisValue (Axis axisObj)
@@ -116,11 +124,9 @@ import java.util.List;
        if (loc != null)
           return (Value) axisObj.getValueList().get(loc.intValue());
 
-       return (Value) null;
+       return null;
 
    }
-
-
 
 
    /** Set the index of an axis to the index of a value
@@ -144,27 +150,47 @@ import java.util.List;
 
    }
 
-  /** @return true if there are more elements, false if no more elements
-   */
-  public boolean hasNext() 
+   /** @return true if there are more Next data cells; false if no more data elements
+    */
+   public boolean hasNext() 
+   {
+       return nextCellAvailable;
+   }
+
+   /** @return true if there are any more Previous data cells; false if no more data elements
+    */
+  public boolean hasPrev() 
   {
-     return HasNext;
+     return prevCellAvailable;
   }
+
+
+  /**
+   * @return an integer array, each element is the position along
+   * the corresponding axis
+   */
+  public int [] getDataCellPosition() {
+      int [] position = new int [dimension];
+      for (int i=0; i<dimension; i++) {
+	  AxisInterface axis = (AxisInterface) axisOrderList.get(i);
+	  position[i] = ((Integer) locations.get(axis)).intValue();
+      }
+      return position;
+  }
+
 
   /** Change the locator coordinates to the next datacell as
       determined from the locator iteration order.
       Returns false if it must cycle back to the first datacell
       to set a new 'next' location.
    */
-
   public boolean next() {
 
     boolean outOfDataCells = true;
 
-    HasNext = true;
+    nextCellAvailable = true;
 
-    int size = axisOrderList.size();
-    for (int i = 0; i < size ; i++) {
+    for (int i = 0; i < dimension ; i++) {
       AxisInterface axis = (AxisInterface) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
       // are we still within the axis?
@@ -182,7 +208,7 @@ import java.util.List;
     // we cycled back to the origin. Set the global
     // to let us know
     if (outOfDataCells) 
-	HasNext = false;
+	nextCellAvailable = false;
 
     return !outOfDataCells;
 
@@ -195,10 +221,9 @@ import java.util.List;
   public boolean prev() {
     boolean outOfDataCells = true;
 
-    HasNext = true;
+    prevCellAvailable = true;
 
-    int size = axisOrderList.size();
-    for (int i = 0; i < size ; i++) {
+    for (int i = 0; i < dimension ; i++) {
       AxisInterface axis = (AxisInterface) axisOrderList.get(i);
       int index = ((Integer) locations.get(axis)).intValue();
       index--;
@@ -212,7 +237,8 @@ import java.util.List;
       }
     }
 
-    if (outOfDataCells) HasNext = false;
+    if (outOfDataCells) 
+	prevCellAvailable = false;
 
     return !outOfDataCells;
   }
@@ -339,8 +365,9 @@ import java.util.List;
 
     private void init (Array array) {
 
-       // just created, must be a next cell
-       HasNext = true;
+       // just created, must have a next cell but no previous cell
+       nextCellAvailable = true;
+       prevCellAvailable = false;
 
        // set the parentArray
        parentArray = array;
@@ -354,6 +381,7 @@ import java.util.List;
        */
 
       List axisList = parentArray.getAxes();
+      dimension = axisList.size();
 
       locations = new Hashtable(axisList.size());
       axisOrderList = Collections.synchronizedList(new ArrayList());
