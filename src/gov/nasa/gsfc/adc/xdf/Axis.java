@@ -65,14 +65,17 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 
   }
 
+
   /** 
-   *  Create an Axis with a desired dimension
-   *  use setValueList() to set axis values
+   *  Create an Axis with a desired dimension 
+   *  with each axis value to be an empty string;
+   *  axis values can be reset using setAxisValue () or setValueList()
    */
   public Axis (int dimension)
   {
     init();
-    length = dimension;
+    for (int i=0; i<dimension; i++)
+	addAxisValue (new Value (""));
   }
 
 
@@ -564,6 +567,9 @@ public class Axis extends BaseObjectWithXMLElements implements AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.25  2001/07/05 22:13:45  huang
+ * modified constructor (int dimension)
+ *
  * Revision 1.24  2001/06/28 16:50:54  thomas
  * changed add method(s) to return boolean.
  *

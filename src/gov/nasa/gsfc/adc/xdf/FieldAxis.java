@@ -75,12 +75,13 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
 
    /**
     *  create a fieldAxis with desired dimension
-    *  use setFieldList() to set fields
+    *  with each field initialized with default values
     */
    public FieldAxis (int fieldDimension)
    {
       init();
-      length = fieldDimension;
+      for (int i=0; i<fieldDimension; i++)
+	 addField(new Field());
    }
 
    /**  This constructor takes a Java Hashtable as an initializer of
@@ -90,7 +91,7 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
      */
    public FieldAxis ( Hashtable InitXDFAttributeTable )
    {
-
+       
       // init the XML attributes (to defaults)
       init();
 
@@ -377,6 +378,9 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
  /**
   * Modification History:
   * $Log$
+  * Revision 1.19  2001/07/05 22:13:45  huang
+  * modified constructor (int dimension)
+  *
   * Revision 1.18  2001/06/28 16:50:54  thomas
   * changed add method(s) to return boolean.
   *
