@@ -32,8 +32,6 @@
  * A string holding the field id of this Field.
  * fieldIdRef--
  * A string holding the field id reference to another field.
- * class--
- * "class" of this field. <b>NOT CURRENTLY IMPLEMENTED</b>
  * noteList--
  * a list of the Note objects held by this field.
  * dataFormat--
@@ -67,7 +65,6 @@ public class Field extends BaseObjectWithXMLElements {
    private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
    private static final String ID_XML_ATTRIBUTE_NAME = new String("fieldId");
    private static final String IDREF_XML_ATTRIBUTE_NAME = new String("fieldIdRef");
-   private static final String CLASS_XML_ATTRIBUTE_NAME = "class";
    private static final String LESSTHANVALUE_XML_ATTRIBUTE_NAME = new String("lessThanValue");
    private static final String LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME = new String("lessThanOrEqualValue");
    private static final String GREATERTHANVALUE_XML_ATTRIBUTE_NAME = new String("greaterThanValue");
@@ -519,7 +516,6 @@ public class Field extends BaseObjectWithXMLElements {
      attribOrder.add(0, GREATERTHANVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, LESSTHANVALUE_XML_ATTRIBUTE_NAME);
-     attribOrder.add(0, CLASS_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, IDREF_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, DESCRIPTION_XML_ATTRIBUTE_NAME);
@@ -531,7 +527,6 @@ public class Field extends BaseObjectWithXMLElements {
      attribHash.put(RELATION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));  //double check
      attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new Attribute(new Units(), Constants.OBJECT_TYPE));
      attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
-     attribHash.put(CLASS_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
      attribHash.put(DISABLEDVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
      attribHash.put(OVERFLOWVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
      attribHash.put(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
