@@ -55,6 +55,9 @@ import java.io.InputStream;
 
 
 /** 
+     Contains the SAX document handler for the XDF reader; it also contains
+     some other handlers (that should be split off into another stand-alone
+     class) needed by the XDF Reader.
  */
 public class SaxDocumentHandler extends HandlerBase {
 
@@ -1142,17 +1145,30 @@ Log.errorln("");
     {
 
 
+/*
+Log.debug("Add Data:["+thisString+"] (");
+List axes = dataLocator.getIterationOrder();
+Iterator liter = axes.iterator();
+while (liter.hasNext()) {
+   AxisInterface axis = (AxisInterface) liter.next();
+   Log.debug(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
+}
+Log.debugln(") ");
+*/
+
        // Note that we dont treat binary data at all here 
        try {
 
            if ( CurrentDataFormat instanceof StringDataFormat) {
 
+//Log.debugln("(String)");
               CurrentArray.setData(dataLocator, thisString);
 
            } else if ( CurrentDataFormat instanceof FloatDataFormat
                        || CurrentDataFormat instanceof BinaryFloatDataFormat) 
            {
 
+//Log.debugln("(Double)");
               Double number = new Double (thisString);
               CurrentArray.setData(dataLocator, number.doubleValue());
 
@@ -1161,6 +1177,7 @@ Log.errorln("");
            {
 
               // Integer number = new Integer (thisString);
+//Log.debugln("(Integer)");
 
               if (intRadix == 16) // peal off leading "0x"
                   thisString = thisString.substring(2);
@@ -2249,8 +2266,12 @@ Log.errorln(" TValue:"+valueString);
 
               Locator myLocator = CurrentArray.createLocator();
               myLocator.setIterationOrder(AxisReadOrder);
+              formatObj.setIOAxesOrder(AxisReadOrder);
 
-              // CurrentIOCmdIndex = 0; 
+Iterator thisIter = AxisReadOrder.iterator();
+while(thisIter.hasNext()) {
+  Log.debugln("ReadAxis: "+((AxisInterface) thisIter.next()).getAxisId());
+}
               CurrentDataFormatIndex = 0; 
               ArrayList strValueList;
 
@@ -2714,7 +2735,10 @@ Log.errorln(" TValue:"+valueString);
           {
              String name = attrs.getName(i);
              if (name.equals("axisIdRef") ) {
+                //int lastindex = AxisReadOrder.size();
+                //AxisReadOrder.add(lastindex, AxisObj.get(attrs.getValue(i)));
                 AxisReadOrder.add(0, AxisObj.get(attrs.getValue(i)));
+                 Log.debugln("Adding AxisId:"+name);
              } else 
                  Log.warnln("Warning: got weird attribute:"+name+" on for node");
           } 
@@ -4048,6 +4072,10 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.33  2001/06/18 21:40:15  thomas
+ * now uses set/getIOAxesOrder from dataIOStyle obj. and
+ * for nodes.
+ *
  * Revision 1.32  2001/05/10 21:40:02  thomas
  * AxisObj, ArrayObj, etc. fields public. Several methods
  * made public. split character data handler into tagged
