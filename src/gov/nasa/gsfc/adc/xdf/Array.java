@@ -151,7 +151,8 @@ import java.util.*;
     attribHash.put("noteList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
     attribHash.put("dataCube", new XMLAttribute(new DataCube(), Constants.OBJECT_TYPE));
     getDataCube().setParentArray(this);  //cross reference with dataCube
-    attribHash.put("xmlDataIOStyle", new XMLAttribute(new TaggedXMLDataIOStyle(), Constants.OBJECT_TYPE));
+    //default is TaggedXMLDataIOStyle, xmlDataOStyle.parentArray = this
+    attribHash.put("xmlDataIOStyle", new XMLAttribute(new TaggedXMLDataIOStyle(this), Constants.OBJECT_TYPE));
     attribHash.put("dataFormat", new XMLAttribute(new StringDataFormat(), Constants.OBJECT_TYPE));  //
     attribHash.put("units", new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
     attribHash.put("axisList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
