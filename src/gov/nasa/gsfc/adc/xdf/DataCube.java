@@ -33,6 +33,9 @@ import java.util.Collections;
 import java.lang.reflect.*;
 
 import java.io.OutputStream;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipOutputStream;
+import java.util.zip.ZipEntry;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -614,7 +617,7 @@ public class DataCube extends BaseObject {
       OutputStream dataOutputStream = outputstream;
   
   
-      if (hrefObj !=null) {  //write out to another file,
+      if (hrefObj != null) {  //write out to another file,
         String fileName = hrefObj.getSysId();
         String hrefName = hrefObj.getName();
   
@@ -641,45 +644,67 @@ public class DataCube extends BaseObject {
               writeHrefAttribute = false;
         }
       }
-      else {
-        // no *href* attribute specified, write out to the passed in OutputStream
-        // dataOutputStream = outputstream; // not needed now 
-      }
   
       // write data node attributes
       if (writeHrefAttribute) {
-        writeOut(outputstream, " "+HREF_XML_ATTRIBUTE_NAME+"=\"");
-        writeOutAttribute(outputstream, hrefObj.getName());
-        writeOut(outputstream, "\"");
+         writeOut(outputstream, " "+HREF_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputstream, hrefObj.getName());
+         writeOut(outputstream, "\"");
       }
   
       String checksum = getChecksum();
       if (checksum != null) {  
-        writeOut(outputstream, " "+CHECKSUM_XML_ATTRIBUTE_NAME+"=\"");
-        writeOutAttribute(outputstream, checksum.toString());
-        writeOut(outputstream, "\"");
+         writeOut(outputstream, " "+CHECKSUM_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputstream, checksum.toString());
+         writeOut(outputstream, "\"");
       }
   
   
       String encoding = getEncoding();
       if (encoding!= null) {  
-        writeOut(outputstream, " "+ENCODING_XML_ATTRIBUTE_NAME+"=\"");
-        writeOutAttribute(outputstream, encoding.toString());
-        writeOut(outputstream, "\"");
+         writeOut(outputstream, " "+ENCODING_XML_ATTRIBUTE_NAME+"=\"");
+         writeOutAttribute(outputstream, encoding.toString());
+         writeOut(outputstream, "\"");
       }
   
   
       String compress = getCompression();
       if (compress != null) {  
-        writeOut(outputstream, " "+COMPRESSION_TYPE_XML_ATTRIBUTE_NAME+"=\"");
-        writeOutAttribute(outputstream, compress.toString());
-        writeOut(outputstream, "\"");
+          writeOut(outputstream, " "+COMPRESSION_TYPE_XML_ATTRIBUTE_NAME+"=\"");
+          writeOutAttribute(outputstream, compress.toString());
+          writeOut(outputstream, "\"");
+ 
+          if (hrefObj == null) {
+             Log.errorln("Cant write compressed data within the XML file (use href instead for an external file). Aborting write.");
+             return;
+          }
+
+          // change the data outputstream to match
+          if (compress.equals(Constants.DATA_COMPRESSION_GZIP)) {
+             try {
+                dataOutputStream = new GZIPOutputStream(dataOutputStream);
+             } catch (java.io.IOException e) {
+                Log.errorln("Cant open compressed (GZIP) outputstream to write to an href. Aborting.");
+                return;
+             }
+          } else if (compress.equals(Constants.DATA_COMPRESSION_ZIP)) {
+             dataOutputStream = new ZipOutputStream(dataOutputStream);
+             try {
+                ((ZipOutputStream) dataOutputStream).putNextEntry(new ZipEntry(hrefObj.getName())); // write only to the first entry for now 
+             } catch (java.io.IOException e) {
+                Log.errorln("Cant open compressed (ZIP) outputstream to write to an href. Aborting.");
+                return;
+             }
+          } else {
+             Log.errorln("Error: cant write data with compression type:"+compress+". Ignoring request.");
+             return;
+          }
       }
   
       if (writeHrefAttribute) 
-         writeOut(outputstream, "/>");  //we just close the data node now
+          writeOut(outputstream, "/>");  //we just close the data node now
       else 
-         writeOut(outputstream, ">");  //end of opening code
+          writeOut(outputstream, ">");  //end of opening code
   
       Locator currentLocator = parentArray.createLocator();
   
@@ -699,14 +724,6 @@ public class DataCube extends BaseObject {
                 NoDataValues[i]=field.getNoDataValue().toString();
             i++;
         } 
-  /*
-        DataFormat[] dataFormatList = parentArray.getDataFormatList();
-        for (int i = 0; i < NoDataValues.length; i++) {
-          DataFormat d =  dataFormatList[i];
-          if (d != null && d.getNoDataValue() != null) 
-            NoDataValues[i]=d.getNoDataValue().toString();
-        }
-  */
       }
       else {
             NoDataValues = new String[1];
@@ -715,33 +732,24 @@ public class DataCube extends BaseObject {
                 value = parentArray.getNoDataValue().toString(); // this is a HACK 
             }
             NoDataValues[0] = value;
-  /*
-       // what tis this?? If there is no fieldAxis, then no fields,
-       // and hence, only ONE noDataValue.
-        DataFormat d = parentArray.getDataFormat();
-        for (int i = 0; i < NoDataValues.length; i++) {
-          if (d!=null && d.getNoDataValue() != null) 
-            NoDataValues[i] = d.getNoDataValue().toString();
-        }
-  */
       }
   
       if (readObj instanceof TaggedXMLDataIOStyle) {
-        String[] tagOrder = ((TaggedXMLDataIOStyle)readObj).getAxisTags();
-        int stop = tagOrder.length;
-        String[] tags = new String[stop];
+         String[] tagOrder = ((TaggedXMLDataIOStyle)readObj).getAxisTags();
+         int stop = tagOrder.length;
+         String[] tags = new String[stop];
   
-        for (int i = stop-1; i >= 0 ; i--) {
-          tags[stop-i-1]  = tagOrder[i];
-        }
+         for (int i = stop-1; i >= 0 ; i--) {
+            tags[stop-i-1]  = tagOrder[i];
+         }
   
-        int[] axes = getMaxDataIndex();
-        stop =axes.length;
-        int[] axisLength = new int[stop];
-        for (int i = 0; i < stop; i++) {
-          axisLength[i] =axes[stop - 1 - i];
-        }
-        writeTaggedData(dataOutputStream,
+         int[] axes = getMaxDataIndex();
+         stop =axes.length;
+         int[] axisLength = new int[stop];
+         for (int i = 0; i < stop; i++) {
+            axisLength[i] =axes[stop - 1 - i];
+         }
+         writeTaggedData(dataOutputStream,
                         currentLocator,
                         indent,
                         axisLength,
@@ -769,6 +777,16 @@ public class DataCube extends BaseObject {
                                writeHrefAttribute ? false : true
                              );
          }
+
+         if (writeHrefAttribute) {
+            try {
+               dataOutputStream.close();
+            } catch (java.io.IOException e) {
+               Log.errorln("Cant close dataOuputStream! Aborting.");
+               return;
+            }
+         }
+
       }
   
       //close the data section appropriately
@@ -1625,6 +1643,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.36  2001/06/27 21:19:45  thomas
+  * Implimented writing of compressed data to external file (GZIP, Zip only).
+  *
   * Revision 1.35  2001/06/26 19:46:08  thomas
   * moved calculation of long, short axis up to
   * the Array. Probably will be moved again (to locator?)
