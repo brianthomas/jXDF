@@ -447,11 +447,19 @@ the particular axis.  For now, one is restricted to use d0...d7 for tagnames.
 	data tags.  The parser can pass the images to the display applet
 	rather than waiting for the entire data set to arrive.	Of course,
 	external entities can be used, so that the data
-	may resides in one or several separate physical files. -->
+	may resides in one or several separate physical files. 
+  
+	Note that data OUTSIDE the specified byte range of startByte to endByte
+      	will be preserved by XDF (the rest is thrown away at read time). 
+        If endByte is not specified, it is accepted to mean the last available byte
+        (e.g. the default condition is to use ALL of the bytes in the data section).
+-->
 <!ELEMENT data (#PCDATA | data | d0)*>
 <!ATTLIST data
-	href ENTITY #IMPLIED
-	checksum NMTOKEN #IMPLIED
+	startByte NMTOKEN  "0"
+	endByte   NMTOKEN  #IMPLIED
+	href      ENTITY   #IMPLIED
+	checksum  NMTOKEN  #IMPLIED
 	encoding (uuencoded | base64) #IMPLIED
 	compression (zip | gzip | bzip2 | XMILL | compress) #IMPLIED
 >
