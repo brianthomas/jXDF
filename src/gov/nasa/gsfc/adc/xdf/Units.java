@@ -2,13 +2,33 @@
 // CVS $Id$
 
 
+// Units.java Copyright (C) 2000 Brian Thomas,
+// ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
+
+/*
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*/
+
+
 package gov.nasa.gsfc.adc.xdf;
 import java.util.*;
+import java.io.*;
 
 /**
  * Units.java:
- * @author: Brian Thomas (thomas@adc.gsfc.nasa.gov)
- *          Kelly Zeng (kelly.zeng@commerceone.com)
  * @version $Revision$
  */
 
@@ -18,9 +38,10 @@ import java.util.*;
   //
 
   protected String XDFNodeName;
+
   //double check
-  String unitDivideSymbol = "/";
-  String classNoUnitChildNodeName = "unitless";
+  protected static String unitDivideSymbol = "/";
+  protected static String classNoUnitChildNodeName = "unitless";
 
  //
   // Constructor and related methods
@@ -57,7 +78,7 @@ import java.util.*;
   {
 
     classXDFNodeName = "units";
-    XDFNodeName = "units";
+    XDFNodeName = classXDFNodeName;
 
     // order matters! these are in *reverse* order of their
     // occurence in the XDF DTD
@@ -72,77 +93,169 @@ import java.util.*;
   //
   //Get/Set Methods
 
-  /**setXDFNodeName: change teh XDF node name for this object.
-   *
+  /**setXDFNodeName: change the XDF node name for this object.
+   * @param: String
+   * @return: the current XDF node name
    */
   public String setXDFNodeName(String strName) {
     XDFNodeName = strName;
     return XDFNodeName;
   }
+
+  /**setFactor: set the *factor* attribute
+   * @param: Number
+   * @return: the current *factor* attribute
+   */
   public Number setFactor (Number factor) {
-    return (Number) ((XMLAttribute) attribHash.get("factors")).setAttribValue(factor);
+    Log.info("in Units.setFactor()");
+    return (Number) ((XMLAttribute) attribHash.get("factor")).setAttribValue(factor);
   }
 
+  /**getFactor
+   * @return: the current *factor* attribute
+   */
   public Number getFactor () {
     return (Number) ((XMLAttribute) attribHash.get("factor")).getAttribValue();
   }
 
+  /**setSystem: set the *system* attribute
+   * @param: String
+   * @return: the current *system* attribute
+   */
   public String setSystem (String system) {
     return (String) ((XMLAttribute) attribHash.get("system")).setAttribValue(system);
   }
 
+  /**getSystem
+   * @return: the current *system* attribute
+   */
   public String getSystem () {
     return (String) ((XMLAttribute) attribHash.get("system")).getAttribValue();
   }
 
+  /**setUnitList: set the *unitList* attribute
+   * @param: List
+   * @return: the current *unitList* attribute
+   */
   public List setUnitList(List units) {
     return (List)((XMLAttribute) attribHash.get("unitList")).setAttribValue(units);
   }
 
+  /**getUnitList
+   * @return: the current *unitList* attribute
+   */
   public List getUnitList() {
     return (List) ((XMLAttribute) attribHash.get("unitList")).getAttribValue();
   }
 
+  /**getUnits: convenience method that returns the list of units this object holds
+   *
+   */
   public List getUnits() {
     return getUnitList();
+  }
+
+  /** getClassNoUnitChildNodeName
+   * return: Name of the child node to print in the toXMLFileHandle method when
+   * an  XDF::Units object contains NO XDF::Unit child objects.
+   */
+  public String getClassNoUnitChildName() {
+    return classNoUnitChildNodeName;
   }
 
   //
   //Other PUBLIC Methods
   //
 
-  /**addUnit
-   * */
-
+  /**addUnit: Insert an XDF::Unit object into the list of units held in this object
+   * @param: Unit to be added
+   * @return: an XDF::Unit object if successfull, null if not.
+   */
   public Unit addUnit(Unit unit) {
+    if (unit == null) {
+      Log.warn("in Units.addUnit(), the Unit passed in is null");
+      return null;
+    }
     getUnitList().add(unit);
     return unit;
   }
 
-   /**removeUnit
-   * pass in Unit
+   /**removeUnit: Remove an XDF::Unit object the list of units held in
+   * this object
+   * @param: Unit to be removed
+   * @return: true if successful, false if not
    */
    public boolean removeUnit(Unit what) {
      return removeFromList(what, getUnitList(), "unitList");
   }
 
-  /**removeUnit
-   * pass in index
-   * function overload
+  /**removeUnit: Remove an XDF::Unit object from the list of units held in
+   * this object
+   * @param: list index number
+   * @return: true if successful, false if not
    */
-  public boolean removeUnit(int what) {
-     return removeFromList(what, getUnitList(), "unitList");
+  public boolean removeUnit(int index) {
+     return removeFromList(index, getUnitList(), "unitList");
+  }
+
+  /**value
+   * assemble all the units in the list of units held in this object and return
+   * it as a string
+   */
+   public String value() {
+    StringBuffer strValue = new StringBuffer();
+    Number factor = getFactor();  //retrieve the *factor* attribute
+    List units = getUnitList();   //retrieve the *unitList* attribute
+    Unit unit;
+    Number power;
+
+    if ( factor != null) {
+      strValue.append(factor.doubleValue());  //append *factor* value
+    }
+
+    for ( int i = 0; i < units.size(); i ++ ) {
+      unit = (Unit) units.get(i);
+      strValue.append(unit.getValue());  //append *value* attribute of Unit
+      power = unit.getPower();
+      if (power !=null) {  //append *power* attribute of Unit
+        strValue.append("**");
+        strValue.append(power.floatValue());
+        strValue.append("  ");
+      }
+    }
+
+    Log.debug("exiting Units.value(): value = " + strValue.toString());
+    return strValue.toString();
   }
 
 
+  public void toXDFOutputStream  (
+                                   OutputStream outputstream,
+                                   Hashtable XMLDeclAttribs,
+                                   String indent,
+                                   boolean dontCloseNode
+                                 )
 
-  //not done yet, 10/2/2000, k.z.
-  public String value() {
-    return null;
+  {
+    super.toXDFOutputStream( outputstream,
+                             XMLDeclAttribs,
+                             indent,
+                             dontCloseNode,
+                             XDFNodeName,
+                             classNoUnitChildNodeName
+                           );
   }
 
-  //not done yet, 10/2/2000, k.z.
-  public void toXDFFileHandle() {
-  }
 
- }
+ }  //end of Units Class
+
+ /* Modification History:
+ *
+ * $Log$
+ * Revision 1.3  2000/10/11 14:37:17  kelly
+ * complete value(), toXDFOutputStream(), added more documentation.
+ * this file is considered done  -k.z.
+ *
+ */
+
+
