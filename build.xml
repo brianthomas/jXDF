@@ -1,13 +1,20 @@
-
+<?xml version="1.0"?>
+<!-- 
+The XDF build file 
+CVS $Id$
+-->
 <project name="XDF" default="help" basedir=".">
 
   <!-- set global properties for this build -->
+
   <property name="path" value="gov/nasa/gsfc/adc/xdf"/>
   <property name="src" value="src/${path}"/>
   <property name="build" value="."/>
   <property name="docApi"  value="docs/api"/>
   <property name="build.compiler" value="modern"/>
   <property name="adc_xml_homepage" value="http://xml.gsfc.nasa.gov"/>
+
+  <!-- Targets Start -->
 
   <target name="init">
     <!-- Create the time stamp -->
@@ -16,6 +23,60 @@
     <mkdir dir="${build}"/>
     <mkdir dir="${docApi}"/>
   </target>
+
+  <target name="initTest">
+     <!-- build software -->
+     <javac debug="on" srcdir="test"/>
+     <taskdef name="loadXDFTest" classname="test.loadXDFTest" classpath="test"/>
+     <taskdef name="validateTest" classname="test.ValidateTest" classpath="test"/>
+  </target>
+
+  <!-- <target name="test" depends="compile"> -->
+  <target name="test" depends="compile,initTest">
+    <echo message="Running tests..." />
+
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample1.xml"/></antcall>
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample2.xml"/></antcall>
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample3.xml"/></antcall>
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample4.xml"/></antcall>
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample5.xml"/></antcall>
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample6.xml"/></antcall>
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample7.xml"/></antcall>
+
+    <!-- file 8 is very problematic: wont validate versus the DTD --> 
+    <!-- 
+         <antcall target="runTests"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
+      -->
+    <antcall target="loadXDFTest"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
+
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample9.xml"/></antcall>
+    <!-- no bzip in Java (yet) -->
+    <!-- <antcall target="runTests"><param name="file" value="samples/XDF_sample10.xml"/></antcall> -->
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample11.xml"/></antcall>
+    <antcall target="runTests"><param name="file" value="samples/XDF_sample12.xml"/></antcall>
+
+    <antcall target="cleanRunTests"/>
+
+  </target>
+
+  <target name="runTests" >
+    <antcall target="loadXDFTest"><param name="file" value="${file}"/></antcall>
+    <echo message="Checking validation of ${file} output ..." />
+    <validateTest inputfile="test1.xml" showsuccess="true"/>
+  </target>
+
+  <target name="loadXDFTest" >
+    <echo message="Checking loading ${file} ..." />
+    <loadXDFTest inputfile="${file}" outputfile="test1.xml" />
+    <loadXDFTest inputfile="test1.xml" outputfile="test2.xml" showsuccess="true"/>
+  </target>
+
+  <target name="cleanRunTests" >
+    <echo message="Cleaning up test files.." />
+    <delete file="test1.xml"/>
+    <delete file="test2.xml"/>
+  </target>
+
 
   <target name="dump-info" >
     <echo message="java.vm.info=${java.vm.info}" />
@@ -75,6 +136,7 @@
     <echo message="   dump-info - dump information about your machine" />
     <echo message="   help      - print this help message and exit" />
     <echo message="   jar       - compile XDF jar file" />
+    <echo message="   test      - runs tests of the build" />
     <echo message=" "/>
     <echo message=" "/>
     <echo message="Example usage: "/>
