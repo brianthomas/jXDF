@@ -127,9 +127,6 @@ public class Structure extends BaseObject {
   }
 
 
-  public Note addNote (Note note) {
-  }
-
   public Note setNote (Note note, int i) {
   }
 
