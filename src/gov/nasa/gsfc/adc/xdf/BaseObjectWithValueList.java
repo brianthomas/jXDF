@@ -200,8 +200,11 @@ public abstract class BaseObjectWithValueList extends BaseObject
                   Iterator iter = valueListObjects.iterator();
                   while(iter.hasNext()) {
                      ValueListInterface valueListObj = (ValueListInterface) iter.next();
-                     // first determine if groups should open or close
-                     // using the first value in the values list.
+                     // Grouping *may* differ between the values held in each ValueLists. To check we
+                     // if all valueListObjects are 'kosher' we use the first value in the values 
+                     // list of each ValueListObj as a reference object and compare it to all other
+                     // values in that list (but not the lists of values in other ValueListObj). Yes, 
+                     // this can be slow for large lists of values but is the correct thing to do.
                      List values = valueListObj.getValues();
                      Value valueObj = (Value) values.get(0);
 
@@ -356,6 +359,9 @@ public abstract class BaseObjectWithValueList extends BaseObject
 /** Modification Log 
   *
   * $Log$
+  * Revision 1.2  2001/07/13 21:45:04  thomas
+  * improved comments
+  *
   * Revision 1.1  2001/07/11 22:40:44  thomas
   * Initial Version
   *
