@@ -311,7 +311,7 @@ public abstract class BaseObject implements Serializable {
     if (groupObject != null)  {
       if (groupMemberHash.contains(groupObject))  {
         //this object does belong to the indicated Group object
-        groupObject.removeMemberObj(this);
+        groupObject.removeMemberObject((Object) this);
         groupMemberHash.remove(groupObject);
         return groupObject;
       }
@@ -494,10 +494,11 @@ public abstract class BaseObject implements Serializable {
           }
         } else {
           // error: weird type, actually shouldnt occur. Is this needed??
-          Log.error("Weird error: unknown XML attribute type for item:"+item);
+          Log.errorln("Weird error: unknown XML attribute type for item:"+item);
         }
 
       }
+
 
       // print out PCDATA, if any
       if(pcdata != null)  {
@@ -568,7 +569,8 @@ public abstract class BaseObject implements Serializable {
                                   String indent
                                 )
   {
-     toXDFOutputStream(outputstream, XMLDeclAttribs, indent, false, null, null);
+     toXDFOutputStream(outputstream, XMLDeclAttribs, indent, false, (String) null, (String) null);
+
   }
 
   /** A different invokation style for writing this object out to
@@ -577,8 +579,7 @@ public abstract class BaseObject implements Serializable {
   public void toXDFOutputStream (OutputStream outputstream, Hashtable XMLDeclAttribs)
   {
      //not reseanable to set the indent to sPrettyXDFOutputIndentation --k.z. 10/17
-     //toXDFOutputStream(outputstream, XMLDeclAttribs, sPrettyXDFOutputIndentation, false, null, null);
-     toXDFOutputStream(outputstream, XMLDeclAttribs,"", false, null, null);
+     toXDFOutputStream(outputstream, XMLDeclAttribs, new String(""), false, (String) null, (String) null);
   }
 
   /** A different invokation style. It has defaults for the XML Declaration
@@ -606,8 +607,6 @@ public abstract class BaseObject implements Serializable {
      XMLDeclAttribs.put("version", (String) sXMLSpecVersion);
 
      toXDFOutputStream(outputstream, XMLDeclAttribs);
-
-
 
   }
 
@@ -688,8 +687,9 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
      @return: true on success, false on failure
   */
   protected boolean removeFromList ( Object what, List fromList, String listName ) {
-    if (fromList !=null) {
-      if ( what !=null) {
+
+    if (fromList != null) {
+      if ( what != null) {
         int index = fromList.indexOf(what);
         if (index !=-1) {  //object to be removed is found in the list
           fromList.remove(index);
@@ -988,6 +988,10 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2000/10/25 21:47:53  thomas
+ * Minor bug fix. Sync up method removeMemberObject
+ * name from Group.java. -b.t.
+ *
  * Revision 1.15  2000/10/24 21:34:24  thomas
  * Added some clone code needed by the Reader (now)
  * and programmers (later, when we have some!) -b.t.
