@@ -25,30 +25,32 @@
 
 package gov.nasa.gsfc.adc.xdf;
 
-import java.util.Hashtable;
+// import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.io.OutputStream;
 import java.io.IOException;
 
-//import org.apache.crimson.tree.ElementNode;
+import org.apache.crimson.tree.ElementNode;
 import org.xml.sax.Attributes;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.Attr;
+import org.w3c.dom.NamedNodeMap;
+
+//import org.w3c.dom.Document;
+// import org.w3c.dom.Element;
+//import org.apache.crimson.tree.DomEx;
 
 /** 
  */
 
-public class XMLElement extends BaseObjectWithXMLElements {
+public class XMLElement extends ElementNode implements Cloneable {
 
    // 
    // Fields
    //
-   private Hashtable attribHash = new Hashtable();
-   private String myTagName;
    private StringBuffer myCDATA;
+//   private List childElementNodeList = Collections.synchronizedList(new ArrayList());
 
-   private List childNodeList = (List) new Vector ();
 
    //
    // Constructors
@@ -56,54 +58,120 @@ public class XMLElement extends BaseObjectWithXMLElements {
 
    //public XMLElement (String tagName, Document ownerDoc) { }
 
-   public XMLElement (String tagName) {
+   public XMLElement (String tagName) 
+//   throws DomEx
+   {
+      super(tagName);
       init();
-      setTagName(tagName);
    }
+
+   public XMLElement(String namespaceURI, String qName)
+//   throws DomEx
+   {
+      super(namespaceURI,qName);
+      init();
+   }
+
 
    //
    // Get/Set Methods 
    //
 
+   /** Set the value of the CDATA held by this XMLElement.
+    */
    public void setCData(String text) {
       myCDATA.delete(0,myCDATA.length());
       myCDATA.append(text);
    }
 
-   /** get the *value* (PCDATA) attribute.
+   /** Get any CDATA held within this XMLElement.
    */
    public String getCData() {
       return myCDATA.toString();
    }
 
-   /**
-    */
-   public String getTagName( ) {
-      return myTagName;
-   }
+//   public void getXMLElementList () { return childElementNodeList(); }
 
    //
    // Other Public Methods
    //
 
-   /**
+   /** appends more CDATA into this XMLElement. 
     */
    public void appendCData (String text) {
       myCDATA.append(text);
    }
 
    public boolean addAttribute (String name, String value) {
-      attribHash.put(name, value);
+      this.setAttribute(name, value);
       return true;
    }
 
-   public boolean removeAttribute ( String name ) {
-      return attribHash.remove(name) == null ? false : true;
+/*
+   // ugh. Wont allow me to override the 'void' method that is 
+   // already declared. so be it.
+   public boolean removeAttribute ( String name ) 
+   {
+
+      this.removeAttribute(name);
+      NamedNodeMap attribs = this.getAttributes();
+      if (attribs.getNamedItem(name) != null) {
+         attribs.removeNamedItem(name);
+         return true;
+      }
+      return true;
+   }
+*/
+
+   public boolean addXMLElement (XMLElement obj) {
+
+      return false;
    }
 
-   public void setXMLAttributes (Attributes attribs) { 
+   public boolean removeXMLElement (XMLElement obj) {
 
-// TBD 
+      return false;
+   }
+
+   public void setXMLAttributes (Attributes attrs) { 
+
+      resetXMLAttributes();
+
+      // must we do it this way? argh.
+      if (attrs != null) {
+          // whip thru the list setting each
+          int size = attrs.getLength();
+          for (int i = 0; i < size; i++) {
+             String attribName = attrs.getQName(i);
+             String attribValue = attrs.getValue(i);
+             this.setAttribute(attribName, attribValue);
+          }
+      }
+
+   }
+
+   public void setXMLAttribute (String name, String value) { 
+      this.setAttribute(name, value);
+   }
+
+   public void addXMLAttribute (String name, String value) { 
+      this.setAttribute(name, value);
+   }
+
+   /** Clears all XML attributes in this XMLElement.
+    */
+   public void resetXMLAttributes() {
+
+       if (this.hasAttributes()) {
+
+          NamedNodeMap attribs = this.getAttributes();
+
+          int size = attribs.getLength();
+          for (int i = 0; i < size; i++) {
+             Attr attrib = (Attr) attribs.item(i);
+             attribs.removeNamedItem(attrib.getName());
+          }
+       }
 
    }
 
@@ -111,7 +179,6 @@ public class XMLElement extends BaseObjectWithXMLElements {
     */
    public void toXMLOutputStream (
                                    OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
                                    String indent,
                                    boolean dontCloseNode,
                                    String newNodeNameString,
@@ -121,11 +188,98 @@ public class XMLElement extends BaseObjectWithXMLElements {
    {
 
 
+      boolean isPrettyOutput = Specification.getInstance().isPrettyXDFOutput();
+      if (isPrettyOutput) 
+          writeOut(outputstream, indent); // indent node if desired
+      writeOut(outputstream, this.toString());
+      if (isPrettyOutput) 
+          writeOut(outputstream, Constants.NEW_LINE); 
+
+/*
       String nodeNameString = this.getTagName();
+      // Setup. Sometimes the name of the node we are opening is different from
+      // that specified in the classXDFNodeName (*sigh*)
       if (newNodeNameString != null) nodeNameString = newNodeNameString;
 
-      super.toXMLOutputStream ( outputstream, new Hashtable(), indent,
-                                dontCloseNode, nodeNameString, noChildObjectNodeName);
+      // 1. open this node, print its simple XML attributes
+      if (nodeNameString != null) {
+
+        if (Specification.getInstance().isPrettyXDFOutput())
+          writeOut(outputstream, indent); // indent node if desired
+        writeOut(outputstream,"<" + nodeNameString);   // print opening statement
+
+      }
+
+      // 2. Print out string object XML attributes 
+      ArrayList attribs = (ArrayList) xmlInfo.get("attribList");
+      // is synchronized here correct?
+      NamedNodeMap attribs = this.getAttributes();
+      synchronized(attribs) {
+
+          int size = attribs.getLength();
+          for (int i = 0; i < size; i++) {
+             Attr attrib = (Attr) attribs.item(i);
+             writeOut(outputstream, " "+attrib.getName()+"=\""+attrib.getValue()+"\"");
+          }
+
+      }
+
+      //3. print child nodes OR CDATA 
+      int nrofChildXMLElements = getXMLElementList().size();
+      String pcdata = getCData();
+      if (pcdata != null || nrofChildXMLElements > 0 )
+      {
+
+          // close opening node
+          writeOut(outputstream, ">");
+
+          if (pcdata != null) {
+             writeOut(outputstream, pcdata);
+          }
+  
+
+          if (pcdata != null || nrofChildXMLElements > 0 )
+          {
+             List childXMLElements = getXMLElementList();
+          }
+
+          // print closing element
+          writeOut(outputstream, "</"+nodeNameString+">");
+
+      } else {
+
+          // close opening node
+          writeOut(outputstream, "/>");
+
+      }
+*/
+
+   }
+
+   /**
+    */
+   public void toXMLOutputStream (
+                                   OutputStream outputstream,
+                                   String indent
+                                )
+   throws java.io.IOException
+   {
+      this.toXMLOutputStream(outputstream, indent, false, null, null);
+   }
+
+   /**
+    */
+   public void toXMLOutputStream ( OutputStream outputstream)
+   throws java.io.IOException
+   {
+      this.toXMLOutputStream(outputstream, "", false, null, null);
+   }
+
+   /**
+    */
+   // NOT finished.
+   public Object clone() throws CloneNotSupportedException {
+     return super.clone(); // not quite right, gets local fields only 
    }
 
    //
@@ -139,7 +293,6 @@ public class XMLElement extends BaseObjectWithXMLElements {
    {
 
        resetXMLAttributes();
-       classXDFNodeName = "";
 
    }
 
@@ -148,16 +301,21 @@ public class XMLElement extends BaseObjectWithXMLElements {
    // Private Methods
    //
 
-   private void setTagName (String name) {
-      myTagName = name;
+   private void writeOut ( OutputStream outputstream, String msg )
+   throws java.io.IOException
+   {
+       outputstream.write(msg.getBytes());
    }
-
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2001/07/19 22:00:38  thomas
+ * Got the class working. Interface not quite right, but good
+ * enuff for the momement.
+ *
  * Revision 1.5  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
