@@ -1,3 +1,4 @@
+
 // XDF Utility Class
 // CVS $Id$
 
@@ -146,6 +147,13 @@ package gov.nasa.gsfc.adc.xdf;
         return false;
     }
 
+    public static boolean isValidDataRepeatable (String strRepeatable) {
+        if ( strRepeatable != null &&
+                (strRepeatable.equals("yes") || strRepeatable.equals("no")) )
+           return true;
+        return false;
+    }
+
     public static boolean isValidStandalone (String str) {
 
         if ( str != null &&
@@ -186,40 +194,3 @@ package gov.nasa.gsfc.adc.xdf;
 
   }  //end of Utility class
 
-/* Modification History:
- *
- * $Log$
- * Revision 1.11  2001/09/18 17:44:13  thomas
- * small documentation insert
- *
- * Revision 1.10  2001/09/14 18:22:01  thomas
- * added isValidStandalone method
- *
- * Revision 1.9  2001/09/13 21:39:25  thomas
- * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
- *
- * Revision 1.8  2001/07/02 18:01:36  thomas
- * fixed bug in isValidValueSPecial : wouldnt allow any value to be set!
- *
- * Revision 1.7  2001/02/07 18:44:38  thomas
- * Added new methods for binary write/read.
- *
- * Revision 1.6  2000/11/08 20:20:55  thomas
- * Trimmed down import path to just needed classes -b.t
- *
- * Revision 1.5  2000/11/02 20:35:26  kelly
- * minor fix
- *
- * Revision 1.4  2000/10/27 21:24:02  kelly
- * changes made in correspondence with Constants.java  -k.z.
- *
- * Revision 1.3  2000/10/26 20:11:27  kelly
- * changes related to Constants are made
- *
- * Revision 1.2  2000/10/18 18:48:34  kelly
- * added isValidEncoding method.  -k.z.
- *
- * Revision 1.1  2000/10/16 14:52:41  kelly
- * create the class for util routines.  --k.z.
- *
- */
