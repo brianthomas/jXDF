@@ -27,6 +27,9 @@ package gov.nasa.gsfc.adc.xdf;
 
 import java.util.Hashtable;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
    @version $Revision$
@@ -37,6 +40,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   //Fields
   //
 
+  //list to store the formatted IO commands
+  private List formatCommandList = Collections.synchronizedList(new ArrayList());
+
   //
   //constructor and related methods
   //
@@ -44,7 +50,6 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   //no-arg constructor
   public FormattedXMLDataIOStyle ()
   {
-
      init();
   }
 
@@ -53,7 +58,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
        Hashtable key/value pairs coorespond to the class XDF attribute
        names and their desired values.
     */
-  public FormattedXMLDataIOStyle ( Hashtable InitXDFAttributeTable )
+  public void FormattedXMLDataIOStyle ( Hashtable InitXDFAttributeTable )
   {
 
     // init the XML attributes (to defaults)
@@ -64,7 +69,40 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 
   }
 
-  // 
+  //
+  //Get/Set methods
+  //
+  /**setFormatCommandList: set the formatCommandList
+   */
+
+  public void setFormatCommandList(List formatList) {
+     formatCommandList = formatList;
+  }
+
+  /**getFormatCommandList: get the formatCommandList
+  */
+  public List getFormatCommandList() {
+   return formatCommandList;
+  }
+  /**getCommands: convenience methods that return the command list
+   */
+  public List getCommands() {
+     return formatCommandList;
+  }
+
+  //
+  //Other PUBLIC methods
+  //
+
+  /**addFormatCommand: add a command to the formatCommandList
+    * @return: the command that is added
+    */
+  public FormattedIOCmd addFormatCommand(FormattedIOCmd formatCmd) {
+    formatCommandList.add(formatCmd);
+    return formatCmd;
+  }
+
+  //
   // Protected Methods
   //
 
@@ -72,6 +110,8 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
   {
 
   }
+
+
 
   //
   // Private Methods
@@ -82,17 +122,45 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
    */
   private void init()
   {
+  }
 
-    classXDFNodeName = "FormattedXMLDataIOStyle";
+  private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) {
+    //base condition
+    if (which > stop) {
+      if (sPrettyXDFOutput) {
+        writeOut(outputstream, Constants.NEW_LINE);
+        writeOut(outputstream, indent);
+      }
+      synchronized (formatCommandList) {
+        int stop = formatCommandList.size();
+        for (int i = 0; i < stop; i++) {
+          FormattedIOCmd command = (FormattedIOCmd) formatCommandList.get(i);
+          command.toXMLOutputStream(outputstream, indent);
+           if (sPrettyXDFOutput) {
+           writeOut(outputstream, Constants.NEW_LINE);
+           writeOut(outputstream, indent);
+          }
+        }
+      }
+    }
+    else {
+      if (sPrettyXDFOutput) {
+        writeOut(outputstream, Constants.NEW_LINE);
+        writeOut(outputstream, indent);
+      }
+      writeOut(outputstream, "<" + UntaggedInstructionNodeName + " axisIdRef=\"");
+      writeOut(outputstream, ((AxisInterface) parentArray.getAxisList().get(which)).getAxisId() + "\">");
+      which++;
+      nestedToXDF(outputstream, indent + sPrettyXDFOutputIndentation, which, stop);
 
-    // order matters! these are in *reverse* order of their
-    // occurence in the XDF DTD
-    attribOrder.add(0,"name");
+      if (sPrettyXDFOutput) {
+        writeOut(outputstream, Constants.NEW_LINE);
+        writeOut(outputstream, indent);
+      }
+       writeOut(outputstream, "</" + UntaggedInstructionNodeName + ">");
+    }
+   }
 
-     //set up the attribute hashtable key with the default initial value
-    attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
-
-  };
 
 }
 
@@ -100,6 +168,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/11/09 23:25:01  kelly
+ * completed specificIOStyleToXDF()
+ *
  * Revision 1.2  2000/11/01 16:14:13  thomas
  *
  *   Another version, not finished but has more in it that before. -b.t.
