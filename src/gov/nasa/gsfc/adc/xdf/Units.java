@@ -45,6 +45,7 @@ import java.io.IOException;
   //
 
   private static final String DESCRIPTION_XML_ATTRIBUTE_NAME = new String("description");
+  private static final String SYSTEM_XML_ATTRIBUTE_NAME = new String("system");
   protected String XDFNodeName;
 
   //double check
@@ -124,14 +125,14 @@ import java.io.IOException;
      @return the current *system* attribute
    */
   public void setSystem (String system) {
-    ((Attribute) attribHash.get("system")).setAttribValue(system);
+    ((Attribute) attribHash.get(SYSTEM_XML_ATTRIBUTE_NAME)).setAttribValue(system);
   }
 
   /**
    * @return the current *system* attribute
    */
   public String getSystem () {
-    return (String) ((Attribute) attribHash.get("system")).getAttribValue();
+    return (String) ((Attribute) attribHash.get(SYSTEM_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** Set the *unitList* attribute
@@ -264,11 +265,11 @@ import java.io.IOException;
     // occurence in the XDF DTD
     attribOrder.add(0,DESCRIPTION_XML_ATTRIBUTE_NAME);
     attribOrder.add(0,"unitList");
-    attribOrder.add(0,"system");
+    attribOrder.add(0,SYSTEM_XML_ATTRIBUTE_NAME);
     attribOrder.add(0,"factor");
 
     attribHash.put("unitList", new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("system", new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put(SYSTEM_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
     attribHash.put("factor", new Attribute(null, Constants.DOUBLE_TYPE));
     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
   }
@@ -279,6 +280,12 @@ import java.io.IOException;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.25  2001/10/02 20:17:09  thomas
+ * minimal change to XMLattrib internals
+ *
+ * Revision 1.24.2.1  2001/10/02 20:13:05  thomas
+ * minimal internal change to XML attrib
+ *
  * Revision 1.24  2001/09/20 20:10:38  huang
  * fixed a bug in set/getDescription()
  *
