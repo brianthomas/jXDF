@@ -199,6 +199,24 @@ public class Reader
             parser.setContentHandler(myDocumentHandler);
             parser.setErrorHandler (new myErrorHandler());
             parser.setEntityResolver(new myEntityResolver());
+            
+            // To set the LexicalHandler for an XML reader, use the setProperty method with the
+            // propertyId "http://xml.org/sax/properties/lexical-handler". If the reader does not support
+            // lexical events, it will throw a SAXNotRecognizedException or a
+            // SAXNotSupportedException when you attempt to register the handler.
+            try {
+               parser.setProperty("http://xml.org/sax/properties/lexical-handler", myDocumentHandler);
+            } catch (org.xml.sax.SAXNotSupportedException e) {
+               Log.warnln("This parser does not support LexicalHandlers and does not allow inspection of DTD events by the XDF reader.");
+               Log.warnln("This means that XDF objects returned by this parser may not have their XMLDeclaration and DocumentType objects set appropriately.");
+               myDocumentHandler.setForceSetXMLHeaderStuffOnXDFObject(true);
+            } catch (org.xml.sax.SAXNotRecognizedException e) {
+               Log.warnln("This parser does not support LexicalHandlers and does not allow inspection of DTD events by the XDF reader.");
+               Log.warnln("This means that XDF objects returned by this parser may not have their XMLDeclaration and DocumentType objects set appropriately.");
+               myDocumentHandler.setForceSetXMLHeaderStuffOnXDFObject(true);
+            } catch (Exception e) {
+               e.printStackTrace();
+            }
 
             // ok, now we are ready to parse the inputsource 
             parser.parse(inputsource);
@@ -340,6 +358,9 @@ class myEntityResolver implements EntityResolver {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2001/09/14 18:20:11  thomas
+ * Added Possible DTD handling for XDF object XMLheader stuff, requires parser supports LexicalHandler stuff
+ *
  * Revision 1.18  2001/08/31 20:00:00  thomas
  * added parseFile, parseString methods
  *
