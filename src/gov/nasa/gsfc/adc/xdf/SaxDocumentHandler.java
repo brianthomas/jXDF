@@ -31,6 +31,7 @@ package gov.nasa.gsfc.adc.xdf;
 
 // Import Java stuff
 import java.util.List;
+import java.util.Vector;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -47,8 +48,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 
 import java.io.Reader;
-import java.io.FileReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+// these can problably be dropped
+import java.io.FileReader;
 
 /** 
  */
@@ -108,6 +113,8 @@ public class SaxDocumentHandler extends HandlerBase {
     // data to.
     private Hashtable DataTagCount = new Hashtable();
 
+    private int INPUTREADSIZE  = 32768; // byte buffer for reads 
+
     // References recording the last object of these types created while
     // parsing the document
     private Parameter LastParameterObject;
@@ -135,6 +142,7 @@ public class SaxDocumentHandler extends HandlerBase {
     private StringBuffer DATABLOCK;
     private boolean CDATAIsArrayData = false;
     private int MaxDataFormatIndex = 0;     // max allowed index in the DataFormatList[]
+    private int CurrentIOCmdIndex = 0;      // For formatted reads, which formattedIOCmd we are currently reading 
     private int CurrentDataFormatIndex = 0; // which dataformat index (in DatFormatList[]) we currently are reading
     private DataFormat DataFormatList[];       // list of CurrentArray.getDataFormatList();
     private int LastFastAxisCoordinate;
@@ -494,6 +502,26 @@ public class SaxDocumentHandler extends HandlerBase {
         // do nothing, method required by interface 
     }
 
+    // not used ?? 
+    public void internalEntityDecl( String name, String value)
+    throws SAXException
+    {
+
+       Log.debugln("H_INTERNAL_ENTITY: "+name+" "+value);
+
+    }
+
+    // not used ?? 
+    public void externalEntityDecl ( String name,
+                                     String publicId,
+                                     String systemId )
+    throws SAXException
+    {
+
+        Log.debugln("H_EXTERNAL_ENTITY: "+name+" "+publicId+" "+systemId);
+
+    }
+
     /* Hurm, why doesnt this method treat 'base'?? */
     public void unparsedEntityDecl ( String name,  
                                      String publicId, 
@@ -565,7 +593,8 @@ public class SaxDocumentHandler extends HandlerBase {
     // This is NOT the best implimentation. In fact, I freely 
     // admit that I dont understand what the entityResolver is 
     // trying to do here.. At this time, it will read a file, 
-    // I dunno if this will really work for other URI's 
+    // I seriously doubt if this will really work for other URI's 
+    // without serious change.
     private String getHrefData (Href hrefObj) {
 
        String buffer = null;
@@ -620,6 +649,332 @@ public class SaxDocumentHandler extends HandlerBase {
 
        return buffer;
     } 
+
+
+    private void loadHrefDataIntoCurrentArray () {
+ 
+       Href hrefObj = CurrentArray.getDataCube().getHref();
+
+       // well, we should be doing something with base here, 
+       // but arent because it isnt captured by this API. feh.
+       // $file = $href->getBase() if $href->getBase();
+
+       if (hrefObj.getSysId() != null) {
+
+          try {
+
+             InputStream in = null;
+
+             try {
+               InputSource inputSource = resolveEntity(hrefObj.getPubId(), hrefObj.getSysId());
+               in = inputSource.getByteStream();
+             } catch (SAXException e) {
+                Log.printStackTrace(e);
+             } catch (NullPointerException e) {
+                // in this case the InputSource object is null to request that 
+                // the parser open a regular URI connection to the system identifier.
+                // In our case, the sysId IS the filename.
+                File f = new File(hrefObj.getSysId());
+                in = (InputStream) new FileInputStream(new File(hrefObj.getSysId()));
+             }
+
+             // ok, got a bytestream, now read the info
+             // Need to use a buffered reader here!!!
+             if (in != null) {
+                // probably could treat endian/nrofDataFormat as a globals too, since thats
+                // how we treat the rest of the array parameters
+                int nrofDataFormat = DataFormatList.length;
+                String endian = CurrentArray.getXMLDataIOStyle().getEndian();
+                byte[] data = new byte[INPUTREADSIZE];
+                int bytes_read = 0;
+
+                while ( true ) {
+
+                  int readAmount = in.read(data, bytes_read, INPUTREADSIZE-bytes_read);
+
+                  if ( readAmount == -1 )
+                  {
+                      // pour out remaining buffer into the current array
+                     addByteDataToCurrentArray(data, bytes_read, endian, nrofDataFormat);
+
+Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
+
+                      break; // EOF reached
+                  }
+
+                  bytes_read += readAmount;
+
+                  // we exceeded the size of the buffer, dump to list
+                  if ( bytes_read == INPUTREADSIZE) 
+                  { 
+
+Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
+
+                     // pour out buffer into array
+                     addByteDataToCurrentArray(data, bytes_read, endian, nrofDataFormat);
+                     bytes_read = 0;
+                  }
+
+                }
+
+             }
+
+          } catch (java.io.IOException e) {
+             Log.printStackTrace(e);
+          }
+
+       } else {
+          Log.warnln("Can't read Href data, undefined sysId!");
+       }
+
+    }
+
+// the problem: need to keep track of the formatting chars. 
+    private void addByteDataToCurrentArray (byte[] data, int amount, String endian, int nrofDataFormat) {
+
+        ArrayList commandList = (ArrayList) ((FormattedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).getCommands();
+        int nrofIOCmd = commandList.size();
+        int bytes_added = 0;
+
+Log.errorln("Adding "+amount+" bytes of data to current array");
+
+        while (bytes_added < amount) {
+
+            FormattedIOCmd currentIOCmd = (FormattedIOCmd) commandList.get(CurrentIOCmdIndex);
+
+            // readCell
+            if (currentIOCmd instanceof ReadCellFormattedIOCmd) {
+
+               DataFormat currentDataFormat = DataFormatList[CurrentDataFormatIndex];
+               int bytes_to_add = currentDataFormat.numOfBytes();
+
+Log.errorln("Adding "+bytes_to_add+" bytes of data to current array");
+//Object objectToAdd = null;
+
+               if ( currentDataFormat instanceof IntegerDataFormat) {
+
+               } else if (currentDataFormat instanceof FixedDataFormat) {
+
+               } else if (currentDataFormat instanceof ExponentialDataFormat) {
+
+Log.errorln("Got Href Data Exponential:["+new String(data,bytes_added,bytes_added+bytes_to_add)+ "]["+bytes_added+"]["+bytes_to_add+"]");
+
+               } else if (currentDataFormat instanceof BinaryFloatDataFormat) {
+
+                  if (bytes_to_add == 4) { 
+  
+                     Float myValue = convert4bytesToFloat(endian, data, bytes_added);
+Log.errorln("Got Href Data Float:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+
+                  } else if (bytes_to_add == 8) { 
+
+                    Double myValue = convert8bytesToDouble(endian, data, bytes_added);
+Log.errorln("Got Href Data Float:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+
+                  } else {
+                     Log.errorln("Error: got floating point with bit size != (32|64). Ignoring data.");
+                  }
+
+               } else if (currentDataFormat instanceof BinaryIntegerDataFormat) {
+
+                  Integer myValue = convert2bytesToInteger (endian, data, bytes_added);
+
+Log.errorln("Got Href Data Integer:["+myValue.toString()+ "]["+bytes_added+"]["+bytes_to_add+"]");
+
+               } else if (currentDataFormat instanceof StringDataFormat) {
+
+// char[] charList = bytesTo8BitChars(data,bytes_added,bytes_added+bytes_to_add);
+
+Log.errorln("String byte range is :"+bytes_added+" to "+(bytes_added+bytes_to_add));
+Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+bytes_to_add))+ "]["+bytes_added+"]["+bytes_to_add+"]");
+
+               }
+
+               // advance our global pointer to the current DataFormat
+               if (nrofDataFormat > 1)
+                  if (CurrentDataFormatIndex == (nrofDataFormat - 1))
+                     CurrentDataFormatIndex = 0;
+                  else
+                     CurrentDataFormatIndex++;
+
+                bytes_added += bytes_to_add;
+
+            } else if (currentIOCmd instanceof SkipCharFormattedIOCmd) {
+               
+                Integer bytes_to_skip = ((SkipCharFormattedIOCmd) currentIOCmd).getCount();
+                bytes_added += bytes_to_skip.intValue();
+
+            } else if (currentIOCmd instanceof RepeatFormattedIOCmd) {
+               // shouldnt happen
+               Log.errorln("Argh getCommands not working right, got repeat command in addByteData!!!");
+               System.exit(-1);
+            }
+
+            // advance our global pointer to the current IOCmd
+            if (nrofIOCmd> 1)
+              if (CurrentIOCmdIndex == (nrofIOCmd - 1))
+                 CurrentIOCmdIndex = 0;
+              else
+                 CurrentIOCmdIndex++;
+
+        }
+
+    }
+
+    // for 16-bit Int
+    private Integer convert2bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
+      
+       int i;
+       if(endianStyle.equals("BigEndian"))
+           i = (bb[sbyte]&0xFF) << 8  | (bb[sbyte+1]&0xFF);
+       else
+           i = (bb[sbyte+1]&0xFF) << 8  | (bb[sbyte]&0xFF);
+
+       return new Integer(i);
+
+    }
+
+    // for 32-bit Int
+    private Integer convert4bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
+
+       int i;
+       if(endianStyle.equals("BigEndian"))
+           i = (bb[sbyte]&0xFF) << 24  | (bb[sbyte+1]&0xFF) << 16 | (bb[sbyte+2]&0xFF) << 8 | (bb[sbyte+3]&0xFF);
+       else
+           i = (bb[sbyte+3]&0xFF) << 24  | (bb[sbyte+2]&0xFF) << 16 | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
+
+       return new Integer(i);
+
+    }
+
+    // for 32-bit Floating point
+    private Float convert4bytesToFloat (String endianStyle, byte[] bb, int sbyte) {
+
+       int i;
+       if(endianStyle.equals("BigEndian")) 
+          i = (bb[sbyte]&0xFF) << 24  | (bb[sbyte+1]&0xFF) << 16 | (bb[sbyte+2]&0xFF) << 8 | (bb[sbyte+3]&0xFF);
+       else 
+          i = (bb[sbyte+3]&0xFF) << 24  | (bb[sbyte+2]&0xFF) << 16 | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
+
+/*
+Log.error("Float bits are: ");
+for (int j=sbyte; j<sbyte+4; j++) {
+   for(int k=7; k >=0; k--) {
+      int newvalue = (bb[j] >> k)&0x01;
+      Log.error(""+newvalue);
+   }
+   Log.error(" ");
+}
+Log.errorln("");
+*/
+
+       return new Float(Float.intBitsToFloat(i));
+    }
+
+    // for 64-bit (Double) Floating point
+    private Double convert8bytesToDouble (String endianStyle, byte[] bb, int sbyte) {
+       int i1;
+       int i2;
+
+       if(endianStyle.equals("BigEndian")) 
+       { 
+          i1 =  (bb[sbyte]&0xFF) << 24 | (bb[sbyte+1]&0xFF) << 16 | (bb[sbyte+2]&0xFF) << 8 | (bb[sbyte+3]&0xFF);
+          i2 =  (bb[sbyte+4]&0xFF) << 24 | (bb[sbyte+5]&0xFF) << 16 | (bb[sbyte+6]&0xFF) << 8 | (bb[sbyte+7]&0xFF);
+       }
+       else 
+       {
+          i2 =  (bb[sbyte+7]&0xFF) << 24 | (bb[sbyte+6]&0xFF) << 16 | (bb[sbyte+5]&0xFF) << 8 | (bb[sbyte+4]&0xFF);
+          i1 =  (bb[sbyte+3]&0xFF) << 24 | (bb[sbyte+2]&0xFF) << 16 | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
+       }
+
+       return new Double(Double.longBitsToDouble( ((long) i1) << 32 | ((long)i2&0x00000000ffffffffL) ));
+
+    }
+
+    // yes, we dont treat anumber of things here (ex. short integers) but this is 
+    // only a hack until we can do binary data 'right'. -b.t.
+    private String convertBinaryDataToString (String endianStyle, 
+                                              DataFormat binaryFormatObj, 
+                                              String strDataRep ) 
+    {
+
+        byte[] bb = strDataRep.getBytes();
+
+        if (binaryFormatObj instanceof BinaryIntegerDataFormat) {
+
+            int i;
+
+            if(((BinaryIntegerDataFormat) binaryFormatObj).numOfBytes() == 2) 
+            {
+               // 16 bit 
+               if(endianStyle.equals("BigEndian")) 
+                  i = (bb[0]&0xFF) << 8  | (bb[1]&0xFF);
+               else 
+                  i = (bb[1]&0xFF) << 8  | (bb[0]&0xFF);
+
+/*
+Log.error("integer bits are: ");
+int sbyte = 0;
+for (int j=sbyte; j<sbyte+2; j++) {
+   for(int k=7; k >=0; k--) {
+      int newvalue = (bb[j] >> k)&0x01;
+      Log.error(""+newvalue);
+   }
+   Log.error(" ");
+}
+Log.errorln("");
+*/
+
+               strDataRep = new Integer(i).toString();
+
+            } 
+            else if(((BinaryIntegerDataFormat) binaryFormatObj).numOfBytes() == 4) 
+            {
+               // 32 bit (long) 
+               if(endianStyle.equals("BigEndian")) 
+                  i = (bb[0]&0xFF) << 24  | (bb[1]&0xFF) << 16 | (bb[2]&0xFF) << 8 | (bb[3]&0xFF);
+               else 
+                  i = (bb[3]&0xFF) << 24  | (bb[2]&0xFF) << 16 | (bb[1]&0xFF) << 8 | (bb[0]&0xFF);
+
+               strDataRep = new Integer(i).toString();
+            } 
+            else 
+            {
+               Log.errorln("Cant treat binaryIntegers that arent either 16 or 32 bit. Ignoring value.");
+            } 
+
+        } else if (binaryFormatObj instanceof BinaryFloatDataFormat) {
+
+            int i;
+
+            if(((BinaryFloatDataFormat) binaryFormatObj).numOfBytes() == 4) 
+            {
+               // 32 bit float
+               if(endianStyle.equals("BigEndian")) 
+                  i = bb[0] << 24  | (bb[1]&0xFF) << 16 | (bb[2]&0xFF) << 8 | (bb[3]&0xFF);
+               else
+                  i = bb[3] << 24  | (bb[2]&0xFF) << 16 | (bb[1]&0xFF) << 8 | (bb[0]&0xFF);
+
+               float myfloat = Float.intBitsToFloat(i);
+               strDataRep = new Float(myfloat).toString();
+
+            } 
+            else if(((BinaryFloatDataFormat) binaryFormatObj).numOfBytes() == 8) 
+            {
+               // 64 bit float
+               strDataRep = new String("");
+
+            } 
+            else 
+            {
+               Log.warnln("Got Floating point number with neither 32 or 64 bits, ignoring.");
+               strDataRep = new String("");
+            } 
+
+        }
+
+        return strDataRep;
+    }
 
     // Placeholder to remind me to do some version checking w/ base class
     private boolean checkXDFDocVersion (String version)
@@ -738,23 +1093,26 @@ public class SaxDocumentHandler extends HandlerBase {
            if ( CurrentDataFormat instanceof StringDataFormat) {
 // Log.errorln(" StringDataFormat");
               CurrentArray.setData(dataLocator, thisString);
-           } else if ( CurrentDataFormat instanceof FixedDataFormat) {
+           } else if ( CurrentDataFormat instanceof FixedDataFormat
+                       || CurrentDataFormat instanceof BinaryFloatDataFormat) 
+           {
 // Log.errorln(" FixedDataFormat");
               Double number = new Double (thisString);
               CurrentArray.setData(dataLocator, number.doubleValue());
-           } else if ( CurrentDataFormat instanceof IntegerDataFormat) {
+           } else if ( CurrentDataFormat instanceof IntegerDataFormat
+                       || CurrentDataFormat instanceof BinaryIntegerDataFormat) 
+           {
 // Log.errorln(" IntegerDataFormat");
               Integer number = new Integer (thisString);
               CurrentArray.setData(dataLocator, number.intValue());
            } else if ( CurrentDataFormat instanceof ExponentialDataFormat) {
 // Log.errorln(" ExponentDataFormat");
               // hurm.. this is a stop-gap. Exponential format needs to be
-              // preserved better than this. -b.t. 
+              // preserved better than this, perhaps??. -b.t. 
               Double number = new Double (thisString);
               CurrentArray.setData(dataLocator, number.doubleValue());
            } else {
-              Log.warnln("The dataFormat:"+CurrentDataFormat.toString()+" is not allowed in tagged data.");
-              Log.warnln("Unable to setData:["+thisString+"], ignoring request");
+              Log.warnln("Unknown data format, unable to setData:["+thisString+"], ignoring request");
            }
 
        } catch (SetDataException e) {
@@ -998,14 +1356,15 @@ Log.errorln(" TValue:"+valueString);
 
         ArrayList stringObjList = new ArrayList();
         List commandList = readObj.getCommands();
-        DataFormat dataFormat[] = CurrentArray.getDataFormatList();
+        // DataFormat dataFormat[] = CurrentArray.getDataFormatList();
 
+        String endian = readObj.getEndian();
         int dataPosition = 0;
         int dataLength = data.length();
         int currentDataFormat = 0;
-        int nrofDataFormat = dataFormat.length;
+        int nrofDataFormat = DataFormatList.length;
 
-        Log.debugln("in formattedSplitString, data :["+data+"]");
+        // Log.debugln("in formattedSplitString, data :["+data+"]");
 
         // the extraction loop
         // whip thru the data string, either ignoring or accepting
@@ -1018,7 +1377,7 @@ Log.errorln(" TValue:"+valueString);
              if (thisCommand instanceof ReadCellFormattedIOCmd) // ReadCell ==> read some data
              {
 
-                 DataFormat formatObj = dataFormat[currentDataFormat];
+                 DataFormat formatObj = DataFormatList[currentDataFormat];
                  int endDataPosition = dataPosition + formatObj.numOfBytes();
 
                  // add in our object
@@ -1029,6 +1388,11 @@ Log.errorln(" TValue:"+valueString);
                  }
 
                  String thisData = data.substring(dataPosition,endDataPosition);
+
+                 // convert binaryData to correct string representation
+                 if(formatObj instanceof BinaryIntegerDataFormat 
+                     || formatObj instanceof BinaryFloatDataFormat) 
+                    thisData = convertBinaryDataToString(endian, formatObj, thisData);
 
                  // remove leading whitespace from what will be non-string data.
                  if (Character.isWhitespace(thisData.charAt(0)) && 
@@ -1480,6 +1844,7 @@ Log.errorln(" TValue:"+valueString);
               myLocator.setIterationOrder(AxisReadOrder);
 
 
+              // CurrentIOCmdIndex = 0; 
               CurrentDataFormatIndex = 0; 
               ArrayList strValueList;
 
@@ -1576,15 +1941,24 @@ Log.errorln(" TValue:"+valueString);
                 hrefObj = new Href();
 
                 Hashtable hrefInfo = (Hashtable) UnParsedEntity.get(hrefValue);
-                hrefObj.setName((String) hrefInfo.get("name"));
-                if (hrefInfo.containsKey("base")) 
-                   hrefObj.setBase((String) hrefInfo.get("base"));
-                if (hrefInfo.containsKey("sysId")) 
-                   hrefObj.setSysId((String) hrefInfo.get("sysId"));
-                if (hrefInfo.containsKey("pubId")) 
-                   hrefObj.setPubId((String) hrefInfo.get("pubId"));
-                if (hrefInfo.containsKey("ndata")) 
-                   hrefObj.setNdata((String) hrefInfo.get("ndata"));
+
+                if (UnParsedEntity.containsKey(hrefValue)) 
+                {
+                   hrefObj.setName((String) hrefInfo.get("name"));
+                   if (hrefInfo.containsKey("base")) 
+                      hrefObj.setBase((String) hrefInfo.get("base"));
+                   if (hrefInfo.containsKey("sysId")) 
+                      hrefObj.setSysId((String) hrefInfo.get("sysId"));
+                   if (hrefInfo.containsKey("pubId")) 
+                      hrefObj.setPubId((String) hrefInfo.get("pubId"));
+                   if (hrefInfo.containsKey("ndata")) 
+                      hrefObj.setNdata((String) hrefInfo.get("ndata"));
+                } else {
+                   // bizarre. It usually means that the unparsed entity handler
+                   // isnt working like it should
+                   Log.error("Error: UnParsedEntity list lacks entry for :"+hrefValue);
+                   Log.errorln(" ignoring request to read data.");
+                }
 
              }
 
@@ -1608,6 +1982,8 @@ Log.errorln(" TValue:"+valueString);
                   
              // reset to start of which dataformat type we currently are reading
              CurrentDataFormatIndex = 0;    
+             // reset to start of which IOCmd we currently are reading
+             CurrentIOCmdIndex = 0;    
 
              // reset the list of dataformats we are reading
              DataFormatList = CurrentArray.getDataFormatList();
@@ -1629,6 +2005,7 @@ Log.errorln(" TValue:"+valueString);
           // tack in href data 
           if (CurrentArray.getDataCube().getHref() != null) 
               DATABLOCK.append(getHrefData(CurrentArray.getDataCube().getHref()));
+              //loadHrefDataIntoCurrentArray();
 
           // entered a datanode, raise the count 
           // this (partially helps) declare we are now reading data, 
@@ -3261,6 +3638,14 @@ Log.errorln(" TValue:"+valueString);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.27  2001/01/29 05:05:42  thomas
+ * Code for reading binary values. The implemented code
+ * is a travesty, it converts bytes to Strings, then decides
+ * how to make strings into numbers and so forth. There
+ * is some better (but still lousy) code for reading in
+ * bytes directly into the array. Lots of needless globals
+ * and messy code. This will need further work. -b.t.
+ *
  * Revision 1.26  2001/01/22 22:11:58  thomas
  * Added id/idref struff to valueList, value and parameter. Read
  * id/idref stuff fixed. valueList values may now be added to
