@@ -48,17 +48,17 @@ public abstract class Constants {
     INTEGER_TYPE_LIST[2]=INTEGER_TYPE_OCTAL;
   }
 
-  public static final String UTF_8 = "UTF-8";
-  public static final String UTF_16 = "UTF-16";
-  public static final String ISO_8859_1 = "ISO-8859-1";
-  public static final String ANSI = "ANSI";
+  public static final String IO_ENCODING_UTF_8 = "UTF-8";
+  public static final String IO_ENCODING_UTF_16 = "UTF-16";
+  public static final String IO_ENCODING_ISO_8859_1 = "ISO-8859-1";
+  public static final String IO_ENCODING_ANSI = "ANSI";
   //store the enum list of encodings
-  public static final String[] ENCODINGS_LIST = new String[4];
+  public static final String[] IO_ENCODINGS_LIST = new String[4];
   static {
-    ENCODINGS_LIST[0]=UTF_8;
-    ENCODINGS_LIST[1]=UTF_16;
-    ENCODINGS_LIST[2]=ISO_8859_1 ;
-    ENCODINGS_LIST[3]=ANSI;
+    IO_ENCODINGS_LIST[0]=IO_ENCODING_UTF_8;
+    IO_ENCODINGS_LIST[1]=IO_ENCODING_UTF_16;
+    IO_ENCODINGS_LIST[2]=IO_ENCODING_ISO_8859_1 ;
+    IO_ENCODINGS_LIST[3]=IO_ENCODING_ANSI;
   }
 
   public static final String DATATYPE_INTEGER = "integer";
@@ -76,7 +76,29 @@ public abstract class Constants {
     DATATYPE_LIST[4]=DATATYPE_URL;
   }
 
+   public static final String DATA_ENCODING_UUENCODED = "uuencoded";
+   public static final String DATA_ENCODING_BASE64 = "base64";
+   public static final String[] DATA_ENCODING_LIST = new String[2];
+   static {
+    DATA_ENCODING_LIST[0]=DATA_ENCODING_UUENCODED;
+    DATA_ENCODING_LIST[1]=DATA_ENCODING_BASE64;
+   }
 
+   public static final String DATA_COMPRESSION_ZIP = "zip";
+   public static final String DATA_COMPRESSION_GZIP = "gzip";
+   public static final String DATA_COMPRESSION_BZIP2 = "bzip2";
+   public static final String DATA_COMPRESSION_XMILL = "XMILL";
+   public static final String DATA_COMPRESSION_COMPRESS = "compress";
 
+   public static final String[] DATA_COMPRESSION_LIST = new String[5];
+   static {
+    DATA_COMPRESSION_LIST[0]=DATA_COMPRESSION_ZIP;
+    DATA_COMPRESSION_LIST[1]=DATA_COMPRESSION_GZIP;
+    DATA_COMPRESSION_LIST[2]=DATA_COMPRESSION_BZIP2;
+    DATA_COMPRESSION_LIST[3]=DATA_COMPRESSION_XMILL;
+    DATA_COMPRESSION_LIST[4]=DATA_COMPRESSION_COMPRESS;
+   }
 
 }
+
+
