@@ -1007,8 +1007,8 @@ public class DataCube extends BaseObject {
                numOfBytes[i]    = dataFormat[i].numOfBytes();
 
                Field field = (Field) fields.get(i);
-               if (field != null && field.getNoDataValue() != null) 
-                   noDataValues[i] = field.getNoDataValue().toString();
+               if (field != null && field.getDataFormat().getNoDataValue() != null) 
+                   noDataValues[i] = field.getDataFormat().getNoDataValue().toString();
 
                if (dataFormat[i] instanceof FloatDataFormat)
                   negExponentialPattern[i] = ((FloatDataFormat) dataFormat[i]).getNegativeExponentFormatPattern();
