@@ -1,0 +1,86 @@
+
+
+This is a brief document defining various concepts in XDF.
+Hopefully, we can write up something a bit more informative in 
+the near future.
+
+Some important terms/concepts associated with XDF:
+
+
+"structure" : This is an object which may hold both other structures
+              and arrays (see def below). Structure is a means of 
+              grouping meta-data related to more than one structure or
+              more than one array. The meta-data of structures are 
+              usually just held within child parameter objects.
+
+"array"     : This is an object holding both the scientific data and
+              its (directly) related metadata.  These related metadata 
+              include axis information, the data format of the data 
+              and how to read in/write out data. Array must always
+              appear within a structure. 
+
+"datacube"  : An object holding an n-dimensional array. There is one
+              (and only one) datacube for each XDF array. 
+
+"axis"      : For each dimension represented within a given datacube
+              there exists 1 axis. Each axes describes the relationship
+              between the internal indexing of the data with the external
+              names for indices (so-called "axisValues"; which may be 
+              numbers or strings).
+
+"fieldAxis" : This is special type of axis. Unlike the "regular" axis
+              objects there can only be one (or zero) fieldAxis in each
+              array object. The field axis object describes the relation
+              between internal indexing of data and field objects (see
+              below).
+
+"axisValue" : A unique point on an axis; internal indices of a datacube
+              are whole numbers with the origin numbered "0", however, 
+              this internal number is never used by the scientist. 
+              Rather, a value is ascribed to each indice; ascribed values can
+              be in any arbitrary ordering but each must be unique to
+              only one indice on the axis. Units may be ascribed
+              to all axis values along a given axis. Units of the
+              data are described either by fields (see below) or
+              in an array object (above).
+
+"field"     : Fields may exist at each index on the fieldAxis.
+              Fields objects may have units that describe the units of *the data*
+              that occur within a data slice through the datacube at the indice 
+              where the given field occurs.
+
+"datacell"  : A unique address within the datacube that holds a single-valued 
+              scalar or vector datum.  More complex data may be stored by adding
+              additional axes to the datacube.
+
+
+Here is a diagram showing the inter-relations between these components
+of the XDF in a 2 - dimensional dataset with no fields.
+
+     axisValue -----> "9" "8" "7" "6" "5" "A"  .   .  "?"
+     axisIndex ----->  0   1   2   3   4   5   .   .   n
+
+                       |   |   |   |   |   |   |   |   |
+     axisIndex--\      |   |   |   |   |   |   |   |   |
+                |      |   |   |   |   |   |   |   |   |
+     axisValue  |      V   V   V   V   V   V   V   V   V
+         |      |
+         V      V      |   |   |   |   |   |   |   |   |
+       "star 1" 0 --> -====================================> axis 0
+       "star 2" 1 --> -|          8.1
+       "star 3" 2 --> -|
+       "star 4" 3 --> -|
+       "star 5" 4 --> -|
+       "star 6" 5 --> -|       7
+          .     . --> -|
+          .     . --> -|
+          .     . --> -|
+        "??"    m --> -|
+                       |
+                       v
+                     axis 1
+
+
+   (explanation; another example with fieldAxis/fields)
+
+
