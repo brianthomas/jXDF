@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Enumeration;
 import java.util.Iterator;
 
 // Import needed SAX stuff
@@ -69,30 +70,53 @@ class SaxDocumentHandler implements DocumentHandler {
     // References to the current working structure/array
     private Structure CurrentStructure;   
     private Array     CurrentArray;   
-    private String    CurrentDatatypeObject;
+    private Object    CurrentDatatypeObject;
     private ArrayList CurrentNodePath = new ArrayList();
     private ArrayList CurrentParameterGroupList = new ArrayList();
     private ArrayList CurrentValueGroupList = new ArrayList();
+    private ArrayList CurrentFormatObjectList = new ArrayList ();
+
+
+    // GLOBALs for saving these between dataFormat/read node and later when we 
+    // know what kind of DataFormat/DataIOStyle object we really have
+    private AttributeList DataIOStyleAttribs;
+    private AttributeList DataFormatAttribs;
+
+    // for tagged reads only. Keeps track of which data tags are open
+    // so we know which datacell in the current datacube to shunt the 
+    // data to.
+    private Hashtable DataTagCount = new Hashtable();
 
     // References recording the last object of these types created while
     // parsing the document
     private Parameter LastParameterObject;
+    private Field     LastFieldObject;
     private Note      LastNoteObject;
-    // private Notes     LastNotesObject;
     private Unit      LastUnitObject;
     private Units     LastUnitsObject;
 
     private Object LastParameterGroupParentObject;
-    private Object LastValueGroupParentObject;
+    private String LastValueGroupParentObject;
+    private String LastNotesParentObjectName;
+
+    private ArrayList NoteLocatorOrder = new ArrayList();
 
     // keeping track of valueList settings
     private Hashtable CurrentValueListParameter;
 
+
     // Data writing stuff
+    private int CurrentDataTagLevel = 0; // how nested we are within d0/d1/d2 data tags
     private int DataNodeLevel = 0; // how deeply nested we are within data nodes 
+    private int DataTagLevel = 0; // the level where the actual char data is
+//my $CDATA_IS_ARRAY_DATA; # Tells us when we are accepting char_data as data 
+    private Locator TaggedLocatorObj;
+    private String DATABLOCK = new String();
+    private boolean CDATAIsArrayData = false;
 
     // lookup tables holding objects that have id/idref stuff
     private Hashtable AxisObj = new Hashtable();
+    private Hashtable NoteObj = new Hashtable();
 
     // DEFAULT settings. We really should be getting these 
     // from the XDF DTD, NOT setting them here.
@@ -102,7 +126,13 @@ class SaxDocumentHandler implements DocumentHandler {
     private int DefaultValueListStart = 1;
     private int DefaultValueListStep = 1;
 
-
+    // this is a BAD thing. I have been having troubles distinguishing between
+    // important whitespace (e.g. char data within a data node) and text nodes
+    // that are purely for the layout of the XML document. Right now I use the 
+    // CRUDE distinquishing characteristic that fluff (eg. only there for the sake
+    // of formatting the output doc) text nodes are all whitespace.
+    // Used by TAGGED data arrays
+    private boolean IgnoreWhitespaceOnlyData = true;
 
     //
     // Constuctors
@@ -204,7 +234,7 @@ class SaxDocumentHandler implements DocumentHandler {
            event.action(attrs);
 
         } else {
-           Log.warn("Warning: UNKNOWN NODE ["+element+"] encountered.\n");
+           Log.warnln("Warning: UNKNOWN NODE ["+element+"] encountered.");
         }
     }
 
@@ -265,8 +295,8 @@ class SaxDocumentHandler implements DocumentHandler {
 
            if (DataNodeLevel > 0) {
 
-       //        &data_node_charData($string)
-               Log.errorln("Data Character Data NOT yet implemented");
+              CharDataHandlerAction event = new dataCharDataHandlerFunc();
+              event.action(buf,offset,len);
 
            } else {
 
@@ -313,7 +343,7 @@ class SaxDocumentHandler implements DocumentHandler {
         // use it, and currently most SAX nonvalidating ones will
         // also; but nonvalidating parsers might hardly use it,
         // depending on the DTD structure.
-        // Log.debugln("Whitespace:["+new String(buf,offset,len)+"]");
+        // Log.debugln("I Whitespace:["+new String(buf,offset,len)+"]");
 
         // do nothing, method required by interface 
     }
@@ -365,7 +395,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
        startElementHandlerHashtable.put(XDFNodeName.ARRAY, new arrayStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.AXIS, new axisStartElementHandlerFunc());
-       startElementHandlerHashtable.put(XDFNodeName.AXISUNITS, new axisUnitsStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.AXISUNITS, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.BINARYFLOAT, new binaryFloatFieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.BINARYINTEGER, new binaryIntegerFieldStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.DATA, new dataStartElementHandlerFunc());
@@ -470,6 +500,16 @@ class SaxDocumentHandler implements DocumentHandler {
        return gParentNodeName;
 
     }
+ 
+    // This will get used heavily during data adding. Implimentation
+    // is kinda slow too. bleh.
+    // isnt there some free code around to do this?
+    private boolean stringIsNotAllWhitespace (String thisString) {
+
+       if(thisString.trim().length() == 0) 
+           return false;
+       return true;
+    } 
 
     // For the case where valueList is storing values in 
     // algorithmic fashion
@@ -496,6 +536,10 @@ class SaxDocumentHandler implements DocumentHandler {
            } else if ( name.equals("start")) {
                Integer tmp = new Integer (attrs.getValue(i));
                start = tmp.intValue();
+           } else if ( name.equals("delimiter")) {
+              // IF delimiter is defined, then we ARENT using
+              // an algorthm, and should exit here without further ado.
+              return values;
            }
        }
 
@@ -609,7 +653,7 @@ class SaxDocumentHandler implements DocumentHandler {
           // set current array and add this array to current structure 
           CurrentArray = CurrentStructure.addArray(newarray);
 
-          CurrentDatatypeObject = "CurrentArray";
+          CurrentDatatypeObject = CurrentArray;
 
        }
     } 
@@ -638,7 +682,7 @@ class SaxDocumentHandler implements DocumentHandler {
 
                  // a warning check, just in case 
                  if (AxisObj.containsKey(axisId)) 
-                    Log.warnln("More than one axis node with axisId=\""+axisId+"\", using latest node.\n" ); 
+                    Log.warnln("More than one axis node with axisId=\""+axisId+"\", using latest node." ); 
 
                  // add this into the list of axis objects
                  AxisObj.put(axisId, newaxis);
@@ -666,7 +710,8 @@ class SaxDocumentHandler implements DocumentHandler {
              // add this axis to the current array object
              CurrentArray.addAxis(newaxis);
 
-             CurrentDatatypeObject = "LastAxis";
+             // I dont believe this is actually used
+             // CurrentDatatypeObject = newaxis;
 
           } else {
              Log.errorln("Axis object:"+newaxis+" lacks either axisId or axisIdRef, ignoring!");
@@ -675,47 +720,71 @@ class SaxDocumentHandler implements DocumentHandler {
        }
     }
 
-    // AXIS UNITS
-    //
-
-    class axisUnitsStartElementHandlerFunc implements StartElementHandlerAction {
-       public void action (AttributeList attrs) { 
-          Log.errorln("AXIS UNITS Start handler not implemented yet.");
-       }
-    }
-
     // BinaryFloatField 
     //
 
     class binaryFloatFieldStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
-          Log.errorln("Binary Float Field Start handler not implemented yet.");
+
+        // create the object
+          BinaryFloatDataFormat bfFormat = new BinaryFloatDataFormat();
+          bfFormat.setXMLAttributes(attrs);
+          bfFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
+
+          if (CurrentDatatypeObject instanceof Field) {
+              ((Field) CurrentDatatypeObject).setDataFormat(bfFormat);
+          } else if (CurrentDatatypeObject instanceof Array) {
+              ((Array) CurrentDatatypeObject).setDataFormat(bfFormat);
+          } else {
+              Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
+          }
+
+
        }
     }
 
 
-    // BinaryIntegerField 
+    // BINARYINTEGERFIELD
     //
 
     class binaryIntegerFieldStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
-          Log.errorln("Binary Integer Field Start handler not implemented yet.");
+
+         // create the object
+          BinaryIntegerDataFormat biFormat = new BinaryIntegerDataFormat();
+          biFormat.setXMLAttributes(attrs);
+          biFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
+
+          if (CurrentDatatypeObject instanceof Field) {
+              ((Field) CurrentDatatypeObject).setDataFormat(biFormat);
+          } else if (CurrentDatatypeObject instanceof Array) {
+              ((Array) CurrentDatatypeObject).setDataFormat(biFormat);
+          } else {
+              Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
+          }
+
+
        }
     }
 
 
-    // Datatag 
+    // DATATAG
     //
 
     class dataTagStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
-          Log.errorln("DATATAG Start handler not implemented yet.");
+          CurrentDataTagLevel++;
        }
     }
 
     class dataTagEndElementHandlerFunc implements EndElementHandlerAction {
        public void action () { 
-          Log.errorln("DATATAG End handler not implemented yet.");
+
+          if (CurrentDataTagLevel == DataTagLevel)
+             TaggedLocatorObj.next();
+
+          CurrentDataTagLevel--;
+
        }
     }
 
@@ -724,19 +793,110 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class dataCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (char buf [], int offset, int len) {
-          System.out.println("DATA NODE Char Data Handler NOT implemented yet.");
+
+          XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
+
+          if ( readObj instanceof TaggedXMLDataIOStyle ) {
+
+             String thisString = new String(buf,offset,len);
+             // dont add this data unless it has more than just whitespace
+             if (!IgnoreWhitespaceOnlyData || stringIsNotAllWhitespace(thisString) ) {
+
+                Log.debugln("ADDING TAGGED DATA to ("+TaggedLocatorObj+") : ["+thisString+"]");
+
+                DataTagLevel = CurrentDataTagLevel;
+
+                // adding data based on what type..
+                try {
+                   CurrentArray.setData(TaggedLocatorObj, thisString);
+                } catch (SetDataException e) {
+                   Log.errorln("Unable to setData:["+thisString+"], ignoring request");
+                }
+
+             }
+
+          } else if ( readObj instanceof DelimitedXMLDataIOStyle ||
+                    readObj instanceof FormattedXMLDataIOStyle )
+          {
+
+              if ( CDATAIsArrayData ) {
+                  // accumulate CDATA in the GLOBAL $DATABLOCK for later reading
+                  DATABLOCK.concat(new String(buf,offset,len));
+              }
+
+           } else {
+               Log.errorln("UNSUPPORTED Data Node CharData style, aborting.\n");
+               System.exit(-1);
+           }
+
        }
     }
 
     class dataEndElementHandlerFunc implements EndElementHandlerAction {
        public void action () { 
-          Log.errorln("DATA End handler not implemented yet.");
+
+          // we stopped reading datanode, lower count by one
+          DataNodeLevel--;
+
+          //  we might still be nested within a data node
+          // if so, return now to accumulate more data within the DATABLOCK
+          if(DataNodeLevel != 0)
+             return;
+
+          // now we are ready to read in untagged data (both delimited/formmatted styles) 
+          // from the DATABLOCK
+
+          // Note: unfortunately we are reduced to using regex style matching
+          // instead of a buffer read in formatted reads. Come back and
+          // improve this later if possible.
+
+          XMLDataIOStyle formatObj = CurrentArray.getXMLDataIOStyle();
+
+          if ( formatObj instanceof DelimitedXMLDataIOStyle ||
+               formatObj instanceof FormattedXMLDataIOStyle ) 
+          {
+
+              Log.errorln("ERROR: Delimited/Formated DATA reading is not implemented yet. Aborting read.");
+              System.exit(-1);
+
+          } else if ( formatObj instanceof TaggedXMLDataIOStyle )
+          {
+
+              // Tagged case: do nothing
+
+          } else {
+
+              Log.errorln("ERROR: Completely unknown DATA IO style! aborting read.");
+              System.exit(-1);
+
+          }
+
        }
     }
 
     class dataStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
-          Log.errorln("DATA Start handler not implemented yet.");
+
+          // we only need to do this for the first time we enter
+          if (DataNodeLevel == 0) {
+              // update the array dataCube with passed attributes
+              CurrentArray.getDataCube().setXMLAttributes(attrs);
+          }
+
+          XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
+
+          if ( readObj instanceof TaggedXMLDataIOStyle) {
+             TaggedLocatorObj = CurrentArray.createLocator();
+          } else {
+             // A safety. We clear datablock when this is the first datanode we 
+             // have entered DATABLOCK is used in cases where we read in untagged data
+             if (DataNodeLevel == 0) DATABLOCK = new String();
+          }
+
+          // entered a datanode, raise the count 
+          // this (partially helps) declare we are now reading data, 
+          DataNodeLevel++; 
+
        }
     }
 
@@ -745,7 +905,10 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class dataFormatStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
-          Log.errorln("DATAFORMAT Start handler not implemented yet.");
+
+           // save attribs for latter
+           DataFormatAttribs = attrs;
+
        }
     }
 
@@ -755,7 +918,20 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class exponentFieldStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("EXPONENTFIELD Start handler not implemented yet.");
+
+         // create the object
+          ExponentialDataFormat exponentFormat = new ExponentialDataFormat();
+          exponentFormat.setXMLAttributes(attrs);
+          exponentFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
+
+          if (CurrentDatatypeObject instanceof Field) {
+              ((Field) CurrentDatatypeObject).setDataFormat(exponentFormat);
+          } else if (CurrentDatatypeObject instanceof Array) { 
+              ((Array) CurrentDatatypeObject).setDataFormat(exponentFormat);
+          } else {
+              Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
+          }
+
        }
     }
 
@@ -764,7 +940,19 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class fieldStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("FIELD Start handler not implemented yet.");
+
+          // create new object appropriately 
+          Field newfield = new Field();
+          newfield.setXMLAttributes(attrs); // set XML attributes from passed list
+
+          // grab the field axis and add the field 
+          FieldAxis fieldAxis = CurrentArray.getFieldAxis();
+          fieldAxis.addField(newfield);
+
+          CurrentDatatypeObject = newfield;
+
+          LastFieldObject = newfield;
+
        }
     }
 
@@ -773,7 +961,57 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class fieldAxisStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("FIELDAXIS Start handler not implemented yet.");
+
+          // create new object appropriately 
+          FieldAxis newfieldaxis = new FieldAxis();
+          newfieldaxis.setXMLAttributes(attrs); // set XML attributes from passed list 
+
+          // Every axis must have *either* axisId *or* an axisIdRef 
+          // else, its illegal!
+          String axisId = null;
+          String axisIdRef = null;
+          if ( (axisId = newfieldaxis.getAxisId()) != null
+                || (axisIdRef = newfieldaxis.getAxisIdRef()) != null
+             )
+          {
+
+             // add this object to the lookup table, if it has an ID
+             if (axisId != null) {
+
+                 // a warning check, just in case 
+                 if (AxisObj.containsKey(axisId))
+                    Log.warnln("More than one axis node with axisId=\""+axisId+"\", using latest node." );
+
+                 // add this into the list of axis objects
+                 AxisObj.put(axisId, newfieldaxis);
+
+             }
+
+             //  If there is a reference object, clone it to get
+             //  the new axis
+             if (axisIdRef != null) {
+
+                 if (AxisObj.containsKey(axisIdRef)) {
+
+                    BaseObject refAxisObj = (BaseObject) AxisObj.get(axisIdRef);
+                    newfieldaxis = (FieldAxis) refAxisObj.clone();
+
+                    // override attrs with those in passed list
+                    newfieldaxis.setXMLAttributes(attrs);
+
+                 } else {
+                    Log.errorln("Error: Reader got an axis with AxisIdRef=\""+axisIdRef+"\" but no previous axis has that id! Ignoring add axis request.");
+                    return;
+                 }
+             }
+
+             // add this axis to the current array object
+             CurrentArray.addFieldAxis(newfieldaxis);
+
+          } else {
+             Log.errorln("FieldAxis object:"+newfieldaxis+" lacks either axisId or axisIdRef, ignoring!");
+          }
+
        }
     }
 
@@ -807,7 +1045,19 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class fixedFieldStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("FIXEDFIELD Start handler not implemented yet.");
+
+          // create the object
+          FixedDataFormat fixedFormat = new FixedDataFormat();
+          fixedFormat.setXMLAttributes(attrs);
+          fixedFormat.setXMLAttributes(DataFormatAttribs);
+
+          if (CurrentDatatypeObject instanceof Field) { 
+              ((Field) CurrentDatatypeObject).setDataFormat(fixedFormat);
+          } else if (CurrentDatatypeObject instanceof Array) { 
+              ((Array) CurrentDatatypeObject).setDataFormat(fixedFormat);
+          } else {
+              Log.warnln("Unknown parent object, cant set string data type/format in $dataTypeObj, ignoring.");
+          }
        }
     }
 
@@ -825,7 +1075,21 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class integerFieldStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("INTEGERFIELD Start handler not implemented yet.");
+
+         // create the object
+          IntegerDataFormat integerFormat = new IntegerDataFormat();
+          integerFormat.setXMLAttributes(attrs);
+          integerFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
+
+          if (CurrentDatatypeObject instanceof Field) {
+              ((Field) CurrentDatatypeObject).setDataFormat(integerFormat);
+          } else if (CurrentDatatypeObject instanceof Array) {
+              ((Array) CurrentDatatypeObject).setDataFormat(integerFormat);
+          } else {
+              Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring.");
+          }
+
+
        }
     }
 
@@ -834,13 +1098,77 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class noteCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (char buf [], int offset, int len) {
-          System.out.println("NOTE Char Data Handler NOT implemented yet.");
+
+          // add cdata as text to the last note object 
+          String newText = new String(buf,offset,len);
+          LastNoteObject.setValue(newText);
+
        }
     }
 
     class noteStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("NOTE Start handler not implemented yet.");
+
+           // Note: note nodes sometimes appear within notes node,
+           // use LastNotesParentObjectName to determine if this is the case
+           String parentNodeName = (LastNotesParentObjectName != null) ? XDFNodeName.ARRAY : getParentNodeName(); 
+
+           // create new object appropriately 
+           Note newnote = new Note();
+           newnote.setXMLAttributes(attrs); // set XML attributes from passed list 
+
+           String noteId = newnote.getNoteId();
+           String noteIdRef = newnote.getNoteIdRef();
+
+           // add this object to the lookup table, if it has an ID
+           if (noteId != null) {
+
+              // a warning check, just in case 
+              if (NoteObj.containsKey(noteId))
+                 Log.warnln("More than one note node with noteId=\""+noteId+"\", using latest node." );
+
+              // add this into the list of note objects
+              NoteObj.put(noteId, newnote);
+
+           }
+
+           // add this object to parent object
+
+           if( parentNodeName.equals(XDFNodeName.ARRAY) )
+           {
+              CurrentArray.addNote(newnote);
+           } else if ( parentNodeName.equals(XDFNodeName.FIELD) )
+           {
+              LastFieldObject.addNote(newnote);
+           } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
+           {
+              LastParameterObject.addNote(newnote);
+           } else 
+           {
+              Log.warnln( "Unknown parent node: "+parentNodeName+" for note. Ignoring.");
+           }
+
+           //  If there is a reference object, clone it to get
+           //  the new axis
+           if (noteIdRef != null) {
+
+              if (NoteObj.containsKey(noteIdRef)) {
+
+                 BaseObject refNoteObj = (BaseObject) NoteObj.get(noteIdRef);
+                 newnote = (Note) refNoteObj.clone();
+
+                 // override attrs with those in passed list
+                 newnote.setXMLAttributes(attrs);
+
+              } else {
+                 Log.errorln("Error: Reader got a note with NoteIdRef=\""+noteIdRef+"\" but no previous note has that id! Ignoring add note request.");
+                 return;
+              }
+           }
+
+           LastNoteObject = newnote;
+
+
        }
     }
 
@@ -850,7 +1178,19 @@ class SaxDocumentHandler implements DocumentHandler {
     
     class noteIndexStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("NOTEINDEX Start handler not implemented yet.");
+
+          String axisIdRef = (String) null;
+          for (int i = 0 ; i < attrs.getLength(); i++) {
+              if (attrs.getName(i).equals("axisIdRef")) { // bad. hardwired axisIdRef name
+                 axisIdRef = attrs.getValue(i);
+                 break;
+              }
+          }
+            
+          if(axisIdRef != null) {
+             NoteLocatorOrder.add(axisIdRef);
+          }
+
        }
     }
 
@@ -860,13 +1200,31 @@ class SaxDocumentHandler implements DocumentHandler {
     
     class notesEndElementHandlerFunc implements EndElementHandlerAction {
        public void action () {
-          Log.errorln("NOTES End handler not implemented yet.");
+
+/*
+   my $notesObj = $LAST_NOTES_OBJECT;
+
+#   if (ref($notesObj) eq 'XDF::Array') {
+#     for (@NOTE_LOCATOR_ORDER) { $notesObj->addAxisIdToLocatorOrder($_); }
+#   }
+*/
+
+
+          // reset the location order
+          NoteLocatorOrder = new ArrayList ();
+
+          // clear notes parent object
+          LastNotesParentObjectName = (String) null;
+
        }
     }
 
     class notesStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("NOTES Start handler not implemented yet.");
+
+          // grab and record the parent node name
+          LastNotesParentObjectName = getParentNodeName();
+
        }
     }
 
@@ -910,7 +1268,11 @@ class SaxDocumentHandler implements DocumentHandler {
 
           {
             // for now, just add as regular parameter 
-           // newparameter = LastParameterGroupParentObject.addParameter(newparameter);
+            if(LastParameterGroupParentObject instanceof Array) {
+               newparameter = ((Array) LastParameterGroupParentObject).addParameter(newparameter);
+            } else if(LastParameterGroupParentObject instanceof Structure) {
+               newparameter = ((Structure) LastParameterGroupParentObject).addParameter(newparameter);
+            }
 
           } else {
             Log.errorln("Error: weird parent node "+parentNodeName+" for parameter");
@@ -954,7 +1316,7 @@ class SaxDocumentHandler implements DocumentHandler {
           {
 
               newparamGroup = CurrentArray.addParamGroup(newparamGroup);
-              LastParameterGroupParentObject = CurrentArray;
+              LastParameterGroupParentObject = (Object) CurrentArray;
 
           } else if ( parentNodeName.equals(XDFNodeName.ROOT)
               || parentNodeName.equals(XDFNodeName.STRUCTURE) )
@@ -996,13 +1358,46 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class readEndElementHandlerFunc implements EndElementHandlerAction {
        public void action () {
-          Log.errorln("READ End handler not implemented yet.");
+
+          // obtain the current XMLDataIOStyle Object
+          XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
+   
+          // initialization for XDF::Reader specific internal GLOBALS
+          if ( (readObj instanceof TaggedXMLDataIOStyle) ) {
+
+             // zero out all the tags
+             Enumeration keys = DataTagCount.keys(); // slight departure from Perl
+             while ( keys.hasMoreElements() )
+             {
+                 Object key = keys.nextElement();
+                 DataTagCount.put((String) key, new Integer(0));
+             }
+
+          } else if ( (readObj instanceof DelimitedXMLDataIOStyle) ||
+                      (readObj instanceof FormattedXMLDataIOStyle) )
+          {
+
+              // do nothing 
+
+          } else {
+             Log.errorln("ERROR: Dont know what do with this read style ("+readObj+"), aborting read.");
+             System.exit(-1);
+          }
+
        }
     }
 
     class readStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
-          Log.errorln("READ Start handler not implemented yet.");
+
+          // save these for later, when we know what kind of dataIOstyle we got
+          DataIOStyleAttribs = attrs;
+
+          // clear out the format command object array
+          // (its used by Formatted reads only, but this is reasonable 
+          //  spot to do this).
+          CurrentFormatObjectList = new ArrayList ();
+
        }
     }
 
@@ -1064,7 +1459,20 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class stringFieldStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
-          Log.errorln("STRINGFIELD Start handler not implemented yet.");
+
+         // create the object
+          StringDataFormat stringFormat = new StringDataFormat();
+          stringFormat.setXMLAttributes(attrs);
+          stringFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
+
+          if (CurrentDatatypeObject instanceof Field) {
+              ((Field) CurrentDatatypeObject).setDataFormat(stringFormat);
+          } else if (CurrentDatatypeObject instanceof Array) {
+              ((Array) CurrentDatatypeObject).setDataFormat(stringFormat);
+          } else {
+              Log.warnln("Unknown parent object, cant set data type/format in dataTypeObj, ignoring");
+          }
+
        }
     }
 
@@ -1081,9 +1489,37 @@ class SaxDocumentHandler implements DocumentHandler {
     // TAGTOAXIS
     //
 
+    // Our purpose here: configure the TaggedXMLDataIOStyle with axis/tag associations.
     class tagToAxisStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
-          Log.errorln("TAGTOAXIS Start handler not implemented yet.");
+
+          // well, if we see tagToAxis nodes, must have tagged data, the 
+          // default style. No need for initing further. 
+
+//          if ( defined $DataIOStyle_Attrib_Ref) {
+//              $CURRENT_ARRAY->XmlDataIOStyle(new XDF::TaggedXMLDataIOStyle($DataIOStyle_Attrib_Ref))
+//          }
+
+         // I cant imagine any need for this in Java. In Perl even?
+//          $DataIOStyle_Attrib_Ref = undef;
+
+          String tagname = new String ();
+          String axisIdRefname = new String();
+
+          // pickup overriding values from attribute list
+          for (int i = 0; i < attrs.getLength(); i++)
+          {
+              String name = attrs.getName(i);
+              if ( name.equals("tag") ) {
+                 tagname = attrs.getValue(i);
+              } else if ( name.equals("axisIdRef")) {
+                 axisIdRefname = attrs.getValue(i);
+              }
+          }
+
+          // works?
+          ((TaggedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).setAxisTag(tagname, axisIdRefname);
+
        }
     }
 
@@ -1092,13 +1528,50 @@ class SaxDocumentHandler implements DocumentHandler {
 
     class unitCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (char buf [], int offset, int len) {
-          System.out.println("UNIT Char Data Handler NOT implemented yet.");
+
+          LastUnitObject.setValue(new String(buf,offset,len));
+
        }
     }
 
     class unitStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) { 
-          Log.errorln("UNIT Start handler not implemented yet.");
+
+          //  grab parent node name
+          String gParentNodeName = getGrandParentNodeName();
+
+          // create new object appropriately 
+          Unit newunit = new Unit();
+          newunit.setXMLAttributes(attrs);
+
+          // determine where this goes and then insert it 
+          if( gParentNodeName.equals(XDFNodeName.PARAMETER) )
+          {
+
+              newunit = LastParameterObject.addUnit(newunit);
+
+          } else if ( gParentNodeName.equals(XDFNodeName.FIELD) )
+          {
+
+              newunit = LastFieldObject.addUnit(newunit);
+
+          } else if ( gParentNodeName.equals(XDFNodeName.AXIS) )
+          {
+
+              ArrayList axisList = (ArrayList) CurrentArray.getAxisList();
+              Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+              newunit = lastAxisObject.addUnit(newunit);
+
+          } else if ( gParentNodeName.equals(XDFNodeName.ARRAY) )
+          {
+
+              newunit = CurrentArray.addUnit(newunit);
+
+          } else {
+              Log.warnln("Unknown grandparent object, cant add unit, ignoring.");
+          }
+
+          LastUnitObject = newunit;
        }
     }
 
@@ -1108,16 +1581,16 @@ class SaxDocumentHandler implements DocumentHandler {
     class valueCharDataHandlerFunc implements CharDataHandlerAction {
        public void action (char buf [], int offset, int len) {
 
-          // 1. grab parent node name
+          //  grab parent node name
           String parentNodeName = getParentNodeName();
           
-          // 2. create new object appropriately 
+          // create new object appropriately 
           Value newvalue = new Value();
           // reconsitute the value node PCdata from passed information.
           // and add value to object
           newvalue.setValue( new String (buf, offset, len) );
 
-          // 3. determine where this goes and then insert it 
+          // determine where this goes and then insert it 
           if( parentNodeName.equals(XDFNodeName.PARAMETER) )
           {
 
@@ -1179,13 +1652,13 @@ class SaxDocumentHandler implements DocumentHandler {
               Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
               newvalueGroup = lastAxisObject.addValueGroup(newvalueGroup);
 
-              LastValueGroupParentObject = lastAxisObject;
+              LastValueGroupParentObject = XDFNodeName.AXIS;
 
           } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
           {
 
               newvalueGroup = LastParameterObject.addValueGroup(newvalueGroup);
-              LastValueGroupParentObject = LastParameterObject;
+              LastValueGroupParentObject = XDFNodeName.PARAMETER;
 
           } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
 
@@ -1220,22 +1693,61 @@ class SaxDocumentHandler implements DocumentHandler {
        public void action (char buf [], int offset, int len) {
 
           String valueListString = new String (buf, offset, len);
+          // get the last axis
+          List axisList = (List) CurrentArray.getAxisList();
+          Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
 
-          // split up string based on declared delimiter
-/*
-  my $delimiter = '/' . $CURRENT_VALUELIST{'delimiter'};
-  if ($CURRENT_VALUELIST{'repeatable'} eq 'yes') {
-    $delimiter .= '+/';
-  } else {
-    $delimiter .= '/';
-  }
-  my @values;
-  eval " \@values = split $delimiter, \$string ";
-*/
+          // split up string into values based on declared delimiter
+          String delimitString = (String) CurrentValueListParameter.get("delimiter");
+          int delimiterSize = delimitString.length();
+          char delimitChar0 = delimitString.charAt(0);
+          int start = 0;
 
+          // *sigh* lack of regular expression support makes this 
+          // difficult to do. I expect that it will be possible to 
+          // break this in various ways if the PCDATA in the XML 
+          // document is off. -b.t. 
+          //
+          // ALSO: the repeatable function is properly implemented for this yet. -b.t.
+          //
+          while ( start < valueListString.length() ) 
+          {
+
+            int stop = start + delimiterSize;
+            // safety, can happen
+            if(stop > valueListString.length())
+                    stop = valueListString.length();
+            String valueListSubString = valueListString.substring(start, stop);
+            if (valueListSubString.compareTo(delimitString) == 0) {
+               // we hit a delimiter
+               start += delimiterSize;
+            } else {
+               // we didnt hit a delimiter, gather values
+
+               // find the end of this substring
+               int end = valueListString.indexOf(delimitChar0, start);
+
+               // can happen if no terminating delimiter
+               if (end < 0) 
+                    end = valueListString.length();
+
+               // add the value to the axis
+               String valueString = valueListString.substring(start, end);
+               lastAxisObject.addAxisValue(new Value(valueString));
+
+               // this is the last value so terminate the while loop 
+               if ((end+delimiterSize) >= valueListString.length()) 
+                   break;
+
+               start = end;
+            }
+
+          }
        }
     }
 
+    // there is undoubtably some code-reuse spots missed in this function.
+    // get it later when Im not being lazy. -b.t.
     class valueListStartElementHandlerFunc implements StartElementHandlerAction {
        public void action (AttributeList attrs) {
  
@@ -1243,9 +1755,10 @@ class SaxDocumentHandler implements DocumentHandler {
            String parentNodeName = getParentNodeName();
 
            // 2. try to determine values from attributes (e.g. algorithm method)
-           ArrayList values =  getValueListNodeValues(attrs);
+           ArrayList values = getValueListNodeValues(attrs);
 
-           // IT could be that no values exist because they are stored
+
+           // 3. IT could be that no values exist because they are stored
            // in PCDATA rather than as algorithm (treat in char data handler
            // in this case).
            if(values.size() > 0 ) { // algoritm case 
@@ -1264,7 +1777,6 @@ class SaxDocumentHandler implements DocumentHandler {
                         String valuePCDATA = (String) iter.next();
                         Value value = new Value (valuePCDATA);
                         valueObjList.add(lastAxisObject.addAxisValue(value));
-Log.errorln("ADD AXIS VALUE:["+valuePCDATA+"]");
                     }
 
               } else if ( parentNodeName.equals(XDFNodeName.VALUEGROUP) )
@@ -1276,22 +1788,36 @@ Log.errorln("ADD AXIS VALUE:["+valuePCDATA+"]");
                      newvalueGroup = lastValueGroup.addValueGroup(newvalueGroup);
                    */
 
-/*
-        my $method;
-        if (ref($LAST_VALUEGROUP_PARENT_OBJECT) eq 'XDF::Parameter') {
-           $method = "addValue";
-        } elsif (ref($LAST_VALUEGROUP_PARENT_OBJECT) eq 'XDF::Axis') {
-           $method = "addAxisValue";
-        } else {
-           my $name = ref($LAST_VALUEGROUP_PARENT_OBJECT);
-           die " ERROR: UNKNOWN valueGroupParent object ($name), can't treat for valueList.\n";
-        }
+                if ( LastValueGroupParentObject.equals(XDFNodeName.PARAMETER) ) 
+                {
 
-        foreach my $val (@values) {
-           push @valueObjList, $LAST_VALUEGROUP_PARENT_OBJECT->$method($val);
-        }
+                    Iterator iter = values.iterator();
+                    while (iter.hasNext()) {
+                        String valuePCDATA = (String) iter.next();
+                        Value value = new Value (valuePCDATA);
+                        valueObjList.add(LastParameterObject.addValue(value));
+                    }
 
-*/
+                } else if ( LastValueGroupParentObject.equals(XDFNodeName.AXIS) ) 
+                {
+
+                    // get the last axis
+                    List axisList = (List) CurrentArray.getAxisList();
+                    Axis lastAxisObject = (Axis) axisList.get(axisList.size()-1);
+
+                    Iterator iter = values.iterator();
+                    while (iter.hasNext()) { 
+                        String valuePCDATA = (String) iter.next();
+                        Value value = new Value (valuePCDATA);
+                        valueObjList.add(lastAxisObject.addAxisValue(value));
+                    }
+
+                } else {
+                   Log.errorln("Error: unknown valueGroupParent "+LastValueGroupParentObject+
+                               " cant treat for "+XDFNodeName.VALUELIST);
+                   System.exit(-1); // fatal error, shut down 
+
+                }
 
               } else if ( parentNodeName.equals(XDFNodeName.PARAMETER) )
               { 
@@ -1326,6 +1852,7 @@ Log.errorln("ADD AXIS VALUE:["+valuePCDATA+"]");
               }
 
            } else { // PCDATA case
+
 
               String delimiter = DefaultValueListDelimiter;
               String repeatable = DefaultValueListRepeatable;
@@ -1366,6 +1893,13 @@ Log.errorln("ADD AXIS VALUE:["+valuePCDATA+"]");
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2000/10/31 20:38:00  thomas
+ * This version is ALMOST capable of full ascii tagged
+ * read. Problems that remain are grouping, notes location
+ * and note.addText function is off a bit. Also consideration
+ * of dataFormat when addData occurs needs to be implemented.
+ * -b.t.
+ *
  * Revision 1.2  2000/10/26 20:42:33  thomas
  * Another interim version. Putting into CVS so I can
  * sync w/ kellys other changes easier. -b.t.
