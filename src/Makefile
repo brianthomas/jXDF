@@ -12,9 +12,9 @@
 
 
 # JCFLAGS == javac flags
-JCFLAGS = -g 
+JCFLAGS = -g # -deprecation
 # CLASSPATH
-CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip:/usr/local/xml-tr2/xml.jar
+CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip:/usr/local/jaxp-1.1ea2/jaxp.jar:/usr/local/jaxp-1.1ea2/xalan.jar:/usr/local/jaxp-1.1ea2/crimson.jar 
 #CPATH = 	.:/usr/local/jdk1.2.2/lib/classes.zip
 
 # archive w/jar flags
