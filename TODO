@@ -7,23 +7,16 @@
 	this package "BETA"
         ------------------------------------------------------------
 
-        - implement new exponential fields.
-
-        - fix ErroredValue to new DTD standard (check Perl Code).
-
         - check that notesEndElementHandlerFunc is finished (?)
 
         - readId/readIdRef not quite working, looks like deep clone issue with/DataIOStyle class.
-
-        - correct href handling. Use entities to read in the files. 
-          Bring into line with Perl package Href Class.
 
 	- Impliment octal/hex data read/write in SaxDocHandler.
 
 	- Impliment binary data read/write in SaxDocHandler/Binary*DataFormats.
 
         - Dropping relationship after output fed thru parser a second time.
-          (relationship node not implemented yet).
+          (relationship node not implemented yet??).
 
 	- always use constants (sPCDATAAttribute = "value") 
           check that all Constants in CONSTANTS class are used. Make attribute names
@@ -36,24 +29,37 @@
 
 	- Check this: Do we update all derived locators when axis is add/removed from an array?
 
-        - Remove Perl junk in documentation. Improve the content of the doc text.
+
+	A list of things that have to be done before we can consider
+	this package "FINAL" 
+        ------------------------------------------------------------
+
+        - Need to examine bufferedIO. In particular, check for buffered reading of 
+          files (incl. href case where data is stored in a file separate from XML 
+          metadata).
+ 
+        - check treatment of other types of hrefs, such as pointing to 
+          http (rather than a file) resource.
+
+        - for all classes on all non-String Set attribute methods, do check 
+          to insure item is within reasonable bounds (needed?).
 
         - set/get DataFormat methods on Array are confusing. Clear up meanings between these
           methods and getDataFormatList().
 
-        - for all classes on all non-String Set attribute methods, do check 
-          to insure item is within reasonable bounds.
+        - Remove Perl junk in documentation. Improve the content of the doc text.
+
+        - FormatPattern of exponential fields has bug, size of field exceeded when
+          exponent in the datum is negative. Seems like bug in java formatter code.
 
         - Need to implement a shadow array for precision on numbers within the dataCube.
-          setData may adjust precision to be *lower* than declared in the relevant 
+          setData may adjust precision to be *lower* than declared in the relevant
           dataFormat object but may *never* insert a number with *higher* precision than
           currently exists in the dataCube. Need a arrayObj.getPrecision(locator) method
           to identify precision on each cell.
-
-
-	A list of things that have to be done before we can consider
-	this package "FINAL"
-        ------------------------------------------------------------
+      
+        - Lots of inefficiencies in the code, synchronized blocks, SPecification calls
+          for PrettyOutput. Check dataCube access.
 
         - show we not allow repeatable attribute to apply to the recordterminator
           on string parsing (it only applies to delimiting characters right now;
@@ -76,9 +82,6 @@
 	  looks at the value string of the attribute character by character and
 	  converts newline/carriageReturns into &#010; and &#013; entities respectively. 
           This is a slow solution, but it works. Isnt there something better?
-
-        - Need to examine bufferedIO. The claim is that this will speed IO
-          operations up for large arrays.
 
 	- Make methods/classes as consistent as possible with Perl package.
 
@@ -147,6 +150,8 @@
         - Id/IdRef stuff is implemented by cloning the object refered to. This works
           ok, however, results in expanded object, writes back out expanded file.
           Review possible solutions to "recompress" like objects.
+
+        - treatment of the XDF object as a (mini-)database. Holding b-,r-tree structures. 
 
 
 
