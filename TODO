@@ -7,12 +7,15 @@
         - XMLDataIOStyle has clone method in it, correct? (I did this, not kelly?)
 
 	- Efficiency issues. Don't use sth. like attrib.size() in the for loop
+          (now fixed? review code again)
 
         - Dataformat classes have regex, templateNotation, sprintFNotation methods.
           Are these needed? Closely evaluate these classes.
        
         - Are Utility, Constants classes truely independant? Shunt methods to
           places they are used.
+
+        - check that notesEndElementHandlerFunc is finished (?)
 
 	- Use singleton for PrettyOutput, etc.
 
@@ -27,17 +30,17 @@
 	- Syncronization may be violated for ArrayList? look into changing 
 	  these to Vector (resolved?).
 
-	- implement Formatted reads.
+	- Check synchronization issues on all code (develop threaded tests). 
 
-        - Field and Value ID/IDREF stuff in SaxDocumentHandler. 
+	- Implement Formatted reads.
 
 	- Update all derived locators when axis is add/removed from an array.
 
-	- Check synchronization issues on all code (develop threaded tests). 
+	- Review the API. Remove unnecessary methods like setDimension, etc.
 
-	- Remove unnecessary methods like setDimension, etc.
+        - Remove Perl junk in documentation. Improve the content of the text.
 
-	- number of significant digits being written out in XML is not
+	- Number of significant digits being written out in XML is not
           controlled by dataFormat at this time. Also, Exponential format
 	  may print out wi/o the 'E'.  
 
@@ -63,6 +66,7 @@
 
 	- Make methods/classes as consistent as possible with Perl package.
 
+
         Things for the next big version upgrade to XDF version 0.19
         ============================================================
 
@@ -75,5 +79,13 @@
 	- Face up to the setData/dataFormat problem. What happens when a user
           sets the first data? Check that it conforms to the declared dataFormat
 	  before allocating the primitive array that will hold the datum.
+
+
+        Longer term issues
+        ==================
+
+        - Large datasets. When to automatically switch to persistent dataCube 
+          How much memory to use, efficiency issues. Native code alternative to
+          Java (?).
 
 
