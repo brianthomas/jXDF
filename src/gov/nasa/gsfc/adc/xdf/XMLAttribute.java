@@ -59,12 +59,8 @@ import java.util.ArrayList;
 
     public Object clone () throws CloneNotSupportedException{
 
-      XMLAttribute cloneObj = null;
-
-      cloneObj = (XMLAttribute) super.clone();
-
+      XMLAttribute cloneObj = (XMLAttribute) super.clone();
       // need to deep copy the fields here too
-      cloneObj.attribType = new String(this.attribType);
       if (attribValue == null) {
         return cloneObj;
       }
@@ -80,43 +76,31 @@ import java.util.ArrayList;
         cloneObj.attribValue = new Double(((Double) this.attribValue).doubleValue());
         return cloneObj;
       }
+
+
+      /**
       if (attribValue instanceof Axis) {
         cloneObj.attribValue =((Axis) this.attribValue).clone();
       }
+      if (attribValue instanceof Units) {
+        cloneObj.attribValue =((Units) this.attribValue).clone();
+      }
+      */
       if (attribValue instanceof List) {
         cloneObj.attribValue = Collections.synchronizedList(new ArrayList(((List) this.attribValue).size()));
         int stop = ((List)this.attribValue).size();
         for (int i = 0; i < stop; i ++) {
+          //List only contains child classes of BaseObject
           Object obj = ((List)this.attribValue).get(i);
-          if (obj instanceof Axis) {
-            ((List)cloneObj.attribValue).add(((Axis) obj).clone());
-          }
-          else {
-            if (obj instanceof Field) {
-              ((List)cloneObj.attribValue).add(((Field) obj).clone());
-            }
-            else {
-              if (obj instanceof FieldAxis) {
-                ((List)cloneObj.attribValue).add(((FieldAxis) obj).clone());
-              }
-              else {
-                if (obj instanceof Note) {
-                  ((List)cloneObj.attribValue).add(((Note) obj).clone());
-                }
-                else {
-                  if (obj instanceof Value) {
-                    ((List)cloneObj.attribValue).add(((Value) obj).clone());
-                  }
-                }
-              }
-
-            }
-          }
+          ((List)cloneObj.attribValue).add(((BaseObject) obj).clone());
 
         }
+        return cloneObj;
       }
 
-      return cloneObj;
+       //all other classes are child classes of BaseObject
+       cloneObj.attribValue = ((BaseObject) this.attribValue).clone();
+       return cloneObj;
 
     }
 
