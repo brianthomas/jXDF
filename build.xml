@@ -46,11 +46,12 @@
   <target name="initTest">
      <!-- build software -->
      <javac debug="on" srcdir="test"/>
+     <taskdef name="createTest" classname="test.CreateXdfTest" classpath="test"/>
      <taskdef name="loadXDFTest" classname="test.loadXDFTest" classpath="test"/>
      <taskdef name="validateTest" classname="test.ValidateTest" classpath="test"/>
   </target>
 
-  <!-- <target name="test" depends="compile"> -->
+  <!-- <target name="test" depends="initTest"> -->
   <target name="test" depends="compile,initTest">
 
     <!-- crimson parser isnt smart enough to follow the cheese. We have to 
@@ -59,31 +60,67 @@
     <copy file="samples/XDF_${DTD_VERSION}.dtd" todir="."/>
     <echo message="Running tests..." />
 
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample1.xml"/></antcall>
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample2.xml"/></antcall>
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample3.xml"/></antcall>
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample4.xml"/></antcall>
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample5.xml"/></antcall>
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample6.xml"/></antcall>
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample7.xml"/></antcall>
+    <!-- create tagged data, internal -->
+    <antcall target="creationTest">
+         <param name="internalFile" value="false"/>
+         <param name="formattedDataType" value="false"/>
+    </antcall>
+
+    <!-- create tagged data, external -->
+    <antcall target="creationTest">
+         <param name="internalFile" value="true"/>
+         <param name="formattedDataType" value="false"/>
+    </antcall>
+
+    <!-- create formatted data, internal -->
+    <antcall target="creationTest">
+         <param name="internalFile" value="false"/>
+         <param name="formattedDataType" value="true"/>
+    </antcall>
+
+    <!-- create formatted data, external -->
+    <antcall target="creationTest">
+         <param name="internalFile" value="true"/>
+         <param name="formattedDataType" value="true"/>
+    </antcall>
+
+    <!-- check loading/re-loading of existing files -->
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample1.xml"/></antcall>
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample2.xml"/></antcall>
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample3.xml"/></antcall>
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample4.xml"/></antcall>
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample5.xml"/></antcall>
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample6.xml"/></antcall>
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample7.xml"/></antcall>
 
     <!-- file 8 is very problematic: wont validate versus the DTD --> 
     <!-- 
-         <antcall target="runTests"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
+         <antcall target="loadingTests"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
       -->
     <antcall target="loadXDFTest"><param name="file" value="samples/XDF_sample8.xml"/></antcall>
 
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample9.xml"/></antcall>
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample9.xml"/></antcall>
     <!-- no bzip in Java (yet) -->
-    <!-- <antcall target="runTests"><param name="file" value="samples/XDF_sample10.xml"/></antcall> -->
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample11.xml"/></antcall>
-    <antcall target="runTests"><param name="file" value="samples/XDF_sample12.xml"/></antcall>
+    <!-- <antcall target="loadingTests"><param name="file" value="samples/XDF_sample10.xml"/></antcall> -->
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample11.xml"/></antcall>
+    <antcall target="loadingTests"><param name="file" value="samples/XDF_sample12.xml"/></antcall>
 
     <antcall target="cleanRunTests"/>
 
   </target>
 
-  <target name="runTests" >
+  <target name="creationTest" >
+    <echo message="Checking creation of file formattedData=${formattedDataType} internalData=${internalFile} ..." />
+    <createTest writedatatoseparatefile="${internalFile}" 
+                createformatteddata="${formattedDataType}" 
+                outputfile="test1.xml" 
+                entityfilename="test1.dat" 
+                entityname="table1" 
+                showsuccess="true"/>
+    <validateTest inputfile="test1.xml" showsuccess="true"/>
+  </target>
+
+  <target name="loadingTests" >
     <antcall target="loadXDFTest"><param name="file" value="${file}"/></antcall>
     <echo message="Checking validation of ${file} output ..." />
     <validateTest inputfile="test1.xml" showsuccess="true"/>
@@ -98,6 +135,7 @@
   <target name="cleanRunTests" >
     <echo message="Cleaning up test files.." />
     <delete file="test1.xml"/>
+    <delete file="test1.dat"/>
     <delete file="test2.xml"/>
     <delete file="XDF_${DTD_VERSION}.dtd"/>
   </target>
