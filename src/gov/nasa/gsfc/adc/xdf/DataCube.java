@@ -280,7 +280,7 @@ public class DataCube extends BaseObject {
          if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
             throw new NoDataException();  //the location we try to access contains noDataValue
    
-         return java.lang.reflect.Array.getInt(longDataArray.get(longIndex), shortIndex);
+         return java.lang.reflect.Array.getInt(longDataArray.get(longIndex+1), shortIndex);
       }
       catch (Exception e) {  //the location we try to access is not allocated,
           //i.e., no data in the cell
@@ -302,7 +302,7 @@ public class DataCube extends BaseObject {
          if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
             throw new NoDataException();  //the location we try to access contains noDataValue
 
-         return java.lang.reflect.Array.getShort(longDataArray.get(longIndex), shortIndex);
+         return java.lang.reflect.Array.getShort(longDataArray.get(longIndex+1), shortIndex);
       }
       catch (Exception e) {  //the location we try to access is not allocated,
         //i.e., no data in the cell
@@ -324,7 +324,7 @@ public class DataCube extends BaseObject {
          if (java.lang.reflect.Array.getByte(longDataArray.get(longIndex), shortIndex) !=1)
             throw new NoDataException();  //the location we try to access contains noDataValue
    
-         return java.lang.reflect.Array.getLong(longDataArray.get(longIndex), shortIndex);
+         return java.lang.reflect.Array.getLong(longDataArray.get(longIndex+1), shortIndex);
       }
       catch (Exception e) {  //the location we try to access is not allocated,
          //i.e., no data in the cell
@@ -1672,6 +1672,9 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.33  2001/06/19 19:04:16  thomas
+  * bug fix on getInt, getShort, getLongData methods.
+  *
   * Revision 1.32  2001/06/18 21:42:29  thomas
   * first implemntation of reset() method. Antipated a possible
   * bug in getting shortArrayIndex when DataCube was 1-D.
