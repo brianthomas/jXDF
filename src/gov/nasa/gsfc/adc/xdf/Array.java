@@ -1125,11 +1125,12 @@ import java.util.Vector;
          ((XMLAttribute) attribHash.get(DATACUBE_XML_ATTRIBUTE_NAME)).setAttribValue(dataCube);
    }
 
-   /**canAddAxisObjToArray: check if we can add this Axis or FieldAxis Object
-     * to the array
-     * 1- check to see that it has an id
-     * 2- we SHOULD also check that the id is unique but DONT currently.
-    */
+   /** canAddAxisObjToArray: check if we can add this Axis or FieldAxis Object
+     * to the array. This entails:  
+     * 1- check to see that it has an id. 
+     * 2- we SHOULD also check that the id is unique to the entire structure
+     *    to which the array belongs but dont currently. 
+     */
    private boolean canAddAxisObjToArray (AxisInterface axisToAdd) {
       if (axisToAdd.getAxisId() == null) {
          return false;
@@ -1191,6 +1192,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.30  2001/06/19 15:51:06  thomas
+  * minor edit
+  *
   * Revision 1.29  2001/06/18 21:41:33  thomas
   * removed extraneous DEBUG statements. Revamp of
   * addAxis and setFieldAxis for new dataCube design.
