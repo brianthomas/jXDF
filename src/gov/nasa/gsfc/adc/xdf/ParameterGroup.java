@@ -23,9 +23,6 @@
 
 package gov.nasa.gsfc.adc.xdf;
 import java.util.Hashtable;
-import java.util.Collections;
-import java.util.Set;
-import java.util.HashSet;
 
 /**
  */
@@ -38,7 +35,6 @@ import java.util.HashSet;
     /** This field stores object references to those parameter group objects
        to which this array object belongs
     */  
-    protected Set paramGroupOwnedHash = Collections.synchronizedSet(new HashSet());
 
     /** No-argument constructor
      */
@@ -65,16 +61,15 @@ import java.util.HashSet;
     */
     public ParameterGroup addParamGroup (ParameterGroup group) {
        //add the group to the groupOwnedHash
-       addMemberObject((Object) group); // paramGroupOwnedHash.add(group);
+       addMemberObject((Object) group); 
        return group;
     }
 
-    /** Remove a ParameterGroup object from the hashset--paramGroupOwnedHash
+    /** Remove a ParameterGroup object from this object.
         @return: true on success, false on failure
      */
     public boolean removeParamGroup(ParameterGroup group) {
 
-       // return paramGroupOwnedHash.remove(group);
        if( removeMemberObject((Object) group) != null) 
           return true;
        return false; 
@@ -89,15 +84,16 @@ import java.util.HashSet;
 
        classXDFNodeName = "parameterGroup";
 
-       // order matters! these are in *reverse* order of their
-       // occurence in the XDF DTD
-       attribOrder.add(0,"description");
-       attribOrder.add(0,"name");
-
-       attribHash.put("description", new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put("name", new XMLAttribute(null, Constants.STRING_TYPE));
-
     }
 
  }
 
+/* Modification History:
+ *
+ * $Log$
+ * Revision 1.6  2000/11/01 21:08:47  thomas
+ * Un-did prior (stupid) change. Also removed extraneous
+ * reference to paramGroupOwnedHash. -b.t.
+ *
+ * 
+ */
