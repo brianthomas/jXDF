@@ -67,10 +67,14 @@
  */
 
 package gov.nasa.gsfc.adc.xdf;
-import java.util.*;
 
-/**Field.java: an XDF::Field describes a field at a given index along a fieldAxis
- * @version $Revision$
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+
+/**an XDF::Field describes a field at a given index along a fieldAxis
+   @version $Revision$
  */
 
 public class Field extends BaseObject {
@@ -373,6 +377,9 @@ public class Field extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2000/11/08 19:46:29  thomas
+ * Trimmed down import path to just needed classes =b.t
+ *
  * Revision 1.9  2000/11/06 21:26:21  kelly
  * added clone() -k.z.
  *
