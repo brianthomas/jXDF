@@ -160,8 +160,6 @@ public class ExponentialDataFormat extends DataFormat {
      // width including 'E' and exponent
      int wsize = getWidth().intValue() - esize - 1;
 
-Log.errorln("EXPONENT WIDTH:"+wsize+" Precision:"+esize);
-   
      if(wsize > 2) 
         etemplate.append("#");
 
@@ -206,6 +204,9 @@ Log.errorln("EXPONENT WIDTH:"+wsize+" Precision:"+esize);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2000/11/22 22:05:21  thomas
+ * Oops. forgot to remove debugging statement. done. =-b.t.
+ *
  * Revision 1.8  2000/11/22 20:42:00  thomas
  * beaucoup changes to make formatted reads work.
  * DataFormat methods now store the "template" or
