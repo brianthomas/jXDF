@@ -1,42 +1,30 @@
 	
 
+	Here is our list of "issues" that need to be solved..
+
+
 	A list of things that have to be done before we can consider
 	this package "BETA"
         ------------------------------------------------------------
 
-        - Axis Id/IdRef problems in SaxDocHandler (try using XDF_sample4.xml)
-
-        - Delimited data needs whitespace, formatted read wants it discarded. Why?
-          Cant these forms get along with the same whitespace handling? Investigate. 
-
-	- Implement Formatted reads.
-          Dataformat classes have regex, templateNotation, sprintFNotation methods.
-          Are these needed? Closely evaluate these classes (after formatted read
-          is implemented). Remove extraneous methods.
+        - for all classes on all non-String Set attribute methods, do check 
+          to insure item is within reasonable bounds.
 
         - make init protected for all main classes (to allow inheritance of classes
           in other dataformats like FITSML).
 
-        - Group cloning needs to be finished.
+        - Group cloning needs to be finished (I think has been done, check??).
           XMLDataIOStyle has clone method in it, correct? (I did this, please check kelly)
 
-        - In SaxDocumentHandler, need set/get for AxisObj, FieldObj, private
-          globals so we can mimic id/idref stuff. In fact, we should just
-          switch to 1 global array of generic objects... 
-
-        - readId/readIdRef not implimented in SaxDocHandler (?)
-
-        - fix the repeatable attribute on string parsing
+        - fix the repeatable attribute on string parsing. 
 
 	- Impliment octal/hex data read/write in SaxDocHandler.
 
 	- Impliment binary data read/write in SaxDocHandler/Binary*DataFormats.
 
-        - fix the repeatable attribute on string parsing
+        - Dropping relationship after output fed thru parser a second time.
 
-        - dropping relationship after output fed thru parser a second time.
-        - notes w/ refId getting 2x the amount of text should have after output fed
-          thru a second time.
+        - readId/readIdRef not quite working, looks like deep clone issue with/DataIOStyle class.
 
         - check that notesEndElementHandlerFunc is finished (?)
 
@@ -48,10 +36,6 @@
 	- Update all derived locators when axis is add/removed from an array.
 
         - Remove Perl junk in documentation. Improve the content of the doc text.
-
-	- Number of significant digits being written out in XML is not
-          controlled by dataFormat at this time. Also, Exponential format
-	  may print out wi/o the 'E'.  
 
         - set/get DataFormat methods on Array are confusing. Clear up meanings between these
           methods and getDataFormatList().
@@ -71,8 +55,18 @@
 	- Treatment of special characters (like NEWLINE) should be entities 
           (&newline;) in element attributes of output XML (this causes a problem
           with being able to re-load delimited case data w/ newline recordterminators). 
+          [Note: this will probably be solved by putting delimiter info into CDATA section] 
+
+        - Need to examine bufferedIO. The claim is that this will speed IO
+          operations up for large arrays.
 
 	- Make methods/classes as consistent as possible with Perl package.
+
+        - Exponential formatting is *less than optimal* in Java. Using DecimalFormat
+          results in rounding errors, for example, the following numbers:
+          double data[] = { 1.01E-1, 3.001E5, -13.E-8, 1.021E3 };
+	  using the following decimalFormat pattern: "#0.0E0;-0.0E0" 
+	  print out as: .101E0, 30.0E4, -13E-8, 10.2E2
 
         - the XML declaration hash doesnt allow user to declare the XML version;
           (partly because XMLDecl Hashtable is not an orderd object, and we cant
@@ -87,7 +81,7 @@
                Shunt methods to places they are used.
 	    2. Remove unnecessary methods like setDimension, etc.
 
-	- Overflow, Underflow, NaN issues for data. What does "null" cell really mean?.
+	- Overflow, Underflow, NaN issues for data. Define what does "null" cell really mean?.
 
 
         Things for the next big version upgrade to XDF version 0.19
@@ -113,6 +107,9 @@
 
         - Making the package compile on W32 machines using nmake.
 
+        - Clean up debugging messages. Improve and make consistent error messaging 
+          within the package. Missing any Exception classes? 
+
         - Large datasets. When to automatically switch to persistent dataCube 
           How much memory to use, efficiency issues. Native code alternative to
           Java (?).
@@ -124,6 +121,10 @@
 	- use of offset reading to allow XDF to wrap complex binary/ascii data file(s).
 
 	- explore holding recursive datastructures? Ex. FITS BINTABLE, b-trees, etc.
+
+        - Id/IdRef stuff is implemented by cloning the object refered to. This works
+          ok, however, results in expanded object, writes back out expanded file.
+          Review possible solutions to "recompress" like objects.
 
 
 
