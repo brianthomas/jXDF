@@ -647,6 +647,52 @@ public class SaxDocumentHandler extends HandlerBase {
 
     }
 
+    private Value createCurrentValueListValueObj (String valueString) {
+
+       Value valueObj = new Value ();
+
+       if (valueString != null) {
+
+           if ( CurrentValueListParameter.containsKey("noDataValue") &&
+                ((String) CurrentValueListParameter.get("noDataValue")).equals(valueString) )
+           {
+              valueObj.setSpecial("noData");
+           }
+           else if ( CurrentValueListParameter.containsKey("infiniteValue") &&
+                ((String) CurrentValueListParameter.get("infiniteValue")).equals(valueString) )
+           {
+              valueObj.setSpecial("infinite");
+           }
+           else if ( CurrentValueListParameter.containsKey("infiniteNegativeValue") &&
+                ((String) CurrentValueListParameter.get("infiniteNegativeValue")).equals(valueString) )
+           {
+              valueObj.setSpecial("infiniteNegative");
+           }
+           else if ( CurrentValueListParameter.containsKey("notANumberValue") &&
+                ((String) CurrentValueListParameter.get("notANumberValue")).equals(valueString) )
+           {
+              valueObj.setSpecial("notANumber");
+           }
+           else if ( CurrentValueListParameter.containsKey("underflowValue") &&
+                ((String) CurrentValueListParameter.get("underflowValue")).equals(valueString) )
+           {
+              valueObj.setSpecial("underflow");
+           }
+           else if ( CurrentValueListParameter.containsKey("overflowValue") &&
+                ((String) CurrentValueListParameter.get("overflowValue")).equals(valueString) )
+           {
+              valueObj.setSpecial("overflow");
+           }
+           else
+           {
+              valueObj.setValue(valueString);
+           }
+
+       }
+
+       return valueObj;
+    }
+
     // This is NOT the best implimentation. In fact, I freely 
     // admit that I dont understand what the entityResolver is 
     // trying to do here.. At this time, it will read a file, 
@@ -3910,7 +3956,7 @@ while(thisIter.hasNext()) {
                 String valueString = (String) iter.next();
 
                 // add the value to the axis
-                Value newvalue = new Value(valueString);
+                Value newvalue = createCurrentValueListValueObj(valueString);
                 lastAxisObject.addAxisValue(newvalue);
 
                 // add this object to all open value groups
@@ -3933,7 +3979,7 @@ while(thisIter.hasNext()) {
                 String valueString = (String) iter.next();
 
                 // add the value to the axis
-                Value newvalue = new Value(valueString);
+                Value newvalue = createCurrentValueListValueObj(valueString);
                 LastParameterObject.addValue(newvalue);
 
                 // add this object to all open value groups
@@ -4045,7 +4091,8 @@ while(thisIter.hasNext()) {
                     Iterator iter = values.iterator();
                     while (iter.hasNext()) {
                         String valuePCDATA = (String) iter.next();
-                        Value value = new Value (valuePCDATA);
+                        // Value value = new Value (valuePCDATA);
+                        Value value = createCurrentValueListValueObj(valuePCDATA);
                         if(lastAxisObject.addAxisValue(value)) 
                            valueObjList.add(value);
                     }
@@ -4062,7 +4109,8 @@ while(thisIter.hasNext()) {
                     Iterator iter = values.iterator();
                     while (iter.hasNext()) {
                         String valuePCDATA = (String) iter.next();
-                        Value value = new Value (valuePCDATA);
+                       // Value value = new Value (valuePCDATA);
+                        Value value = createCurrentValueListValueObj(valuePCDATA);
 			((Parameter) LastValueGroupParentObject).addValue(value);
                         valueObjList.add(value);
                     }
@@ -4076,7 +4124,8 @@ while(thisIter.hasNext()) {
                     Iterator iter = values.iterator();
                     while (iter.hasNext()) {
                         String valuePCDATA = (String) iter.next();
-                        Value value = new Value (valuePCDATA);
+                        // Value value = new Value (valuePCDATA);
+                        Value value = createCurrentValueListValueObj(valuePCDATA);
                         if (myAxisObject.addAxisValue(value))
                            valueObjList.add(value); 
                     }
@@ -4095,7 +4144,8 @@ while(thisIter.hasNext()) {
                  while (iter.hasNext())
                  {
                     String valuePCDATA = (String) iter.next();
-                    Value value = new Value (valuePCDATA);
+                   // Value value = new Value (valuePCDATA);
+                    Value value = createCurrentValueListValueObj(valuePCDATA);
 		    LastParameterObject.addValue(value);
                     valueObjList.add(value);
                  }
@@ -4128,6 +4178,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.38  2001/07/02 21:17:57  thomas
+ * bug fix: missed inserting special values for algorithm valueList expansion.
+ *
  * Revision 1.37  2001/06/28 16:50:54  thomas
  * changed add method(s) to return boolean.
  *
