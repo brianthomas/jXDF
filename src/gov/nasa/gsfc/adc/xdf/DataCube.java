@@ -44,8 +44,7 @@ public class DataCube extends BaseObject {
   //
 
   protected int dimension = 0;;
-
-protected Array parentArray;
+  protected Array parentArray;
 
   //to store the n-dimensional data, it is an ArrayList of ArrayList, whose
   //innermost layer contains two kinds of arrays:
@@ -438,19 +437,22 @@ public double getDoubleData(Locator locator) throws NoDataException{
 }
 
 
-  /**addData: Append the SCALAR value onto the requested datacell
-   */
-public double  addData (Locator locator, double numValue) {
-  Log.error("in DataCube, addData(), function body empty, returning 0");
-  return 0;
-}
 
-  /**addData: Append the SCALAR value onto the requested datacell
+
+  /**appendData: Append the String value onto the requested datacell
+   * double check: now to prevent the user from appending to an int or double?
    */
-public String addData (Locator locator, String strValue) {
-  Log.error("in DataCube, addData(), function body empty, returning null");
-  return null;
-}
+  public String appendData (Locator locator, String strValue) throws SetDataException{
+    String strData;
+    try {
+      strData = getStringData(locator);
+      strData +=strValue;
+    }
+    catch (NoDataException e) {
+      strData = strValue;
+    }
+    return setData(locator, strData);
+  }
 
   /** setData: Set the SCALAR value of the requested datacell
    * (via L<XDF::DataCube> LOCATOR REF).
@@ -925,6 +927,26 @@ public void toXDFOutputStream (
     }
     currentLocator = parentArray.createLocator();
 
+    AxisInterface fastestAxis = (AxisInterface) parentArray.getAxisList().get(0);
+    //stores the NoDataValues for the parentArray,
+    //used in writing out when NoDataException is caught
+    String NoDataValues[] = new String[fastestAxis.getLength()];
+    if (parentArray.hasFieldAxis()) {
+      DataFormat[] dataFormatList = parentArray.getDataFormatList();
+      for (int i = 0; i < NoDataValues.length; i++) {
+        DataFormat d =  dataFormatList[i];
+        if (d !=null)
+          NoDataValues[i]=d.getNoDataValue().toString();
+      }
+    }
+    else {
+      DataFormat d = parentArray.getDataFormat();
+      for (int i = 0; i < NoDataValues.length; i++) {
+        if (d!=null)
+          NoDataValues[i] = d.getNoDataValue().toString();
+      }
+    }
+
     if (readObj.getClass().getName().endsWith("TaggedXMLDataIOStyle")) {
       String[] tagOrder = ((TaggedXMLDataIOStyle)readObj).getAxisTags();
       int stop = tagOrder.length;
@@ -941,10 +963,15 @@ public void toXDFOutputStream (
       for (int i = 0; i < stop; i++) {
         axisLength[i] =axes[stop - 1 - i];
       }
-      writeTaggedData(outputstream, currentLocator, indent, axisLength, tags, 0);
+      writeTaggedData(outputstream, currentLocator, indent, axisLength, tags, 0, fastestAxis, NoDataValues);
 
     }  //done dealwith with TaggedXMLDataIOSytle
+    else {
+     if (readObj.getClass().getName().endsWith("DelimitedXMLDataIOStyle")) {
+      writeDelimitedData(outputstream, currentLocator, (DelimitedXMLDataIOStyle) readObj, fastestAxis, NoDataValues);
 
+     }
+    }
     //close the tagged data section
     if (niceOutput) {
       writeOut(outputstream, Constants.NEW_LINE);
@@ -965,7 +992,9 @@ protected void writeTaggedData(OutputStream outputstream,
 			       String indent,
 			       int[] axisLength,
 			       String[] tags,
-			       int which)
+			       int which,
+                               AxisInterface fastestAxis,
+                               String[] noDataValues)
   {
 
     String tag = (String) tags[which];
@@ -987,17 +1016,18 @@ protected void writeTaggedData(OutputStream outputstream,
 	  writeOut(outputstream, indent + sPrettyXDFOutputIndentation);
 	}
 
-	int fastestAxisLength = axisLength[axisLength.length-1];
+	int fastestAxisLength = fastestAxis.getLength();
 	int dataNum = 0;
 	while (dataNum < fastestAxisLength) {
-	  try {
-	    writeOut( outputstream, "<" + tag1 + ">");
-	    writeOut(outputstream, getStringData(locator));
-	    writeOut( outputstream, "</" + tag1 + ">");
+          writeOut( outputstream, "<" + tag1 + ">");
+  	  try {
+            writeOut(outputstream, getStringData(locator));
+          }
+          catch (NoDataException e) {
+            writeOut(outputstream, noDataValues[locator.getAxisLocation(fastestAxis)]);
 	  }
-	  catch (NoDataException e) {
-	    writeOut(outputstream, e.toString());
-	  }
+          writeOut( outputstream, "</" + tag1 + ">");
+
 	  dataNum ++;
 	  locator.next();
 	}
@@ -1018,7 +1048,7 @@ protected void writeTaggedData(OutputStream outputstream,
 	  writeOut(outputstream, indent);
 	}
 	writeOut(outputstream, "<" + tag + ">");
-	writeTaggedData(outputstream, locator, indent, axisLength, tags, which);
+	writeTaggedData(outputstream, locator, indent, axisLength, tags, which, fastestAxis, noDataValues);
 	if (sPrettyXDFOutput) {
 	  writeOut(outputstream, Constants.NEW_LINE);
 	  writeOut(outputstream, indent);
@@ -1027,11 +1057,48 @@ protected void writeTaggedData(OutputStream outputstream,
       }
     }
   }
+
+  protected void writeDelimitedData(OutputStream outputstream,
+                                    Locator locator,
+                                    DelimitedXMLDataIOStyle readObj,
+                                    AxisInterface fastestAxis, String[] noDataValues) {
+    String delimiter = readObj.getDelimiter();
+    String recordTerminator = readObj.getRecordTerminator();
+    int fastestAxisLength = fastestAxis.getLength();
+    int dataNum = 0;
+
+    writeOut(outputstream, "<![CDDATA[");
+    do {
+      dataNum ++;
+      try {
+        writeOut(outputstream, getStringData(locator));
+        writeOut(outputstream, delimiter);
+      }
+      catch (NoDataException e) {  //double check, a bug here, "yes" is already printed
+        String noData = noDataValues[locator.getAxisLocation(fastestAxis)];
+        if (noData == null)
+          readObj.setRepeatable("no");
+        writeOut(outputstream, noData);
+        writeOut(outputstream, delimiter);
+      }
+      if (dataNum == fastestAxisLength) {
+        writeOut(outputstream, recordTerminator);
+        dataNum = 0;
+      }
+    }
+    while (locator.next());
+    writeOut(outputstream, "]]>");
+  }
+
 }
 
  /**
   * Modification History:
   * $Log$
+  * Revision 1.6  2000/10/31 21:37:18  kelly
+  * --completed *toXDF* for delimited IO style.
+  * --added NoDataException handling  -k.z.
+  *
   * Revision 1.5  2000/10/30 18:16:24  kelly
   * changed are made for relevant FieldAxis stuff.  -k.z.
   *
