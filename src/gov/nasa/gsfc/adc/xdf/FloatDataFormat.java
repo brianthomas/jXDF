@@ -98,7 +98,7 @@ public class FloatDataFormat extends NumberDataFormat {
 
        if (Utility.isValidNumberObject(numWidth))
        {
-          ((XMLAttribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).setAttribValue(numWidth);
+          ((Attribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).setAttribValue(numWidth);
           generateFormatPattern();
        } else 
          Log.warnln("Invalid value for FloatDataFormat.setWidth(). Ignoring set request.");
@@ -112,7 +112,7 @@ public class FloatDataFormat extends NumberDataFormat {
     */
    public Integer getWidth()
    {
-       return (Integer) ((XMLAttribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).getAttribValue();
+       return (Integer) ((Attribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** Set the precision of this floating point field from the portion to the  
@@ -123,7 +123,7 @@ public class FloatDataFormat extends NumberDataFormat {
 
       if (Utility.isValidNumberObject(precision))
       {
-         ((XMLAttribute) attribHash.get(PRECISION_XML_ATTRIBUTE_NAME)).setAttribValue(precision);
+         ((Attribute) attribHash.get(PRECISION_XML_ATTRIBUTE_NAME)).setAttribValue(precision);
          generateFormatPattern();
       } else 
          Log.warnln("Invalid value for FloatDataFormat.setPrecision(). Ignoring set request.");
@@ -137,7 +137,7 @@ public class FloatDataFormat extends NumberDataFormat {
    */
   public Integer getPrecision()
   {
-    return (Integer) ((XMLAttribute) attribHash.get(PRECISION_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (Integer) ((Attribute) attribHash.get(PRECISION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /** Set the exponent size of this floating point field. If this is non-zero, then
@@ -148,7 +148,7 @@ public class FloatDataFormat extends NumberDataFormat {
 
       if (Utility.isValidNumberObject(size))
       {
-         ((XMLAttribute) attribHash.get(EXPONENT_XML_ATTRIBUTE_NAME)).setAttribValue(size);
+         ((Attribute) attribHash.get(EXPONENT_XML_ATTRIBUTE_NAME)).setAttribValue(size);
          generateFormatPattern();
       } else 
          Log.warnln("Invalid value for FloatDataFormat.setExponent(). Ignoring set request.");
@@ -162,7 +162,7 @@ public class FloatDataFormat extends NumberDataFormat {
     */
    public Integer getExponent()
    {
-      return (Integer) ((XMLAttribute) attribHash.get(EXPONENT_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (Integer) ((Attribute) attribHash.get(EXPONENT_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** Get the DecimalFormat pattern for nice output of negative float numbers  
@@ -186,8 +186,8 @@ public class FloatDataFormat extends NumberDataFormat {
 
    // We need this here so that we will properly update the
    // formatPattern of the class. -b.t. 
-   public void setXMLAttributes (Attributes attrs) {
-      super.setXMLAttributes(attrs);
+   public void setAttributes (Attributes attrs) {
+      super.setAttributes(attrs);
       generateFormatPattern();
    }
 
@@ -279,9 +279,9 @@ public class FloatDataFormat extends NumberDataFormat {
     attribOrder.add(0, WIDTH_XML_ATTRIBUTE_NAME);
 
 
-    attribHash.put(WIDTH_XML_ATTRIBUTE_NAME, new XMLAttribute( new Integer(DEFAULT_WIDTH), Constants.INTEGER_TYPE));
-    attribHash.put(PRECISION_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_PRECISION), Constants.INTEGER_TYPE));
-    attribHash.put(EXPONENT_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_EXPONENT), Constants.INTEGER_TYPE));
+    attribHash.put(WIDTH_XML_ATTRIBUTE_NAME, new Attribute( new Integer(DEFAULT_WIDTH), Constants.INTEGER_TYPE));
+    attribHash.put(PRECISION_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_PRECISION), Constants.INTEGER_TYPE));
+    attribHash.put(EXPONENT_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_EXPONENT), Constants.INTEGER_TYPE));
 
     generateFormatPattern();
 
@@ -293,6 +293,9 @@ public class FloatDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.5  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).

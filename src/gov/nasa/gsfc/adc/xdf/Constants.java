@@ -50,11 +50,11 @@ public abstract class Constants {
   */
   public static final String XDF_DTD_NAME = "XDF_017.dtd";
 
-  /** The name of the XMLAttribute which is written out as PCDATA rather than as
-      a node attribute (String/Number type XMLAttributes) or child node (Object
-      and List type XMLAttributes). At this time only String-type XMLAttributes
+  /** The name of the Attribute which is written out as PCDATA rather than as
+      a node attribute (String/Number type Attributes) or child node (Object
+      and List type Attributes). At this time only String-type Attributes
       should be named 'value' (yes, it would be an interesting experiment to call
-      an Object-type XMLAttribute 'value'!).
+      an Object-type Attribute 'value'!).
   */
   public static final String PCDATA_ATTRIBUTE = "value";
 
@@ -174,6 +174,9 @@ public abstract class Constants {
 /* Modification History
  * 
  * $Log$
+ * Revision 1.16  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.15  2001/09/05 21:59:02  thomas
  * moved PCDATA_ATTR, XDF_ROOT_NODE_NAME, XML_SPEC_VERSION, and XDF_DTD_NAME here from Specification
  *
@@ -193,7 +196,7 @@ public abstract class Constants {
  * changes to array decl of constants. -b.t.
  *
  * Revision 1.10  2000/11/20 22:03:48  thomas
- * Split up XMLAttribute type NUMBER_TYPE into
+ * Split up Attribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
  * some needed handling in the SaxDocHandler when
  * parsing data for the formatted read. Put prior NUMBER_TYPE

@@ -99,46 +99,46 @@ public class Value extends BaseObject {
    /** get the *value* (PCDATA) attribute.
    */
    public String getValue() {
-      return (String) ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *value* attribute.
     */
    public void setValue (String strValue)
    {
-      ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
+      ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
   /** get the *valueId* attribute.
    */
    public String getValueId() {
-      return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *valueId* attribute.
     */
    public void setValueId (String strValueId)
    {
-      ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strValueId);
+      ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strValueId);
    }
 
    /** get the *valueIdRef* attribute.
    */
    public String getValueIdRef() {
-      return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *valueRef* attribute.
    */
    public void setValueIdRef (String strValueRef)
    {
-      ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strValueRef);
+      ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strValueRef);
    }
 
     /** get the *inequality*   attribute.
     */
    public String getInequality() {
-      return (String) ((XMLAttribute) attribHash.get(INEQUALITY_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(INEQUALITY_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
 
@@ -147,13 +147,13 @@ public class Value extends BaseObject {
    public void setInequality (String strInequality)
    {
       if (Utility.isValidValueInequality(strInequality))
-        ((XMLAttribute) attribHash.get(INEQUALITY_XML_ATTRIBUTE_NAME)).setAttribValue(strInequality);
+        ((Attribute) attribHash.get(INEQUALITY_XML_ATTRIBUTE_NAME)).setAttribValue(strInequality);
    }
 
   /** get the *special* attribute.
    */
    public String getSpecial() {
-      return (String) ((XMLAttribute) attribHash.get(SPECIAL_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(SPECIAL_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *special* attribute.
@@ -161,7 +161,7 @@ public class Value extends BaseObject {
    public void setSpecial (String strSpecial)
    {
       if (Utility.isValidValueSpecial(strSpecial))
-         ((XMLAttribute) attribHash.get(SPECIAL_XML_ATTRIBUTE_NAME)).setAttribValue(strSpecial);
+         ((Attribute) attribHash.get(SPECIAL_XML_ATTRIBUTE_NAME)).setAttribValue(strSpecial);
       else 
          Log.warnln("Warning: can't set special attribute in value object to:"+strSpecial);
    }
@@ -177,7 +177,7 @@ public class Value extends BaseObject {
    protected void init()
    {
 
-       resetXMLAttributes();
+       resetAttributes();
 
        classXDFNodeName = "value";
 
@@ -190,11 +190,11 @@ public class Value extends BaseObject {
        attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
 
        //set up the attribute hashtable key with the default initial value
-       attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put(INEQUALITY_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put(SPECIAL_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+       attribHash.put(INEQUALITY_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+       attribHash.put(SPECIAL_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+       attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+       attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
    }
 
 
@@ -202,6 +202,9 @@ public class Value extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.13  2001/07/02 18:02:08  thomas
  * added warning message if setSpecial wont allow value to be set.
  *
@@ -209,7 +212,7 @@ public class Value extends BaseObject {
  * added convience constructor methods
  *
  * Revision 1.11  2001/05/10 21:43:06  thomas
- * added resetXMLAttributes to init().
+ * added resetAttributes to init().
  *
  * Revision 1.10  2001/02/07 18:44:04  thomas
  * Converted XML attribute decl

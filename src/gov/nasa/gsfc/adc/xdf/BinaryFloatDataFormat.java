@@ -67,7 +67,7 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
 
     int bits = numBits.intValue();
     if (Utility.isValidFloatBits(bits)) 
-       ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(numBits);
+       ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(numBits);
     else {
       Log.warn("The requested number of bits:["+bits+"] for binary float is not allowed");
       Log.warnln("ignoring 'set' request.");
@@ -79,7 +79,7 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
   public void setBits (int bits) {
 
      if (Utility.isValidFloatBits(bits))
-        ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(new Integer(bits));
+        ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(new Integer(bits));
      else {
         Log.warn("The requested number of bits:["+bits+"] for binary float is not allowed");
         Log.warnln("ignoring 'set' request.");
@@ -91,7 +91,7 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
    */
   public Integer getBits()
   {
-     return (Integer) ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (Integer) ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   //
@@ -110,8 +110,8 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
    // Note: we never have a need for ASCII formatting of these numbers
    // so this isnt needed.
 /*
-   public void setXMLAttributes (Attributes attrs) {
-      super.setXMLAttributes(attrs);
+   public void setAttributes (Attributes attrs) {
+      super.setAttributes(attrs);
       generateFormatPattern();
    }
 */
@@ -132,7 +132,7 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
 
       attribOrder.add(0, BITS_XML_ATTRIBUTE_NAME);  //add bits as the first attribute;
 
-      attribHash.put(BITS_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_BINARY_FLOAT_BITS), Constants.INTEGER_TYPE));
+      attribHash.put(BITS_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_BINARY_FLOAT_BITS), Constants.INTEGER_TYPE));
    }
 
 }
@@ -140,6 +140,9 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.10  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
@@ -161,7 +164,7 @@ public class BinaryFloatDataFormat extends NumberDataFormat {
  * Perl attributes from DataFormat classes. -b.t.
  *
  * Revision 1.6  2000/11/20 22:05:50  thomas
- * plit up XMLAttribute type NUMBER_TYPE into
+ * plit up Attribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
  * some needed handling in the SaxDocHandler when
  * parsing data for the formatted read. Put prior NUMBER_TYPE

@@ -45,7 +45,7 @@ public class NotesLocationOrder extends BaseObject {
    // Fields
    //
 
-   // axisIdRefORder isnt an XMLAttribute because we have special 
+   // axisIdRefORder isnt an Attribute because we have special 
    // handling in the toXMLOutputStream method for it. -b.t.
    ArrayList axisIdRefOrder = new ArrayList();
  
@@ -134,7 +134,7 @@ public class NotesLocationOrder extends BaseObject {
    protected void init()
    {
 
-       resetXMLAttributes();
+       resetAttributes();
 
        classXDFNodeName = "locationOrder";
 
@@ -146,6 +146,9 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.12  2001/09/06 15:56:41  thomas
  * changed basicXMLWriter to return String (nodeName)
  *
@@ -165,7 +168,7 @@ public class NotesLocationOrder extends BaseObject {
  * to the application writer (e.g. they throw the error).
  *
  * Revision 1.7  2001/05/10 21:19:44  thomas
- * added resetXMLAttributes to init().
+ * added resetAttributes to init().
  *
  * Revision 1.6  2001/02/07 18:44:03  thomas
  * Converted XML attribute decl

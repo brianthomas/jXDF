@@ -70,7 +70,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
      if( numBits != null) 
      {
         if(Utility.isValidIntegerBits(numBits.intValue())) { 
-           ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(numBits);
+           ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(numBits);
         } else { 
            Log.warnln(numBits.toString()+" is not a valid number of BinaryInteger bits, ignoring set request.");
         }
@@ -85,7 +85,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
   public void setBits (int numBits) {
 
         if(Utility.isValidIntegerBits(numBits)) { 
-           ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(new Integer(numBits));
+           ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).setAttribValue(new Integer(numBits));
         } else { 
            Log.warnln(numBits+" is not a valid number of BinaryInteger bits, ignoring set request.");
         }
@@ -97,7 +97,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
    */
   public Integer getBits()
   {
-     return (Integer) ((XMLAttribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (Integer) ((Attribute) attribHash.get(BITS_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *signed* attribute
@@ -109,7 +109,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
       return;
     }
 
-    ((XMLAttribute) attribHash.get(SIGNED_XML_ATTRIBUTE_NAME)).setAttribValue(strSigned);
+    ((Attribute) attribHash.get(SIGNED_XML_ATTRIBUTE_NAME)).setAttribValue(strSigned);
 
   }
 
@@ -118,7 +118,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
    */
   public String getSigned()
   {
-     return (String) ((XMLAttribute) attribHash.get(SIGNED_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (String) ((Attribute) attribHash.get(SIGNED_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    //
@@ -137,8 +137,8 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
    // Note: we never have a need for ASCII formatting of these numbers
    // so this isnt needed.
 /*
-   public void setXMLAttributes (Attributes attrs) {
-      super.setXMLAttributes(attrs);
+   public void setAttributes (Attributes attrs) {
+      super.setAttributes(attrs);
       generateFormatPattern();
    }
 */
@@ -160,9 +160,9 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
      attribOrder.add(0, SIGNED_XML_ATTRIBUTE_NAME);
 
      attribHash.put( BITS_XML_ATTRIBUTE_NAME, 
-                      new XMLAttribute(new Integer(DEFAULT_BINARY_INTEGER_BITS), Constants.INTEGER_TYPE));
+                      new Attribute(new Integer(DEFAULT_BINARY_INTEGER_BITS), Constants.INTEGER_TYPE));
      attribHash.put( SIGNED_XML_ATTRIBUTE_NAME, 
-                      new XMLAttribute(DEFAULT_BINARY_INTEGER_SIGNED, Constants.STRING_TYPE));
+                      new Attribute(DEFAULT_BINARY_INTEGER_SIGNED, Constants.STRING_TYPE));
 
   }
 
@@ -172,6 +172,9 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.11  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
@@ -193,7 +196,7 @@ public class BinaryIntegerDataFormat extends NumberDataFormat {
  * Perl attributes from DataFormat classes. -b.t.
  *
  * Revision 1.7  2000/11/20 22:05:50  thomas
- * plit up XMLAttribute type NUMBER_TYPE into
+ * plit up Attribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
  * some needed handling in the SaxDocHandler when
  * parsing data for the formatted read. Put prior NUMBER_TYPE

@@ -65,7 +65,7 @@ import java.util.Hashtable;
      */
     public void setFieldGroupClass (String strName)
     {
-       ((XMLAttribute) attribHash.get(CLASS_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
+       ((Attribute) attribHash.get(CLASS_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
     } 
     
     /**
@@ -73,7 +73,7 @@ import java.util.Hashtable;
      */
     public String getFieldGroupClass()
     { 
-       return (String) ((XMLAttribute) attribHash.get(CLASS_XML_ATTRIBUTE_NAME)).getAttribValue();
+       return (String) ((Attribute) attribHash.get(CLASS_XML_ATTRIBUTE_NAME)).getAttribValue();
     }
 
     //
@@ -109,7 +109,7 @@ import java.util.Hashtable;
        attribOrder.add(CLASS_XML_ATTRIBUTE_NAME);
 
        //set up the attribute hashtable key with the default initial value
-       attribHash.put(CLASS_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(CLASS_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
     }
 
@@ -118,6 +118,9 @@ import java.util.Hashtable;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.7  2001/08/01 19:13:23  thomas
  * forgot to put in accessor methodscvs update fixed
  *

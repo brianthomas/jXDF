@@ -58,7 +58,7 @@ import org.xml.sax.Attributes;
     and writing out the XML-based properties of the XDF objects. It also
     provides fields/methods to allow all inheriting XDF objects be
     members of Group objects. Key parts to the BaseObject class include the
-    XMLAttributes and the toXML* methods it provides.
+    Attributes and the toXML* methods it provides.
  */
 public abstract class BaseObject implements Serializable, Cloneable {
 
@@ -99,11 +99,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
   public BaseObject() {
 
     // The heart of the baseObject is that it manages the storage, retrieval
-    // and writing out the XMLAttributes for the XDF objects.
-    // There are 2 parts to making the XMLAttributes of the base Object
+    // and writing out the Attributes for the XDF objects.
+    // There are 2 parts to making the Attributes of the base Object
     // work properly: a lookup table of key/value pairs in attribHash and a
     // list containing the  proper order of the attributes.
-    resetXMLAttributes();
+    resetAttributes();
 
   }
 
@@ -123,9 +123,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 // Removing it for the time being. -b.t. 
 //
 
-  /* Return the hashtable of XMLAttribute names and their values.
+  /* Return the hashtable of Attribute names and their values.
       @return Hashtable on success, an empty hashtable is passed back if their
-               are no XMLAttributes within a given XDF object class.
+               are no Attributes within a given XDF object class.
   */
 /*
   public Hashtable getAttribHash() {
@@ -145,33 +145,33 @@ public abstract class BaseObject implements Serializable, Cloneable {
    
   /** Return a list of the proper ordering of the XML attributes of this object.
       @return List on success, on failure an empty List object is passed back if
-               there are no XMLAttributes within a XDF given object class.
+               there are no Attributes within a XDF given object class.
   */
-  public List getXMLAttributeOrder() {
+  public List getAttributeOrder() {
     return attribOrder;
   }
 
   
-  /** Get the Hashtable containing the XMLAttributes for this object.
+  /** Get the Hashtable containing the Attributes for this object.
   */
-  public Hashtable getXMLAttributes() {
+  public Hashtable getAttributes() {
     return attribHash;
   }
 
-  /** Get a specific XMLAttribute by its name
+  /** Get a specific Attribute by its name
    */
-  public XMLAttribute getXMLAttribute (String attribName) {
-     XMLAttribute obj = (XMLAttribute) attribHash.get(attribName);
+  public Attribute getAttribute (String attribName) {
+     Attribute obj = (Attribute) attribHash.get(attribName);
      return obj;
   }
 
-  /** Get the value of a specific XMLAttribute. Only returns non-null
-      if the XMLAttribute exists and is of STRING_TYPE.
+  /** Get the value of a specific Attribute. Only returns non-null
+      if the Attribute exists and is of STRING_TYPE.
    */
-  public String getXMLAttributeStringValue(String attribName) 
+  public String getAttributeStringValue(String attribName) 
   {
       String value = null;
-      XMLAttribute attrib = getXMLAttribute(attribName); 
+      Attribute attrib = getAttribute(attribName); 
       if (attrib != null && attrib.getAttribType() == Constants.STRING_TYPE) {
         value = (String) attrib.getAttribValue();
       }
@@ -350,7 +350,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
       }
 
-      // gather info about XMLAttributes in this object/node
+      // gather info about Attributes in this object/node
       Hashtable xmlInfo = getXMLInfo();
 
       // 2. Print out string object XML attributes EXCEPT for the one that
@@ -507,7 +507,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
       that attribute doesnt already exist.
    */
   // NOTE: this is essentially the Perl update method
-  public void setXMLAttributes (Attributes attrs) {
+  public void setAttributes (Attributes attrs) {
 
      synchronized (attribHash) {
       // set object attributes from an Attributes Object
@@ -521,9 +521,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
              // set it as appropriate to the type
              if (name != null && value != null) {
                 if (this.attribHash.containsKey(name)) { 
-                   setXMLAttribute(name,value);
+                   setAttribute(name,value);
                 } else {
-                   addXMLAttribute(name,value);
+                   addAttribute(name,value);
                 }
              }
 
@@ -534,22 +534,22 @@ public abstract class BaseObject implements Serializable, Cloneable {
      } //synchronize
   }
 
-  public void setXMLAttribute (String name, String value) {
+  public void setAttribute (String name, String value) {
 
      if (this.attribHash.containsKey(name)) {
      
-        String type = ((XMLAttribute) this.attribHash.get(name)).getAttribType();
+        String type = ((Attribute) this.attribHash.get(name)).getAttribType();
         if(type.equals(Constants.INTEGER_TYPE))
            // convert string to proper Integer
-           ((XMLAttribute) this.attribHash.get(name)).setAttribValue(new Integer(value));
+           ((Attribute) this.attribHash.get(name)).setAttribValue(new Integer(value));
         else if(type.equals(Constants.DOUBLE_TYPE))
            // convert string to proper Double
-           ((XMLAttribute) this.attribHash.get(name)).setAttribValue(new Double(value));
+           ((Attribute) this.attribHash.get(name)).setAttribValue(new Double(value));
         else // string or Object
-           ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
+           ((Attribute) this.attribHash.get(name)).setAttribValue(value);
 
      } else { // its an add operation 
-        Log.errorln("Cannot set XML attribute:"+name+" as it doesnt exist, use addXMLAttribute() instead.");
+        Log.errorln("Cannot set XML attribute:"+name+" as it doesnt exist, use addAttribute() instead.");
      }
 
   }
@@ -559,20 +559,20 @@ public abstract class BaseObject implements Serializable, Cloneable {
   */
   // private for now, I dont see the need to allow users to add 'object' or 'number'
   // or etc. type XML attributes other than 'string'
-  private boolean addXMLAttribute (String name, Object value, String type) {
+  private boolean addAttribute (String name, Object value, String type) {
 
     if (!this.attribHash.containsKey(name)) { 
 
        this.attribOrder.add(name);
 
        //set up the attribute hashtable key with the default initial value
-       this.attribHash.put(name, new XMLAttribute(value, type));
+       this.attribHash.put(name, new Attribute(value, type));
 
        return true;
 
     } else {
 
-       Log.warnln("Cannot addXMLAttribute("+name+") as it already exists, use setXMLAttribute() instead.");
+       Log.warnln("Cannot addAttribute("+name+") as it already exists, use setAttribute() instead.");
        return false;
 
     }
@@ -582,8 +582,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** Appends on an XML attribute into the object.
       @return: true if successfull.
    */
-  public boolean addXMLAttribute (String name, String value) {
-     return addXMLAttribute(name, (Object) value, Constants.STRING_TYPE);
+  public boolean addAttribute (String name, String value) {
+     return addAttribute(name, (Object) value, Constants.STRING_TYPE);
   }
 
   /**
@@ -625,15 +625,15 @@ public abstract class BaseObject implements Serializable, Cloneable {
         }
       }
     }
-     // XMLAttributes Clone, deep copy
+     // Attributes Clone, deep copy
      synchronized (this.attribHash) {
       synchronized (cloneObj.attribHash) {
         cloneObj.attribHash = new Hashtable();
         Enumeration keys = this.attribHash.keys();
         while (keys.hasMoreElements()) {
           String key = (String) keys.nextElement();
-          XMLAttribute XMLAttributeValue = (XMLAttribute) this.attribHash.get(key);
-          cloneObj.attribHash.put(key, XMLAttributeValue.clone());
+          Attribute AttributeValue = (Attribute) this.attribHash.get(key);
+          cloneObj.attribHash.put(key, AttributeValue.clone());
         }
         return cloneObj;
       }
@@ -641,7 +641,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   }
 
-  protected void resetXMLAttributes() { 
+  protected void resetAttributes() { 
     // clear out arrays, etc
     attribHash  = new Hashtable(Constants.INIT_ATTRIBUTE_HASH_SIZE);
     attribOrder = Collections.synchronizedList(new ArrayList());
@@ -667,8 +667,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
         // only if object exists
         if (obj != null) {
-          XMLAttribute toRemove = (XMLAttribute) attribHash.remove(attribute);
-          attribHash.put(attribute, new XMLAttribute(obj, toRemove.getAttribType()));
+          Attribute toRemove = (Attribute) attribHash.remove(attribute);
+          attribHash.put(attribute, new Attribute(obj, toRemove.getAttribType()));
         }
 
       }
@@ -741,7 +741,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
    }
 
 
-  /** Basically this rearranges XMLAttribute information into a more convient
+  /** Basically this rearranges Attribute information into a more convient
       order for the toXMLOutputstream method.
       @return Hashtable with 3 entries:  attribList --> attributes(strings, numbers)
                                          objRefList --> the object this class owns
@@ -760,7 +760,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
       while (iter.hasNext()) {
         String attribName = (String) iter.next();
 
-        XMLAttribute obj = (XMLAttribute) attribHash.get(attribName);
+        Attribute obj = (Attribute) attribHash.get(attribName);
         if (obj != null && obj.attribValue != null) {
           if ( obj.attribType == Constants.STRING_TYPE)
           {
@@ -927,6 +927,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.58  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.57  2001/09/06 15:55:44  thomas
  * re-implemented check on null nodeName in toXMLWriter; changed basicXMLWriter to return String (nodeName)
  *
@@ -949,8 +952,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
  * Revision 1.51  2001/07/19 21:50:53  thomas
  * yanked XMLDeclAttribs from toXMLOutputStream (only needed
  * in the XDF class)
- * removed XMLNotationHash stuff (again, only needed in XDF class)
- * added ability to add arbitary XMLAttributes to any class
+ * removed NotationNodeHash stuff (again, only needed in XDF class)
+ * added ability to add arbitary Attributes to any class
  * (that inherits from BaseObject).
  *
  * Revision 1.50  2001/07/17 19:05:51  thomas
@@ -982,16 +985,16 @@ public abstract class BaseObject implements Serializable, Cloneable {
  * Revision 1.42  2001/05/10 21:07:19  thomas
  * moved attribHash/attribOrder to init method.
  * shift around stuff to XDF file.
- * made setXMLAttributes public (why?, hurm.)
+ * made setAttributes public (why?, hurm.)
  *
  * Revision 1.41  2001/05/04 21:01:06  thomas
- * made setXMLAttributes public method.
+ * made setAttributes public method.
  *
  * Revision 1.40  2001/05/04 20:18:58  thomas
  * Small changes to accomodate new XDF class.
  *
  * Revision 1.39  2001/03/28 21:59:46  thomas
- * Forgot to declare an empty hashset for XMLNotationHash
+ * Forgot to declare an empty hashset for NotationNodeHash
  * on init. This resulted in bomb on toXMLOutputStream
  * call from objects built by hand. One line fixed.
  *
@@ -1022,7 +1025,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
  *
  * Revision 1.33  2000/11/20 22:04:41  thomas
  * Implimented new INTEGER_TYPE/DOUBLE_TYPE for
- * XMLAttribute printout in toXMLOutputStream. -b.t.
+ * Attribute printout in toXMLOutputStream. -b.t.
  *
  * Revision 1.32  2000/11/16 19:55:35  kelly
  * fixed documentation.  -k.z. and singleton related stuff.
@@ -1062,7 +1065,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
  * --more synchronization on clone.  -k.z.
  *
  * Revision 1.23  2000/11/03 21:23:33  thomas
- * Small change to setXMLAttributes to intercept null
+ * Small change to setAttributes to intercept null
  * values in the attributelist. -b.t.
  *
  * Revision 1.22  2000/11/02 17:55:11  kelly
@@ -1073,7 +1076,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
  * code (mostly in dealWith*nodes mthods). -b.t.
  *
  * Revision 1.20  2000/11/01 21:58:08  kelly
- * moved XMLAttribute out of BaseObject -k.z
+ * moved Attribute out of BaseObject -k.z
  *
  * Revision 1.19  2000/10/31 22:09:08  kelly
  * minor fix.
@@ -1101,7 +1104,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
  * was missing .. whichis silly as most nodes lack it). -b.t.
  *
  * Revision 1.13  2000/10/23 21:32:16  thomas
- * added setXMLAttributes method to BaseObject. This
+ * added setAttributes method to BaseObject. This
  * method is functionally similar to Perl BaseObject
  * update method. -b.t.
  *
@@ -1114,7 +1117,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
  * --constructed default XMLDelAttrib in several *toXDF* routines
  *
  * Revision 1.10  2000/10/16 14:47:24  kelly
- * use enum list to  check valid XMLAttribute type. --k.z.
+ * use enum list to  check valid Attribute type. --k.z.
  *
  * Revision 1.9  2000/10/10 19:12:05  cvs
  * First Feature complete version of the base class.

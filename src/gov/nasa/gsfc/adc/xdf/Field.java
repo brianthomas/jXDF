@@ -119,7 +119,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public void setName (String strName)
    {
-      ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
+      ((Attribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
    }
 
    /**
@@ -127,7 +127,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public String getName()
    {
-      return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *description* attribute
@@ -135,14 +135,14 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public void setDescription (String strDesc)
    {
-      ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /**
        @return the current *description* attribute
    */
    public String getDescription() {
-      return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *fieldId* attribute
@@ -150,7 +150,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public void setFieldId (String strField)
    {
-      ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strField);
+      ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strField);
    }
 
    /**
@@ -158,7 +158,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public String getFieldId()
    {
-      return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *fieldIdRef* attribute
@@ -166,7 +166,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public void setFieldIdRef (String strField)
    {
-      ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strField);
+      ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strField);
    }
 
    /**
@@ -174,7 +174,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public String getFieldIdRef()
    {
-      return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *units* attribute
@@ -182,161 +182,161 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public void setUnits (Units units)
    {
-      ((XMLAttribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).setAttribValue(units);
+      ((Attribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).setAttribValue(units);
    }
 
    /** set the *lessThanValue* attribute
     */
    public void setLessThanValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /*
     * @return the current *lessThanValue* attribute
     */
    public Object getLessThanValue() {
-      return ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *lessThanOrEqualValue* attribute
     */
    public void setLessThanOrEqualValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /*
     * @return the current *lessThanOrEqualValue* attribute
     */
    public Object getLessThanOrEqualValue() {
-      return ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /*
     * @return the current *lessThanValue* attribute
     */
    public Object getGreaterThanValue() {
-      return ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *greaterThanValue* attribute
     */
    public void setGreaterThanValue (Object strDesc)
    {
-       ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+       ((Attribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /** set the *greaterThanOrEqualValue* attribute
     */
    public void setGreaterThanOrEqualValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /*
     * @return the current *greaterThanOrEqualValue* attribute
     */
    public Object getGreaterThanOrEqualValue() {
-      return ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *infiniteValue* attribute
     */
    public void setInfiniteValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /*
     * @return the current *infiniteValue* attribute
     */
    public Object getInfiniteValue() {
-     return ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return ((Attribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *infiniteNegativeValue* attribute
     */
    public void setInfiniteNegativeValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /*
     * @return the current *infiniteNegativeValue* attribute
     */
    public Object getInfiniteNegativeValue() {
-      return ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *noDataValue* attribute
     */
    public void setNoDataValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /*
     * @return the current *noDataValue* attribute
     */
    public Object getNoDataValue() {
-      return ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *notANumberValue* attribute
     */
    public void setNotANumberValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
    
    /*
     * @return the current *notANumberValue* attribute
     */
    public Object getNotANumberValue() {
-      return ((XMLAttribute) attribHash.get(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *overflowValue* attribute
     */
    public void setOverflowValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(OVERFLOWVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(OVERFLOWVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
    
    /*
     * @return the current *overflowValue* attribute
     */
    public Object getOverflowValue() {
-      return ((XMLAttribute) attribHash.get(OVERFLOWVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(OVERFLOWVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *underflowValue* attribute
     */
    public void setUnderflowValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /*
     * @return the current *underflowValue* attribute
     */
    public Object getUnderflowValue() {
-      return ((XMLAttribute) attribHash.get(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *disabledValue* attribute
     */
    public void setDisabledValue (Object strDesc)
    {
-      ((XMLAttribute) attribHash.get(DISABLEDVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(DISABLEDVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
    }
 
    /*
     * @return the current *disabledValue* attribute
     */
    public Object getDisabledValue() {
-      return ((XMLAttribute) attribHash.get(DISABLEDVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(DISABLEDVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**
@@ -344,7 +344,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public Units getUnits()
    {
-      return (Units) ((XMLAttribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (Units) ((Attribute) attribHash.get(UNITS_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**  set the *dataFormat* attribute
@@ -352,7 +352,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public void setDataFormat (DataFormat dataFormat)
    {
-       ((XMLAttribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).setAttribValue(dataFormat);
+       ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).setAttribValue(dataFormat);
    }
 
    /**
@@ -360,7 +360,7 @@ public class Field extends BaseObjectWithXMLElements {
    */
    public DataFormat getDataFormat()
    {
-      return (DataFormat) ((XMLAttribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (DataFormat) ((Attribute) attribHash.get(DATAFORMAT_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *noteList* attribute
@@ -368,7 +368,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public void setNoteList(List note)
    {
-      ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(note);
+      ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(note);
    }
 
    /**
@@ -376,7 +376,7 @@ public class Field extends BaseObjectWithXMLElements {
    */
    public List getNoteList()
    {
-      return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (List) ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**  set the *relationship* attribute
@@ -384,7 +384,7 @@ public class Field extends BaseObjectWithXMLElements {
     */
    public void setRelationship (FieldRelationship fieldRelation)
    {
-       ((XMLAttribute) attribHash.get(RELATION_XML_ATTRIBUTE_NAME)).setAttribValue(fieldRelation);
+       ((Attribute) attribHash.get(RELATION_XML_ATTRIBUTE_NAME)).setAttribValue(fieldRelation);
    }
  
    /**
@@ -392,7 +392,7 @@ public class Field extends BaseObjectWithXMLElements {
    */
    public FieldRelationship getRelationship ()
    {
-      return (FieldRelationship) ((XMLAttribute) attribHash.get(RELATION_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (FieldRelationship) ((Attribute) attribHash.get(RELATION_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    //
@@ -527,26 +527,26 @@ public class Field extends BaseObjectWithXMLElements {
 
       //set up the attribute hashtable key with the default initial value
      attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, 
-                new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-     attribHash.put(RELATION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));  //double check
-     attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new XMLAttribute(new Units(), Constants.OBJECT_TYPE));
-     attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));
-     attribHash.put(CLASS_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(DISABLEDVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(OVERFLOWVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(NODATAVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(INFINITEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(GREATERTHANVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(LESSTHANVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+                new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(RELATION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));  //double check
+     attribHash.put(UNITS_XML_ATTRIBUTE_NAME, new Attribute(new Units(), Constants.OBJECT_TYPE));
+     attribHash.put(DATAFORMAT_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
+     attribHash.put(CLASS_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(DISABLEDVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(OVERFLOWVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(UNDERFLOWVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(NOTANUMBERVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(NODATAVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(INFINITEVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(GREATERTHANVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(LESSTHANVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(NAME_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
    };
 
@@ -556,6 +556,9 @@ public class Field extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.19  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.18  2001/07/11 22:38:14  thomas
  * Changes related to Interface removeal
  *

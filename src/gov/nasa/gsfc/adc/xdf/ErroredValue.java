@@ -86,27 +86,27 @@ public class  ErroredValue extends Value {
   /** get the *upperErrorValue* attribute.
    */
    public String getUpperErrorValue() {
-      return (String) ((XMLAttribute) attribHash.get(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *upperErrorValue* attribute.
     */
    public void setUpperErrorValue (Number upperErrorValue)
    {
-      ((XMLAttribute) attribHash.get(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(upperErrorValue);
+      ((Attribute) attribHash.get(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(upperErrorValue);
    }
 
    /** get the *lowerErrorValue* attribute.
    */
    public String getLowerErrorValue() {
-      return (String) ((XMLAttribute) attribHash.get(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *lowerErrorValue* attribute.
     */
    public void setLowerErrorValue (Number lowerErrorValue)
    {
-      ((XMLAttribute) attribHash.get(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(lowerErrorValue);
+      ((Attribute) attribHash.get(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(lowerErrorValue);
    }
 
    //
@@ -126,14 +126,17 @@ public class  ErroredValue extends Value {
        attribOrder.add(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME);
 
        //set up the attribute hashtable key with the default initial value
-       attribHash.put(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(UPPER_ERROR_VALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+       attribHash.put(LOWER_ERROR_VALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
    }
 }
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.8  2001/06/12 16:03:58  huang
  * initialize a variable
  *
@@ -153,7 +156,7 @@ public class  ErroredValue extends Value {
  * is no attribute called "errorValue". -b.t.
  *
  * Revision 1.3  2000/11/20 22:03:48  thomas
- * Split up XMLAttribute type NUMBER_TYPE into
+ * Split up Attribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
  * some needed handling in the SaxDocHandler when
  * parsing data for the formatted read. Put prior NUMBER_TYPE

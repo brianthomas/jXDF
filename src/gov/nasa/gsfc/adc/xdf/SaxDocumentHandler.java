@@ -49,7 +49,9 @@ import org.xml.sax.InputSource;
 // Java IO stuff
 // import java.io.Reader;
 import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 // import java.io.FileReader; // this can problably be dropped
@@ -121,7 +123,8 @@ public class SaxDocumentHandler extends DefaultHandler {
     // data to.
     private Hashtable DataTagCount = new Hashtable();
 
-    private int INPUTREADSIZE  = 32768; // byte buffer for reads 
+    private int BASEINPUTREADSIZE =     4096; // base byte buffer for reads 
+    private int MAXINPUTREADSIZE  = 16777216; // maximum byte buffer for reads
 
     // References recording the last object of these types created while
     // parsing the document
@@ -153,6 +156,8 @@ public class SaxDocumentHandler extends DefaultHandler {
     private int CurrentIOCmdIndex = 0;      // For formatted reads, which formattedIOCmd we are currently reading 
     private int CurrentDataFormatIndex = 0; // which dataformat index (in DatFormatList[]) we currently are reading
     private DataFormat DataFormatList[];       // list of CurrentArray.getDataFormatList();
+    private int CurrentReadBytes = 0;  // how many bytes exist in a 'record' 
+    private int CurrentInputReadSize = 0; // how big the current byte buffer should be for reading
     private int NrofDataFormats;
     private int[] IntRadix;
     private int LastFastAxisCoordinate;
@@ -419,9 +424,9 @@ public class SaxDocumentHandler extends DefaultHandler {
        return CurrentStructure;
     }
 
-    private XMLElementNode createNewXMLElementNode (String elementNodeName, Attributes attrs) {
-       XMLElementNode myElement = new XMLElementNode(elementNodeName);
-       myElement.setXMLAttributes(attrs);
+    private ElementNode createNewElementNode (String elementNodeName, Attributes attrs) {
+       ElementNode myElement = new ElementNode(elementNodeName);
+       myElement.setAttributes(attrs);
        return myElement;
     }
 
@@ -575,7 +580,7 @@ public class SaxDocumentHandler extends DefaultHandler {
         Iterator iter = Notation.iterator();
         while (iter.hasNext()) {
            Hashtable initValues = (Hashtable) iter.next(); 
-           XDF.getDocumentType().addNotation(new XMLNotation(initValues));
+           XDF.getDocumentType().addNotation(new NotationNode(initValues));
         }
 
     }
@@ -762,9 +767,11 @@ public class SaxDocumentHandler extends DefaultHandler {
     // trying to do here.. At this time, it will read a file, 
     // I seriously doubt if this will really work for other URI's 
     // without serious change.
-    private String getHrefData (XDFEntity hrefObj, String compressionType) {
+    private InputStream getInputStreamFromHref (Entity hrefObj, String compressionType) 
+    throws java.io.IOException
+    {
 
-       StringBuffer buffer = new StringBuffer();
+       InputStream in = null;
 
        // well, we should be doing something with base here, 
        // but arent because it isnt captured by this API. feh.
@@ -774,19 +781,15 @@ public class SaxDocumentHandler extends DefaultHandler {
 
           // we assume here that this is a file. hurm.
           String fileName = hrefObj.getSystemId();
- //         int size = 0;
+
 
           try {
-
-             java.io.InputStream in = null;
-
-             try {
                InputSource input = resolveEntity(hrefObj.getPublicId(), hrefObj.getSystemId()); 
                in = input.getByteStream();
-             } catch (SAXException e) {
+          } catch (SAXException e) {
                 Log.printStackTrace(e);
-             } catch (NullPointerException e) {
-                Log.infoln("Trying to open href file resource:"+hrefObj.getSystemId());
+          } catch (NullPointerException e) {
+                Log.info("Trying to open href file resource:"+hrefObj.getSystemId());
                 // in this case the InputSource object is null to request that 
                 // the parser open a regular URI connection to the system identifier.
                 // In our case, the systemId IS the filename.
@@ -797,63 +800,89 @@ public class SaxDocumentHandler extends DefaultHandler {
                 } catch (java.io.FileNotFoundException fileNotFound) {
                    fileNotFound.printStackTrace();
                 }
+                Log.infoln("...success");
 
-             }
+          }
 
-             // ok, got an InputStream
-             // but do we have compressed data? If so wrap with decompress reader 
-             if (compressionType != null) {
-                if (compressionType.equals(Constants.DATA_COMPRESSION_GZIP)) {
+          // ok, got an InputStream
+          // but do we have compressed data? If so wrap with decompress reader 
+          if (compressionType != null) {
+             if (compressionType.equals(Constants.DATA_COMPRESSION_GZIP)) {
                    in = new GZIPInputStream(in);
-                } else if (compressionType.equals(Constants.DATA_COMPRESSION_ZIP)) {
+             } else if (compressionType.equals(Constants.DATA_COMPRESSION_ZIP)) {
                    in = new ZipInputStream(in);
                    ((ZipInputStream) in).getNextEntry(); // read only first entry for now 
-                } else {
+             } else {
                    Log.errorln("Error: cant read data with compression type:"+compressionType);
-                   return new String("");
-                }
+                   return in;
              }
+          }
 
-             // now, read the info
-             // *sigh*, we could be better off (faster) IF we actually populated the dataCube from
-             // here rather than insert it in a string Buffer and then re-parse it later on. *Pfhht*
-             if (in != null) {
+        } else {
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+           throw new java.io.IOException("SystemId not defined in Entity, cannot open inputstream"); 
 
-                int size = 4096;
-                char[] data = new char[size]; 
+        }
 
-                int chars_this_read = 0;
-                int offset = 0;
-                while ( (chars_this_read = reader.read(data)) >= 0)
-                {
-                   buffer.append(data, 0, chars_this_read);
-                   if (chars_this_read < size) {
-                      break; // short read? then thats all
-                   } 
-                   offset += chars_this_read;
-                }
+        return in;
+    }
+
+    private String getHrefData (Entity hrefObj, String compressionType) 
+    {
+
+       StringBuffer buffer = new StringBuffer();
+
+       // well, we should be doing something with base here, 
+       // but arent because it isnt captured by this API. feh.
+       // $file = $href->getBase() if $href->getBase();
+
+       InputStream in = null;
+       try {
+
+          in = getInputStreamFromHref(hrefObj, compressionType);
+
+          // now, read the info
+          // *sigh*, we could be better off (faster) IF we actually populated the dataCube from
+          // here rather than insert it in a string Buffer and then re-parse it later on. *Pfhht*
+          if (in != null) 
+          {
+
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+             int size = BASEINPUTREADSIZE;
+             char[] data = new char[size];
+
+             int chars_this_read = 0;
+             int offset = 0;
+             while ( (chars_this_read = reader.read(data)) >= 0)
+             {
+                buffer.append(data, 0, chars_this_read);
+                if (chars_this_read < size) {
+                   break; // short read? then thats all
+                } 
+                offset += chars_this_read;
 
              }
   
-          } catch (java.io.IOException e) {
-             Log.printStackTrace(e);
-          }
-
-       } else {
-          Log.warnln("Can't read XDFEntity data, systemId is not defined! Ignoring read request.");
+          } else {
+              Log.errorln("Cant open href resource for reading, aborting read.");
+              return (String) null;
+          } 
+  
+       } catch (IOException e) {
+          Log.printStackTrace(e);
+          return (String) null;
        }
 
        return buffer.toString();
     } 
 
-
     // This and its sub-routines are Not currently used
-    private void loadHrefDataIntoCurrentArray () {
+    private void loadHrefDataIntoCurrentArray ( Entity hrefObj,
+                                                String compressionType
+                                              ) 
+    {
  
-       XDFEntity hrefObj = CurrentArray.getDataCube().getHref();
-
        // well, we should be doing something with base here, 
        // but arent because it isnt captured by this API. feh.
        // $file = $href->getBase() if $href->getBase();
@@ -873,43 +902,61 @@ public class SaxDocumentHandler extends DefaultHandler {
                 // in this case the InputSource object is null to request that 
                 // the parser open a regular URI connection to the system identifier.
                 // In our case, the systemId IS the filename.
-                File f = new File(hrefObj.getSystemId());
-                in = (InputStream) new FileInputStream(new File(hrefObj.getSystemId()));
+         //       File f = new File(hrefObj.getSystemId());
+         //       in = (InputStream) new BufferedInputStream (new FileInputStream(new File(hrefObj.getSystemId())));
+                try {
+                  in = getInputStreamFromHref(hrefObj, compressionType);
+                } catch (IOException ex) {
+                  Log.printStackTrace(ex);
+                }
+
              }
 
-             // ok, got a bytestream, now read the info
-             // Need to use a buffered reader here!!!
              if (in != null) {
+
+                in = (InputStream) new BufferedInputStream (in);
+
+
                 // probably could treat endian as a global too, since thats
                 // how we treat the rest of the array parameters
                 String endian = CurrentArray.getXMLDataIOStyle().getEndian();
-                byte[] data = new byte[INPUTREADSIZE];
+
+                byte[] data = new byte[CurrentInputReadSize]; // new byte[BASEINPUTREADSIZE]; 
                 int bytes_read = 0;
+
+                Locator locator = CurrentArray.createLocator();
 
                 while ( true ) {
 
-                  int readAmount = in.read(data, bytes_read, INPUTREADSIZE-bytes_read);
+                  // int readAmount = in.read(data, bytes_read, BASEINPUTREADSIZE-bytes_read);
+                  int readAmount = in.read(data, bytes_read, CurrentInputReadSize-bytes_read);
 
                   if ( readAmount == -1 )
                   {
                       // pour out remaining buffer into the current array
-                     addByteDataToCurrentArray(data, bytes_read, endian );
-
-// Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
-
+                      try {
+                         addByteDataToCurrentArray(locator, data, bytes_read, endian );
+                      } catch (SetDataException e) { 
+                         Log.errorln("Failed to load external data at start byte:"+bytes_read);
+                         e.printStackTrace();
+                      }
                       break; // EOF reached
                   }
 
                   bytes_read += readAmount;
 
                   // we exceeded the size of the buffer, dump to list
-                  if ( bytes_read == INPUTREADSIZE) 
+                  // if ( bytes_read == BASEINPUTREADSIZE) 
+                  if ( bytes_read == CurrentInputReadSize) 
                   { 
 
-// Log.errorln("Dumping buffer after reading in "+bytes_read+" bytes");
-
                      // pour out buffer into array
-                     addByteDataToCurrentArray(data, bytes_read, endian );
+                     try {
+                         addByteDataToCurrentArray(locator, data, bytes_read, endian );
+                     } catch (SetDataException e) {
+                         Log.errorln("Failed to load external data at start byte:"+bytes_read);
+                         e.printStackTrace();
+                     }
                      bytes_read = 0;
                   }
 
@@ -922,23 +969,24 @@ public class SaxDocumentHandler extends DefaultHandler {
           }
 
        } else {
-          Log.warnln("Can't read XDFEntity data, undefined systemId!");
+          Log.warnln("Can't read Entity data, undefined systemId!");
        }
 
     }
 
 // the problem: need to keep track of the formatting chars. 
-    private void addByteDataToCurrentArray (byte[] data, int amount, String endian) {
+    private void addByteDataToCurrentArray (Locator location, byte[] data, int amount, String endian) 
+    throws SetDataException
+    {
 
         ArrayList commandList = (ArrayList) ((FormattedXMLDataIOStyle) CurrentArray.getXMLDataIOStyle()).getFormatCommands();
         int nrofIOCmd = commandList.size();
         int bytes_added = 0;
 
-// Log.errorln("Adding "+amount+" bytes of data to current array");
-
         while (bytes_added < amount) {
 
             FormattedIOCmd currentIOCmd = (FormattedIOCmd) commandList.get(CurrentIOCmdIndex);
+
 
             // readCell
             if (currentIOCmd instanceof ReadCellFormattedIOCmd) {
@@ -946,26 +994,34 @@ public class SaxDocumentHandler extends DefaultHandler {
                DataFormat currentDataFormat = DataFormatList[CurrentDataFormatIndex];
                int bytes_to_add = currentDataFormat.numOfBytes();
 
-// Log.errorln("Adding "+bytes_to_add+" bytes of data to current array");
-//Object objectToAdd = null;
+               if ( currentDataFormat instanceof IntegerDataFormat
+                    || currentDataFormat instanceof FloatDataFormat
+                  ) {
 
-               if ( currentDataFormat instanceof IntegerDataFormat) {
+                   String thisData = new String(data,bytes_added,bytes_to_add);
+Log.errorln("Got Href Formatted Number Data:["+thisData.trim()+ "]["+bytes_added+"]["+bytes_to_add+"]");
 
-               } else if (currentDataFormat instanceof FloatDataFormat) {
+                   addDataToCurrentArray(location, thisData.trim(), currentDataFormat, IntRadix[CurrentDataFormatIndex]);
 
-//Log.errorln("Got Href Data Float:["+new String(data,bytes_added,bytes_added+bytes_to_add)+ "]["+bytes_added+"]["+bytes_to_add+"]");
+               } else if (currentDataFormat instanceof StringDataFormat) {
+                   String thisData = new String(data,bytes_added,bytes_to_add);
+Log.errorln("Got Href Formatted Character Data:["+thisData+ "]["+bytes_added+"]["+bytes_to_add+"]");
+                   addDataToCurrentArray(location, thisData, currentDataFormat, IntRadix[CurrentDataFormatIndex]);
 
                } else if (currentDataFormat instanceof BinaryFloatDataFormat) {
 
                   if (bytes_to_add == 4) { 
   
-                     Float myValue = convert4bytesToFloat(endian, data, bytes_added);
-//Log.errorln("Got Href Data BFloatSingle:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+                     float myValue = convert4bytesToFloat(endian, data, bytes_added);
+// Log.errorln("Got Href Data BFloatSingle:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+                     CurrentArray.setData(location, myValue);
 
                   } else if (bytes_to_add == 8) { 
 
-                    Double myValue = convert8bytesToDouble(endian, data, bytes_added);
 // Log.errorln("Got Href Data BFloatDouble:["+myValue.toString()+"]["+bytes_added+"]["+bytes_to_add+"]");
+
+                     double myValue = convert8bytesToDouble(endian, data, bytes_added);
+                     CurrentArray.setData(location, myValue);
 
                   } else {
                      Log.errorln("Error: got floating point with bit size != (32|64). Ignoring data.");
@@ -973,21 +1029,20 @@ public class SaxDocumentHandler extends DefaultHandler {
 
                } else if (currentDataFormat instanceof BinaryIntegerDataFormat) {
 
+// Log.errorln("Got Href Data Integer:["+myValue.toString()+ "]["+bytes_added+"]["+bytes_to_add+"]");
+
                   //  Integer myValue = convert2bytesToInteger (endian, data, bytes_added);
                   Integer numOfBits = ((BinaryIntegerDataFormat) currentDataFormat).getBits();
                   int numOfBytes = numOfBits.intValue()/8;
-                  Integer myValue = convertBytesToInteger (numOfBytes, endian, data, bytes_added);
+                  int myValue = convertBytesToInteger (numOfBytes, endian, data, bytes_added);
+                  CurrentArray.setData(location, myValue);
 
-// Log.errorln("Got Href Data Integer:["+myValue.toString()+ "]["+bytes_added+"]["+bytes_to_add+"]");
+//               return convert8bytesToLong (endianStyle, bb, sbyte);
 
-               } else if (currentDataFormat instanceof StringDataFormat) {
+               } 
 
-// char[] charList = bytesTo8BitChars(data,bytes_added,bytes_added+bytes_to_add);
-
-// Log.errorln("String byte range is :"+bytes_added+" to "+(bytes_added+bytes_to_add));
-// Log.errorln("Got Href Data String:["+new String(data,bytes_added,(bytes_added+bytes_to_add))+ "]["+bytes_added+"]["+bytes_to_add+"]");
-
-               }
+               // advance the data pointer to next location
+               location.next();
 
                // advance our global pointer to the current DataFormat
                if (NrofDataFormats > 1)
@@ -1020,42 +1075,43 @@ public class SaxDocumentHandler extends DefaultHandler {
 
     }
 
-    private Integer convertBytesToInteger (int numOfBytes, String endianStyle, byte[] bb, int sbyte) {
+    private int convertBytesToInteger (int numOfBytes, String endianStyle, byte[] bb, int sbyte) {
 
         // is it better to use a dispatch table here?
         switch (numOfBytes) {
 
-           case '1': // 8-bit 
+           case 1: // 8-bit 
               return convert1byteToInteger (bb, sbyte);
-           case '2': // 16-bit 
+           case 2: // 16-bit 
               return convert2bytesToInteger (endianStyle, bb, sbyte);
-           case '3': // 24-bit (unusual) 
+           case 3: // 24-bit (unusual) 
               return convert3bytesToInteger (endianStyle, bb, sbyte);
-           case '4': // 32-bit
+           case 4: // 32-bit
               return convert4bytesToInteger (endianStyle, bb, sbyte);
               // This will most likely break the Java Integer. Lets not pretend
               // that we support it yet. Will have to contemplate BigInteger implementation for this. 
            /*
-           case '8': // 64-bit 
-               return convert8bytesToInteger (endianStyle, bb, sbyte);
+           case 8: // 64-bit 
+              return convert8bytesToLong (endianStyle, bb, sbyte);
               break;
            */
            default:
-              Log.errorln("XDF Can't handle binary integers of byte size:"+numOfBytes+". Ignoring Request");
-              return (Integer) null;
+              Log.errorln("XDF Can't handle binary integers of byte size:"+numOfBytes+". Aborting!");
+              System.exit(-1);
+              return -1;
         }
     }
 
     // for 8-bit Int
-    private Integer convert1byteToInteger (byte[] bb, int sbyte) {
+    private int convert1byteToInteger (byte[] bb, int sbyte) {
 
        int i = bb[sbyte]&0xFF;
-       return new Integer(i);
+       return i; // new Integer(i);
 
     }
 
     // for 16-bit Int
-    private Integer convert2bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
+    private int convert2bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
       
        int i;
        if(endianStyle.equals(Constants.BIG_ENDIAN))
@@ -1063,12 +1119,12 @@ public class SaxDocumentHandler extends DefaultHandler {
        else
            i = (bb[sbyte+1]&0xFF) << 8  | (bb[sbyte]&0xFF);
 
-       return new Integer(i);
+       return i; // new Integer(i);
 
     }
 
     // for 24-bit Int
-    private Integer convert3bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
+    private int convert3bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
 
        int i;
        if(endianStyle.equals(Constants.BIG_ENDIAN))
@@ -1076,12 +1132,12 @@ public class SaxDocumentHandler extends DefaultHandler {
        else
            i = (bb[sbyte+2]&0xFF) << 16  | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
 
-       return new Integer(i);
+       return i; // new Integer(i);
 
     }
 
     // for 32-bit Int
-    private Integer convert4bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
+    private int convert4bytesToInteger (String endianStyle, byte[] bb, int sbyte) {
 
        int i;
        if(endianStyle.equals(Constants.BIG_ENDIAN))
@@ -1089,12 +1145,12 @@ public class SaxDocumentHandler extends DefaultHandler {
        else
            i = (bb[sbyte+3]&0xFF) << 24  | (bb[sbyte+2]&0xFF) << 16 | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
 
-       return new Integer(i);
+       return i; // new Integer(i);
 
     }
 
     // for 32-bit Floating point
-    private Float convert4bytesToFloat (String endianStyle, byte[] bb, int sbyte) {
+    private float convert4bytesToFloat (String endianStyle, byte[] bb, int sbyte) {
 
        int i;
        if(endianStyle.equals(Constants.BIG_ENDIAN)) 
@@ -1114,11 +1170,12 @@ for (int j=sbyte; j<sbyte+4; j++) {
 Log.errorln("");
 */
 
-       return new Float(Float.intBitsToFloat(i));
+       // return new Float(Float.intBitsToFloat(i));
+       return Float.intBitsToFloat(i);
     }
 
     // for 64-bit (Double) Floating point
-    private Double convert8bytesToDouble (String endianStyle, byte[] bb, int sbyte) {
+    private double convert8bytesToDouble (String endianStyle, byte[] bb, int sbyte) {
        int i1;
        int i2;
 
@@ -1133,7 +1190,8 @@ Log.errorln("");
           i1 =  (bb[sbyte+3]&0xFF) << 24 | (bb[sbyte+2]&0xFF) << 16 | (bb[sbyte+1]&0xFF) << 8 | (bb[sbyte]&0xFF);
        }
 
-       return new Double(Double.longBitsToDouble( ((long) i1) << 32 | ((long)i2&0x00000000ffffffffL) ));
+      // return new (Double.longBitsToDouble( ((long) i1) << 32 | ((long)i2&0x00000000ffffffffL) ));
+       return Double.longBitsToDouble( ((long) i1) << 32 | ((long)i2&0x00000000ffffffffL) );
 
     }
 
@@ -1193,7 +1251,7 @@ Log.errorln("");
             } 
             else 
             {
-               Log.errorln("Cant treat binaryIntegers that arent either 8, 16, 24 or 32 bit. Ignoring value.");
+               Log.errorln("Cant treat binaryIntegers that arent 8, 16, 24 or 32 bit. Ignoring value.");
             } 
 
         } else if (binaryFormatObj instanceof BinaryFloatDataFormat) {
@@ -1356,18 +1414,16 @@ Log.errorln("");
                                        ) 
     {
 
-/*
 // this stuff slows down the parser too much to leave commented in.
 // uncomment as needed
-Log.debug("Add Data:["+thisString+"] (");
+Log.error("Add Data:["+thisString+"] (");
 List axes = dataLocator.getIterationOrder();
 Iterator liter = axes.iterator();
 while (liter.hasNext()) {
    AxisInterface axis = (AxisInterface) liter.next();
-   Log.debug(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
+   Log.error(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
 }
-Log.debugln(") ");
-*/
+Log.errorln(") ");
 
        // Note that we dont treat binary data at all here 
        try {
@@ -2074,7 +2130,7 @@ Log.errorln(" TValue:"+valueString);
 
            String parentNodeName = getParentNodeName();
            String elementNodeName = getCurrentNodeName();
-           XMLElementNode newElement = null;
+           ElementNode newElement = null;
 
            if ( parentNodeName == null) {
               Log.warnln("Warning: ILLEGAL non-XDF NODE:["+elementNodeName+"]. Ignoring.");
@@ -2084,44 +2140,44 @@ Log.errorln(" TValue:"+valueString);
            // the DTD sez that if we get non-xdf defined nodes, it IS 
            // allowed as long as these are children of the following 
            // XDF defined nodes, OR are children of a non-XDF defined node
-           // (e.g. the child of one of these nodes, which we call 'XDF::XMLElementNode')
+           // (e.g. the child of one of these nodes, which we call 'XDF::ElementNode')
            if( parentNodeName.equals(XDFNodeName.STRUCTURE) 
                || parentNodeName.equals(XDFNodeName.ROOT)
              )
            {
 
-              newElement = createNewXMLElementNode(elementNodeName, attrs);
-              getCurrentStructure().addXMLElementNode(newElement);
+              newElement = createNewElementNode(elementNodeName, attrs);
+              getCurrentStructure().addElementNode(newElement);
 
            } else if( parentNodeName.equals(XDFNodeName.ARRAY) ) {
 
-              newElement = createNewXMLElementNode(elementNodeName, attrs);
-              getCurrentArray().addXMLElementNode(newElement);
+              newElement = createNewElementNode(elementNodeName, attrs);
+              getCurrentArray().addElementNode(newElement);
 
            } else if( parentNodeName.equals(XDFNodeName.FIELDAXIS) ) {
 
-              newElement = createNewXMLElementNode(elementNodeName, attrs);
-              getCurrentArray().getFieldAxis().addXMLElementNode(newElement);
+              newElement = createNewElementNode(elementNodeName, attrs);
+              getCurrentArray().getFieldAxis().addElementNode(newElement);
 
            } else if( parentNodeName.equals(XDFNodeName.AXIS) ) {
 
-              newElement = createNewXMLElementNode(elementNodeName, attrs);
+              newElement = createNewElementNode(elementNodeName, attrs);
               List axisList = (List) CurrentArray.getAxes();
               AxisInterface lastAxisObject = (AxisInterface) axisList.get(axisList.size()-1);
-              lastAxisObject.addXMLElementNode(newElement);
+              lastAxisObject.addElementNode(newElement);
 
            } else if( parentNodeName.equals(XDFNodeName.FIELD) ) {
 
-              newElement = createNewXMLElementNode(elementNodeName, attrs);
-              LastFieldObject.addXMLElementNode(newElement);
+              newElement = createNewElementNode(elementNodeName, attrs);
+              LastFieldObject.addElementNode(newElement);
 
            } else {
 
               Object lastObj = getLastObject();
-              if (lastObj != null && lastObj instanceof XMLElementNode) {
+              if (lastObj != null && lastObj instanceof ElementNode) {
 
-                  newElement = createNewXMLElementNode(elementNodeName, attrs);
-                  ((XMLElementNode) lastObj).addXMLElementNode(newElement);
+                  newElement = createNewElementNode(elementNodeName, attrs);
+                  ((ElementNode) lastObj).addElementNode(newElement);
 
               } else {
                   Log.warnln("Warning: ILLEGAL NODE:["+elementNodeName+"] (child of "+parentNodeName
@@ -2169,7 +2225,7 @@ Log.errorln(" TValue:"+valueString);
        public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
            DelimitedXMLDataIOStyle readObj = new DelimitedXMLDataIOStyle(CurrentArray);
-           readObj.setXMLAttributes(attrs);
+           readObj.setAttributes(attrs);
            CurrentArray.setXMLDataIOStyle(readObj);
 
          // is this needed??
@@ -2226,7 +2282,7 @@ Log.errorln(" TValue:"+valueString);
 
           // create new object appropriately 
           Array newarray = new Array();
-          newarray.setXMLAttributes(attrs); // set XML attributes from passed list 
+          newarray.setAttributes(attrs); // set XML attributes from passed list 
 
           // add this array to our list of arrays if it has an ID
           if (newarray != null) { 
@@ -2250,7 +2306,7 @@ Log.errorln(" TValue:"+valueString);
 
           // create new object appropriately 
           Axis newaxis = new Axis();
-          newaxis.setXMLAttributes(attrs); // set XML attributes from passed list 
+          newaxis.setAttributes(attrs); // set XML attributes from passed list 
 
           // Every axis must have *either* axisId *or* an axisIdRef 
           // else, its illegal!
@@ -2277,7 +2333,7 @@ Log.errorln(" TValue:"+valueString);
                     }
 
                     // override attrs with those in passed list
-                    newaxis.setXMLAttributes(attrs);
+                    newaxis.setAttributes(attrs);
                     // give the clone a unique Id and remove IdRef 
                     newaxis.setAxisId(findUniqueIdName(AxisObj,newaxis.getAxisId(), AxisAliasId)); 
                     newaxis.setAxisIdRef(null);
@@ -2327,8 +2383,8 @@ Log.errorln(" TValue:"+valueString);
 
         // create the object
           BinaryFloatDataFormat bfFormat = new BinaryFloatDataFormat();
-          bfFormat.setXMLAttributes(attrs);
-          bfFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
+          bfFormat.setAttributes(attrs);
+          bfFormat.setAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
 
           if (CurrentDatatypeObject instanceof Field) {
               ((Field) CurrentDatatypeObject).setDataFormat(bfFormat);
@@ -2352,8 +2408,8 @@ Log.errorln(" TValue:"+valueString);
 
          // create the object
           BinaryIntegerDataFormat biFormat = new BinaryIntegerDataFormat();
-          biFormat.setXMLAttributes(attrs);
-          biFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
+          biFormat.setAttributes(attrs);
+          biFormat.setAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
 
           if (CurrentDatatypeObject instanceof Field) {
               ((Field) CurrentDatatypeObject).setDataFormat(biFormat);
@@ -2533,6 +2589,9 @@ Log.errorln(" TValue:"+valueString);
           if(DataNodeLevel != 0)
              return;
 
+          // only add the data here if it was *not* read in from a file 
+          if (CurrentArray.getDataCube().getHref() != null) return;
+
           // now we are ready to read in untagged data (both delimited/formmatted styles) 
           // from the DATABLOCK
 
@@ -2574,8 +2633,8 @@ while(thisIter.hasNext()) {
 
                  // snag the string representation of the values
                  strValueList = formattedSplitStringIntoStringObjects( DATABLOCK.toString(), 
-                                                                        ((FormattedXMLDataIOStyle) formatObj)
-                                                                                );
+                                                                       ((FormattedXMLDataIOStyle) formatObj)
+                                                                     );
                  if (strValueList.size() == 0) {
                     Log.errorln("Error: XDF Reader is unable to acquire formatted data, bad format?");
                     System.exit(-1);
@@ -2583,6 +2642,7 @@ while(thisIter.hasNext()) {
 
               } else {
 
+                 // Delimited Case here
                  // snag the string representation of the values
                  strValueList = splitStringIntoStringObjects( DATABLOCK.toString(), 
                                                 ((DelimitedXMLDataIOStyle) formatObj).getDelimiter(), 
@@ -2620,7 +2680,8 @@ while(thisIter.hasNext()) {
               }
 
 
-          } else if ( formatObj instanceof TaggedXMLDataIOStyle )
+          } 
+          else if ( formatObj instanceof TaggedXMLDataIOStyle )
           {
 
               // Tagged case: do nothing
@@ -2645,14 +2706,14 @@ while(thisIter.hasNext()) {
 
              // A little 'pre-handling' as href is a specialattribute
              // that will hold an (Href) object rather than string value 
-             XDFEntity hrefObj = null;
+             Entity hrefObj = null;
              String hrefValue = getAttributesValueByName(attrs,"href");
              if (hrefValue != null ) 
              {
 
                 // now we look up the href from the entity list gathered by
                 // the parser and transfer relevant info to our Href object 
-                hrefObj = new XDFEntity();
+                hrefObj = new Entity();
 
                 Hashtable hrefInfo = (Hashtable) UnParsedEntity.get(hrefValue);
 
@@ -2679,7 +2740,7 @@ while(thisIter.hasNext()) {
              }
 
              // update the array dataCube with passed attributes
-             CurrentArray.getDataCube().setXMLAttributes(attrs);
+             CurrentArray.getDataCube().setAttributes(attrs);
 
              // Clean up. We override the string value of Href and set it as
              // the Href object , if we created it (yeh, sloppy). 
@@ -2708,7 +2769,9 @@ while(thisIter.hasNext()) {
 
              // set up some other global information bout the dataformats
              // that will help speed reading 
+             CurrentReadBytes = 0;
              for (int i=0; i < NrofDataFormats; i++) { 
+               CurrentReadBytes += DataFormatList[i].numOfBytes();
                if (DataFormatList[i] instanceof IntegerDataFormat) {
                   String type = ((IntegerDataFormat) DataFormatList[i]).getType();
                   if (type.equals(Constants.INTEGER_TYPE_DECIMAL))
@@ -2722,6 +2785,19 @@ while(thisIter.hasNext()) {
                } else if (DataFormatList[i] instanceof BinaryIntegerDataFormat) {
                      IntRadix[i] = 10;
                }
+             }
+
+             if (CurrentReadBytes > MAXINPUTREADSIZE) {
+                Log.errorln("This XDF file has single record that is too big (greater than "+MAXINPUTREADSIZE+" bytes in a record) to parse by this code");
+                System.exit(-1);
+             }
+
+             // now determine properread size
+             CurrentInputReadSize = BASEINPUTREADSIZE * CurrentReadBytes;
+
+             // make sure its not TOO big
+             while (CurrentInputReadSize > MAXINPUTREADSIZE) {
+                CurrentInputReadSize -= CurrentReadBytes;
              }
 
           }
@@ -2739,12 +2815,14 @@ while(thisIter.hasNext()) {
           }
 
           // tack in href data 
-          if (CurrentArray.getDataCube().getHref() != null) 
-              DATABLOCK.append(getHrefData(CurrentArray.getDataCube().getHref(), 
-                                           CurrentArray.getDataCube().getCompression()
-                                          )
-                              );
-              //loadHrefDataIntoCurrentArray();
+          Entity href = CurrentArray.getDataCube().getHref();
+          if (href != null) 
+              // The first method is the 'old' way.
+              // If you uncomment it  be sure to uncomment line that looks like:
+              //    if (CurrentArray.getDataCube().getHref() != null) return;
+              // in the end dataElementHandler
+              // DATABLOCK.append(getHrefData(href, CurrentArray.getDataCube().getCompression()));
+              loadHrefDataIntoCurrentArray(href, CurrentArray.getDataCube().getCompression());
 
           // entered a datanode, raise the count 
           // this (partially helps) declare we are now reading data, 
@@ -2776,7 +2854,7 @@ while(thisIter.hasNext()) {
 
           // create new object appropriately 
           Field newfield = new Field();
-          newfield.setXMLAttributes(attrs); // set XML attributes from passed list
+          newfield.setAttributes(attrs); // set XML attributes from passed list
 
           // grab the field axis and add the field 
           FieldAxis fieldAxis = CurrentArray.getFieldAxis();
@@ -2813,7 +2891,7 @@ while(thisIter.hasNext()) {
                 }
 
                 // override attrs with those in passed list
-                newfield.setXMLAttributes(attrs);
+                newfield.setAttributes(attrs);
 
                 // give the clone a unique Id and remove IdRef 
                 newfield.setFieldId(findUniqueIdName(FieldObj, newfield.getFieldId())); 
@@ -2853,7 +2931,7 @@ while(thisIter.hasNext()) {
 
           // create new object appropriately 
           FieldAxis newfieldaxis = new FieldAxis();
-          newfieldaxis.setXMLAttributes(attrs); // set XML attributes from passed list 
+          newfieldaxis.setAttributes(attrs); // set XML attributes from passed list 
 
           // Every axis must have *either* axisId *or* an axisIdRef 
           // else, its illegal!
@@ -2891,7 +2969,7 @@ while(thisIter.hasNext()) {
                     }
 
                     // override attrs with those in passed list
-                    newfieldaxis.setXMLAttributes(attrs);
+                    newfieldaxis.setAttributes(attrs);
 
                     // give the clone a unique Id and remove IdRef 
                     newfieldaxis.setAxisId(findUniqueIdName(AxisObj, newfieldaxis.getAxisId(), AxisAliasId)); 
@@ -2936,7 +3014,7 @@ while(thisIter.hasNext()) {
 
           // create new object appropriately 
           FieldGroup newfieldGroup = new FieldGroup();
-          newfieldGroup.setXMLAttributes(attrs); // set XML attributes from passed list 
+          newfieldGroup.setAttributes(attrs); // set XML attributes from passed list 
 
           // determine where this goes and then insert it 
           if( parentNodeName.equals(XDFNodeName.FIELDAXIS) )
@@ -2982,7 +3060,7 @@ while(thisIter.hasNext()) {
 
           // create the object
           FieldRelationship newfieldrelation = new FieldRelationship();
-          newfieldrelation.setXMLAttributes(attrs);
+          newfieldrelation.setAttributes(attrs);
 
           // add in reference object if it exists
           String fieldIdRefs = newfieldrelation.getFieldIdRefs();
@@ -3005,8 +3083,8 @@ while(thisIter.hasNext()) {
 
           // create the object
           FloatDataFormat fixedFormat = new FloatDataFormat();
-          fixedFormat.setXMLAttributes(attrs);
-          fixedFormat.setXMLAttributes(DataFormatAttribs);
+          fixedFormat.setAttributes(attrs);
+          fixedFormat.setAttributes(DataFormatAttribs);
 
           if (CurrentDatatypeObject instanceof Field) { 
               ((Field) CurrentDatatypeObject).setDataFormat(fixedFormat);
@@ -3054,8 +3132,8 @@ while(thisIter.hasNext()) {
 
          // create the object
           IntegerDataFormat integerFormat = new IntegerDataFormat();
-          integerFormat.setXMLAttributes(attrs);
-          integerFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
+          integerFormat.setAttributes(attrs);
+          integerFormat.setAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
 
           if (CurrentDatatypeObject instanceof Field) {
               ((Field) CurrentDatatypeObject).setDataFormat(integerFormat);
@@ -3089,7 +3167,7 @@ while(thisIter.hasNext()) {
 
            // create new object appropriately 
            Note newnote = new Note();
-           newnote.setXMLAttributes(attrs); // set XML attributes from passed list 
+           newnote.setAttributes(attrs); // set XML attributes from passed list 
 
            String noteId = newnote.getNoteId();
            String noteIdRef = newnote.getNoteIdRef();
@@ -3121,7 +3199,7 @@ while(thisIter.hasNext()) {
                  }
 
                  // override attrs with those in passed list
-                 newnote.setXMLAttributes(attrs);
+                 newnote.setAttributes(attrs);
 
                  // give the clone a unique Id and remove IdRef 
                  newnote.setNoteId(findUniqueIdName(NoteObj, newnote.getNoteId())); 
@@ -3230,7 +3308,7 @@ while(thisIter.hasNext()) {
 
           // create new object appropriately 
           Parameter newparameter = new Parameter();
-          newparameter.setXMLAttributes(attrs); // set XML attributes from passed list 
+          newparameter.setAttributes(attrs); // set XML attributes from passed list 
 
           // add this object to the lookup table, if it has an ID
           String paramId = newparameter.getParamId();
@@ -3261,7 +3339,7 @@ while(thisIter.hasNext()) {
                  }
 
                  // override attrs with those in passed list
-                 newparameter.setXMLAttributes(attrs);
+                 newparameter.setAttributes(attrs);
                  // give the clone a unique Id and remove IdRef 
                  newparameter.setParamId(findUniqueIdName(ParamObj,newparameter.getParamId()));
                  newparameter.setParamIdRef(null);
@@ -3336,7 +3414,7 @@ while(thisIter.hasNext()) {
 
           // create new object appropriately 
           ParameterGroup newparamGroup = new ParameterGroup();
-          newparamGroup.setXMLAttributes(attrs); // set XML attributes from passed list 
+          newparamGroup.setAttributes(attrs); // set XML attributes from passed list 
 
           // determine where this goes and then insert it 
           if( parentNodeName.equals(XDFNodeName.ARRAY) )
@@ -3530,7 +3608,7 @@ while(thisIter.hasNext()) {
           Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
 
           ReadCellFormattedIOCmd readCellObj = new ReadCellFormattedIOCmd();
-          readCellObj.setXMLAttributes(attrs);
+          readCellObj.setAttributes(attrs);
 
           if (formatObj instanceof FormattedXMLDataIOStyle) {
              if (((FormattedXMLDataIOStyle) formatObj).addFormatCommand(readCellObj)) 
@@ -3579,7 +3657,7 @@ while(thisIter.hasNext()) {
           Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
 
           RepeatFormattedIOCmd repeatObj = new RepeatFormattedIOCmd();
-          repeatObj.setXMLAttributes(attrs);
+          repeatObj.setAttributes(attrs);
 
           if (formatObj instanceof FormattedXMLDataIOStyle) {
              CurrentFormatObjectList.add(repeatObj);
@@ -3606,7 +3684,7 @@ while(thisIter.hasNext()) {
        public Object action (SaxDocumentHandler handler, Attributes attrs) { 
           // The root node is just a "structure" node,
           // but is always the first one.
-          XDF.setXMLAttributes(attrs); // set XML attributes from passed list 
+          XDF.setAttributes(attrs); // set XML attributes from passed list 
           setCurrentStructure(XDF);    // current working structure is now the root 
                                        // structure
 
@@ -3646,7 +3724,7 @@ while(thisIter.hasNext()) {
           Object formatObj = (Object) CurrentFormatObjectList.get(CurrentFormatObjectList.size()-1);
 
           SkipCharFormattedIOCmd skipObj = new SkipCharFormattedIOCmd();
-          skipObj.setXMLAttributes(attrs);
+          skipObj.setAttributes(attrs);
 
           if (formatObj instanceof FormattedXMLDataIOStyle) {
              if (((FormattedXMLDataIOStyle) formatObj).addFormatCommand(skipObj) ) 
@@ -3671,8 +3749,8 @@ while(thisIter.hasNext()) {
 
          // create the object
           StringDataFormat stringFormat = new StringDataFormat();
-          stringFormat.setXMLAttributes(attrs);
-          stringFormat.setXMLAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
+          stringFormat.setAttributes(attrs);
+          stringFormat.setAttributes(DataFormatAttribs); // probably arent any, but who knows.. 
 
           if (CurrentDatatypeObject instanceof Field) {
               ((Field) CurrentDatatypeObject).setDataFormat(stringFormat);
@@ -3695,7 +3773,7 @@ while(thisIter.hasNext()) {
        public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
           Structure structObj = new Structure();
-          structObj.setXMLAttributes(attrs); // set XML attributes from passed list 
+          structObj.setAttributes(attrs); // set XML attributes from passed list 
 
           getCurrentStructure().addStructure(structObj);
           setCurrentStructure(structObj);
@@ -3777,7 +3855,7 @@ while(thisIter.hasNext()) {
 
           // create new object appropriately 
           Unit newunit = new Unit();
-          newunit.setXMLAttributes(attrs);
+          newunit.setAttributes(attrs);
 
           // determine where this goes and then insert it 
           if( gParentNodeName.equals(XDFNodeName.PARAMETER) )
@@ -3848,7 +3926,7 @@ while(thisIter.hasNext()) {
                  }
 
                  // override attrs with those in passed list
-                 newvalue.setXMLAttributes(attrs);
+                 newvalue.setAttributes(attrs);
                  // give the clone a unique Id and remove IdRef 
                  newvalue.setValueId(findUniqueIdName(ValueObj,newvalue.getValueId()));
                  newvalue.setValueIdRef(null);
@@ -4008,7 +4086,7 @@ while(thisIter.hasNext()) {
 
           // 2. create new object appropriately 
           ValueGroup newvalueGroup = new ValueGroup();
-          newvalueGroup.setXMLAttributes(attrs); // set XML attributes from passed list 
+          newvalueGroup.setAttributes(attrs); // set XML attributes from passed list 
 
           // 3. determine where this goes and then insert it 
           if( parentNodeName.equals(XDFNodeName.AXIS) )
@@ -4106,7 +4184,7 @@ while(thisIter.hasNext()) {
 // later note to self: Huh??  
 /*
                  // override attrs with those in passed list
-              //   strValueList.setXMLAttributes(attrs);
+              //   strValueList.setAttributes(attrs);
                  // give the clone a unique Id and remove IdRef 
               //   strValueList.setValueListId(findUniqueIdName(ValueListObj,strValueList.getValueListId()));
               //   strValueList.setValueListIdRef(null);
@@ -4350,8 +4428,11 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.50  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.49  2001/09/05 22:02:09  thomas
- * Added in new XMLNotation class. Made Href->XDFEntity change
+ * Added in new NotationNode class. Made Href->Entity change
  *
  * Revision 1.48  2001/09/04 21:50:53  thomas
  * added 8, 24 bit integer handling
@@ -4369,7 +4450,7 @@ while(thisIter.hasNext()) {
  * Fix for XDF_sample4 reading: cloned read object child axes need to be the ones in the parent array, not default cloned ones.
  *
  * Revision 1.43  2001/07/26 15:57:24  thomas
- * changes related to name change in XMLElementNode class.
+ * changes related to name change in ElementNode class.
  *
  * Revision 1.42  2001/07/23 16:01:32  thomas
  * trivial chage to comments.

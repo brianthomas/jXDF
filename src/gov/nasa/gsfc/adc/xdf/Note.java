@@ -89,69 +89,69 @@ public class Note extends BaseObject {
       @return the current *location* attribute.
     */
    public String getLocation() {
-      return (String) ((XMLAttribute) attribHash.get(LOCATION_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(LOCATION_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *location* attribute.
    */
    public void setLocation(String strValue)
    {
-      ((XMLAttribute) attribHash.get(LOCATION_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
+      ((Attribute) attribHash.get(LOCATION_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
   /** get the *mark* attribute.
       @return the current *mark* attribute.
     */
    public String getMark() {
-      return (String) ((XMLAttribute) attribHash.get(MARK_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(MARK_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *mark* attribute.
    */
    public void setMark (String strValue)
    {
-      ((XMLAttribute) attribHash.get(MARK_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
+      ((Attribute) attribHash.get(MARK_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
    /** get the *noteId* attribute.
       @return the current *noteId* attribute.
     */
    public String getNoteId() {
-      return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *noteId* attribute.
    */
    public void setNoteId (String strValue)
    {
-      ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
+      ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
    /** get the *noteIdRef* attribute.
       @return the current *noteIdRef* attribute.
     */
    public String getNoteIdRef() {
-      return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *noteIdRef* attribute.
    */
    public void setNoteIdRef (String strValue)
    {
-      ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
+      ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
    /** get the *value* (PCDATA) attribute.
     */
    public String getValue() {
-      return (String) ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /**set the *value* attribute (PCDATA).
    */
    public void setValue (String strValue)
    {
-      ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
+      ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strValue);
    }
 
    //
@@ -206,7 +206,7 @@ public class Note extends BaseObject {
    protected void init()
    {
 
-      resetXMLAttributes();
+      resetAttributes();
 
       classXDFNodeName = "note";
 
@@ -218,11 +218,11 @@ public class Note extends BaseObject {
       attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
       attribOrder.add(0, MARK_XML_ATTRIBUTE_NAME);
 
-      attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-      attribHash.put(LOCATION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-      attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-      attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-      attribHash.put(MARK_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+      attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+      attribHash.put(LOCATION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+      attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+      attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+      attribHash.put(MARK_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
    }
 

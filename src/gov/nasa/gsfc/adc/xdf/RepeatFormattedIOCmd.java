@@ -90,14 +90,14 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
     if (numCount.intValue() < 1) {
        Log.warnln("Cant set repeatFormattedIOCmd count to less than 1, ignoring set request.");
     } else {
-       ((XMLAttribute) attribHash.get(COUNT_XML_ATTRIBUTE_NAME)).setAttribValue(numCount);
+       ((Attribute) attribHash.get(COUNT_XML_ATTRIBUTE_NAME)).setAttribValue(numCount);
     }
   }
 
   /** Get the *count* attribute. 
    */
   public Integer getCount() {
-     return (Integer) ((XMLAttribute) attribHash.get(COUNT_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (Integer) ((Attribute) attribHash.get(COUNT_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** Set the formatCommandList. 
@@ -213,12 +213,12 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
   protected void init()
   {
 
-    resetXMLAttributes();
+    resetAttributes();
 
     classXDFNodeName = "repeat";
 
     attribOrder.add(0, COUNT_XML_ATTRIBUTE_NAME);
-    attribHash.put(COUNT_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_COUNT), Constants.INTEGER_TYPE));
+    attribHash.put(COUNT_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_COUNT), Constants.INTEGER_TYPE));
   }
 
 }
@@ -227,6 +227,9 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.14  2001/09/06 15:56:41  thomas
  * changed basicXMLWriter to return String (nodeName)
  *
@@ -249,7 +252,7 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
  * changed add method(s) to return boolean.
  *
  * Revision 1.8  2001/05/10 21:38:04  thomas
- * added resetXMLAttributes to init().
+ * added resetAttributes to init().
  * replaced specificIOStyleToXDF w/ appropriate
  * toXMLOutputStream method.
  *
@@ -270,7 +273,7 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
  * Revision 1.4  2000/11/20 22:07:58  thomas
  * Implimented some changes needed by SaxDocHandler
  * to allow formatted reads (e.g. these classes were not
- * working!!). Implemented new XMLAttribute INTEGER_TYPE
+ * working!!). Implemented new Attribute INTEGER_TYPE
  * in count attributes for repeat/skipChar classes. -b.t.
  *
  * Revision 1.3  2000/11/20 18:31:35  thomas

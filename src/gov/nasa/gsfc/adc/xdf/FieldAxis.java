@@ -108,7 +108,7 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
    */
   public void setName (String strName)
   {
-     ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
+     ((Attribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
   }
 
    /**
@@ -116,28 +116,28 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
    */
   public String getName()
   {
-    return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /** set the *description* attribute
    */
   public void setDescription (String strDesc)
   {
-     ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+     ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
   }
 
   /**
    * @return the current *description* attribute
    */
   public String getDescription() {
-    return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
  /** set the *align* attribute
    */
   public void setAlign(String strName)
   {
-      ((XMLAttribute) attribHash.get(ALIGN_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
+      ((Attribute) attribHash.get(ALIGN_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
   }
 
    /**
@@ -145,14 +145,14 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
    */
   public String getAlign()
   {
-     return (String) ((XMLAttribute) attribHash.get(ALIGN_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (String) ((Attribute) attribHash.get(ALIGN_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *axisId* attribute
    */
   public void setAxisId (String strAxisId)
   {
-     ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strAxisId);
+     ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strAxisId);
 
   }
 
@@ -161,14 +161,14 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
    */
   public String getAxisId()
   {
-    return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *axisIdRef* attribute
    */
   public void setAxisIdRef (String strAxisIdRef)
   {
-     ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strAxisIdRef);
+     ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strAxisIdRef);
 
   }
 
@@ -177,20 +177,20 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
    */
   public String getAxisIdRef()
   {
-    return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *fieldList* attribute
    */
   public void setFieldList(List field) {
-     ((XMLAttribute) attribHash.get(FIELDLIST_XML_ATTRIBUTE_NAME)).setAttribValue(field);
+     ((Attribute) attribHash.get(FIELDLIST_XML_ATTRIBUTE_NAME)).setAttribValue(field);
   }
 
   /**
    * @return the current *fieldList* attribute
    */
   public List getFieldList() {
-    return (List) ((XMLAttribute) attribHash.get(FIELDLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (List) ((Attribute) attribHash.get(FIELDLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the fieldGroupOwnedHash
@@ -362,12 +362,12 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
      //set up the attribute hashtable key with the default initial value
 
      //set the minimum array size(essentially the size of the axis)
-    attribHash.put(FIELDLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList(Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE));
-    attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(ALIGN_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));  //double check??
-    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+    attribHash.put(FIELDLIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList(Specification.getInstance().getDefaultDataArraySize())), Constants.LIST_TYPE));
+    attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put(ALIGN_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));  //double check??
+    attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put(NAME_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
     length = 0;
 
@@ -378,6 +378,9 @@ public class FieldAxis extends BaseObjectWithXMLElements implements AxisInterfac
  /**
   * Modification History:
   * $Log$
+  * Revision 1.20  2001/09/13 21:39:25  thomas
+  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+  *
   * Revision 1.19  2001/07/05 22:13:45  huang
   * modified constructor (int dimension)
   *

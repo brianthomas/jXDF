@@ -162,7 +162,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
 
       }
 
-      // gather info about XMLAttributes in this object/node
+      // gather info about Attributes in this object/node
       Hashtable xmlInfo = getXMLInfo();
 
       // 2. Print out string object XML attributes EXCEPT for the one that
@@ -345,7 +345,7 @@ public abstract class BaseObjectWithValueList extends BaseObject
    protected void init()
    {
 
-        resetXMLAttributes();
+        resetAttributes();
         hasValueListCompactDescription = false;
 
    }
@@ -355,6 +355,9 @@ public abstract class BaseObjectWithValueList extends BaseObject
 /** Modification Log 
   *
   * $Log$
+  * Revision 1.8  2001/09/13 21:39:25  thomas
+  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+  *
   * Revision 1.7  2001/09/06 15:56:41  thomas
   * changed basicXMLWriter to return String (nodeName)
   *

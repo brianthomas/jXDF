@@ -109,14 +109,14 @@ import java.io.IOException;
    * @return the current *factor* attribute
    */
   public void setFactor (Double factor) {
-    ((XMLAttribute) attribHash.get("factor")).setAttribValue(factor);
+    ((Attribute) attribHash.get("factor")).setAttribValue(factor);
   }
 
   /**
    * @return the current *factor* attribute
    */
   public Double getFactor () {
-    return (Double) ((XMLAttribute) attribHash.get("factor")).getAttribValue();
+    return (Double) ((Attribute) attribHash.get("factor")).getAttribValue();
   }
 
   /**set the *system* attribute
@@ -124,14 +124,14 @@ import java.io.IOException;
      @return the current *system* attribute
    */
   public void setSystem (String system) {
-    ((XMLAttribute) attribHash.get("system")).setAttribValue(system);
+    ((Attribute) attribHash.get("system")).setAttribValue(system);
   }
 
   /**
    * @return the current *system* attribute
    */
   public String getSystem () {
-    return (String) ((XMLAttribute) attribHash.get("system")).getAttribValue();
+    return (String) ((Attribute) attribHash.get("system")).getAttribValue();
   }
 
   /**set the *unitList* attribute
@@ -139,14 +139,14 @@ import java.io.IOException;
      @return the current *unitList* attribute
    */
   public void setUnitList(List units) {
-    ((XMLAttribute) attribHash.get("unitList")).setAttribValue(units);
+    ((Attribute) attribHash.get("unitList")).setAttribValue(units);
   }
 
   /**
    * @return the current *unitList* attribute
    */
   public List getUnitList() {
-    return (List) ((XMLAttribute) attribHash.get("unitList")).getAttribValue();
+    return (List) ((Attribute) attribHash.get("unitList")).getAttribValue();
   }
 
   /** convenience method that returns the list of units this object holds
@@ -191,14 +191,14 @@ import java.io.IOException;
    * set the description* attribute
    */
   public void setDescription (String strDesc) {
-      ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+      ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
   }
 
   /**
    * @return the current *description* attribute
    */
   public String getDescription() {
-      return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**
@@ -255,7 +255,7 @@ import java.io.IOException;
   protected void init()
   {
 
-    resetXMLAttributes();
+    resetAttributes();
 
     classXDFNodeName = "units";
     XDFNodeName = classXDFNodeName;
@@ -266,9 +266,9 @@ import java.io.IOException;
     attribOrder.add(0,"system");
     attribOrder.add(0,"factor");
 
-    attribHash.put("unitList", new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-    attribHash.put("system", new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put("factor", new XMLAttribute(null, Constants.DOUBLE_TYPE));
+    attribHash.put("unitList", new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+    attribHash.put("system", new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put("factor", new Attribute(null, Constants.DOUBLE_TYPE));
   }
 
 
@@ -277,6 +277,9 @@ import java.io.IOException;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.22  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.21  2001/09/06 15:56:41  thomas
  * changed basicXMLWriter to return String (nodeName)
  *
@@ -304,7 +307,7 @@ import java.io.IOException;
  * added description set/get methods
  *
  * Revision 1.13  2001/05/10 21:43:06  thomas
- * added resetXMLAttributes to init().
+ * added resetAttributes to init().
  *
  * Revision 1.12  2001/05/02 18:16:39  thomas
  * Minor changes related to API standardization effort.
@@ -314,7 +317,7 @@ import java.io.IOException;
  * Dataformats may make use of them. -b.t.
  *
  * Revision 1.10  2000/11/20 22:03:48  thomas
- * Split up XMLAttribute type NUMBER_TYPE into
+ * Split up Attribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
  * some needed handling in the SaxDocHandler when
  * parsing data for the formatted read. Put prior NUMBER_TYPE

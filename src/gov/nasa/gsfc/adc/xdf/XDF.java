@@ -45,13 +45,13 @@ public class XDF extends Structure {
    //
    //Fields
    //
-   private XDFDocumentType documentType;
+   private DocumentType documentType;
 
    /* XML attribute names */
    protected static final String TYPE_XML_ATTRIBUTE_NAME = new String("type");
 
    // stores notation entries for the XMLDeclaration
-//   protected HashSet XMLNotationHash = new HashSet();
+//   protected HashSet NotationNodeHash = new HashSet();
 
    //
    // Constructors
@@ -93,7 +93,7 @@ public class XDF extends Structure {
     *  dataformat actually is. If undefined, then the structure is *vanilla* XDF.
     */
   public String getType() {
-     return (String) ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (String) ((Attribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /* Set the NotationHash for this XDF object. Each entry in the passed HashSet
@@ -102,16 +102,16 @@ public class XDF extends Structure {
       toXMLFileHandle call that prints the XML declaration (e.g. DOCTYPE header). 
   */
 /*
-  public void setXMLNotationHash (HashSet hash) {
-     XMLNotationHash = hash;
+  public void setNotationNodeHash (HashSet hash) {
+     NotationNodeHash = hash;
   }
 */
 
-  public XDFDocumentType getDocumentType() {
+  public DocumentType getDocumentType() {
      return documentType;
   }
 
-  public void setDocumentType (XDFDocumentType docType) {
+  public void setDocumentType (DocumentType docType) {
      documentType = docType;
   }
 
@@ -222,12 +222,12 @@ public class XDF extends Structure {
    {
        super.init();
 
-       documentType = new XDFDocumentType(this);
+       documentType = new DocumentType(this);
 
        classXDFNodeName = "XDF";
 
        attribOrder.add(TYPE_XML_ATTRIBUTE_NAME);
-       attribHash.put(TYPE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(TYPE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
    };
 
@@ -236,7 +236,7 @@ public class XDF extends Structure {
      *  dataformat actually is. If undefined, then the structure is *vanilla* XDF.
      */
    protected void setType(String type) {
-     ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(type);
+     ((Attribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(type);
    }
 
 
@@ -279,8 +279,11 @@ public class XDF extends Structure {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.7  2001/09/05 21:58:18  thomas
- *  moved XMLNotation/Decl stuff out to new classes
+ *  moved NotationNode/Decl stuff out to new classes
  *
  * Revision 1.6  2001/07/26 15:55:42  thomas
  * added flush()/close() statement to outputWriter object as
@@ -289,7 +292,7 @@ public class XDF extends Structure {
  * Revision 1.5  2001/07/19 22:01:30  thomas
  * put XMLDeclAttribs into toXMLOutputStream (only needed
  * in the XDF class)
- * added  XMLNotationHash stuff (again, only needed in XDF class)
+ * added  NotationNodeHash stuff (again, only needed in XDF class)
  *
  * Revision 1.4  2001/07/11 22:35:21  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.

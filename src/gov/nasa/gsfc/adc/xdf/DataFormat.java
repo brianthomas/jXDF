@@ -109,7 +109,7 @@ import java.util.Hashtable;
 /*
    public Object getLessThanValue()
    {
-      return ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return ((Attribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
  
    /**
@@ -118,7 +118,7 @@ import java.util.Hashtable;
 /*
    public Object getlessThanOrEqualValue()
    {
-     return ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return ((Attribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
  
    /**
@@ -127,7 +127,7 @@ import java.util.Hashtable;
 /*
    public Object getGreaterThanValue()
    {
-     return ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return ((Attribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
  
     /**
@@ -136,7 +136,7 @@ import java.util.Hashtable;
 /*
    public Object getGreaterThanOrEqualValue()
    {
-     return ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return ((Attribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
  
     /**
@@ -145,7 +145,7 @@ import java.util.Hashtable;
 /*
    public Object getInfiniteValue()
    {
-     return ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return ((Attribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
  
     /**
@@ -154,7 +154,7 @@ import java.util.Hashtable;
 /*
    public Object getInfiniteNegativeValue()
    {
-     return ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return ((Attribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 */
  
@@ -164,7 +164,7 @@ import java.util.Hashtable;
 /*
    public Object getNoDataValue()
    {
-     return ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return ((Attribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 */
  
@@ -191,7 +191,7 @@ import java.util.Hashtable;
        //write out the body of DataFormat
        outputWriter.write( "<" + specificDataFormatName);
  
-     // gather info about XMLAttributes in this object/node
+     // gather info about Attributes in this object/node
      Hashtable xmlInfo = getXMLInfo();
  
      // 2. Print out string object XML attributes EXCEPT for the one that
@@ -231,7 +231,7 @@ import java.util.Hashtable;
    protected void init()
    {
  
-     resetXMLAttributes();
+     resetAttributes();
 
      classXDFNodeName = "dataFormat";
  
@@ -250,13 +250,13 @@ import java.util.Hashtable;
  
 /*
      // typing here is just filler for latter
-     attribHash.put( LESSTHANVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put( LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put( GREATERTHANVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put( GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put( INFINITEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put( INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put( NODATAVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put( LESSTHANVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put( LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put( GREATERTHANVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put( GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put( INFINITEVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put( INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put( NODATAVALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 */
  
    }
@@ -266,6 +266,9 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.20  2001/09/06 15:56:41  thomas
  * changed basicXMLWriter to return String (nodeName)
  *
@@ -285,7 +288,7 @@ import java.util.Hashtable;
  * to the application writer (e.g. they throw the error).
  *
  * Revision 1.15  2001/05/10 21:09:38  thomas
- * added resetXMLAttributes to init().
+ * added resetAttributes to init().
  *
  * Revision 1.14  2001/05/04 20:22:25  thomas
  * changed init() to protected.
@@ -315,7 +318,7 @@ import java.util.Hashtable;
  * Perl attributes from DataFormat classes. -b.t.
  *
  * Revision 1.9  2000/11/20 22:03:48  thomas
- * Split up XMLAttribute type NUMBER_TYPE into
+ * Split up Attribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
  * some needed handling in the SaxDocHandler when
  * parsing data for the formatted read. Put prior NUMBER_TYPE

@@ -77,7 +77,7 @@ public class FieldRelationship extends BaseObject {
    */
    public String getRole ( )
    {
-      return (String) ((XMLAttribute) attribHash.get(ROLE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(ROLE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** Set the value of the role attribute. 
@@ -86,7 +86,7 @@ public class FieldRelationship extends BaseObject {
    public void setRole (String strRole )
    {
        if (Utility.isValidRelationRole(strRole))
-          ((XMLAttribute) attribHash.get(ROLE_XML_ATTRIBUTE_NAME)).setAttribValue(strRole);
+          ((Attribute) attribHash.get(ROLE_XML_ATTRIBUTE_NAME)).setAttribValue(strRole);
        else 
           Log.warnln("Invalid FieldRelationship.setRole() value. Ignoring set request.");
    }
@@ -96,14 +96,14 @@ public class FieldRelationship extends BaseObject {
    */
    public String getDescription ( )
    {
-      return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** Set the value of the description attribute. 
    */
    public void setDescription (String strDescription )
    {
-       ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDescription);
+       ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDescription);
    }
 
    /** Get the value of the fieldIdRefs attribute. 
@@ -111,14 +111,14 @@ public class FieldRelationship extends BaseObject {
    */
    public String getFieldIdRefs ( )
    {
-      return (String) ((XMLAttribute) attribHash.get(IDREFS_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(IDREFS_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** Set the value of the fieldIdRefs attribute. 
    */
    public void setFieldIdRefs (String strFieldIdRefs )
    {
-       ((XMLAttribute) attribHash.get(IDREFS_XML_ATTRIBUTE_NAME)).setAttribValue(strFieldIdRefs);
+       ((Attribute) attribHash.get(IDREFS_XML_ATTRIBUTE_NAME)).setAttribValue(strFieldIdRefs);
    }
 
    // 
@@ -131,7 +131,7 @@ public class FieldRelationship extends BaseObject {
    protected void init()
    {
 
-       resetXMLAttributes();
+       resetAttributes();
 
        classXDFNodeName = "relation";
 
@@ -142,9 +142,9 @@ public class FieldRelationship extends BaseObject {
        attribOrder.add(0, ROLE_XML_ATTRIBUTE_NAME);
 
        //set up the attribute hashtable key with the default initial value
-       attribHash.put(IDREFS_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-       attribHash.put(ROLE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+       attribHash.put(IDREFS_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+       attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+       attribHash.put(ROLE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
    };
 
@@ -154,8 +154,11 @@ public class FieldRelationship extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.5  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.4  2001/05/10 21:17:17  thomas
- * added resetXMLAttributes to init().
+ * added resetAttributes to init().
  *
  * Revision 1.3  2001/02/07 18:44:04  thomas
  * Converted XML attribute decl

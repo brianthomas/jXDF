@@ -69,7 +69,7 @@ public class ReadCellFormattedIOCmd extends BaseObject implements FormattedIOCmd
    */
   protected void init()
   {
-     resetXMLAttributes();
+     resetAttributes();
      classXDFNodeName = "readCell";
   }
 
@@ -79,11 +79,14 @@ public class ReadCellFormattedIOCmd extends BaseObject implements FormattedIOCmd
 /* Modification History:
  *
  * $Log$
+ * Revision 1.6  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.5  2001/07/19 21:58:09  thomas
  * removed commented out toXMLOutputStream stuff.
  *
  * Revision 1.4  2001/05/10 21:24:44  thomas
- * added resetXMLAttributes to init().
+ * added resetAttributes to init().
  * replaced specificIOStyleToXDF w/ appropriate
  * toXMLOutputStream method.
  *

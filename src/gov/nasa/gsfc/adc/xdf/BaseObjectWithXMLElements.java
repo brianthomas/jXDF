@@ -77,18 +77,18 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
    //
 
    /** get the list of XML Elements held within this object.
-      @return list of XMLElementNode objects.
+      @return list of ElementNode objects.
     */
-   public List getXMLElementNodeList() {
-      // return (List) ((XMLAttribute) attribHash.get(XML_ELEMENTLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+   public List getElementNodeList() {
+      // return (List) ((Attribute) attribHash.get(XML_ELEMENTLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
       return xmlElementList; 
    }
 
    /**set the *location* attribute.
    */
-   public void setXMLElementNodeList (List elements)
+   public void setElementNodeList (List elements)
    {
-      // ((XMLAttribute) attribHash.get(XML_ELEMENTLIST_XML_ATTRIBUTE_NAME)).setAttribValue(elements);
+      // ((Attribute) attribHash.get(XML_ELEMENTLIST_XML_ATTRIBUTE_NAME)).setAttribValue(elements);
       xmlElementList = elements;
    }
 
@@ -96,17 +96,17 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
    // Other Public Methods
    //
 
-   /** append an XMLElementNode into the list of internal elements held by this object.
+   /** append an ElementNode into the list of internal elements held by this object.
      * @return true on success, false on failure.
     */
-   public boolean addXMLElementNode (XMLElementNode element) {
-      return getXMLElementNodeList().add(element);
+   public boolean addElementNode (ElementNode element) {
+      return getElementNodeList().add(element);
    }
 
    /** Indicate the datacell that this note applies to within an array.
     */
-   public boolean removeXMLElementNode (XMLElementNode element) {
-      return getXMLElementNodeList().remove(element);
+   public boolean removeElementNode (ElementNode element) {
+      return getElementNodeList().remove(element);
    }
 
    public Object clone() throws CloneNotSupportedException {
@@ -116,7 +116,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
       cloneObj.xmlElementList = Collections.synchronizedList(new ArrayList());
       int stop = this.xmlElementList.size();
       for (int i = 0; i < stop; i++) {
-          cloneObj.xmlElementList.add( ((XMLElementNode) this.xmlElementList.get(i)).clone());
+          cloneObj.xmlElementList.add( ((ElementNode) this.xmlElementList.get(i)).clone());
       }
       return cloneObj;
    }
@@ -152,7 +152,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
    
          }
    
-         // gather info about XMLAttributes in this object/node
+         // gather info about Attributes in this object/node
          Hashtable xmlInfo = getXMLInfo();
    
          // 2. Print out string object XML attributes EXCEPT for the one that
@@ -175,7 +175,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
          //    XML attributes. The way this stuff occurs will also affect how we
          //    close the node.
          ArrayList childObjs = (ArrayList) xmlInfo.get("childObjList");
-         List childXMLElements = getXMLElementNodeList();
+         List childXMLElements = getElementNodeList();
          String pcdata = (String) xmlInfo.get("PCDATA");
    
         if ( childObjs.size() > 0 || 
@@ -194,7 +194,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
            int size = childXMLElements.size();
            String childindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
            for (int i = 0; i < size; i++) {
-              ((XMLElementNode) childXMLElements.get(i)).toXMLWriter(outputWriter, childindent);
+              ((ElementNode) childXMLElements.get(i)).toXMLWriter(outputWriter, childindent);
            }
    
            // deal with object/list XML attributes, if any in our list
@@ -293,11 +293,11 @@ public abstract class BaseObjectWithXMLElements extends BaseObject
    protected void init()
    {
 
-        resetXMLAttributes();
+        resetAttributes();
 
         // NO! not XML attributes.. should be protected field
         // attribOrder.add(0, XML_ELEMENTLIST_XML_ATTRIBUTE_NAME);
-        // attribHash.put(XML_ELEMENTLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+        // attribHash.put(XML_ELEMENTLIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
 
    }
 

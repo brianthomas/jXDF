@@ -248,6 +248,9 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.20  2001/07/26 15:55:42  thomas
  * added flush()/close() statement to outputWriter object as
  * needed to get toXMLOutputStream to work properly.
@@ -296,7 +299,7 @@ public class FormattedXMLDataIOStyle extends XMLDataIOStyle {
  * Revision 1.8  2000/11/20 22:07:58  thomas
  * Implimented some changes needed by SaxDocHandler
  * to allow formatted reads (e.g. these classes were not
- * working!!). Implemented new XMLAttribute INTEGER_TYPE
+ * working!!). Implemented new Attribute INTEGER_TYPE
  * in count attributes for repeat/skipChar classes. -b.t.
  *
  * Revision 1.7  2000/11/17 22:29:55  thomas

@@ -100,28 +100,28 @@ public class Unit extends BaseObject {
    * @return the current *power* attribute
    */
   public void setPower (Double power) {
-     ((XMLAttribute) attribHash.get(POWER_XML_ATTRIBUTE_NAME)).setAttribValue(power);
+     ((Attribute) attribHash.get(POWER_XML_ATTRIBUTE_NAME)).setAttribValue(power);
   }
 
   /**
    * @return the current *power* attribute
    */
   public Double getPower() {
-    return (Double) ((XMLAttribute) attribHash.get(POWER_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (Double) ((Attribute) attribHash.get(POWER_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *value* attribute
    * @return the current *value* attribute
    */
   public void setValue(String value) {
-     ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(value);
+     ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).setAttribValue(value);
   }
 
   /**
    * @return the current *value* attribute
    */
   public String getValue() {
-    return (String) ((XMLAttribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(VALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   //
@@ -133,7 +133,7 @@ public class Unit extends BaseObject {
   protected void init()
   {
 
-    resetXMLAttributes();
+    resetAttributes();
 
     classXDFNodeName = "unit";  //XDF node name
 
@@ -142,8 +142,8 @@ public class Unit extends BaseObject {
     attribOrder.add(0, VALUE_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, POWER_XML_ATTRIBUTE_NAME);
 
-    attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(POWER_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.DOUBLE_TYPE));
+    attribHash.put(VALUE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put(POWER_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.DOUBLE_TYPE));
 
   };
 
@@ -152,11 +152,14 @@ public class Unit extends BaseObject {
  /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.12  2001/05/22 19:35:59  huang
  * added several constructor methods
  *
  * Revision 1.11  2001/05/10 21:42:26  thomas
- * added resetXMLAttributes to init().
+ * added resetAttributes to init().
  *
  * Revision 1.10  2001/02/07 18:44:03  thomas
  * Converted XML attribute decl
@@ -168,7 +171,7 @@ public class Unit extends BaseObject {
  * Dataformats may make use of them. -b.t.
  *
  * Revision 1.8  2000/11/20 22:03:48  thomas
- * Split up XMLAttribute type NUMBER_TYPE into
+ * Split up Attribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
  * some needed handling in the SaxDocHandler when
  * parsing data for the formatted read. Put prior NUMBER_TYPE

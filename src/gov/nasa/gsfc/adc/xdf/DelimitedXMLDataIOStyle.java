@@ -78,7 +78,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public void setDelimiter (String strDelimiter)
   {
-      ((XMLAttribute) attribHash.get(DELIMITER_XML_ATTRIBUTE_NAME)).setAttribValue(strDelimiter);
+      ((Attribute) attribHash.get(DELIMITER_XML_ATTRIBUTE_NAME)).setAttribValue(strDelimiter);
   }
 
   /**
@@ -86,7 +86,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String getDelimiter()
   {
-     return (String) ((XMLAttribute) attribHash.get(DELIMITER_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (String) ((Attribute) attribHash.get(DELIMITER_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *repeatable* attribute
@@ -98,7 +98,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
         Log.errorln("*repeatable* attribute can only be set to yes|no. Ignoring set request.");
         return;
      }
-     ((XMLAttribute) attribHash.get(REPEATABLE_XML_ATTRIBUTE_NAME)).setAttribValue(strIsRepeatable);
+     ((Attribute) attribHash.get(REPEATABLE_XML_ATTRIBUTE_NAME)).setAttribValue(strIsRepeatable);
   }
 
   /**
@@ -106,7 +106,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String getRepeatable()
   {
-     return (String) ((XMLAttribute) attribHash.get(REPEATABLE_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (String) ((Attribute) attribHash.get(REPEATABLE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
 
@@ -115,7 +115,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public void setRecordTerminator (String strRecordTerminator)
   {
-     ((XMLAttribute) attribHash.get(END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME)).setAttribValue(strRecordTerminator);
+     ((Attribute) attribHash.get(END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME)).setAttribValue(strRecordTerminator);
   }
 
   /**
@@ -123,7 +123,7 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    */
   public String getRecordTerminator()
   {
-     return (String) ((XMLAttribute) attribHash.get(END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (String) ((Attribute) attribHash.get(END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    //
@@ -220,10 +220,10 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
       attribOrder.add(0, END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME);
       attribOrder.add(0, DELIMITER_XML_ATTRIBUTE_NAME);
 
-      attribHash.put(DELIMITER_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_DELIMITER, Constants.STRING_TYPE));
-      attribHash.put(REPEATABLE_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_REPEATABLE, Constants.STRING_TYPE));
+      attribHash.put(DELIMITER_XML_ATTRIBUTE_NAME, new Attribute(DEFAULT_DELIMITER, Constants.STRING_TYPE));
+      attribHash.put(REPEATABLE_XML_ATTRIBUTE_NAME, new Attribute(DEFAULT_REPEATABLE, Constants.STRING_TYPE));
       attribHash.put(END_OF_LINE_DELIMITER_XML_ATTRIBUTE_NAME, 
-                       new XMLAttribute(DEFAULT_RECORD_TERMINATOR, Constants.STRING_TYPE));
+                       new Attribute(DEFAULT_RECORD_TERMINATOR, Constants.STRING_TYPE));
 
    }
 
@@ -235,6 +235,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.16  2001/07/26 15:55:42  thomas
  * added flush()/close() statement to outputWriter object as
  * needed to get toXMLOutputStream to work properly.
@@ -282,11 +285,11 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
  * Opps, another fix needed. delimiter, repeatable and
  * recordTerminator werent being stored as XMLattributes.
  * Also, changed set mthods so void is returned. Set
- * inital values of XMLAttributes to defined defaults.
+ * inital values of Attributes to defined defaults.
  * -b.t.
  *
  * Revision 1.3  2000/11/03 21:22:23  thomas
- * Had to add in XMLAttributes to init method. Added
+ * Had to add in Attributes to init method. Added
  * Hashtable init constructor also. -b.t.
  *
  * Revision 1.2  2000/10/31 21:43:11  kelly

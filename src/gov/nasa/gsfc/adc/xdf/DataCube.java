@@ -118,30 +118,30 @@ public class DataCube extends BaseObject {
 
   /** set the *href* attribute
    */
-  public void setHref (XDFEntity hrefObj)
+  public void setHref (Entity hrefObj)
   {
-     ((XMLAttribute) attribHash.get(HREF_XML_ATTRIBUTE_NAME)).setAttribValue(hrefObj);
+     ((Attribute) attribHash.get(HREF_XML_ATTRIBUTE_NAME)).setAttribValue(hrefObj);
   }
 
   /**
    * @return the current *href* attribute
    */
-  public XDFEntity getHref()
+  public Entity getHref()
   {
-     return (XDFEntity) ((XMLAttribute) attribHash.get(HREF_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (Entity) ((Attribute) attribHash.get(HREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /** set the *checksum* attribute
    */
   public void setChecksum (String checksum) {
-     ((XMLAttribute) attribHash.get(CHECKSUM_XML_ATTRIBUTE_NAME)).setAttribValue(checksum);
+     ((Attribute) attribHash.get(CHECKSUM_XML_ATTRIBUTE_NAME)).setAttribValue(checksum);
   }
 
   /**
    * @return the current *checksum* attribute
    */
   public String getChecksum () {
-     return (String) ((XMLAttribute) attribHash.get(CHECKSUM_XML_ATTRIBUTE_NAME)).getAttribValue();
+     return (String) ((Attribute) attribHash.get(CHECKSUM_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /** set the *encoding* attribute
@@ -152,7 +152,7 @@ public class DataCube extends BaseObject {
       if (!Utility.isValidDataEncoding(strEncoding))
          Log.warnln("Encoding is not valid, ignoring request to setEncoding.");
       else
-         ((XMLAttribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).setAttribValue(strEncoding);
+         ((Attribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).setAttribValue(strEncoding);
 
   }
 
@@ -161,7 +161,7 @@ public class DataCube extends BaseObject {
    */
   public String getEncoding()
   {
-    return (String) ((XMLAttribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
 
@@ -173,7 +173,7 @@ public class DataCube extends BaseObject {
     if (!Utility.isValidDataCompression(strCompression))
        Log.warnln("Data compression value is not valid, ignoring request to set it.");
     else
-      ((XMLAttribute) attribHash.get(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strCompression);
+      ((Attribute) attribHash.get(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strCompression);
 
   }
 
@@ -182,7 +182,7 @@ public class DataCube extends BaseObject {
    */
   public String getCompression()
   {
-    return (String) ((XMLAttribute) attribHash.get(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**
@@ -677,7 +677,7 @@ public class DataCube extends BaseObject {
   
       outputWriter.write("<" + nodeName );
   
-      XDFEntity hrefObj = getHref();
+      Entity hrefObj = getHref();
   
       XMLDataIOStyle readObj = parentArray.getXMLDataIOStyle();
   
@@ -1669,7 +1669,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
    protected void init()
    {
 
-    resetXMLAttributes();
+    resetAttributes();
 
     classXDFNodeName = "data";
 
@@ -1681,10 +1681,10 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
     attribOrder.add(0, HREF_XML_ATTRIBUTE_NAME);
 
     //set up the attribute hashtable key with the default initial value
-    attribHash.put(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(CHECKSUM_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-    attribHash.put(HREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.OBJECT_TYPE));
+    attribHash.put(COMPRESSION_TYPE_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put(CHECKSUM_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+    attribHash.put(HREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.OBJECT_TYPE));
 
   };
 
@@ -1755,11 +1755,14 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.44  2001/09/13 21:39:25  thomas
+  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+  *
   * Revision 1.43  2001/09/06 15:55:16  thomas
   * added byte set/getData stuff; changed basicXMLWriter to return String (nodeName)
   *
   * Revision 1.42  2001/09/05 22:01:36  thomas
-  * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter. Made Href->XDFEntity change
+  * removed toXMLoutputstream, toXMLWriter. Made it basicXMLWriter. Made Href->Entity change
   *
   * Revision 1.41  2001/09/04 21:17:52  thomas
   * added 8, 16 bit Integers
@@ -1807,7 +1810,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
   * added [set/get][Long/Short]Data methods.
   *
   * Revision 1.29  2001/05/10 21:08:51  thomas
-  * init method is now protected. Added resetXMLAttributes
+  * init method is now protected. Added resetAttributes
   * call to init.
   *
   * Revision 1.28  2001/05/04 20:22:01  thomas
@@ -1863,7 +1866,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
   * Perl attributes from DataFormat classes. -b.t.
   *
   * Revision 1.16  2000/11/20 22:06:08  thomas
-  * plit up XMLAttribute type NUMBER_TYPE into
+  * plit up Attribute type NUMBER_TYPE into
   * INTEGER_TYPE and DOUBLE_TYPE. This allows for
   * some needed handling in the SaxDocHandler when
   * parsing data for the formatted read. Put prior NUMBER_TYPE

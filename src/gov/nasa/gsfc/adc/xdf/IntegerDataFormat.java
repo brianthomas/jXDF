@@ -84,7 +84,7 @@ public class IntegerDataFormat extends NumberDataFormat {
          return;
       }
 
-      ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strType);
+      ((Attribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).setAttribValue(strType);
    }
 
    /**
@@ -92,7 +92,7 @@ public class IntegerDataFormat extends NumberDataFormat {
     */
    public String getType()
    {
-      return (String) ((XMLAttribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(TYPE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    /** set the *width* attribute
@@ -101,7 +101,7 @@ public class IntegerDataFormat extends NumberDataFormat {
 
       if (Utility.isValidNumberObject(width)) 
       {
-         ((XMLAttribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).setAttribValue(width);
+         ((Attribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).setAttribValue(width);
          generateFormatPattern();
       } else 
          Log.warnln("Invalid object for IntegerDataFormat.setWidth(). Ignoring set request.");
@@ -120,7 +120,7 @@ public class IntegerDataFormat extends NumberDataFormat {
     */
    public Integer getWidth()
    {
-      return (Integer) ((XMLAttribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (Integer) ((Attribute) attribHash.get(WIDTH_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
 
    //
@@ -136,8 +136,8 @@ public class IntegerDataFormat extends NumberDataFormat {
 
    // We need this here so that we will properly update the
    // formatPattern of the class. -b.t. 
-   public void setXMLAttributes (Attributes attrs) {
-      super.setXMLAttributes(attrs);
+   public void setAttributes (Attributes attrs) {
+      super.setAttributes(attrs);
       generateFormatPattern();
    }
 
@@ -189,8 +189,8 @@ public class IntegerDataFormat extends NumberDataFormat {
     attribOrder.add(0, TYPE_XML_ATTRIBUTE_NAME);
     attribOrder.add(0, WIDTH_XML_ATTRIBUTE_NAME);
 
-    attribHash.put( TYPE_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_TYPE, Constants.STRING_TYPE));
-    attribHash.put( WIDTH_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_WIDTH), Constants.INTEGER_TYPE));
+    attribHash.put( TYPE_XML_ATTRIBUTE_NAME, new Attribute(DEFAULT_TYPE, Constants.STRING_TYPE));
+    attribHash.put( WIDTH_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_WIDTH), Constants.INTEGER_TYPE));
 
     generateFormatPattern();
 
@@ -201,6 +201,9 @@ public class IntegerDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.13  2001/07/29 16:55:36  huang
  * added a constructor
  *
@@ -228,7 +231,7 @@ public class IntegerDataFormat extends NumberDataFormat {
  * Perl attributes from DataFormat classes. -b.t.
  *
  * Revision 1.7  2000/11/20 22:03:48  thomas
- * Split up XMLAttribute type NUMBER_TYPE into
+ * Split up Attribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
  * some needed handling in the SaxDocHandler when
  * parsing data for the formatted read. Put prior NUMBER_TYPE

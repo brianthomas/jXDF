@@ -85,7 +85,7 @@ public class Notes extends BaseObject {
         @deprecated use the setNotes method.
      */
     public void setNoteList (List notes) {
-       ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
+       ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
     }
 
     /**
@@ -93,14 +93,14 @@ public class Notes extends BaseObject {
         @deprecated use the getNotes method.
      */
     public List getNoteList() {
-       return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+       return (List) ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
     }
 
     /** set the list of notes in this object.
         @return the current list of notes in this object.
      */
     public void setNotes (List noteList) {
-       ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(noteList);
+       ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(noteList);
     }
 
     /**convenience method that returns the list of notes this object holds
@@ -111,7 +111,7 @@ public class Notes extends BaseObject {
      */
     public void setLocationOrderList (List axisIdList) {
        NotesLocationOrder orderObj = (NotesLocationOrder)
-               ((XMLAttribute) attribHash.get(LOCATION_ORDER_XML_ATTRIBUTE_NAME)).getAttribValue();
+               ((Attribute) attribHash.get(LOCATION_ORDER_XML_ATTRIBUTE_NAME)).getAttribValue();
 
        orderObj.setAxisOrderList(axisIdList);
     }
@@ -177,7 +177,7 @@ public class Notes extends BaseObject {
    protected void init()
    {
 
-      resetXMLAttributes();
+      resetAttributes();
 
       classXDFNodeName = "notes";
 
@@ -186,8 +186,8 @@ public class Notes extends BaseObject {
       attribOrder.add(0, NOTELIST_XML_ATTRIBUTE_NAME);
       attribOrder.add(0, LOCATION_ORDER_XML_ATTRIBUTE_NAME);
 
-      attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-      attribHash.put(LOCATION_ORDER_XML_ATTRIBUTE_NAME, new XMLAttribute(new NotesLocationOrder(), Constants.OBJECT_TYPE));
+      attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+      attribHash.put(LOCATION_ORDER_XML_ATTRIBUTE_NAME, new Attribute(new NotesLocationOrder(), Constants.OBJECT_TYPE));
 
    }
 
@@ -196,8 +196,11 @@ public class Notes extends BaseObject {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.13  2001/09/13 21:39:25  thomas
+  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+  *
   * Revision 1.12  2001/07/19 21:57:04  thomas
-  * added resetXMLAttributes to init statement
+  * added resetAttributes to init statement
   * yanked XMLDecl from toXMLOutputstream mehtod.
   *
   * Revision 1.11  2001/07/11 22:38:50  thomas

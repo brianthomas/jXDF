@@ -52,7 +52,7 @@ package gov.nasa.gsfc.adc.xdf;
       return false;
     }
 
-    public static boolean isValidXMLAttributeType(String strAttributeType) {
+    public static boolean isValidAttributeType(String strAttributeType) {
       String[] attributeTypeList = Constants.XMLATTRIBUTE_TYPE_LIST;
       int stop = attributeTypeList.length;
       for (int i = 0; i< stop; i++) {
@@ -176,6 +176,9 @@ package gov.nasa.gsfc.adc.xdf;
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.8  2001/07/02 18:01:36  thomas
  * fixed bug in isValidValueSPecial : wouldnt allow any value to be set!
  *

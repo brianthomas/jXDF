@@ -38,7 +38,7 @@ public interface AxisInterface {
    public String getAlign();
    /* ugh. shouldnt be public method */
    public void setParentArray(Array parent);
-   public boolean addXMLElementNode (XMLElementNode element);
+   public boolean addElementNode (ElementNode element);
    public void toXMLWriter (Writer outputWriter, String indent) throws java.io.IOException;
    public void toXMLOutputStream (OutputStream o, String indent) throws java.io.IOException;
 
@@ -47,11 +47,14 @@ public interface AxisInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.11  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.10  2001/09/04 21:16:48  thomas
  * added toXMLOutputStream, toXMLWriter methods
  *
  * Revision 1.9  2001/07/26 15:54:31  thomas
- * addXMLElementNode method name change.
+ * addElementNode method name change.
  *
  * Revision 1.8  2001/07/11 22:35:20  thomas
  * Changes related to adding valueList or removeal of unneeded interface files.

@@ -66,56 +66,56 @@ public class StringDataFormat extends DataFormat {
    */
 /*
   public void setLessThanValue(Object strLessThanValue) {
-     ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanValue);
+     ((Attribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanValue);
   }
 
   /**set the *lessThanValueOrEqualValue* attribute
    */
 /*
   public void setLessThanOrEqualValue(Object strLessThanOrEqualValue) {
-     ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanOrEqualValue);
+     ((Attribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strLessThanOrEqualValue);
   }
 
   /**set the *greaterThanValue* attribute
    */
 /*
   public void setGreaterThanValue(Object strGreaterThanValue) {
-    ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanValue);
+    ((Attribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanValue);
   }
 
   /**set the *greaterThanOrEqualValue* attribute
    */
 /*
   public void setGreaterThanOrEqualValue(Object strGreaterThanOrEqualValue) {
-    ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanOrEqualValue);
+    ((Attribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strGreaterThanOrEqualValue);
   }
 
   /** set the *infiniteValue* attribute
    */
 /*
   public void setInfiniteValue(Object strInfiniteValue) {
-    ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteValue);
+    ((Attribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteValue);
   }
 
   /**set the *infiniteNegativeValue* attribute
    */
 /*
   public void setInfiniteNegativeValue(Object strInfiniteNegativeValue) {
-    ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteNegativeValue);
+    ((Attribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strInfiniteNegativeValue);
   }
 
   /**set the *noDataValue* attribute
    */
 /*
   public void setNoDataValue(Object strNoDataValue) {
-     ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strNoDataValue);
+     ((Attribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).setAttribValue(strNoDataValue);
   }
 
   /**setlength: set the *length* attribute
    */
   public void setLength(Integer numLength) {
      if (numLength != null) 
-        ((XMLAttribute) attribHash.get(LENGTH_XML_ATTRIBUTE_NAME)).setAttribValue(numLength);
+        ((Attribute) attribHash.get(LENGTH_XML_ATTRIBUTE_NAME)).setAttribValue(numLength);
      else 
         Log.warnln("StringDataFormat.setLength() cant accept null value. Ignoring request.");
   }
@@ -125,7 +125,7 @@ public class StringDataFormat extends DataFormat {
    */
   public Integer getLength()
   {
-    return (Integer) ((XMLAttribute) attribHash.get(LENGTH_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (Integer) ((Attribute) attribHash.get(LENGTH_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    //
@@ -134,8 +134,8 @@ public class StringDataFormat extends DataFormat {
 
    // We need this here so that we will properly update the
    // formatPattern of the class. -b.t. 
-   public void setXMLAttributes (Attributes attrs) {
-      super.setXMLAttributes(attrs);
+   public void setAttributes (Attributes attrs) {
+      super.setAttributes(attrs);
       generateFormatPattern();
    }
 
@@ -170,7 +170,7 @@ public class StringDataFormat extends DataFormat {
 
      attribOrder.add(0, LENGTH_XML_ATTRIBUTE_NAME);  //add length as the first attribute;
 
-     attribHash.put(LENGTH_XML_ATTRIBUTE_NAME, new XMLAttribute(new Integer(DEFAULT_LENGTH), Constants.INTEGER_TYPE));
+     attribHash.put(LENGTH_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_LENGTH), Constants.INTEGER_TYPE));
 
      generateFormatPattern();
 
@@ -181,6 +181,9 @@ public class StringDataFormat extends DataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.14  2001/07/17 19:06:23  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
@@ -206,7 +209,7 @@ public class StringDataFormat extends DataFormat {
  * Perl attributes from DataFormat classes. -b.t.
  *
  * Revision 1.9  2000/11/20 22:03:48  thomas
- * Split up XMLAttribute type NUMBER_TYPE into
+ * Split up Attribute type NUMBER_TYPE into
  * INTEGER_TYPE and DOUBLE_TYPE. This allows for
  * some needed handling in the SaxDocHandler when
  * parsing data for the formatted read. Put prior NUMBER_TYPE

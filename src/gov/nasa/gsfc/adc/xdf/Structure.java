@@ -115,7 +115,7 @@ public class Structure extends BaseObjectWithXMLElements {
    */
   public void setName (String strName)
   {
-      ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
+      ((Attribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).setAttribValue(strName);
   }
 
   /**
@@ -123,27 +123,27 @@ public class Structure extends BaseObjectWithXMLElements {
    */
   public String getName()
   {
-      return (String) ((XMLAttribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
+      return (String) ((Attribute) attribHash.get(NAME_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
    /**set the *description* attribute
    */
   public void setDescription (String strDesc)
   {
-     ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
+     ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).setAttribValue(strDesc);
   }
 
    /**
    * @return the current *description* attribute
    */
   public String getDescription() {
-    return (String) ((XMLAttribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(DESCRIPTION_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *paramList* attribute
    */
   public void setParamList(List param) {
-     ((XMLAttribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).setAttribValue(param);
+     ((Attribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).setAttribValue(param);
   }
 
   /**
@@ -151,53 +151,53 @@ public class Structure extends BaseObjectWithXMLElements {
    * @deprecated use getParameters method instead
    */
   public List getParamList() {
-    return (List) ((XMLAttribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (List) ((Attribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**
   * @return the current *paramList* attribute
   */
   public List getParameters() {
-    return (List) ((XMLAttribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (List) ((Attribute) attribHash.get(PARAMETERLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *structList* attribute
    */
   public void setStructList(List structList) {
-    ((XMLAttribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).setAttribValue(structList);
+    ((Attribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).setAttribValue(structList);
   }
 
   /**
    * @return the current *structList* attribute
    */
   public List getStructList() {
-    return (List) ((XMLAttribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (List) ((Attribute) attribHash.get(STRUCTURELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *arrayList* attribute
    */
   public void setArrayList(List array) {
-     ((XMLAttribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(array);
+     ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).setAttribValue(array);
   }
 
   /**
    * @return the current *arrayList* attribute
    */
   public List getArrayList() {
-    return (List) ((XMLAttribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (List) ((Attribute) attribHash.get(ARRAYLIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *noteList* attribute
    */
   public void setNotes (List notes) {
-    ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
+    ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).setAttribValue(notes);
   }
 
   /**
    * @return the current list of notes held by this structure.
    */
   public List getNotes () {
-    return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (List) ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**
@@ -205,7 +205,7 @@ public class Structure extends BaseObjectWithXMLElements {
    * @deprecated Outdated method. Use getNotes instead.
    */
   public List getNoteList () {
-    return (List) ((XMLAttribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (List) ((Attribute) attribHash.get(NOTELIST_XML_ATTRIBUTE_NAME)).getAttribValue();
   } 
 
   /**
@@ -394,12 +394,12 @@ public class Structure extends BaseObjectWithXMLElements {
      attribOrder.add(0, NAME_XML_ATTRIBUTE_NAME);
 
      //set up the attribute hashtable key with the default initial value
-     attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-     attribHash.put(ARRAYLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-     attribHash.put(STRUCTURELIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-     attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new XMLAttribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
-     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-     attribHash.put(NAME_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+     attribHash.put(NOTELIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(ARRAYLIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(STRUCTURELIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(PARAMETERLIST_XML_ATTRIBUTE_NAME, new Attribute(Collections.synchronizedList(new ArrayList()), Constants.LIST_TYPE));
+     attribHash.put(DESCRIPTION_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+     attribHash.put(NAME_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
   };
 
@@ -416,7 +416,7 @@ public class Structure extends BaseObjectWithXMLElements {
            Iterator iter = arrayList.iterator(); // Must be in synchronized block
            while (iter.hasNext()) {
                Array childArray = (Array) iter.next();
-               XDFEntity hrefObj = childArray.getDataCube().getHref();
+               Entity hrefObj = childArray.getDataCube().getHref();
                if (hrefObj != null)
                   list.add(hrefObj);
            }
@@ -447,6 +447,9 @@ public class Structure extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.23  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.22  2001/09/05 22:02:49  thomas
  * moved findAllHrefObjects to her from baseObject class
  *

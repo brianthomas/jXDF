@@ -92,7 +92,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
    public void setReadId (String strReadId)
    {
-       ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strReadId);
+       ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).setAttribValue(strReadId);
    }
 
   /**getReadId
@@ -100,7 +100,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String getReadId()
   {
-    return (String) ((XMLAttribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(ID_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
 
@@ -110,7 +110,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
    public void setReadIdRef (String strReadIdRef)
    {
-      ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strReadIdRef);
+      ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).setAttribValue(strReadIdRef);
    }
 
   /**getReadIdRef
@@ -118,7 +118,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String getReadIdRef()
   {
-    return (String) ((XMLAttribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(IDREF_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *encoding* attribute
@@ -130,7 +130,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
          Log.warnln("setEncoding() got invalid value. Request ignored.");
          return;
       }
-      ((XMLAttribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).setAttribValue(strEncoding);
+      ((Attribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).setAttribValue(strEncoding);
     }
 
   /**getEncoding
@@ -138,7 +138,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String getEncoding()
   {
-    return (String) ((XMLAttribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(ENCODING_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
   /**set the *endian* attribute
@@ -151,7 +151,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
           return;
        }
 
-       ((XMLAttribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).setAttribValue(strEndian);
+       ((Attribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).setAttribValue(strEndian);
    }
 
   /**getEndian
@@ -159,7 +159,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    */
   public String getEndian()
   {
-    return (String) ((XMLAttribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).getAttribValue();
+    return (String) ((Attribute) attribHash.get(ENDIAN_XML_ATTRIBUTE_NAME)).getAttribValue();
   }
 
 
@@ -294,7 +294,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
    protected void init()
    {
 
-      resetXMLAttributes();
+      resetAttributes();
 
       classXDFNodeName = "read";
      
@@ -306,10 +306,10 @@ public abstract class XMLDataIOStyle extends BaseObject {
       attribOrder.add(0, ID_XML_ATTRIBUTE_NAME);
 
       //set up the attribute hashtable key with the default initial value
-      attribHash.put(ENDIAN_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENDIAN, Constants.STRING_TYPE));
-      attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new XMLAttribute(DEFAULT_ENCODING, Constants.STRING_TYPE));
-      attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
-      attribHash.put(ID_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+      attribHash.put(ENDIAN_XML_ATTRIBUTE_NAME, new Attribute(DEFAULT_ENDIAN, Constants.STRING_TYPE));
+      attribHash.put(ENCODING_XML_ATTRIBUTE_NAME, new Attribute(DEFAULT_ENCODING, Constants.STRING_TYPE));
+      attribHash.put(IDREF_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
+      attribHash.put(ID_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.STRING_TYPE));
 
       setIOAxesOrder(parentArray.getAxes());
 
@@ -333,6 +333,9 @@ public abstract class XMLDataIOStyle extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.27  2001/09/13 21:39:25  thomas
+ * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
+ *
  * Revision 1.26  2001/09/06 15:56:41  thomas
  * changed basicXMLWriter to return String (nodeName)
  *
@@ -362,7 +365,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
  * get/setIOAxes
  *
  * Revision 1.18  2001/05/10 21:45:33  thomas
- * added resetXMLAttributes to init().
+ * added resetAttributes to init().
  * small change to constructor related to inheritance.
  *
  * Revision 1.17  2001/05/04 20:27:02  thomas
