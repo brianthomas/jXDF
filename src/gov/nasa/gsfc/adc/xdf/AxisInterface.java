@@ -41,12 +41,19 @@ public interface AxisInterface {
    public boolean addElementNode (ElementNode element);
    public void toXMLWriter (Writer outputWriter, String indent) throws java.io.IOException;
    public void toXMLOutputStream (OutputStream o, String indent) throws java.io.IOException;
+   public Object clone() throws CloneNotSupportedException; 
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.12  2001/10/02 19:52:16  thomas
+ * added clone
+ *
+ * Revision 1.11.4.1  2001/10/02 17:54:46  thomas
+ * added clone to interface
+ *
  * Revision 1.11  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
  *
