@@ -47,5 +47,16 @@
                      - Added append array functionality.
       
 0.17-beta0_1 3/28/01  bug fix
-                     - bug in BaseObject class that caused crash for certain toXMLOutputStream 
-                       calls (private field XMLNotationHash not properly declared). FIXED. 
+                      - bug in BaseObject class that caused crash for certain toXMLOutputStream 
+                        calls (private field XMLNotationHash not properly declared). FIXED. 
+
+0.17-beta1   5/??/01  - Added BaseObjectWithXMLElements class. Array, Field, Structure, Axis
+                        classes may now hold new XMLElements.
+                      - Re-added writeAxisOrder stuff to XMLDataIOStyle classes. Fixed write
+                        bug. 
+                      - Added many Interface classes for those classes which seem most likely to
+                        be customized in new (derived) XDF dataformats.
+                      - Added XDF base object structure class. This class represents the top
+                        level structure in an XDF object and (hopefully) clarifies some 
+                        confusion over the nature of structure objects in general.
+
