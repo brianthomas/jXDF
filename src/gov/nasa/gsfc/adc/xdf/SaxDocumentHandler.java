@@ -257,6 +257,26 @@ public class SaxDocumentHandler implements DocumentHandler {
 
     }
 
+    public void setCurrentDatatypeObject(Object object) {
+        CurrentDatatypeObject = object;
+    }
+
+    public Object getCurrentDatatypeObject() {
+       return CurrentDatatypeObject;
+    }
+
+    public void setCurrentArray(Array array) {
+       CurrentArray = array;
+    }
+
+    public Array getCurrentArray () {
+       return CurrentArray;
+    }
+
+    public void setCurrentStructure (Structure structure) {
+       CurrentStructure = structure;
+    }
+
     public Structure getCurrentStructure () {
        return CurrentStructure;
     }
@@ -836,7 +856,7 @@ public class SaxDocumentHandler implements DocumentHandler {
           // set current array and add this array to current structure 
           CurrentArray = CurrentStructure.addArray(newarray);
 
-          CurrentDatatypeObject = CurrentArray;
+          setCurrentDatatypeObject(CurrentArray);
 
           return newarray;
        }
@@ -2346,6 +2366,10 @@ public class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2000/11/10 06:14:43  thomas
+ * Added set/get for Current/Array/Structure/DatatypeObject
+ * methods . -b.t.
+ *
  * Revision 1.13  2000/11/10 05:49:44  thomas
  * Updated start/end element handlers to update
  * CUrrentObjectList appropriately. Added getLastObject
