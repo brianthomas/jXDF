@@ -38,11 +38,14 @@ import java.util.Map;
 // Import needed SAX stuff
 import org.xml.sax.HandlerBase;
 import org.xml.sax.InputSource;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.ParserFactory;
 import com.sun.xml.parser.Resolver;
+
+import org.xml.sax.EntityResolver;
 
 /** This class is used to create Java (structure) objects from XDF files/streams.
  */
@@ -133,19 +136,33 @@ public class Reader
     public Structure parse (InputSource inputsource) 
     throws java.io.IOException
     {
+        String parsername = Specification.getInstance().getXMLParser();
+        return parse(inputsource, parsername);
+
+    }
+
+    /* Parse an InputSource into an XDF Structure object.
+       Set to private because we want users to only set XML parser in
+       the Specification object, not override it in the method call. -b.t. 
+     */
+    private Structure parse (InputSource inputsource, String parsername) 
+    throws java.io.IOException
+    {
+
+        Log.debugln("XDF reader is using the XML parser:"+ parsername);
 
         try {
 
             Parser parser;
-            String parsername = "org.apache.xerces.parsers.SAXParser";
-
 
             // create an instance of the parser
             parser = (Parser) ParserFactory.makeParser (parsername);
 
             // set parser handlers to XDF standard ones
             parser.setDocumentHandler(myDocumentHandler);
-            parser.setErrorHandler(new SaxErrorHandler());
+            parser.setDTDHandler(myDocumentHandler);
+            parser.setEntityResolver(new myEntityResolver());
+            parser.setErrorHandler(new myErrorHandler());
 
             // ok, now we are ready to parse the inputsource 
             parser.parse(inputsource);
@@ -200,7 +217,7 @@ public class Reader
 //
 
 // The parser error Handler
-class SaxErrorHandler extends HandlerBase
+class myErrorHandler implements ErrorHandler
 {
   // treat validation errors as fatal
   public void error (SAXParseException e)
@@ -216,11 +233,41 @@ class SaxErrorHandler extends HandlerBase
     Log.error("** Warning"+", line "+e.getLineNumber()
                + ", uri " + e.getSystemId()+"   " + e.getMessage());
   }
-} // End of SaxErrorHandler class 
+
+  public void fatalError (SAXParseException e)
+  throws SAXException
+  {
+     throw e;
+  }
+
+} // End of myErrorHandler class 
+
+// parser EntityResolver
+class myEntityResolver implements EntityResolver {
+
+   public InputSource resolveEntity (String publicId, String systemId)
+   {
+
+     Log.debugln("CALL to Entity Resolver:"+publicId+" "+systemId);
+     if (systemId != null) {
+        // return a special input source
+        return new InputSource(systemId);
+     } else {
+        // use the default behaviour
+        return null;
+     }
+   }
+
+
+} // End of myEntityResolver class 
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/01/19 17:22:16  thomas
+ * Added ability to set the XML parser to use.
+ * Added ability to pick up UnparsedEntities. -b.t.
+ *
  * Revision 1.9  2000/11/16 20:05:26  kelly
  * fixed documentation.  -k.z.
  *
