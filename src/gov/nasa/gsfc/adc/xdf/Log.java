@@ -12,14 +12,11 @@ public class Log {
   //
   //Fields
   //
-  protected int priority ; //hold the priority that is read from the configuration file
-  protected OutputStream output ;  //hold the output stream
-
-  //got to find a way to specify relative file path!!!
-  public static final String DEFAULT_CONFIG_FILE = "C:/Data/XDF/gov/nasa/gsfc/adc/xdf/XDFLogConfig";   //default configuration file
+  protected static int priority ; //hold the priority that is read from the configuration file
+  protected static OutputStream output ;  //hold the output stream
 
   public static final OutputStream DEFAULT_OUTPUTSTREAM = System.out;
-  public static final int DEFAULT_PRIORITY = 0;
+  public static final int DEFAULT_PRIORITY = Priority.ERROR;
 
   //
   //constructor and related methods
@@ -28,9 +25,7 @@ public class Log {
    * no arg constructor
    */
    public Log () {
-     configure(DEFAULT_CONFIG_FILE);
    }
-
 
   //
   //Other Public Methods
@@ -39,7 +34,7 @@ public class Log {
   /**
    * configure: read in the properties from the configuration file
    */
-   public void configure(String configFileName) {
+   public static void configure(String configFileName) {
     Properties props = new Properties();  //the property hashtable
     try {
       FileInputStream istream = new FileInputStream(configFileName);
@@ -48,7 +43,6 @@ public class Log {
     }
     catch (IOException e) {
       System.err.println("Could not read configuration file [" + configFileName+ "].");
-     // e.printStackTrace();
       System.err.println("Ignoring configuration file [" + configFileName+"].");
       System.err.println("using default config");
       defaultConfig();
@@ -59,7 +53,13 @@ public class Log {
     configure(props);
   }
 
-  public void defaultConfig() {
+  /**
+   * defaultConfig: set the default configuration
+   * Output=System.out
+   * Priority=4
+   */
+
+  public static void defaultConfig() {
     output = DEFAULT_OUTPUTSTREAM;
     priority = DEFAULT_PRIORITY;
   }
@@ -68,12 +68,12 @@ public class Log {
    *  Read configuration options from <code>properties</code>.
   */
 
-   public void configure(Properties properties){
+   public static void configure(Properties properties){
 
     String outputFormat = properties.getProperty("Output");
     String strPri = properties.getProperty("Priority");
     if (strPri == null)
-      priority = DEFAULT_PRIORITY;
+      priority = DEFAULT_PRIORITY;  //default priority
     else
       priority = Integer.parseInt(properties.getProperty("Priority"));
     if(outputFormat != null) {
@@ -93,13 +93,12 @@ public class Log {
         }
       }
     }
-    else { // default
-     // System.out.println("yes, this is the default ");
+    else { // default output
       output = new PrintStream(DEFAULT_OUTPUTSTREAM);
     }
   }
 
-  public void info(String msg) {
+  public static void info(String msg) {
     if (priority > Priority.INFO)
       return;
     try {
@@ -112,7 +111,7 @@ public class Log {
     }
   }
 
-  public void debug(String msg) {
+  public static void debug(String msg) {
     if (priority > Priority.DEBUG)
       return;
     try {
@@ -124,7 +123,7 @@ public class Log {
       e.printStackTrace();
     }
   }
-  public void warn(String msg) {
+  public static void warn(String msg) {
     if (priority > Priority.WARN)
       return;
     try {
@@ -137,7 +136,7 @@ public class Log {
     }
   }
 
-  public void error(String msg) {
+  public static void error(String msg) {
     if (priority > Priority.ERROR)
       return;
     try {
@@ -149,10 +148,6 @@ public class Log {
       e.printStackTrace();
     }
   }
-
-
-
-
 
 }
 
