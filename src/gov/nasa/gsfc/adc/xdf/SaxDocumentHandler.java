@@ -4174,7 +4174,7 @@ while(thisIter.hasNext()) {
 
           } 
 
-          // 4. add this valueList to the lookup table, if the original valueList had an ID
+          // 3. add this valueList to the lookup table, if the original valueList had an ID
           String valueListId = thisValueList.getValueListId();
           if (valueListId != null) {
 
@@ -4187,7 +4187,7 @@ while(thisIter.hasNext()) {
 
           }
 
-          // 5. Populate correct parent node w/ values 
+          // 4. Populate correct parent node w/ values 
           ValueListAlgorithm valueListObj = new ValueListAlgorithm ( thisValueList.getStart(),
                                                                      thisValueList.getStep(),
                                                                      thisValueList.getSize(),
@@ -4245,7 +4245,7 @@ while(thisIter.hasNext()) {
              System.exit(-1); // fatal error, shut down 
           }
 
-          // now add valueObjects to groups 
+          // 5. now add valueObjects to groups 
           List values = valueListObj.getValues();
           Iterator iter = values.iterator();
           while (iter.hasNext())
@@ -4280,6 +4280,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.42  2001/07/23 16:01:32  thomas
+ * trivial chage to comments.
+ *
  * Revision 1.41  2001/07/19 22:04:08  thomas
  * fixed bug in ValueList (algorithm) stuff. Start, size, step
  * not being correctly stored as String, fixed.
