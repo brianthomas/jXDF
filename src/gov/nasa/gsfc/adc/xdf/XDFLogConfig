@@ -1,0 +1,9 @@
+ # t h i s   i s   t h e   X D F   l o g   c o n f i g u r a t i o n   f i l e
+ Output=System.out
+
+ # four levels of priority, error>warn>debug>info
+ # 0: all levels are printed
+ # 1: priority >=debug are printed
+ # 2: priority >=warn are printed
+ # 3: priority >=error are printed
+ Priority=0
