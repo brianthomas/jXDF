@@ -87,7 +87,7 @@
          </fixedWidthStyle>
       </read>
 
-      <data href="table1"/>
+      <data href="table1" startByte="13" endByte="211"/>
 
       <notes>
         <locationOrder>
