@@ -7,8 +7,6 @@
 	this package "BETA"
         ------------------------------------------------------------
 
-        - fix the repeatable attribute on string parsing. 
-
 	- Impliment octal/hex data read/write in SaxDocHandler.
 
 	- Impliment binary data read/write in SaxDocHandler/Binary*DataFormats.
@@ -24,7 +22,7 @@
 	- if the attribute is primitive number, *get* function overloading, two
  	 *set* functions--one returning primitive number, one returning Number object
 
-	- Update all derived locators when axis is add/removed from an array.
+	- Check this: Do we update all derived locators when axis is add/removed from an array?
 
         - Remove Perl junk in documentation. Improve the content of the doc text.
 
@@ -38,6 +36,10 @@
 	A list of things that have to be done before we can consider
 	this package "FINAL"
         ------------------------------------------------------------
+
+        - show we not allow repeatable attribute to apply to the recordterminator
+          on string parsing (it only applies to delimiting characters right now;
+          Question: how does the Perl package handle this?) 
    
 	- Improve efficiency of data reading. Direct char->number converstion
 	  (faster) rather than convert to String, then to a number object,

@@ -4,9 +4,14 @@
 	have any problems running under 1.3, but let me know if thats
 	not the case.
 	
-	We are planning better support than what is given below,
-	however, I just havent had the time to compile the code
-	under a broad series of platforms, only Linux is truely tested.
+	You will need a SAX level 1 parser and the org.xml.sax package
+	to run this software.
+
+	Instructions on install: well, we are planning to better instruct
+	you than what is given below, however, I just havent had the time 
+	to compile the code under a broad series of platforms, only Linux 
+	is truely tested (but one developer regularly runs this code under
+	windows).
 
 	Good Luck. -b.t.
 
@@ -31,5 +36,7 @@
 	> nmake 
 
 	This *should* create the xdf.jar file, and HTML API documentation. 
+	Let me know if you have problems, or better yet, send me a patch
+	so it will work ;)
 
 

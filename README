@@ -25,6 +25,9 @@
 	returns are used as either a delimiter or recordTerminator
 	character.
 
+	This package supports SAX1 parsers. SAX2 and schema will be 
+	supported as soon as these become comfortably mature recogmendations. 
+
 	For more details on missing features/problems that remain in 
 	the package please refer to the TODO file.
 
