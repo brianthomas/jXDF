@@ -156,28 +156,33 @@ implements Cloneable
    //
 
    /** Set the value of the PCDATA held by this ElementNode.
-       This method will choose to create a CDATASection for this text
-       so as to insure special characters like the lessthan sign are 
-       preserved without resorting to entities.
+       This method will choose to create a Text child node for this text. 
+       Note: we are assuming that you have been kosher with all of your
+       characters (e.g. no unentified '&"< chars in the text. 
+       If you want to pass stuff like that, you should use setPCData(CDATASection data)
+       method instead.
     */
    public void setPCData (String text) {
       removeAllTextChildNodes();
-      CDATASection newTextNode = (CDATASection) this.getOwnerDocument().createTextNode(text);
+      Text newTextNode = new org.apache.crimson.tree.TextNode(text);
+      // CDATASection newTextNode = (CDATASection) new org.apache.crimson.tree.CDataNode(text);
+// this.getOwnerDocument().createTextNode(text);
       appendChild(newTextNode);
    }
 
    /** Set the value of the PCDATA held by this ElementNode.
-       Passed node totally replaces all other text nodes.
-       By using CDATASection node here (sub-class of Text), the 
-       user may insure special characters like the lessthan sign are 
-       preserved without resorting to entities.
+       Passed node totally replaces all other text nodes with one new one.
+       Note: we are assuming that you have been kosher with all of your
+       characters (e.g. no unentified '&"< chars in the text. 
+       If you want to pass stuff like that, you should use setPCData (Text cdataNode)
+       method instead (e.g. pass a CDATASection node as type 'Text').
     */
    public void setPCData (Text newTextNode) {
       removeAllTextChildNodes();
       appendChild(newTextNode);
    }
 
-  private void removeAllTextChildNodes() {
+   private void removeAllTextChildNodes() {
 
       NodeList childNodes = this.getChildNodes();
       int size = childNodes.getLength();
@@ -242,7 +247,7 @@ implements Cloneable
     */
    public void appendPCData (String text) 
    {
-      CDATASection newTextNode = (CDATASection) this.getOwnerDocument().createTextNode(text);
+      Text newTextNode = new org.apache.crimson.tree.TextNode(text);
       appendChild(newTextNode);
    }
 
@@ -251,6 +256,7 @@ implements Cloneable
    public void appendPCData (Text textNode) {
       appendChild(textNode);
    }
+
 
 /*
    // ugh. Wont allow me to override the 'Element' method that is 
