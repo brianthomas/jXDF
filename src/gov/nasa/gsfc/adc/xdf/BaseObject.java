@@ -80,14 +80,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
   /** A Hashtable to hold the XML attributes.
   */
-  protected Hashtable attribHash;
+  protected Hashtable attribHash = new Hashtable ();
 
   /** A List to store the order of the XML attributes.
   */
-  protected List attribOrder;
-
-  // stores notation entries for the XMLDeclaration
-  protected HashSet XMLNotationHash = new HashSet();
+  protected List attribOrder = Collections.synchronizedList(new ArrayList());
 
   //
   // Constructor Methods
@@ -142,20 +139,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
 */
 
    
-  /** Set the NotationHash for this object. Each entry in the passed HashSet
-      will be a Hashtable containing the keys 'name' 'publicId' and 'systemId'.
-      This information will be printed out with other XMLDeclarations in a 
-      toXMLFileHandle call that prints the XML declaration (e.g. DOCTYPE header). 
-  */
-  public void setXMLNotationHash (HashSet hash) {
-     XMLNotationHash = hash;
-  }
-
   /** Return a list of the proper ordering of the XML attributes of this object.
       @return List on success, on failure an empty List object is passed back if
                there are no XMLAttributes within a XDF given object class.
   */
-  public List getAttribOrder() {
+  public List getXMLAttributeOrder() {
     return attribOrder;
   }
 
@@ -227,37 +215,20 @@ public abstract class BaseObject implements Serializable, Cloneable {
       Uses toXMLOutputStream. The passed hashtable will be used to initialize the
       attributes of the XML declaration in the output XDF file.
   */
-  public void toXMLFile (String filename, Hashtable XMLDeclAttribs) 
+  public void toXMLFile (String filename) 
   throws java.io.IOException
   {
 
     // open file writer
  //   try {
       FileOutputStream fileout = new FileOutputStream(filename);
-      toXMLOutputStream(fileout, XMLDeclAttribs);
+      toXMLOutputStream(fileout);
       fileout.close();
 /*
     } catch (IOException e) {
       Log.error("Error: toXMLFile method hash trouble writing to "+ filename + " for writing.");
     }
 */
-
-  }
-
-  /** A different invokation style. It has defaults for the XML Declaration
-      setting standalone to "no" and version to the value of sXMLSpecVersion.
-  */
-  public void toXMLFile (String filename) 
-  throws java.io.IOException
-  {
-
-     // prepare XMLDeclaration
-     Hashtable XMLDeclAttribs = new Hashtable();
-     XMLDeclAttribs.put("standalone", new String("no"));
-     XMLDeclAttribs.put("rootName", Specification.getInstance().getXDFRootNodeName());
-     XMLDeclAttribs.put("dtdName", Specification.getInstance().getXDFDTDName());
-
-     toXMLFile(filename, XMLDeclAttribs);
 
   }
 
@@ -270,7 +241,6 @@ public abstract class BaseObject implements Serializable, Cloneable {
   */
   public void toXMLOutputStream (
                                    OutputStream outputstream,
-                                   Hashtable XMLDeclAttribs,
                                    String indent,
                                    boolean dontCloseNode,
                                    String newNodeNameString,
@@ -351,7 +321,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
                 indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
                 indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                 String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-                containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
+                containedObj.toXMLOutputStream(outputstream, newindent);
               }
             }
           } else {
@@ -419,37 +389,12 @@ public abstract class BaseObject implements Serializable, Cloneable {
       the indicated OutputStream.
   */
   public void toXMLOutputStream ( OutputStream outputstream,
-                                  Hashtable XMLDeclAttribs,
                                   String indent
                                 )
   throws java.io.IOException
   {
-     toXMLOutputStream(outputstream, XMLDeclAttribs, indent, false, null, null);
+     toXMLOutputStream(outputstream, indent, false, null, null);
 
-  }
-
-  /** A different invokation style for writing this object out to
-      the indicated OutputStream.
-  */
-  public void toXMLOutputStream (OutputStream outputstream, Hashtable XMLDeclAttribs)
-  throws java.io.IOException
-  {
-     //not reseanable to set the indent to Specification.getInstance().isPrettyXDFOutput()Indentation --k.z. 10/17
-     toXMLOutputStream(outputstream, XMLDeclAttribs, new String(""), false, null, null);
-  }
-
-  /** A different invokation style. It has defaults for the XML Declaration
-      setting standalone to "no" and version to the value of sXMLSpecVersion.
-  */
-  public void toXMLOutputStream (OutputStream outputstream, String indent)
-  throws java.io.IOException
-  {
-     // prepare XMLDeclaration
-     Hashtable XMLDeclAttribs = new Hashtable();
-     XMLDeclAttribs.put("standalone", new String("no"));
-     XMLDeclAttribs.put("dtdName", Specification.getInstance().getXDFDTDName());
-     XMLDeclAttribs.put("rootName", Specification.getInstance().getXDFRootNodeName());
-     toXMLOutputStream(outputstream, XMLDeclAttribs, indent);
   }
 
   /** A different invokation style. It has defaults for the XML Declaration
@@ -460,13 +405,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
   throws java.io.IOException
   {
 
-     // prepare XMLDeclaration
-     Hashtable XMLDeclAttribs = new Hashtable();
-     XMLDeclAttribs.put("standalone", new String("no"));
-     XMLDeclAttribs.put("dtdName", Specification.getInstance().getXDFDTDName());
-     XMLDeclAttribs.put("rootName", Specification.getInstance().getXDFRootNodeName());
-
-     toXMLOutputStream(outputstream, XMLDeclAttribs);
+     toXMLOutputStream(outputstream, "", false, null, null);
 
   }
 
@@ -475,6 +414,8 @@ public abstract class BaseObject implements Serializable, Cloneable {
   //
 
   /** Set the XMLattributes of this object using the passed Attributes.
+      An attribute will be appended to the objects list of XML attributes if 
+      that attribute doesnt already exist.
    */
   // NOTE: this is essentially the Perl update method
   public void setXMLAttributes (Attributes attrs) {
@@ -490,15 +431,11 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
              // set it as appropriate to the type
              if (name != null && value != null) {
-                String type = ((XMLAttribute) this.attribHash.get(name)).getAttribType();
-                if(type.equals(Constants.INTEGER_TYPE))
-                   // convert string to proper Integer
-                   ((XMLAttribute) this.attribHash.get(name)).setAttribValue(new Integer(value));
-                else if(type.equals(Constants.DOUBLE_TYPE))
-                   // convert string to proper Double
-                   ((XMLAttribute) this.attribHash.get(name)).setAttribValue(new Double(value));
-                else
-                   ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
+                if (this.attribHash.containsKey(name)) { 
+                   setXMLAttribute(name,value);
+                } else {
+                   addXMLAttribute(name,value);
+                }
              }
 
           }
@@ -506,6 +443,58 @@ public abstract class BaseObject implements Serializable, Cloneable {
       }
 
      } //synchronize
+  }
+
+  public void setXMLAttribute (String name, String value) {
+
+     if (this.attribHash.containsKey(name)) {
+     
+        String type = ((XMLAttribute) this.attribHash.get(name)).getAttribType();
+        if(type.equals(Constants.INTEGER_TYPE))
+           // convert string to proper Integer
+           ((XMLAttribute) this.attribHash.get(name)).setAttribValue(new Integer(value));
+        else if(type.equals(Constants.DOUBLE_TYPE))
+           // convert string to proper Double
+           ((XMLAttribute) this.attribHash.get(name)).setAttribValue(new Double(value));
+        else // string or Object
+           ((XMLAttribute) this.attribHash.get(name)).setAttribValue(value);
+
+     } else { // its an add operation 
+        Log.errorln("Cannot set XML attribute:"+name+" as it doesnt exist, use addXMLAttribute() instead.");
+     }
+
+  }
+
+  /* Appends on an XML attribute into the object.
+      @return: true if successfull.
+  */
+  // private for now, I dont see the need to allow users to add 'object' or 'number'
+  // or etc. type XML attributes other than 'string'
+  private boolean addXMLAttribute (String name, Object value, String type) {
+
+    if (!this.attribHash.containsKey(name)) { 
+
+       this.attribOrder.add(name);
+
+       //set up the attribute hashtable key with the default initial value
+       this.attribHash.put(name, new XMLAttribute(value, type));
+
+       return true;
+
+    } else {
+
+       Log.warnln("Cannot addXMLAttribute("+name+") as it already exists, use setXMLAttribute() instead.");
+       return false;
+
+    }
+
+  }
+
+  /** Appends on an XML attribute into the object.
+      @return: true if successfull.
+   */
+  public boolean addXMLAttribute (String name, String value) {
+     return addXMLAttribute(name, (Object) value, Constants.STRING_TYPE);
   }
 
   /** deep copy of this XDF object
@@ -633,7 +622,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
                indent = dealWithClosingGroupNodes(containedObj, outputstream, indent);
                indent = dealWithOpeningGroupNodes(containedObj, outputstream, indent);
                String newindent = indent + Specification.getInstance().getPrettyXDFOutputIndentation();
-               containedObj.toXMLOutputStream(outputstream, new Hashtable(), newindent);
+               containedObj.toXMLOutputStream(outputstream, newindent);
             }
          }
       }
@@ -655,9 +644,12 @@ public abstract class BaseObject implements Serializable, Cloneable {
     ArrayList objRefList = new ArrayList();
 
     synchronized (attribHash) {
-      int size = attribHash.size();
-      for (int i = 0; i < size; i++) {
-        String attribName = (String) attribOrder.get(i);
+      synchronized (attribOrder) {
+
+      Iterator iter = attribOrder.iterator();
+      while (iter.hasNext()) {
+        String attribName = (String) iter.next();
+
         XMLAttribute obj = (XMLAttribute) attribHash.get(attribName);
         if (obj != null && obj.attribValue != null) {
           if ( obj.attribType == Constants.STRING_TYPE)
@@ -691,6 +683,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
             }
           }
         }
+      }
       }
 
       xmlInfo.put("attribList", attribList);
@@ -771,7 +764,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
             // its *not* already open, so we bump up the indentation,
             // open it and add it to the open group node list.
             newIndent.append(Specification.getInstance().getPrettyXDFOutputIndentation());
-            memberGroup.toXMLOutputStream(outputstream, new Hashtable(), newIndent.toString(), true, null, null);
+            memberGroup.toXMLOutputStream(outputstream, newIndent.toString(), true, null, null);
             this.openGroupNodeHash.add(memberGroup);
           }
         }
@@ -861,6 +854,13 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.51  2001/07/19 21:50:53  thomas
+ * yanked XMLDeclAttribs from toXMLOutputStream (only needed
+ * in the XDF class)
+ * removed XMLNotationHash stuff (again, only needed in XDF class)
+ * added ability to add arbitary XMLAttributes to any class
+ * (that inherits from BaseObject).
+ *
  * Revision 1.50  2001/07/17 19:05:51  thomas
  * upgrade to use JAXP (SAX2) only. Namespaces NOT
  * implemented (yet).
