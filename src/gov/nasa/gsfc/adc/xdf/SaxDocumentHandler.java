@@ -618,11 +618,13 @@ public class SaxDocumentHandler implements DocumentHandler {
     }
 
     // *sigh* lack of regular expression support makes this 
-    // difficult to do. I expect that it will be possible to 
+    // more difficult to do. I expect that it will be possible to 
     // break this in various ways if the PCDATA in the XML 
     // document is off. -b.t. 
     //
-    // ALSO: the repeatable function is properly implemented for this yet. -b.t.
+    // Note: right now repeatable is limited to just preventing repeating
+    // on delimiting strings, NOT on recordTerminators. Not sure if this
+    // behavior is consistent with that in the Perl. -b.t.
     //
     private ArrayList splitStringIntoStringObjects ( String valueListString, 
                                                      String delimiter,
@@ -640,6 +642,7 @@ public class SaxDocumentHandler implements DocumentHandler {
        int termDelimiterSize = 0;
        char termDelimitChar0;
        int valueListSize = valueListString.length(); 
+       boolean isNotRepeatable = repeatable.equals("yes") ? false : true;
 
        if(terminatingDelimiter != null) {
           termDelimiterSize = terminatingDelimiter.length();
@@ -659,8 +662,61 @@ public class SaxDocumentHandler implements DocumentHandler {
           if ( valueListString.substring(start, stop).compareTo(delimiter) == 0 ) 
           {
 
-             // we hit a delimiter
-             start += delimiterSize;
+            // we hit a delimiter
+            start += delimiterSize;
+
+            if (isNotRepeatable) { 
+                // gather a value now.
+
+// Log.errorln("ISNOTREPEATABLE CHECK");
+
+                // find the end of this substring
+                int end = valueListString.indexOf(delimitChar0, start);
+
+                int termend = 0;
+
+                if(terminatingDelimiter != null)
+                   termend = valueListString.indexOf(terminatingDelimiter.charAt(0), start);
+
+// Log.error("end:"+end+" termend:"+termend);
+
+                String valueString;
+                if(termend == 0 || end < termend) {
+
+                   // can happen if no terminating delimiter
+                   if (end < 0) end = valueListSize;
+
+                   // derive our value from string
+                   valueString = valueListString.substring(start, end);
+
+                   // add the value to arrayList 
+                   values.add(valueString);
+
+// Log.errorln(" DValue:"+valueString);
+
+                   // this is the last value so terminate the while loop 
+                   if ((end+delimiterSize) >= valueListSize ) break;
+
+                   start = end;
+
+                } else {
+
+                   // if (termend < 0) termend = valueListSize;
+
+                   valueString = valueListString.substring(start, termend);
+
+                   // add the value to arrayList 
+                   values.add(valueString);
+
+// Log.errorln(" TValue:"+valueString);
+
+                   // this is the last value so terminate the while loop 
+                   if ((termend+termDelimiterSize) >= valueListSize ) break;
+
+                   start = termend;
+                }
+
+             }
 
           } else if (termDelimiterSize > 0 
                        && valueListString.substring(start, start + termDelimiterSize).compareTo(terminatingDelimiter) == 0
@@ -669,7 +725,61 @@ public class SaxDocumentHandler implements DocumentHandler {
 
              // we hit record terminator(delimiter) 
              start += termDelimiterSize;
- 
+           
+             // we DONT repeat on record terminators (??)
+/*
+             if (isNotRepeatable) { 
+                // gather values now.
+
+Log.errorln("ISNOTREPEATABLE CHECK");
+
+                // find the end of this substring
+                int end = valueListString.indexOf(delimitChar0, start);
+
+                int termend = 0;
+
+                if(terminatingDelimiter != null)
+                   termend = valueListString.indexOf(terminatingDelimiter.charAt(0), start);
+
+Log.error("end:"+end+" termend:"+termend);
+
+                String valueString;
+                if(termend == 0 || end < termend) {
+
+                   // can happen if no terminating delimiter
+                   if (end < 0) end = valueListSize;
+
+                   // derive our value from string
+                   valueString = valueListString.substring(start, end);
+
+                   // add the value to arrayList 
+                   values.add(valueString);
+
+Log.errorln(" DValue:"+valueString);
+
+                   // this is the last value so terminate the while loop 
+                   if ((end+delimiterSize) >= valueListSize ) break;
+
+                   start = end;
+
+                } else {
+
+                   // if (termend < 0) termend = valueListSize;
+
+                   valueString = valueListString.substring(start, termend);
+
+                   // add the value to arrayList 
+                   values.add(valueString);
+
+Log.errorln(" TValue:"+valueString);
+
+                   // this is the last value so terminate the while loop 
+                   if ((termend+termDelimiterSize) >= valueListSize ) break;
+
+                   start = termend;
+                }
+*/
+
           } else {
 
              // we didnt hit a delimiter, gather values
@@ -2646,6 +2756,10 @@ public class SaxDocumentHandler implements DocumentHandler {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.20  2000/11/27 19:58:52  thomas
+ * Added repeatable functionality to splitstringInotObj
+ * method. -b.t.
+ *
  * Revision 1.19  2000/11/22 22:04:06  thomas
  * Cloned objects for Id/IDRef stuff *shouldnt* have
  * an idRef after cloning. Inserted line to set this
