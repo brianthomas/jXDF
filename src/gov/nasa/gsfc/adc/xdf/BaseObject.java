@@ -316,12 +316,13 @@ public abstract class BaseObject implements Serializable, Cloneable {
   throws java.io.IOException
   {
 
-     basicXMLWriter(outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
-     if (Specification.getInstance().isPrettyXDFOutput()) //  && nodeNameString != null)
+     String nodeNameString = 
+         basicXMLWriter(outputWriter, indent, dontCloseNode, newNodeNameString, noChildObjectNodeName);
+     if (Specification.getInstance().isPrettyXDFOutput() && nodeNameString != null)
           outputWriter.write(Constants.NEW_LINE);
   }
 
-  protected void basicXMLWriter ( 
+  protected String basicXMLWriter ( 
                                 Writer outputWriter,
                                 String indent,
                                 boolean dontCloseNode,
@@ -333,6 +334,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
 
     //while writing out, attribHash should not be changed
     synchronized (attribHash) {
+
       String nodeNameString = this.classXDFNodeName;
 
       // Setup. Sometimes the name of the node we are opening is different from
@@ -465,7 +467,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 //      if (Specification.getInstance().isPrettyXDFOutput()  && nodeNameString != null) 
 //	  outputWriter.write(Constants.NEW_LINE);
 
-    }//synchronize
+      return nodeNameString;
+
+    } //synchronize
 
   }
 
@@ -923,6 +927,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.57  2001/09/06 15:55:44  thomas
+ * re-implemented check on null nodeName in toXMLWriter; changed basicXMLWriter to return String (nodeName)
+ *
  * Revision 1.56  2001/09/05 22:06:40  thomas
  * made basicXMLWriter protected, added BufferedWriter to toXMLFile method, moved findAllChildHrefObjects method to Structure class
  *
