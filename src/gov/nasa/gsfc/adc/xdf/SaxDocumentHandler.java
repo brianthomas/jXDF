@@ -670,6 +670,30 @@ public class SaxDocumentHandler extends DefaultHandler {
 
     }
 
+    // creates object & adds to appropriate lists, etc. 
+    private XMLDataIOStyle createFormattedReadObj (Hashtable attribs) {
+
+       // create new object appropriately 
+       XMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, attribs);
+
+       String readId = readObj.getReadId();
+       // add this object to the lookup table, if it has an ID
+       if (readId != null) 
+       {
+
+          // a warning check, just in case 
+          if (ReadObj.containsKey(readId))
+             Log.warnln("More than one read node with readId=\""+readId+"\", using latest node." );
+
+          // add this into the list of read objects
+          ReadObj.put(readId, readObj);
+
+       }
+
+       return readObj;
+
+    }
+
     private Value createValueListValueObj (ValueList thisValueList, String valueString) {
 
        Value valueObj = new Value ();
@@ -1260,7 +1284,9 @@ Log.errorln("");
                                        ) 
     {
 
-
+/*
+// this stuff slows down the parser too much to leave commented in.
+// uncomment as needed
 Log.debug("Add Data:["+thisString+"] (");
 List axes = dataLocator.getIterationOrder();
 Iterator liter = axes.iterator();
@@ -1269,20 +1295,19 @@ while (liter.hasNext()) {
    Log.debug(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
 }
 Log.debugln(") ");
+*/
 
        // Note that we dont treat binary data at all here 
        try {
 
            if ( CurrentDataFormat instanceof StringDataFormat) {
 
-//Log.debugln("(String)");
               CurrentArray.setData(dataLocator, thisString);
 
            } else if ( CurrentDataFormat instanceof FloatDataFormat
                        || CurrentDataFormat instanceof BinaryFloatDataFormat) 
            {
 
-//Log.debugln("(Double)");
               Double number = new Double (thisString);
               CurrentArray.setData(dataLocator, number.doubleValue());
 
@@ -1291,7 +1316,6 @@ Log.debugln(") ");
            {
 
               // Integer number = new Integer (thisString);
-//Log.debugln("(Integer)");
 
               if (intRadix == 16) // peal off leading "0x"
                   thisString = thisString.substring(2);
@@ -1384,8 +1408,6 @@ Log.debugln(") ");
             if (isNotRepeatable) { 
                 // gather a value now.
 
-// Log.errorln("ISNOTREPEATABLE CHECK");
-
                 // find the end of this substring
                 int end = valueListString.indexOf(delimitChar0, start);
 
@@ -1393,8 +1415,6 @@ Log.debugln(") ");
 
                 if(terminatingDelimiter != null)
                    termend = valueListString.indexOf(terminatingDelimiter.charAt(0), start);
-
-// Log.error("end:"+end+" termend:"+termend);
 
                 String valueString;
                 if(termend == 0 || end < termend) {
@@ -1407,8 +1427,6 @@ Log.debugln(") ");
 
                    // add the value to arrayList 
                    values.add(valueString);
-
-// Log.errorln(" DValue:"+valueString);
 
                    // this is the last value so terminate the while loop 
                    if ((end+delimiterSize) >= valueListSize ) break;
@@ -1423,8 +1441,6 @@ Log.debugln(") ");
 
                    // add the value to arrayList 
                    values.add(valueString);
-
-// Log.errorln(" TValue:"+valueString);
 
                    // this is the last value so terminate the while loop 
                    if ((termend+termDelimiterSize) >= valueListSize ) break;
@@ -1508,8 +1524,6 @@ Log.errorln(" TValue:"+valueString);
              if(terminatingDelimiter != null) 
                  termend = valueListString.indexOf(terminatingDelimiter.charAt(0), start);
 
-// Log.error("end:"+end+" termend:"+termend);
-
              String valueString;
              if(termend == 0 || end < termend) {
 
@@ -1521,8 +1535,6 @@ Log.errorln(" TValue:"+valueString);
 
                 // add the value to arrayList 
                 values.add(valueString);
-
-// Log.errorln(" DValue:"+valueString);
 
                 // this is the last value so terminate the while loop 
                 if ((end+delimiterSize) >= valueListSize ) break;
@@ -1537,8 +1549,6 @@ Log.errorln(" TValue:"+valueString);
 
                 // add the value to arrayList 
                 values.add(valueString);
-
-// Log.errorln(" TValue:"+valueString);
 
                 // this is the last value so terminate the while loop 
                 if ((termend+termDelimiterSize) >= valueListSize ) break;
@@ -1668,32 +1678,6 @@ Log.errorln(" TValue:"+valueString);
        return hash;
     }
 
-    // For the case where valueList is storing values in 
-    // algorithmic fashion
-/*
-    private ArrayList getValueListNodeValues (ValueList thisValueList) {
-
-       ArrayList values = new ArrayList();
-
-       // parameters for the algorithm
-       int size  = Integer.valueOf(thisValueList.getSize()).intValue();
-       int start = Integer.valueOf(thisValueList.getStart()).intValue();
-       int step  = Integer.valueOf(thisValueList.getStep()).intValue();
-
-       // do the algorithm to populate the values in the ArrayList 
-       int numberOfValues = 0;
-       int currentValue = start;
-       while (numberOfValues < size) 
-       {
-          values.add(String.valueOf(currentValue));
-          currentValue += step;
-          numberOfValues++;
-       }
-       
-       return values;
-    }
-*/
-          
     public Array appendArrayToArray ( Array arrayToAppendTo, 
                                       Array arrayToAdd ) 
     {
@@ -3354,7 +3338,6 @@ while(thisIter.hasNext()) {
 
           // save these for later, when we know what kind of dataIOstyle we got
           // Argh we really need a clone on Attributes. Just dumb copy for now.
-          DataIOStyleAttribs.clear(); // all old values cleared
           DataIOStyleAttribs = attribListToHashtable(attrs);
 
           // clear out the format command object array
@@ -3368,14 +3351,13 @@ while(thisIter.hasNext()) {
           AxisReadOrder = new ArrayList();
 
           //  If there is a reference object, clone it to get
-          //  the new readObj
+          //  the new readObj. Note: this piece *must* be here.
           String readIdRef = (String) DataIOStyleAttribs.get("readIdRef");
           if (readIdRef != null) {
 
-             XMLDataIOStyle readObj = null;
-
              if (ReadObj.containsKey(readIdRef)) {
 
+                XMLDataIOStyle readObj = null;
                 XMLDataIOStyle refReadObj = (XMLDataIOStyle) ReadObj.get(readIdRef);
                 try {
                    readObj = (XMLDataIOStyle) refReadObj.clone();
@@ -3399,36 +3381,34 @@ while(thisIter.hasNext()) {
                 // adding/getting data :). I suppose we should somehow put this code
                 // inside the clone method of the readObject, but its difficult to do, 
                 // as well questionable utility. 
+                // Note that this part is ONLY needed for Delmited/Formatted read Objects
                 ArrayList newAxisOrderList = new ArrayList();
                 Iterator iter = CurrentArray.getAxes().iterator();
                 while (iter.hasNext()) {
                    AxisInterface arrayAxisObj = (AxisInterface) iter.next();
-                   String refAxisId = (String) AxisAliasId.get(arrayAxisObj.getAxisId()); 
+                   String refAxisId = (String) AxisAliasId.get(arrayAxisObj.getAxisId());
                    Iterator iter2 = readObj.getIOAxesOrder().iterator();
                    while (iter2.hasNext()) {
                       AxisInterface readAxisObj = (AxisInterface) iter2.next();
                       if (readAxisObj.getAxisId().equals(refAxisId)) {
                           newAxisOrderList.add(arrayAxisObj);
                           break; // got a match, go to next axis object 
-                      } 
+                      }
                    }
                 }
                 // now set the new IO Axes order with correct axis refs 
                 readObj.setIOAxesOrder(newAxisOrderList);
+
+                // add read object to Current Array
+                CurrentArray.setXMLDataIOStyle(readObj);
+
+                CurrentFormatObjectList.add(readObj);
 
              } else {
                 Log.warnln("Error: Reader got a read node with ReadIdRef=\""+readIdRef+"\"");
                 Log.warnln("but no previous read node has that id! Ignoring add request.");
                 return (Object) null;
              }
-
-             // add read object to Current Array
-             CurrentArray.setXMLDataIOStyle(readObj); 
-
-             // clear attrib table since we cloned to get values 
-             DataIOStyleAttribs.clear();
-
-             CurrentFormatObjectList.add(readObj);
 
           }
 
@@ -3442,34 +3422,16 @@ while(thisIter.hasNext()) {
     class readCellStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
-          // if this is still defined, we havent init'd an
+          // if this is set to Tagged style, then we really havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
-          if ( !(DataIOStyleAttribs.isEmpty()) ) {
+          if ( CurrentArray.getXMLDataIOStyle() instanceof TaggedXMLDataIOStyle ) {
 
-             // create new object appropriately 
-             FormattedXMLDataIOStyle readObj = 
-                 new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
-             CurrentArray.setXMLDataIOStyle(readObj); 
+             // create first object appropriately 
+             XMLDataIOStyle readObj = createFormattedReadObj(DataIOStyleAttribs);
 
-             String readId = readObj.getReadId();
+             // add read object to Current Array
+             CurrentArray.setXMLDataIOStyle(readObj);
 
-             // add this object to the lookup table, if it has an ID
-             if (readId != null) {
-
-                // a warning check, just in case 
-                if (ReadObj.containsKey(readId))
-                   Log.warnln("More than one read node with readId=\""+readId+"\", using latest node." );
-
-                // add this into the list of read objects
-                ReadObj.put(readId, readObj);
-
-             }
-
-            // Note that we DONT need to check for IdRef here, it should be  
-            // impossible to have readIdRef on DataAttributes AND then hit a readCell
-            // command.
-
-             DataIOStyleAttribs.clear(); // clear table 
              CurrentFormatObjectList.add(readObj);
 
           }
@@ -3509,33 +3471,16 @@ while(thisIter.hasNext()) {
     class repeatStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, Attributes attrs) {
 
-          // if this is still defined, we havent init'd an
+          // if this is set to Tagged style, then we really havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
-          if ( !DataIOStyleAttribs.isEmpty()) {
+          if ( CurrentArray.getXMLDataIOStyle() instanceof TaggedXMLDataIOStyle ) {
 
-             // must be formatted style, thats the only style that has 
-             // repeat formatted commands
-             FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
+             // create first object appropriately 
+             XMLDataIOStyle readObj = createFormattedReadObj(DataIOStyleAttribs);
+
+             // add read object to Current Array
              CurrentArray.setXMLDataIOStyle(readObj);
- 
-             String readId = readObj.getReadId();
-            // add this object to the lookup table, if it has an ID
-             if (readId != null) {
 
-                // a warning check, just in case 
-                if (ReadObj.containsKey(readId))
-                   Log.warnln("More than one read node with readId=\""+readId+"\", using latest node." );
-
-                // add this into the list of read objects
-                ReadObj.put(readId, readObj);
-
-             }
-
-             // Note that we DONT need to check for IdRef here, it should be  
-             // impossible to have readIdRef on DataAttributes AND then hit a repeat
-             // command.
-
-             DataIOStyleAttribs.clear(); // clear table 
              CurrentFormatObjectList.add(readObj);
 
           }
@@ -3593,32 +3538,16 @@ while(thisIter.hasNext()) {
     class skipCharStartElementHandlerFunc implements StartElementHandlerAction {
        public Object action (SaxDocumentHandler handler, Attributes attrs) { 
 
-          // if this is still defined, we havent init'd an
+          // if this is set to Tagged style, then we really havent init'd an
           //  XMLDataIOStyle object for this array yet, do it now. 
-          if ( !DataIOStyleAttribs.isEmpty()) {
+          if ( CurrentArray.getXMLDataIOStyle() instanceof TaggedXMLDataIOStyle ) {
 
-             // If we see a skipChar command, then we must have Formatted data IO style
-             FormattedXMLDataIOStyle readObj = new FormattedXMLDataIOStyle (CurrentArray, DataIOStyleAttribs);
+             // create first object appropriately 
+             XMLDataIOStyle readObj = createFormattedReadObj(DataIOStyleAttribs);
+
+             // add read object to Current Array
              CurrentArray.setXMLDataIOStyle(readObj);
 
-             String readId = readObj.getReadId();
-             // add this object to the lookup table, if it has an ID
-             if (readId != null) {
-
-                // a warning check, just in case 
-                if (ReadObj.containsKey(readId))
-                   Log.warnln("More than one read node with readId=\""+readId+"\", using latest node." );
-
-                // add this into the list of read objects
-                ReadObj.put(readId, readObj);
-
-             }
-
-            // Note that we DONT need to check for IdRef here, it should be  
-            // impossible to have readIdRef on DataAttributes AND then hit a skipChar
-            // command.
-
-             DataIOStyleAttribs.clear(); // clear out table 
              CurrentFormatObjectList.add(readObj);
 
           }
@@ -4320,6 +4249,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.45  2001/07/30 19:24:39  thomas
+ * bug fix: read obj not init'ing if didnt have readId!
+ *
  * Revision 1.44  2001/07/30 18:28:11  thomas
  * Fix for XDF_sample4 reading: cloned read object child axes need to be the ones in the parent array, not default cloned ones.
  *
