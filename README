@@ -45,8 +45,8 @@
 	http://tarantella.gsfc.nasa.gov/xml/XDFhome.html
 
 
-  CVS Repository Access
-  ---------------------
+  CVS Repository and Guest FTP Access
+  -----------------------------------
 
 	Read only access to the nightly snapshot is allowed for people who
 	have downloaded this code once from the main site. The CVS account
@@ -65,6 +65,10 @@
 	Note that you only have to use "cvs login" step ONCE. Thereafter, only
 	the last step is needed to obtain a copy from CVS.
 
+	Access to the nightly snapshot via FTP is via the "guest" account is also
+        available from xdf.gsfc.nasa.gov. Use your email address as a password to
+        log in.
+        
 
    Credits
    -------
