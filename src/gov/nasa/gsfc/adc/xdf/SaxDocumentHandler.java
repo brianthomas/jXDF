@@ -1541,7 +1541,7 @@ Log.errorln("");
        startElementHandlerHashtable.put(XDFNodeName.TD8, new dataTagStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.TEXTDELIMITER, new asciiDelimiterStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.UNIT, new unitStartElementHandlerFunc());
-       startElementHandlerHashtable.put(XDFNodeName.UNITS, new nullStartElementHandlerFunc());
+       startElementHandlerHashtable.put(XDFNodeName.UNITS, new unitsStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.UNITLESS, new nullStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUE, new valueStartElementHandlerFunc());
        startElementHandlerHashtable.put(XDFNodeName.VALUEGROUP, new valueGroupStartElementHandlerFunc());
@@ -4221,6 +4221,64 @@ while (iter.hasNext()) {
        }
     }
 
+    // UNITS
+    //
+
+    class unitsStartElementHandlerFunc implements StartElementHandlerAction {
+       public Object action (SaxDocumentHandler handler, Attributes attrs) 
+       throws SAXException
+       {
+
+          //  grab parent node name
+          String parentNodeName = getParentNodeName();
+
+          // create new object appropriately 
+          Units newunits = new Units();
+          newunits.setAttributes(attrs);
+
+          // determine where this goes and then insert it 
+          if( parentNodeName.equals(XDFNodeName.PARAMETER) )
+          {
+
+              LastParameterObject.setUnits(newunits);
+
+          } else if ( parentNodeName.equals(XDFNodeName.FIELD) )
+          {
+
+              LastFieldObject.setUnits(newunits);
+
+          } else if ( parentNodeName.equals(XDFNodeName.AXIS) )
+          {
+
+            // yes, axis is correct here, cant add units to a fieldAxis 
+              // (only to fields!)
+              List axisList = (List) CurrentArray.getAxes();
+              AxisInterface lastAxisObject = (AxisInterface) axisList.get(axisList.size()-1);
+              if(lastAxisObject instanceof Axis) {
+                  ((Axis) lastAxisObject).setAxisUnits(newunits);
+              } else {
+                 Log.errorln("Tried to add Unit to FieldAxis!! Aborting!");
+                 System.exit(-1);
+              }
+
+          } else if ( parentNodeName.equals(XDFNodeName.ARRAY) )
+          {
+
+              CurrentArray.setUnits(newunits);
+
+          } else {
+
+              Log.warnln("Unknown grandparent object, cant add unit, ignoring.");
+
+          }
+
+//          LastUnitObject = newunit;
+
+          return newunits;
+
+       }
+    }
+
     // VALUE 
     //
 
@@ -4782,6 +4840,12 @@ while (iter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.65  2001/10/02 20:17:36  thomas
+ * merged from ver017 branch
+ *
+ * Revision 1.64.2.1  2001/10/02 20:13:20  thomas
+ *  implemented Units stuf
+ *
  * Revision 1.64  2001/10/01 17:03:00  thomas
  * added capabilty to add external, delmited data; small fix to trim off whitespace before running the Integer.parseInt stuff in addData..
  *

@@ -48,11 +48,12 @@ public interface AxisInterface {
 /* Modification History:
  *
  * $Log$
- * Revision 1.12  2001/10/02 19:52:16  thomas
- * added clone
+ * Revision 1.13  2001/10/02 20:17:36  thomas
+ * merged from ver017 branch
  *
- * Revision 1.11.4.1  2001/10/02 17:54:46  thomas
- * added clone to interface
+ *
+ * Revision 1.11.2.1  2001/10/02 18:17:45  thomas
+ * added clone
  *
  * Revision 1.11  2001/09/13 21:39:25  thomas
  * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
