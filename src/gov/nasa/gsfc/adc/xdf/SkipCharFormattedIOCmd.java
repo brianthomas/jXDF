@@ -25,6 +25,7 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import java.util.Hashtable;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.ArrayList;
@@ -116,6 +117,7 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
                                    String newNodeNameString,
                                    String noChildObjectNodeName
                                 )
+  throws java.io.IOException
   {
 
     boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
@@ -173,6 +175,10 @@ public class SkipCharFormattedIOCmd extends BaseObject implements FormattedIOCmd
 /* Modification History:
  *
  * $Log$
+ * Revision 1.9  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.8  2001/05/10 21:40:20  thomas
  * added resetXMLAttributes to init().
  * replaced specificIOStyleToXDF w/ appropriate

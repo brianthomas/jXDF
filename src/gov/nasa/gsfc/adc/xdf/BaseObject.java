@@ -227,23 +227,29 @@ public abstract class BaseObject implements Serializable, Cloneable {
       Uses toXMLOutputStream. The passed hashtable will be used to initialize the
       attributes of the XML declaration in the output XDF file.
   */
-  public void toXMLFile (String filename, Hashtable XMLDeclAttribs) {
+  public void toXMLFile (String filename, Hashtable XMLDeclAttribs) 
+  throws java.io.IOException
+  {
 
     // open file writer
-    try {
+ //   try {
       FileOutputStream fileout = new FileOutputStream(filename);
       toXMLOutputStream(fileout, XMLDeclAttribs);
       fileout.close();
+/*
     } catch (IOException e) {
       Log.error("Error: toXMLFile method hash trouble writing to "+ filename + " for writing.");
     }
+*/
 
   }
 
   /** A different invokation style. It has defaults for the XML Declaration
       setting standalone to "no" and version to the value of sXMLSpecVersion.
   */
-  public void toXMLFile (String filename) {
+  public void toXMLFile (String filename) 
+  throws java.io.IOException
+  {
 
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
@@ -270,6 +276,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
                                    String newNodeNameString,
                                    String noChildObjectNodeName
                                 )
+  throws java.io.IOException
   {
 
     //while writing out, attribHash should not be changed
@@ -456,6 +463,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
                                   Hashtable XMLDeclAttribs,
                                   String indent
                                 )
+  throws java.io.IOException
   {
      toXMLOutputStream(outputstream, XMLDeclAttribs, indent, false, null, null);
 
@@ -465,6 +473,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
       the indicated OutputStream.
   */
   public void toXMLOutputStream (OutputStream outputstream, Hashtable XMLDeclAttribs)
+  throws java.io.IOException
   {
      //not reseanable to set the indent to Specification.getInstance().isPrettyXDFOutput()Indentation --k.z. 10/17
      toXMLOutputStream(outputstream, XMLDeclAttribs, new String(""), false, null, null);
@@ -474,6 +483,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
       setting standalone to "no" and version to the value of sXMLSpecVersion.
   */
   public void toXMLOutputStream (OutputStream outputstream, String indent)
+  throws java.io.IOException
   {
      // prepare XMLDeclaration
      Hashtable XMLDeclAttribs = new Hashtable();
@@ -488,6 +498,7 @@ public abstract class BaseObject implements Serializable, Cloneable {
       Indentation starts as "".
   */
   public void toXMLOutputStream (OutputStream outputstream)
+  throws java.io.IOException
   {
 
      // prepare XMLDeclaration
@@ -707,27 +718,37 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** Write message out to specified OutputStream Object.
   */
   //declare as proteced, sub-classes may use --k.z. 10/17/2000
-  protected void writeOut ( OutputStream outputstream, String msg ) {
-    try {
+  protected void writeOut ( OutputStream outputstream, String msg ) 
+  throws java.io.IOException
+  {
+ //   try {
       outputstream.write(msg.getBytes());
+/*
     } catch (IOException e) {
       Log.error("Error: couldnt open OutputStream for writing");
     }
+*/
   }
 
-  protected void writeOut ( OutputStream outputstream, char c ) {
-    try {
+  protected void writeOut ( OutputStream outputstream, char c ) 
+  throws java.io.IOException
+  {
+ //   try {
       outputstream.write(c);
+/*
     } catch (IOException e) {
       Log.error("Error: couldnt open OutputStream for writing");
     }
+*/
   }
 
   /** Write out string object formatted so it may be a proper XML 
       (XDF) string in a node attribute. Basically, newLine and carriageReturn
       entities are substituted in for appropriate characters. 
    */
-  protected void writeOutAttribute ( OutputStream outputstream, String text) {
+  protected void writeOutAttribute ( OutputStream outputstream, String text) 
+  throws java.io.IOException
+  {
 
      StringCharacterIterator iter = new StringCharacterIterator(text);
 
@@ -748,7 +769,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** Method determines if any of the group objects to which the passed object
       belongs are already opened and opens them If they arent already opened.
   */
-  protected String dealWithOpeningGroupNodes (BaseObject obj, OutputStream outputstream, String indent) {
+  protected String dealWithOpeningGroupNodes (BaseObject obj, OutputStream outputstream, String indent) 
+  throws java.io.IOException
+  {
 
     StringBuffer newIndent = new StringBuffer(indent);
 
@@ -777,7 +800,9 @@ public abstract class BaseObject implements Serializable, Cloneable {
   /** Method determines if any of the currently open group objects
       belong to the current object and closes them if they arent.
   */
-  protected String dealWithClosingGroupNodes (BaseObject obj, OutputStream outputstream, String indent) {
+  protected String dealWithClosingGroupNodes (BaseObject obj, OutputStream outputstream, String indent) 
+  throws java.io.IOException
+  {
 
     // Should *both* groupMemberHash and openGroupNodeHash be synchronized??
     synchronized(obj.groupMemberHash) {
@@ -852,6 +877,10 @@ public abstract class BaseObject implements Serializable, Cloneable {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.48  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.47  2001/07/06 18:31:47  thomas
  * Fixed bug in group printing in toXMLOutputStream.
  *

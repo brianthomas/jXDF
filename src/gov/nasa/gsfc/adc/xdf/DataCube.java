@@ -592,6 +592,7 @@ public class DataCube extends BaseObject {
                                      String newNodeNameString,
                                      String noChildObjectNodeName
                                   )
+    throws java.io.IOException
     {
   
       boolean writeHrefAttribute = false;
@@ -1042,6 +1043,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
 			       int which,
                                AxisInterface fastestAxis,
                                String[] noDataValues)
+  throws java.io.IOException
   {
 
     int nrofNoDataValues = noDataValues.length;
@@ -1132,6 +1134,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                                     String[] noDataValues,
                                     boolean writeCDATAStatement
                                   ) 
+  throws java.io.IOException
   {
 
     int nrofNoDataValues = noDataValues.length;
@@ -1193,6 +1196,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                                    String[] noDataValues,
                                    boolean writeCDATAStatement 
                                   )
+   throws java.io.IOException
    {
 
       int nrofNoDataValues = noDataValues.length;
@@ -1325,6 +1329,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
 
    private void doSkipCharFormattedIOCmdOutput ( OutputStream outputstream, 
                                                  SkipCharFormattedIOCmd skipCharCommand)
+   throws java.io.IOException
    {
        writeOut(outputstream, skipCharCommand.getOutput());
    }
@@ -1344,7 +1349,7 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
                                                  String intFlagType,
                                                  Locator locator
                                                ) 
-   throws NoDataException
+   throws NoDataException, java.io.IOException
    {
 
          String output = null;
@@ -1643,6 +1648,10 @@ Log.debugln(" DataCube is expanding internal LongDataArray size to "+(newsize*2)
  /**
   * Modification History:
   * $Log$
+  * Revision 1.37  2001/07/06 19:04:23  thomas
+  * toXMLOutputStream and related methods now pass on IOExceptions
+  * to the application writer (e.g. they throw the error).
+  *
   * Revision 1.36  2001/06/27 21:19:45  thomas
   * Implimented writing of compressed data to external file (GZIP, Zip only).
   *

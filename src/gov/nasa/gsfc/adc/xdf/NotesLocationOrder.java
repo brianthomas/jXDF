@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
 import java.io.OutputStream;
+import java.io.IOException; 
 
 /** A simple object for storing the order in which axis are arranged
     for note objects. 
@@ -82,6 +83,7 @@ public class NotesLocationOrder extends BaseObject {
                                     String newNodeNameString,
                                     String noChildObjectNodeName
                                   ) 
+   throws java.io.IOException
    {
 
       String nodeNameString = this.classXDFNodeName;
@@ -148,6 +150,10 @@ public class NotesLocationOrder extends BaseObject {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.7  2001/05/10 21:19:44  thomas
  * added resetXMLAttributes to init().
  *

@@ -27,6 +27,7 @@ package gov.nasa.gsfc.adc.xdf;
 import java.util.Hashtable;
 import java.util.List;
 import java.io.OutputStream;
+import java.io.IOException; 
 
 /** handles tagged IO
  *  @version $Revision$
@@ -120,6 +121,7 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
   //PROTECTED Methods
   //
    protected void specificIOStyleToXDF( OutputStream outputstream,String indent)
+   throws java.io.IOException
    {
 
       boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
@@ -171,6 +173,10 @@ public class TaggedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.15  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.14  2001/06/18 21:34:09  thomas
  * changes reflecting new getIOAxesOrder in parent and cleanup
  * of specificIO method output.

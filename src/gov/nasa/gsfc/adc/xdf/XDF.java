@@ -26,6 +26,7 @@ package gov.nasa.gsfc.adc.xdf;
 
 // import java.util.ArrayList;
 import java.io.OutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -128,6 +129,7 @@ public class XDF extends Structure implements XDFInterface {
                                    String newNodeNameString,
                                    String noChildObjectNodeName
                                 )
+   throws java.io.IOException
    {
 
        //  To be valid XML, we always start an XML block with an
@@ -197,6 +199,7 @@ public class XDF extends Structure implements XDFInterface {
   protected void writeXMLDeclToOutputStream ( OutputStream outputstream,
                                             Hashtable XMLDeclAttribs
                                           )
+  throws java.io.IOException
   {
 
     // initial statement
@@ -330,6 +333,10 @@ public class XDF extends Structure implements XDFInterface {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.3  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.2  2001/05/10 21:44:07  thomas
  * small change to constructors related to inheritance.
  * moved appropriate code for XMLDecl writing to

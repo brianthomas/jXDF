@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 import java.io.OutputStream;
+import java.io.IOException; 
 
 /** This abstract class indicates how records are to be read/written
  * back out into XDF formatted XML files.
@@ -172,6 +173,7 @@ public abstract class XMLDataIOStyle extends BaseObject {
                                    String newNodeNameString,
                                    String noChildObjectNodeName
                                 )
+  throws java.io.IOException
   {
     boolean niceOutput = Specification.getInstance().isPrettyXDFOutput();
     String myIndent;
@@ -319,13 +321,18 @@ public abstract class XMLDataIOStyle extends BaseObject {
   }
 
 
-  protected abstract void specificIOStyleToXDF(OutputStream out, String indent);
+  protected abstract void specificIOStyleToXDF(OutputStream out, String indent)
+  throws java.io.IOException; 
 
 }
 
 /* Modification History:
  *
  * $Log$
+ * Revision 1.21  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.20  2001/06/19 19:29:22  thomas
  * *** empty log message ***
  *

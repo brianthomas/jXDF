@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Hashtable;
 import java.io.OutputStream;
+import java.io.IOException;
 
 /**
      The base object class for XDF objects which may hold internal XML elements.
@@ -117,6 +118,7 @@ public abstract class BaseObjectWithXMLElements extends BaseObject implements Cl
                                    String newNodeNameString,
                                    String noChildObjectNodeName
                                  )
+   throws java.io.IOException
    {
       // while writing out, attribHash should not be changed
       synchronized (attribHash) {

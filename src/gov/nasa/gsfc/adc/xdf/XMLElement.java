@@ -29,6 +29,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 import java.io.OutputStream;
+import java.io.IOException;
 
 //import org.apache.crimson.tree.ElementNode;
 import org.xml.sax.AttributeList;
@@ -114,6 +115,7 @@ public class XMLElement extends BaseObjectWithXMLElements {
                                    String newNodeNameString,
                                    String noChildObjectNodeName
                                 )
+   throws java.io.IOException
    {
 
 
@@ -154,6 +156,10 @@ public class XMLElement extends BaseObjectWithXMLElements {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.4  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.3  2001/06/28 16:50:54  thomas
  * changed add method(s) to return boolean.
  *

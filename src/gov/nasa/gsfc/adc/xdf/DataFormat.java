@@ -26,6 +26,7 @@
 package gov.nasa.gsfc.adc.xdf;
 
 import java.io.OutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -176,7 +177,9 @@ import java.util.Hashtable;
                                     boolean dontCloseNode,
                                     String newNodeNameString,
                                     String noChildObjectNodeName
-   ) {
+   ) 
+   throws java.io.IOException
+   {
  
      String nodeNameString = classXDFNodeName;
      // 1. open this node, print its simple XML attributes
@@ -260,6 +263,10 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.16  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.15  2001/05/10 21:09:38  thomas
  * added resetXMLAttributes to init().
  *

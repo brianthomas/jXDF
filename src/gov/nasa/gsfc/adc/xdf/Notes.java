@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import java.io.OutputStream;
+import java.io.IOException; 
 
 /**
  *  
@@ -156,6 +157,7 @@ public class Notes extends BaseObject implements NotesInterface {
                                    String newNodeNameString,
                                    String noChildObjectNodeName
                                  )
+   throws java.io.IOException
    {
 
       if( getNoteList().size() > 0 ) {
@@ -194,6 +196,10 @@ public class Notes extends BaseObject implements NotesInterface {
  /* Modification History:
   *
   * $Log$
+  * Revision 1.10  2001/07/06 19:04:23  thomas
+  * toXMLOutputStream and related methods now pass on IOExceptions
+  * to the application writer (e.g. they throw the error).
+  *
   * Revision 1.9  2001/06/26 21:22:25  huang
   * changed return type to boolean for all addObject()
   *

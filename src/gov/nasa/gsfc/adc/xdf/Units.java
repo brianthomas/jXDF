@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import java.io.OutputStream;
+import java.io.IOException;
 
 /**
  *  handles a list of units
@@ -236,7 +237,7 @@ import java.io.OutputStream;
                                    Hashtable XMLDeclAttribs,
                                    String indent
                                  )
-
+  throws java.io.IOException
   {
     super.toXMLOutputStream( outputstream,
                              XMLDeclAttribs,
@@ -279,6 +280,10 @@ import java.io.OutputStream;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.16  2001/06/26 21:22:26  huang
  * changed return type to boolean for all addObject()
  *

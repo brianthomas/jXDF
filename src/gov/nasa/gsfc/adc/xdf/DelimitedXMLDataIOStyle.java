@@ -129,7 +129,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    //PROTECTED methods
    //
 
-   protected void specificIOStyleToXDF( OutputStream outputstream,String indent) {
+   protected void specificIOStyleToXDF( OutputStream outputstream,String indent) 
+   throws java.io.IOException
+   {
 
       int stop = getIOAxesOrder().size()-1;
       synchronized (attribHash) {
@@ -145,7 +147,9 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
    // PRIVATE methods
    //
 
-   private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) {
+   private void nestedToXDF(OutputStream outputstream, String indent, int which, int stop) 
+   throws java.io.IOException
+   {
 
      String delimiter = getDelimiter();
      String repeatable = getRepeatable();
@@ -230,6 +234,10 @@ public class DelimitedXMLDataIOStyle extends XMLDataIOStyle {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.14  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.13  2001/06/18 21:33:18  thomas
  * changes reflecting new getIOAxesOrder in parent.
  *

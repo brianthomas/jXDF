@@ -27,6 +27,7 @@ package gov.nasa.gsfc.adc.xdf;
 
 import java.util.Hashtable;
 import java.io.OutputStream;
+import java.io.IOException; 
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -162,6 +163,7 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
                                    String newNodeNameString,
                                    String noChildObjectNodeName
                                 )
+  throws java.io.IOException
   {
 
      if (Specification.getInstance().isPrettyXDFOutput()) {
@@ -224,6 +226,10 @@ public class RepeatFormattedIOCmd extends BaseObject implements FormattedIOCmd {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.10  2001/07/06 19:04:23  thomas
+ * toXMLOutputStream and related methods now pass on IOExceptions
+ * to the application writer (e.g. they throw the error).
+ *
  * Revision 1.9  2001/06/28 16:50:54  thomas
  * changed add method(s) to return boolean.
  *
