@@ -59,7 +59,7 @@ import java.util.Vector;
   *      "star 3" 2 --> -|
   *      "star 4" 3 --> -|
   *      "star 5" 4 --> -|
-  *        "star 6" 5 --> -|       7
+  *      "star 6" 5 --> -|       7
   *         .     . --> -|
   *         .     . --> -|
   *         .     . --> -|
@@ -1138,8 +1138,8 @@ import java.util.Vector;
     }
 
     /**
-     * @return a record, an array of object 
-     * e.g. a row or a column of data in a 2-d table
+     * @return a record, an array of object; 
+     * e.g. a row or a column of data in a 2-d table.
      * In general, this record could be along any axis and the
      * data value in each cell along the axis could be anything,
      * we use an object represent the data value;
@@ -1168,9 +1168,9 @@ import java.util.Vector;
 
 	// get each dataCell value as an object
 	Object [] record = new Object [length];
+	int [] dataCellPosition = anyValidAxisPosition;
 	for (int i = 0; i<length; i++) {
 	    Locator lo = new Locator(this);
-	    int [] dataCellPosition = anyValidAxisPosition;
 	    dataCellPosition [axisIndex] = i + axisStart;
 	    record[i]=getData(dataCellPosition);
 	}
@@ -1349,6 +1349,9 @@ import java.util.Vector;
 
    }
 
+   /**
+    * Ping: is fieldAxis supposed to be at 0 if any???
+    */
    public FieldAxis getFieldAxis() {
 
        FieldAxis fieldAxis = null;
