@@ -756,12 +756,15 @@ import java.util.Vector;
        return removeFromList(index, getParameters(), PARAMETERLIST_XML_ATTRIBUTE_NAME);
    }
    
-   /**A convenience method that returns an array ref of non-negative INTEGERS
+   /*A convenience method that returns an array ref of non-negative INTEGERS
       which are the maximum index values along each dimension (FieldAxis and Axis objects).
     */
+   // should use the locator to find this information
+/*
    public int[] getMaxDataIndices () {
        return getDataCube().getMaxDataIndex();
    }
+*/
    
    /** insert a Note object into the list of notes in this Array object
     * @param n - Note to be added
@@ -1417,6 +1420,9 @@ import java.util.Vector;
 /**
   * Modification History:
   * $Log$
+  * Revision 1.37  2001/09/18 17:41:23  thomas
+  * removed maxDataIndex convience method
+  *
   * Revision 1.36  2001/09/13 21:39:25  thomas
   * name change to either XMLAttribute, XMLNotation, XDFEntity, XMLElementNode class forced small change in this file
   *
