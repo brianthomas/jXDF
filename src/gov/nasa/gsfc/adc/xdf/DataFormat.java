@@ -42,6 +42,7 @@ import java.util.Hashtable;
    //
 
    /* XML attribute names */
+/*
    protected static final String LESSTHANVALUE_XML_ATTRIBUTE_NAME = new String("lessThanValue");
    protected static final String LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME = new String("lessThanOrEqualValue");
    protected static final String GREATERTHANVALUE_XML_ATTRIBUTE_NAME = new String("greaterThanValue");
@@ -49,6 +50,7 @@ import java.util.Hashtable;
    protected static final String INFINITEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteValue");
    protected static final String INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME = new String("infiniteNegativeValue");
    protected static final String NODATAVALUE_XML_ATTRIBUTE_NAME = new String("noDataValue");
+*/
 
    //
    //Fields
@@ -74,6 +76,7 @@ import java.util.Hashtable;
    //
  
    public abstract int numOfBytes(); //return the number of bytes
+/*
    public  abstract void setLessThanValue(Object Obj);
    public  abstract void setLessThanOrEqualValue(Object Obj);
    public  abstract void setGreaterThanValue(Object Obj) ;
@@ -81,6 +84,7 @@ import java.util.Hashtable;
    public  abstract void setInfiniteValue(Object Obj) ;
    public  abstract void setInfiniteNegativeValue(Object Obj) ;
    public  abstract void setNoDataValue(Object Obj) ;
+*/
 
    //
    // Public Get/Set Methods
@@ -98,6 +102,7 @@ import java.util.Hashtable;
    /**
     * @return the current *lessThanValue* attribute
     */
+/*
    public Object getLessThanValue()
    {
       return ((XMLAttribute) attribHash.get(LESSTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
@@ -106,6 +111,7 @@ import java.util.Hashtable;
    /**
     * @return the current *lessThanOrEqualValue* attribute
     */
+/*
    public Object getlessThanOrEqualValue()
    {
      return ((XMLAttribute) attribHash.get(LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
@@ -114,6 +120,7 @@ import java.util.Hashtable;
    /**
     * @return the current *greaterThanValue* attribute
     */
+/*
    public Object getGreaterThanValue()
    {
      return ((XMLAttribute) attribHash.get(GREATERTHANVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
@@ -122,6 +129,7 @@ import java.util.Hashtable;
     /**
     * @return the current *greaterThanOrEqualValue* attribute
     */
+/*
    public Object getGreaterThanOrEqualValue()
    {
      return ((XMLAttribute) attribHash.get(GREATERTHANOREQUALVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
@@ -130,6 +138,7 @@ import java.util.Hashtable;
     /**
     * @return the current *infiniteValue* attribute
     */
+/*
    public Object getInfiniteValue()
    {
      return ((XMLAttribute) attribHash.get(INFINITEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
@@ -138,18 +147,22 @@ import java.util.Hashtable;
     /**
     * @return the current *infiniteNegativeValue* attribute
     */
+/*
    public Object getInfiniteNegativeValue()
    {
      return ((XMLAttribute) attribHash.get(INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
+*/
  
    /**
     * @return the current *noDataValue* attribute
     */
+/*
    public Object getNoDataValue()
    {
      return ((XMLAttribute) attribHash.get(NODATAVALUE_XML_ATTRIBUTE_NAME)).getAttribValue();
    }
+*/
  
    //
    // Other Public Methods
@@ -217,6 +230,7 @@ import java.util.Hashtable;
      // order matters! these are in *reverse* order of their
      // occurence in the XDF DTD
      //the order of the attributes that all sub-classses should have
+/*
      attribOrder.add(0, NODATAVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, INFINITEVALUE_XML_ATTRIBUTE_NAME);
@@ -224,7 +238,9 @@ import java.util.Hashtable;
      attribOrder.add(0, GREATERTHANVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME);
      attribOrder.add(0, LESSTHANVALUE_XML_ATTRIBUTE_NAME);
+*/
  
+/*
      // typing here is just filler for latter
      attribHash.put( LESSTHANVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
      attribHash.put( LESSTHANOREQUALVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
@@ -233,6 +249,7 @@ import java.util.Hashtable;
      attribHash.put( INFINITEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
      attribHash.put( INFINITENEGATIVEVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
      attribHash.put( NODATAVALUE_XML_ATTRIBUTE_NAME, new XMLAttribute(null, Constants.STRING_TYPE));
+*/
  
    }
  
@@ -241,6 +258,12 @@ import java.util.Hashtable;
  /* Modification History:
  *
  * $Log$
+ * Revision 1.13  2001/04/27 21:28:57  thomas
+ * No longer has get/set methods for lessthan, etc.
+ * These are in Array and Field classes as per the DTD
+ * (for now, we plan to move them back into Dataformat
+ * for 0.20 DTD).
+ *
  * Revision 1.12  2001/02/07 18:44:04  thomas
  * Converted XML attribute decl
  * to use constants (final static fields within the object). These
