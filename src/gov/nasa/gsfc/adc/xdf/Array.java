@@ -399,11 +399,8 @@ import java.util.*;
       return null;
 
     getDataCube().incrementDimension(axis );  //increment the DataCube dimension by 1
-    if (hasFieldAxis()) {
-      getAxisList().add(1,axis);
-    }
-    else
-      getAxisList().add(0,axis);
+
+    getAxisList().add(axis);
     return axis;
   }
 
@@ -494,8 +491,9 @@ import java.util.*;
    * Returns a SCALAR ARRAY REF of SCALARS (non-negative INTEGERS) which are the maximum index
    * values along each dimension (FieldAxis and Axis objects).
    */
-  public List getMaxDataIndices () {
+  public int[] getMaxDataIndices () {
     return getDataCube().getMaxDataIndex();
+
   }
 
  /** addNote: insert an XDF::Note object into the list of notes in this Array object
