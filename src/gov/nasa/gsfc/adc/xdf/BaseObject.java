@@ -397,16 +397,16 @@ public abstract class BaseObject implements Serializable {
     // 0. To be valid XML, we always start an XML block with an
     //    XML declaration (e.g. somehting like "<?xml standalone="no"?>").
     //    Here we deal with  printing out XML Declaration && its attributes
-    if (!XMLDeclAttribs.isEmpty()) {
+    if ((XMLDeclAttribs !=null) &&(!XMLDeclAttribs.isEmpty())) {
         indent = "";
         writeXMLDeclToOutputStream(outputstream, XMLDeclAttribs);
-    } 
+    }
 
     // 1. open this node, print its simple XML attributes
     if (nodeNameString != null) {
 
-      if (sPrettyXDFOutput) writeOut(outputstream, indent); // indent node if desired
-
+      if (sPrettyXDFOutput)
+        writeOut(outputstream, indent); // indent node if desired
       // For printing the opening statement we need to invoke a little
       // Voodoo to keep the DTD happy: the first structure node is always
       // called by the root node name instead of the usual nodeNameString
@@ -446,13 +446,22 @@ public abstract class BaseObject implements Serializable {
     ArrayList childObjs = (ArrayList) xmlInfo.get("childObjList");
     String pcdata = (String) xmlInfo.get("PCDATA");
 
+    //it is the simplest node, with opening/closing node, no child, no PCDATA
+    if ( childObjs.size() == 0 && pcdata == null && noChildObjectNodeName == null){
+      writeOut(outputstream, "></" + nodeNameString + ">");
+      if (sPrettyXDFOutput)
+        writeOut(outputstream, Constants.NEW_LINE);
+      return ;
+    }
+
     if ( childObjs.size() > 0 || pcdata != null || noChildObjectNodeName != null)
     {
 
       // close the opening tag
       if (nodeNameString != null) {
         writeOut(outputstream, ">");
-        if (sPrettyXDFOutput && pcdata == null) writeOut(outputstream, Constants.NEW_LINE);
+        if ((sPrettyXDFOutput) && (pcdata == null)  && (childObjs.size() !=0))
+          writeOut(outputstream, Constants.NEW_LINE);
       }
 
       // deal with object/list XML attributes, if any in our list
@@ -512,19 +521,21 @@ public abstract class BaseObject implements Serializable {
           } else {
             writeOut(outputstream, "</"+nodeNameString+">");
           }
-         if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
-         return ; //now we are done, return!
+        if (sPrettyXDFOutput)
+          writeOut(outputstream, Constants.NEW_LINE);
+        return ; //now we are done, return!
         //k.z. 10/18/2000
       };
 
       // if there are no PCDATA or child objects/nodes then
-      // we print out noChildObjectNodeName
+      // we print out noChildObjectNodeName and close the node
       if ( childObjs.size() == 0 && pcdata == null && noChildObjectNodeName != null)
       {
-        if (sPrettyXDFOutput) writeOut(outputstream, indent);
         writeOut(outputstream, "<" + noChildObjectNodeName + "/>");
-        if (sPrettyXDFOutput) writeOut(outputstream, Constants.NEW_LINE);
-
+        writeOut(outputstream, "</"+nodeNameString + ">");
+        if (sPrettyXDFOutput)
+          writeOut(outputstream, Constants.NEW_LINE);
+        return ;
       }
 
       // ok, now deal with closing the node
@@ -613,7 +624,7 @@ public abstract class BaseObject implements Serializable {
   /** Clone an XDF object.
    */
   protected Object clone () {
- 
+
      BaseObject cloneObj = null;
 
      try {
@@ -630,7 +641,7 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
        {
            Object key = keys.nextElement();
            XMLAttribute XMLAttributeValue = (XMLAttribute) this.attribHash.get((String) key);
-           cloneObj.attribHash.put((String) key, XMLAttributeValue.clone()); 
+           cloneObj.attribHash.put((String) key, XMLAttributeValue.clone());
        }
 
 
@@ -638,10 +649,10 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
 //       cloneObj.attribOrder = this.attribOrder;
 //       cloneObj.groupMemberHash = Collections.synchronizedSet(new HashSet());
 //       cloneObj.openGroupNodeHash = Collections.synchronizedSet(new HashSet());
-       
+
   /** This field stores object references to those group objects to which a given
       object belongs.
-  */    
+  */
 
 
      } catch (java.lang.CloneNotSupportedException e) {
@@ -768,18 +779,21 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
           }
         }
         else {
-          if(obj.attribType == Constants.NUMBER_TYPE) {  //it's an attribute of Number type
+          if(obj.attribType == Constants.NUMBER_TYPE ||
+             obj.attribType == Constants.STRING_OR_NUMBER_TYPE) {  //it's an attribute of Number type
             Hashtable item = new Hashtable();
             item.put("name", attribName);
             item.put("value", obj.attribValue.toString());
             attribList.add(item);
           }
-          else {// it's an obj ref, add to list
-            Hashtable item = new Hashtable();
-            item.put("name", attribName);
-            item.put("value", obj.attribValue);
-            item.put("type", obj.attribType);
-            objRefList.add(item);
+          else {// add to list if it is not an empty list  -k.z.
+            if ((obj.attribType !=Constants.LIST_TYPE) || (((List)obj.attribValue).size()!=0)) {
+              Hashtable item = new Hashtable();
+              item.put("name", attribName);
+              item.put("value", obj.attribValue);
+              item.put("type", obj.attribType);
+              objRefList.add(item);
+            }
           }
         }
       }
@@ -806,7 +820,7 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
    */
   // NOTE: this is essentially the Perl update method
   protected void setXMLAttributes (AttributeList attrs) {
-     // set object attributes from an AttributeList 
+     // set object attributes from an AttributeList
      if (attrs != null) {
         // whip thru the list, setting each value
         for (int i = 0; i < attrs.getLength (); i++)
@@ -988,6 +1002,11 @@ Log.errorln("CLONING Orig:"+this+" Clone:"+cloneObj);
 /* Modification History:
  *
  * $Log$
+ * Revision 1.17  2000/10/27 21:07:57  kelly
+ * --fixed a bug in *toXDF* when writing out <units><unitless></units>
+ * --fixed a bug when writing out the simplest node
+ * --add STRING_OR_NUMBER_TYPE in *toXDF*  -k.z.
+ *
  * Revision 1.16  2000/10/25 21:47:53  thomas
  * Minor bug fix. Sync up method removeMemberObject
  * name from Group.java. -b.t.
