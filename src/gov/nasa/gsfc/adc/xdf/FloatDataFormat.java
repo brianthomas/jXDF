@@ -179,7 +179,10 @@ public class FloatDataFormat extends NumberDataFormat {
     */
    public Integer getExponent()
    {
-      return (Integer) ((Attribute) attribHash.get(EXPONENT_XML_ATTRIBUTE_NAME)).getAttribValue();
+      Integer exponent = (Integer) ((Attribute) attribHash.get(EXPONENT_XML_ATTRIBUTE_NAME)).getAttribValue();
+      if (exponent == null) 
+         exponent = new Integer(DEFAULT_EXPONENT);
+      return exponent;
    }
 
    /** Get the DecimalFormat pattern for nice output of negative float numbers  
@@ -325,7 +328,8 @@ public class FloatDataFormat extends NumberDataFormat {
 
     attribHash.put(WIDTH_XML_ATTRIBUTE_NAME, new Attribute( new Integer(DEFAULT_WIDTH), Constants.INTEGER_TYPE));
     attribHash.put(PRECISION_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_PRECISION), Constants.INTEGER_TYPE));
-    attribHash.put(EXPONENT_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_EXPONENT), Constants.INTEGER_TYPE));
+    // attribHash.put(EXPONENT_XML_ATTRIBUTE_NAME, new Attribute(new Integer(DEFAULT_EXPONENT), Constants.INTEGER_TYPE));
+    attribHash.put(EXPONENT_XML_ATTRIBUTE_NAME, new Attribute(null, Constants.INTEGER_TYPE));
 
     generateFormatPattern();
 
@@ -337,6 +341,9 @@ public class FloatDataFormat extends NumberDataFormat {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.8  2001/09/18 17:43:32  thomas
+ * small change to prevent exponent attrib from writing out if undefined
+ *
  * Revision 1.7  2001/09/13 22:18:37  thomas
  * added isPrimiativeFloat() method and some checking on width when precision is set
  *
