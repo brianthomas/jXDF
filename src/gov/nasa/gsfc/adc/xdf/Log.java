@@ -1,8 +1,6 @@
+
 // XDF Log Class
 // CVS $Id$
-package gov.nasa.gsfc.adc.xdf;
-import java.util.*;
-import java.io.*;
 
 // Log.java Copyright (C) 2000 Brian Thomas,
 // ADC/GSFC-NASA, Code 631, Greenbelt MD, 20771
@@ -24,18 +22,30 @@ import java.io.*;
 
 */
 
+package gov.nasa.gsfc.adc.xdf;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.IOException;
+
+import java.util.Properties;
 
 /**
- * Log.java: to handle debug, error msg, etc. There are four priority levels for
- * messages--error|warn|debug|info with priority error>warn>debug>info. The
- * default setting for msg handling is that only error msgs are printed out to
- * standard System.out.  The user can supply a configuration file for this Log
- * to read from.  A sample of the configuration file is included--XDFLogConfig.
- * contributor: Kelly Zeng (kelly.zeng@commerceone.com)
- * @version $Revision$
+   General purpose class to handle various levels of program messaging.
+   There are four priority levels for
+   messages--error|warn|debug|info with priority error>warn>debug>info. The
+   default setting for msg handling is that only error msgs are printed out to
+   standard System.out.  The user can supply a configuration file for this Log
+   to read from.  A sample of the configuration file is included--XDFLogConfig.
+   contributor: Kelly Zeng (kelly.zeng@commerceone.com)
+   @version $Revision$
  */
 
- /**
+ /** SAMPLE XDFLogConfig file :  
+
  # this is a sample of the XDF log configuration file
  # Output could be either a file for the log messages to write to or
  # standard System.out, for example
