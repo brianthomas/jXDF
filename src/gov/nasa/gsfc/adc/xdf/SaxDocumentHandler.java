@@ -165,9 +165,9 @@ public class SaxDocumentHandler extends DefaultHandler {
     private int CurrentInputReadSize = 0; // how big the current byte buffer should be for reading
     private int NrofDataFormats;
     private int[] IntRadix;
-    private int LastFastAxisCoordinate;
+//    private int LastFastAxisCoordinate;
+//    private AxisInterface FastestAxis;
     private int LastFieldAxisCoordinate;
-    private AxisInterface FastestAxis;
     private ArrayList AxisReadOrder;
 
     // lookup tables holding objects that have id/idref stuff
@@ -1484,7 +1484,6 @@ Log.errorln("");
 
 // this stuff slows down the parser too much to leave commented in.
 // uncomment as needed
-/*
 Log.info("Add Data:["+thisString+"] (");
 List axes = dataLocator.getIterationOrder();
 Iterator liter = axes.iterator();
@@ -1493,7 +1492,6 @@ while (liter.hasNext()) {
    Log.info(dataLocator.getAxisIndex(axis)+ " ["+axis.getAxisId()+"],");
 }
 Log.infoln(") ["+CurrentDataFormat+"]");
-*/
 
        // Note that we dont treat binary data at all here 
        try {
@@ -2514,7 +2512,7 @@ Log.errorln(" TValue:"+valueString);
              TaggedLocatorObj.next();
 
           // bump up DataFormat appropriately
-          if (MaxDataFormatIndex > 0) { 
+          if (CurrentArray.hasFieldAxis()) { 
 
              int currentFieldAxisCoordinate = TaggedLocatorObj.getAxisIndex(CurrentArray.getFieldAxis());
              if ( currentFieldAxisCoordinate != LastFieldAxisCoordinate ) 
@@ -2676,12 +2674,15 @@ Log.errorln(" TValue:"+valueString);
                formatObj instanceof FormattedXMLDataIOStyle ) 
           {
 
+              FieldAxis fieldAxis = null;
+              boolean hasFieldAxis = false;
 
               // determine the size of the dataFormat (s) in our dataCube
               if (CurrentArray.hasFieldAxis()) {
                  // if there is a field axis, then its set to the number of fields
-                 FieldAxis fieldAxis = CurrentArray.getFieldAxis();
+                 fieldAxis = CurrentArray.getFieldAxis();
                  MaxDataFormatIndex = (fieldAxis.getLength()-1);
+                 hasFieldAxis = true;
               } else {
                  // its homogeneous 
                  MaxDataFormatIndex = 0;
@@ -2690,12 +2691,6 @@ Log.errorln(" TValue:"+valueString);
               Locator myLocator = CurrentArray.createLocator();
               myLocator.setIterationOrder(AxisReadOrder); // shouldnt be needed now, havent checked tho 
 
-/*
-Iterator thisIter = AxisReadOrder.iterator();
-while(thisIter.hasNext()) {
-  Log.debugln("ReadAxis: "+((AxisInterface) thisIter.next()).getAxisId());
-}
-*/
               CurrentDataFormatIndex = 0; 
               ArrayList strValueList;
 
@@ -2733,20 +2728,20 @@ while(thisIter.hasNext()) {
                  String thisData = (String) iter.next();
                  addDataToCurrentArray(myLocator, thisData, CurrentDataFormat, IntRadix[CurrentDataFormatIndex]);
 
+                 myLocator.next();
+
                  // bump up DataFormat appropriately
-                 if (MaxDataFormatIndex > 0) {
-                    int currentFastAxisCoordinate = myLocator.getAxisIndex(FastestAxis);
-                    if ( currentFastAxisCoordinate != LastFastAxisCoordinate )
+                 if (hasFieldAxis) {
+                    int currentFieldAxisCoordinate = myLocator.getAxisIndex(fieldAxis);
+                    if ( currentFieldAxisCoordinate != LastFieldAxisCoordinate )
                     {
-                       LastFastAxisCoordinate = currentFastAxisCoordinate;
+                       LastFieldAxisCoordinate = currentFieldAxisCoordinate;
                        if (CurrentDataFormatIndex == MaxDataFormatIndex)
                           CurrentDataFormatIndex = 0;
                        else
                           CurrentDataFormatIndex++;
                     }
                  }
-
-                 myLocator.next();
 
               }
 
@@ -2875,9 +2870,9 @@ while(thisIter.hasNext()) {
           }
 
           XMLDataIOStyle readObj = CurrentArray.getXMLDataIOStyle();
-          FastestAxis = (AxisInterface) CurrentArray.getAxes().get(0);
-          LastFastAxisCoordinate = 0;   // for Delimited/Formatted Data
-          LastFieldAxisCoordinate = 0; // for TaggedData 
+//          FastestAxis = (AxisInterface) CurrentArray.getAxes().get(0);
+//          LastFastAxisCoordinate = 0;   
+          LastFieldAxisCoordinate = 0;
 
           if ( readObj instanceof TaggedXMLDataIOStyle) {
 
@@ -3192,8 +3187,9 @@ while(thisIter.hasNext()) {
              if (name.equals("axisIdRef") ) {
                 //int lastindex = AxisReadOrder.size();
                 //AxisReadOrder.add(lastindex, AxisObj.get(attrs.getValue(i)));
-                 AxisReadOrder.add(0, AxisObj.get(attrs.getValue(i)));
-                 Log.debugln("Adding AxisId:"+name);
+                 String axisId = attrs.getValue(i);
+                 AxisReadOrder.add(0, AxisObj.get(axisId));
+                 Log.debugln("Adding AxisId to AxisReadOrder:"+axisId);
              } else 
                  Log.warnln("Warning: got weird attribute:"+name+" on for node");
           } 
@@ -4508,6 +4504,9 @@ while(thisIter.hasNext()) {
 /* Modification History:
  *
  * $Log$
+ * Revision 1.53  2001/09/18 19:36:29  thomas
+ * intermediate code, may fail for delmited/formatted data
+ *
  * Revision 1.52  2001/09/18 17:46:45  thomas
  * fixes for tagged data, small speed up for binary numbers fix
  *
